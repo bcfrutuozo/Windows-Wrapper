@@ -92,3 +92,52 @@ Window::Window(int width, int height, const char* name)
 		throw;
 	}
 }
+
+Window::~Window()
+{
+	DestroyWindow(m_Handle);
+}
+
+void Window::SetTitle(const char* title)
+{
+	if (SetWindowText(m_Handle, title) == 0)
+	{
+		// TODO: IMPLEMENT WINDOW EXCEPTION TYPE
+		throw;
+	}
+}
+
+void Window::EnableCursor() noexcept
+{
+	m_IsCursorEnabled = true;
+	ShowCursor();
+	FreeCursor();
+}
+
+void Window::DisableCursor() noexcept
+{
+	m_IsCursorEnabled = false;
+	HideCursor();
+	EncloseCursor();
+}
+
+std::optional<int> Window::ProcessMessages()
+{
+	MSG msg;
+
+	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+	{
+		// Check for quit message because PeekMessage doesn't signal it via return val
+		if (msg.message == WM_QUIT)
+		{
+			return static_cast<int>(msg.wParam);
+		}
+
+		// Translate and dispatch messages
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+
+	// Return empty optional when not exiting application
+	return {};
+}
