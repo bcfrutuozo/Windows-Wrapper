@@ -361,5 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/DataStructures/Graphics.cpp
-/DataStructures/Graphics.h
+/Windows-Wrapper/Graphics.cpp
+/Windows-Wrapper/Graphics.h
