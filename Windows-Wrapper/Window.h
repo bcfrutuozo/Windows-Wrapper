@@ -47,12 +47,24 @@ private:
 	LRESULT WINAPI HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 
 	// Events implementations
+	void OnActivate_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	void OnClose_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	void OnClosing_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	void OnClosed_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	void OnFocusEnter_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	void OnFocusLeave_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+	void OnKeyDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+	void OnKeyPressed_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+	void OnKeyUp_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	void OnMouseMove_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+	void OnMouseLeftDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+	void OnMouseLeftUp_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+	void OnMouseRightDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+	void OnMouseRightUp_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+	void OnMouseLeftDoubleClick_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+	void OnMouseRightDoubleClick_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+	void OnMouseWheel_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+	void OnRawInput_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 
 	bool m_IsCursorEnabled;
 	int m_Width;
@@ -69,6 +81,24 @@ protected:
 		return true;
 	}
 
+	virtual void OnActivation() const
+	{
+		if (m_IsCursorEnabled)
+		{
+			EncloseCursor();
+			HideCursor();
+		}
+	};
+
+	virtual void OnDeactivation() const
+	{
+		if (m_IsCursorEnabled)
+		{
+			FreeCursor();
+			ShowCursor();
+		}
+	};
+
 	virtual void OnClose() const {};
 
 	virtual void OnClosed() const {};
@@ -81,7 +111,11 @@ protected:
 
 	virtual void OnFocusLeave() const {};
 
-	virtual void OnPaint() const {};
+	virtual void OnKeyDown() const {};
+
+	virtual void OnKeyPressed() const {};
+
+	virtual void OnKeyUp() const {};
 
 	virtual void OnMouseMove() const {};
 
@@ -97,9 +131,9 @@ protected:
 
 	virtual void OnMouseRightDoubleClick() const {};
 
-	virtual void OnKeyDown() const {};
+	virtual void OnMouseWheel() const {};
 
-	virtual void OnKeyUp(int key, int keyData) const {};
+	virtual void OnPaint() const {};
 
 public:
 

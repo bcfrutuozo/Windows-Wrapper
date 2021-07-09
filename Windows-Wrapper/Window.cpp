@@ -83,7 +83,6 @@ Window::Window(int width, int height, const char* name)
 
 	ShowWindow(m_Handle, SW_SHOWDEFAULT);
 
-
 	// TODO: THIS IS WHERE THE GRAPHICS DEVICE, CONTEXT, RENDER TARGET, DEPTHSTENCIL (MAYBE) WILL BE INSTANTIATED.
 	// YES: THIS IS GONNA TAKE SOME TIME DO DESIGN
 	// AND YES AS WELL: WILL BE PROBABLY POORLY DONE :( 
@@ -233,6 +232,12 @@ LRESULT WINAPI Window::HandleMessageForwarder(HWND hWnd, UINT msg, WPARAM lParam
 	return pWnd->HandleMessage(hWnd, msg, lParam, wParam);
 }
 
+// Event handling implementation
+void Window::OnActivate_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+{
+
+}
+
 void Window::OnClose_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
 	PostQuitMessage(0);
@@ -255,7 +260,27 @@ void Window::OnFocusEnter_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 
 void Window::OnFocusLeave_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
+	// Clear key state when window loses focus to prevent input getting "stuck" 
 	m_Keyboard->ClearState();
+}
+
+void Window::OnKeyDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+{
+	// Filter AutoRepeat key events
+	if (!(lParam & 0x40000000) || m_Keyboard->IsAutoRepeatEnabled())
+	{
+		m_Keyboard->OnKeyPressed(static_cast<unsigned char>(wParam));
+	}
+}
+
+void Window::OnKeyPressed_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+{
+	m_Keyboard->OnChar(static_cast<unsigned char>(wParam));
+}
+
+void Window::OnKeyUp_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+{
+	m_Keyboard->OnKeyReleased(static_cast<unsigned char>(wParam));
 }
 
 void Window::OnMouseMove_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -301,188 +326,233 @@ void Window::OnMouseMove_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 }
 
+void Window::OnMouseLeftDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+{
+	SetForegroundWindow(m_Handle);
+
+	if (!m_IsCursorEnabled)
+	{
+		EncloseCursor();
+		HideCursor();
+	}
+
+	const POINTS pt = MAKEPOINTS(lParam);
+	m_Mouse->OnLeftPressed(pt.x, pt.y);
+}
+
+void Window::OnMouseLeftUp_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+{
+	const POINTS pt = MAKEPOINTS(lParam);
+	m_Mouse->OnLeftReleased(pt.x, pt.y);
+}
+
+void Window::OnMouseRightDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+{
+	const POINTS pt = MAKEPOINTS(lParam);
+	m_Mouse->OnRightPressed(pt.x, pt.y);
+}
+
+void Window::OnMouseRightUp_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+{
+	const POINTS pt = MAKEPOINTS(lParam);
+	m_Mouse->OnRightReleased(pt.x, pt.y);
+}
+
+void Window::OnMouseLeftDoubleClick_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+{
+
+}
+
+void Window::OnMouseRightDoubleClick_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+{
+
+}
+
+void Window::OnMouseWheel_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+{
+	const POINTS pt = MAKEPOINTS(lParam);
+
+	if (GET_WHEEL_DELTA_WPARAM(wParam) > 0)
+	{
+		m_Mouse->OnWheelUp(pt.x, pt.y);
+	}
+	else if (GET_WHEEL_DELTA_WPARAM(wParam) < 0)
+	{
+		m_Mouse->OnWheelDown(pt.x, pt.y);
+	}
+}
+
+void Window::OnRawInput_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+{
+	if (!m_Mouse->IsRawEnabled())
+	{
+		return;
+	}
+
+	UINT size = 0;
+	// First get the size of the input data
+	if (GetRawInputData(
+		reinterpret_cast<HRAWINPUT>(lParam),
+		RID_INPUT,
+		nullptr,
+		&size,
+		sizeof(RAWINPUTHEADER)) == -1)
+	{
+		// Ignore messaging errors
+		return;
+	}
+	m_RawBuffer.resize(size);
+
+	// Read in the input data
+	if (GetRawInputData(
+		reinterpret_cast<HRAWINPUT>(lParam),
+		RID_INPUT,
+		m_RawBuffer.data(),
+		&size,
+		sizeof(RAWINPUTHEADER)) != size)
+	{
+		// Ignore messaging errors
+		return;
+	}
+
+	// Process the raw input data
+	const auto& ri = reinterpret_cast<const RAWINPUT&>(*m_RawBuffer.data());
+	if (ri.header.dwType == RIM_TYPEMOUSE &&
+		(ri.data.mouse.lLastX != 0 || ri.data.mouse.lLastY != 0))
+	{
+		m_Mouse->OnRawDelta(ri.data.mouse.lLastX, ri.data.mouse.lLastY);
+	}
+}
+
 LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
 	switch (msg)
-	{
-		// Exit message to be handled in application class
-	case WM_CLOSE: OnClose_Impl(hWnd, msg, wParam, lParam); OnClose(); return 0;
+	{	
+	case WM_CLOSE: OnClose_Impl(hWnd, msg, wParam, lParam); OnClose(); return 0;		// Exit message to be handled in application class
 	case WM_DESTROY: OnClosing_Impl(hWnd, msg, wParam, lParam); OnClosing(); break;
 	case WM_NCDESTROY: OnClosed_Impl(hWnd, msg, wParam, lParam); OnClosed(); break;
 	case WM_SETFOCUS: OnFocusEnter_Impl(hWnd, msg, wParam, lParam); OnFocusEnter(); break;
-		// Clear key state when window loses focus to prevent input getting "stuck" 
 	case WM_KILLFOCUS: OnFocusLeave_Impl(hWnd, msg, wParam, lParam); OnFocusLeave(); break;
-
-	case WM_ACTIVATE:
-	{
-		// Confine/Free cursor on window to foreground/background if cursor disabled
-		if (m_IsCursorEnabled)
-		{
-			if (wParam & WA_ACTIVE)
-			{
-				EncloseCursor();
-				HideCursor();
-			}
-			else
-			{
-				FreeCursor();
-				ShowCursor();
-			}
-		}
-
-		break;
-	}
-
-	/************************ KEYBOARD MESSAGES ************************/
-
+	case WM_ACTIVATE: OnActivate_Impl(hWnd, msg, wParam, lParam); (wParam & WA_ACTIVE) ? OnActivation() : OnDeactivation(); break;
+		/******************** KEYBOARD MESSAGES *********************/
 	case WM_KEYDOWN:
-		// Syskey commands need to be handled to track ALT key (VK_MENU)
-	case WM_SYSKEYDOWN:
-	{
-		// Filter AutoRepeat key events
-		if (!(lParam & 0x40000000) || m_Keyboard->IsAutoRepeatEnabled())
-		{
-			m_Keyboard->OnKeyPressed(static_cast<unsigned char>(wParam));
-		}
-
-		break;
-	}
-
+	case WM_SYSKEYDOWN: OnKeyDown_Impl(hWnd, msg, wParam, lParam); OnKeyDown(); break;	// Syskey commands need to be handled to track ALT key (VK_MENU)
 	case WM_KEYUP:
-		// Syskey commands need to be handled to track ALT key (VK_MENU)
-	case WM_SYSKEYUP:
-	{
-		m_Keyboard->OnKeyReleased(static_cast<unsigned char>(wParam));
-		break;
-	}
+	case WM_SYSKEYUP: OnKeyUp_Impl(hWnd, msg, wParam, lParam); OnKeyUp(); break;		// Syskey commands need to be handled to track ALT key (VK_MENU)
+	case WM_CHAR: OnKeyPressed_Impl(hWnd, msg, wParam, lParam); OnKeyPressed(); break;
+		/******************* END KEYBOARD MESSAGES ******************/
+		/********************** MOUSE MESSAGES **********************/
+	case WM_MOUSEMOVE: 	OnMouseMove_Impl(hWnd, msg, wParam, lParam); OnMouseMove(); break;
+	case WM_LBUTTONDOWN: OnMouseLeftDown_Impl(hWnd, msg, wParam, lParam); OnMouseLeftDown(); break;
+	case WM_LBUTTONUP: OnMouseLeftUp_Impl(hWnd, msg, wParam, lParam); OnMouseLeftUp(); break;
+	case WM_RBUTTONDOWN: OnMouseRightDown_Impl(hWnd, msg, wParam, lParam); OnMouseRightDown(); break;
+	case WM_RBUTTONUP: OnMouseRightUp_Impl(hWnd, msg, wParam, lParam); OnMouseRightUp(); break;
+	case WM_LBUTTONDBLCLK: OnMouseLeftDoubleClick_Impl(hWnd, msg, wParam, lParam); OnMouseLeftDoubleClick(); break;
+	case WM_RBUTTONDBLCLK: OnMouseRightDoubleClick_Impl(hWnd, msg, wParam, lParam); OnMouseRightDoubleClick(); break;
+	case WM_MOUSEWHEEL: OnMouseWheel_Impl(hWnd, msg, wParam, lParam); OnMouseWheel(); break;
+		/******************** END MOUSE MESSAGES ********************/
+		/******************** RAW MOUSE MESSAGES ********************/
+	case WM_INPUT: OnRawInput_Impl(hWnd, msg, wParam, lParam); break;
+		/****************** END RAW MOUSE MESSAGES ******************/
 
-	case WM_CHAR:
+	case WM_SIZE:
 	{
-		m_Keyboard->OnChar(static_cast<unsigned char>(wParam));
-		break;
-	}
+		int width = LOWORD(lParam);
+		int height = HIWORD(lParam);
 
-	/********************** END KEYBOARD MESSAGES **********************/
+		// Get the window and client dimensions
+		RECT window;
+		RECT window2;
 
-	/********************** MOUSE MESSAGES **********************/
-	case WM_MOUSEMOVE:
-	{
-		OnMouseMove_Impl(hWnd, msg, wParam, lParam);
-		OnMouseMove();
-		break;
-	}
+		GetWindowRect(hWnd, &window);
+		GetClientRect(hWnd, &window2);
 
-	case WM_LBUTTONDOWN:
-	{
-		SetForegroundWindow(m_Handle);
-		if (!m_IsCursorEnabled)
+		if (width < (height * m_Width) / m_Height)
 		{
-			EncloseCursor();
-			HideCursor();
-		}
+			// Calculate desired window width and height
+			int border = (window.right - window.left) -
+				window2.right;
+			int header = (window.bottom - window.top) -
+				window2.bottom;
+			width = ((height * m_Width) / m_Height) + border;
+			height = height + header; // + toolbar.rect.bottom
 
-		const POINTS pt = MAKEPOINTS(lParam);
-		m_Mouse->OnLeftPressed(pt.x, pt.y);
-
-		break;
-	}
-
-	case WM_RBUTTONDOWN:
-	{
-		{
-			const POINTS pt = MAKEPOINTS(lParam);
-			m_Mouse->OnRightPressed(pt.x, pt.y);
-		}
-
-		break;
-	}
-
-	case WM_LBUTTONUP:
-	{
-		const POINTS pt = MAKEPOINTS(lParam);
-		m_Mouse->OnLeftReleased(pt.x, pt.y);
-
-		break;
-	}
-
-	case WM_RBUTTONUP:
-	{
-		const POINTS pt = MAKEPOINTS(lParam);
-		m_Mouse->OnRightReleased(pt.x, pt.y);
-
-		break;
-	}
-
-	case WM_MOUSEWHEEL:
-	{
-		const POINTS pt = MAKEPOINTS(lParam);
-		
-		if (GET_WHEEL_DELTA_WPARAM(wParam) > 0)
-		{
-			m_Mouse->OnWheelUp(pt.x, pt.y);
-		}
-		else if (GET_WHEEL_DELTA_WPARAM(wParam) < 0)
-		{
-			m_Mouse->OnWheelDown(pt.x, pt.y);
+			// Set new dimensions
+			SetWindowPos(hWnd, NULL, 0, 0,
+				width, height,
+				SWP_NOMOVE | SWP_NOZORDER);
 		}
 
 		break;
 	}
-
-	/******************** END MOUSE MESSAGES ********************/
-
-	/******************** RAW MOUSE MESSAGES ********************/
-
-	case WM_INPUT:
+	case WM_SIZING:
 	{
-		if (!m_Mouse->IsRawEnabled())
+		PRECT rectp = (PRECT)lParam;
+
+		RECT window;
+		RECT window2;
+
+		// Get the window and client dimensions
+		GetWindowRect(hWnd, &window);
+		GetClientRect(hWnd, &window2);
+
+		// Edges
+		int border = (window.right - window.left) -
+			window2.right;
+		int header = (window.bottom - window.top) -
+			window2.bottom;
+
+		// Window minimum width and height
+		int width = m_Width + border;
+		int height = m_Width + header; // + toolbar.rect.bottom +
+
+		// Minimum size
+		if (rectp->right - rectp->left < width)
+			rectp->right = rectp->left + width;
+
+		if (rectp->bottom - rectp->top < height)
+			rectp->bottom = rectp->top + height;
+
+		// Maximum width
+		if (rectp->right - rectp->left > 1 + border)
+			rectp->right = rectp->left + 1 + border;
+
+		// Offered width and height
+		width = rectp->right - rectp->left;
+		height = rectp->bottom - rectp->top;
+
+		switch (wParam)
 		{
+		case WMSZ_LEFT:
+		case WMSZ_RIGHT:
+			height = (((width - border) * m_Height) / m_Width) +
+				+header; // + toolbar.rect.bottom +
+			rectp->bottom = rectp->top + height;
 			break;
-		}
 
-		UINT size = 0;
-		// First get the size of the input data
-		if (GetRawInputData(
-			reinterpret_cast<HRAWINPUT>(lParam),
-			RID_INPUT,
-			nullptr,
-			&size,
-			sizeof(RAWINPUTHEADER)) == -1)
-		{
-			// Ignore messaging errors
+		case WMSZ_TOP:
+		case WMSZ_BOTTOM:
+
+			//  width = ((((height - toolbar.rect.bottom) - header) *
+			width = ((((height)-header) *
+				m_Width) / m_Height) + border;
+			rectp->right = rectp->left + width;
 			break;
-		}
-		m_RawBuffer.resize(size);
 
-		// Read in the input data
-		if (GetRawInputData(
-			reinterpret_cast<HRAWINPUT>(lParam),
-			RID_INPUT,
-			m_RawBuffer.data(),
-			&size,
-			sizeof(RAWINPUTHEADER)) != size)
-		{
-			// Ignore messaging errors
+		default:
+			// width = ((((height - toolbar.rect.bottom) - header) *
+			width = ((((height)-header) *
+				m_Width) / m_Height) + border;
+			rectp->right = rectp->left + width;
 			break;
-		}
-
-		// Process the raw input data
-		const auto& ri = reinterpret_cast<const RAWINPUT&>(*m_RawBuffer.data());
-		if (ri.header.dwType == RIM_TYPEMOUSE &&
-			(ri.data.mouse.lLastX != 0 || ri.data.mouse.lLastY != 0))
-		{
-			m_Mouse->OnRawDelta(ri.data.mouse.lLastX, ri.data.mouse.lLastY);
-		}
-
+		}		
 
 		break;
 	}
 
-	/****************** END RAW MOUSE MESSAGES ******************/
-
 	}
 
-	return DefWindowProc(hWnd, msg, wParam, lParam);;
+	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
 // Exceptions
@@ -514,7 +584,7 @@ const std::string& Window::WindowException::TranslateErrorCode(HRESULT hr) noexc
 	// Free windows buffer
 	LocalFree(pMessageBuffer);
 
-	return pMessageBuffer;
+	return errorString;
 }
 
 Window::HRException::HRException(int line, const char* file, HRESULT hr) noexcept
