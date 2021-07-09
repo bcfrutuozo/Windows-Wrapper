@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Common.h"
+#include "dxerr.h"
 
 #pragma warning(disable:4265)
 #include <wrl.h>

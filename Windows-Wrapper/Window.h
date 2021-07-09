@@ -46,13 +46,60 @@ private:
 	static LRESULT WINAPI HandleMessageForwarder(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	LRESULT WINAPI HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 
+	// Events implementations
+	void OnClose_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+	void OnClosing_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+	void OnClosed_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+	void OnFocusEnter_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+	void OnFocusLeave_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+	void OnMouseMove_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+
 	bool m_IsCursorEnabled;
 	int m_Width;
 	int m_Height;
 	HWND m_Handle;
 	std::unique_ptr<Keyboard> m_Keyboard;
 	std::unique_ptr<Mouse> m_Mouse;
-	std::vector<BYTE> rawBuffer;
+	std::vector<BYTE> m_RawBuffer;
+
+protected:
+
+	bool OnCreate(LPCREATESTRUCT lpCreateStruct)
+	{
+		return true;
+	}
+
+	virtual void OnClose() const {};
+
+	virtual void OnClosed() const {};
+
+	virtual void OnClosing() const {};
+
+	virtual void OnDestroy() const {};
+
+	virtual void OnFocusEnter() const {};
+
+	virtual void OnFocusLeave() const {};
+
+	virtual void OnPaint() const {};
+
+	virtual void OnMouseMove() const {};
+
+	virtual void OnMouseLeftDown() const {};
+
+	virtual void OnMouseLeftUp() const {};
+
+	virtual void OnMouseRightDown() const {};
+
+	virtual void OnMouseRightUp() const {};
+
+	virtual void OnMouseLeftDoubleClick() const {};
+
+	virtual void OnMouseRightDoubleClick() const {};
+
+	virtual void OnKeyDown() const {};
+
+	virtual void OnKeyUp(int key, int keyData) const {};
 
 public:
 

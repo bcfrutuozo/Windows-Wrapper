@@ -233,223 +233,254 @@ LRESULT WINAPI Window::HandleMessageForwarder(HWND hWnd, UINT msg, WPARAM lParam
 	return pWnd->HandleMessage(hWnd, msg, lParam, wParam);
 }
 
+void Window::OnClose_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+{
+	PostQuitMessage(0);
+}
+
+void Window::OnClosing_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+{
+
+}
+
+void Window::OnClosed_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+{
+
+}
+
+void Window::OnFocusEnter_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+{
+
+}
+
+void Window::OnFocusLeave_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+{
+	m_Keyboard->ClearState();
+}
+
+void Window::OnMouseMove_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+{
+	const POINTS pt = MAKEPOINTS(lParam);
+
+	// Cursorless exclusive gets first dibs
+	if (!m_IsCursorEnabled)
+	{
+		if (!m_Mouse->IsInWindow())
+		{
+			SetCapture(m_Handle);
+			m_Mouse->OnMouseEnter();
+			HideCursor();
+		}
+
+		return;
+	}
+
+	// Inside client region -> log move, and log enter + capture mouse (if not previously in window)
+	if (pt.x >= 0 && pt.x < m_Width && pt.y >= 0 && pt.y < m_Height)
+	{
+		m_Mouse->OnMouseMove(pt.x, pt.y);
+		if (!m_Mouse->IsInWindow())
+		{
+			SetCapture(hWnd);
+			m_Mouse->OnMouseEnter();
+		}
+	}
+	// Out of client region -> log move / maintain capture if button down
+	else
+	{
+		if (wParam & (MK_LBUTTON | MK_RBUTTON))
+		{
+			m_Mouse->OnMouseMove(pt.x, pt.y);
+		}
+		// Button up -> release capture / log event for leaving
+		else
+		{
+			ReleaseCapture();
+			m_Mouse->OnMouseLeave();
+		}
+	}
+}
+
 LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-	//switch (msg)
-	//{
-	//	// Exit message to be handled in application class
-	//case WM_DESTROY:
-	//case WM_CLOSE: PostQuitMessage(0); return 0;
+	switch (msg)
+	{
+		// Exit message to be handled in application class
+	case WM_CLOSE: OnClose_Impl(hWnd, msg, wParam, lParam); OnClose(); return 0;
+	case WM_DESTROY: OnClosing_Impl(hWnd, msg, wParam, lParam); OnClosing(); break;
+	case WM_NCDESTROY: OnClosed_Impl(hWnd, msg, wParam, lParam); OnClosed(); break;
+	case WM_SETFOCUS: OnFocusEnter_Impl(hWnd, msg, wParam, lParam); OnFocusEnter(); break;
+		// Clear key state when window loses focus to prevent input getting "stuck" 
+	case WM_KILLFOCUS: OnFocusLeave_Impl(hWnd, msg, wParam, lParam); OnFocusLeave(); break;
 
-	//	// Clear key state when window loses focus to prevent input getting "stuck" 
-	//case WM_KILLFOCUS: m_Keyboard->ClearState(); break;
+	case WM_ACTIVATE:
+	{
+		// Confine/Free cursor on window to foreground/background if cursor disabled
+		if (m_IsCursorEnabled)
+		{
+			if (wParam & WA_ACTIVE)
+			{
+				EncloseCursor();
+				HideCursor();
+			}
+			else
+			{
+				FreeCursor();
+				ShowCursor();
+			}
+		}
 
-	//case WM_ACTIVATE:
-	//{
-	//	// Confine/Free cursor on window to foreground/background if cursor disabled
-	//	if (m_IsCursorEnabled)
-	//	{
-	//		if (wParam & WA_ACTIVE)
-	//		{
-	//			EncloseCursor();
-	//			HideCursor();
-	//		}
-	//		else
-	//		{
-	//			FreeCursor();
-	//			ShowCursor();
-	//		}
-	//	}
+		break;
+	}
 
-	//	break;
-	//}
+	/************************ KEYBOARD MESSAGES ************************/
 
-	///************************ KEYBOARD MESSAGES ************************/
+	case WM_KEYDOWN:
+		// Syskey commands need to be handled to track ALT key (VK_MENU)
+	case WM_SYSKEYDOWN:
+	{
+		// Filter AutoRepeat key events
+		if (!(lParam & 0x40000000) || m_Keyboard->IsAutoRepeatEnabled())
+		{
+			m_Keyboard->OnKeyPressed(static_cast<unsigned char>(wParam));
+		}
 
-	//case WM_KEYDOWN:
-	//	// Syskey commands need to be handled to track ALT key (VK_MENU)
-	//case WM_SYSKEYDOWN:
-	//{
-	//	// Filter AutoRepeat key events
-	//	if (!(lParam & 0x40000000) || m_Keyboard->IsAutoRepeatEnabled())
-	//	{
-	//		m_Keyboard->OnKeyPressed(static_cast<unsigned char>(wParam));
-	//	}
+		break;
+	}
 
-	//	break;
-	//}
+	case WM_KEYUP:
+		// Syskey commands need to be handled to track ALT key (VK_MENU)
+	case WM_SYSKEYUP:
+	{
+		m_Keyboard->OnKeyReleased(static_cast<unsigned char>(wParam));
+		break;
+	}
 
-	//case WM_KEYUP:
-	//	// Syskey commands need to be handled to track ALT key (VK_MENU)
-	//case WM_SYSKEYUP:
-	//{
-	//	m_Keyboard->OnKeyReleased(static_cast<unsigned char>(wParam));
-	//	break;
-	//}
+	case WM_CHAR:
+	{
+		m_Keyboard->OnChar(static_cast<unsigned char>(wParam));
+		break;
+	}
 
-	//case WM_CHAR:
-	//{
-	//	m_Keyboard->OnChar(static_cast<unsigned char>(wParam));
-	//	break;
-	//}
+	/********************** END KEYBOARD MESSAGES **********************/
 
-	///********************** END KEYBOARD MESSAGES **********************/
+	/********************** MOUSE MESSAGES **********************/
+	case WM_MOUSEMOVE:
+	{
+		OnMouseMove_Impl(hWnd, msg, wParam, lParam);
+		OnMouseMove();
+		break;
+	}
 
-	///********************** MOUSE MESSAGES **********************/
-	//case WM_MOUSEMOVE:
-	//{
-	//	const POINTS pt = MAKEPOINTS(lParam);
+	case WM_LBUTTONDOWN:
+	{
+		SetForegroundWindow(m_Handle);
+		if (!m_IsCursorEnabled)
+		{
+			EncloseCursor();
+			HideCursor();
+		}
 
-	//	// Cursorless exclusive gets first dibs
-	//	if (!m_IsCursorEnabled)
-	//	{
-	//		if (!m_Mouse->IsInWindow())
-	//		{
-	//			SetCapture(m_Handle);
-	//			m_Mouse->OnMouseEnter();
-	//			HideCursor();
-	//		}
+		const POINTS pt = MAKEPOINTS(lParam);
+		m_Mouse->OnLeftPressed(pt.x, pt.y);
 
-	//		break;
-	//	}
+		break;
+	}
 
-	//	// Inside client region -> log move, and log enter + capture mouse (if not previously in window)
-	//	if (pt.x >= 0 && pt.x < m_Width && pt.y >= 0 && pt.y < m_Height)
-	//	{
-	//		m_Mouse->OnMouseMove(pt.x, pt.y);
-	//		if (!m_Mouse->IsInWindow())
-	//		{
-	//			SetCapture(hWnd);
-	//			m_Mouse->OnMouseEnter();
-	//		}
-	//	}
-	//	// Out of client region -> log move / maintain capture if button down
-	//	else
-	//	{
-	//		if (wParam & (MK_LBUTTON | MK_RBUTTON))
-	//		{
-	//			m_Mouse->OnMouseMove(pt.x, pt.y);
-	//		}
-	//		// Button up -> release capture / log event for leaving
-	//		else
-	//		{
-	//			ReleaseCapture();
-	//			m_Mouse->OnMouseLeave();
-	//		}
-	//	}
+	case WM_RBUTTONDOWN:
+	{
+		{
+			const POINTS pt = MAKEPOINTS(lParam);
+			m_Mouse->OnRightPressed(pt.x, pt.y);
+		}
 
-	//	break;
-	//}
+		break;
+	}
 
-	//case WM_LBUTTONDOWN:
-	//{
-	//	SetForegroundWindow(m_Handle);
-	//	if (!m_IsCursorEnabled)
-	//	{
-	//		EncloseCursor();
-	//		HideCursor();
-	//	}
+	case WM_LBUTTONUP:
+	{
+		const POINTS pt = MAKEPOINTS(lParam);
+		m_Mouse->OnLeftReleased(pt.x, pt.y);
 
-	//	const POINTS pt = MAKEPOINTS(lParam);
-	//	m_Mouse->OnLeftPressed(pt.x, pt.y);
+		break;
+	}
 
-	//	break;
-	//}
+	case WM_RBUTTONUP:
+	{
+		const POINTS pt = MAKEPOINTS(lParam);
+		m_Mouse->OnRightReleased(pt.x, pt.y);
 
-	//case WM_RBUTTONDOWN:
-	//{
-	//	{
-	//		const POINTS pt = MAKEPOINTS(lParam);
-	//		m_Mouse->OnRightPressed(pt.x, pt.y);
-	//	}
+		break;
+	}
 
-	//	break;
-	//}
+	case WM_MOUSEWHEEL:
+	{
+		const POINTS pt = MAKEPOINTS(lParam);
+		
+		if (GET_WHEEL_DELTA_WPARAM(wParam) > 0)
+		{
+			m_Mouse->OnWheelUp(pt.x, pt.y);
+		}
+		else if (GET_WHEEL_DELTA_WPARAM(wParam) < 0)
+		{
+			m_Mouse->OnWheelDown(pt.x, pt.y);
+		}
 
-	//case WM_LBUTTONUP:
-	//{
-	//	const POINTS pt = MAKEPOINTS(lParam);
-	//	m_Mouse->OnLeftReleased(pt.x, pt.y);
+		break;
+	}
 
-	//	break;
-	//}
+	/******************** END MOUSE MESSAGES ********************/
 
-	//case WM_RBUTTONUP:
-	//{
-	//	const POINTS pt = MAKEPOINTS(lParam);
-	//	m_Mouse->OnRightReleased(pt.x, pt.y);
+	/******************** RAW MOUSE MESSAGES ********************/
 
-	//	break;
-	//}
+	case WM_INPUT:
+	{
+		if (!m_Mouse->IsRawEnabled())
+		{
+			break;
+		}
 
-	//case WM_MOUSEWHEEL:
-	//{
-	//	const POINTS pt = MAKEPOINTS(lParam);
-	//	
-	//	if (GET_WHEEL_DELTA_WPARAM(wParam) > 0)
-	//	{
-	//		m_Mouse->OnWheelUp(pt.x, pt.y);
-	//	}
-	//	else if (GET_WHEEL_DELTA_WPARAM(wParam) < 0)
-	//	{
-	//		m_Mouse->OnWheelDown(pt.x, pt.y);
-	//	}
+		UINT size = 0;
+		// First get the size of the input data
+		if (GetRawInputData(
+			reinterpret_cast<HRAWINPUT>(lParam),
+			RID_INPUT,
+			nullptr,
+			&size,
+			sizeof(RAWINPUTHEADER)) == -1)
+		{
+			// Ignore messaging errors
+			break;
+		}
+		m_RawBuffer.resize(size);
 
-	//	break;
-	//}
+		// Read in the input data
+		if (GetRawInputData(
+			reinterpret_cast<HRAWINPUT>(lParam),
+			RID_INPUT,
+			m_RawBuffer.data(),
+			&size,
+			sizeof(RAWINPUTHEADER)) != size)
+		{
+			// Ignore messaging errors
+			break;
+		}
 
-	///******************** END MOUSE MESSAGES ********************/
-
-	///******************** RAW MOUSE MESSAGES ********************/
-
-	//case WM_INPUT:
-	//{
-	//	if (!m_Mouse->IsRawEnabled())
-	//	{
-	//		break;
-	//	}
-
-	//	UINT size = 0;
-	//	// First get the size of the input data
-	//	if (GetRawInputData(
-	//		reinterpret_cast<HRAWINPUT>(lParam),
-	//		RID_INPUT,
-	//		nullptr,
-	//		&size,
-	//		sizeof(RAWINPUTHEADER)) == -1)
-	//	{
-	//		// Ignore messaging errors
-	//		break;
-	//	}
-	//	rawBuffer.resize(size);
-
-	//	// Read in the input data
-	//	if (GetRawInputData(
-	//		reinterpret_cast<HRAWINPUT>(lParam),
-	//		RID_INPUT,
-	//		rawBuffer.data(),
-	//		&size,
-	//		sizeof(RAWINPUTHEADER)) != size)
-	//	{
-	//		// Ignore messaging errors
-	//		break;
-	//	}
-
-	//	// Process the raw input data
-	//	const auto& ri = reinterpret_cast<const RAWINPUT&>(*rawBuffer.data());
-	//	if (ri.header.dwType == RIM_TYPEMOUSE &&
-	//		(ri.data.mouse.lLastX != 0 || ri.data.mouse.lLastY != 0))
-	//	{
-	//		m_Mouse->OnRawDelta(ri.data.mouse.lLastX, ri.data.mouse.lLastY);
-	//	}
+		// Process the raw input data
+		const auto& ri = reinterpret_cast<const RAWINPUT&>(*m_RawBuffer.data());
+		if (ri.header.dwType == RIM_TYPEMOUSE &&
+			(ri.data.mouse.lLastX != 0 || ri.data.mouse.lLastY != 0))
+		{
+			m_Mouse->OnRawDelta(ri.data.mouse.lLastX, ri.data.mouse.lLastY);
+		}
 
 
-	//	break;
-	//}
+		break;
+	}
 
-	///****************** END RAW MOUSE MESSAGES ******************/
+	/****************** END RAW MOUSE MESSAGES ******************/
 
-	//}
+	}
 
 	return DefWindowProc(hWnd, msg, wParam, lParam);;
 }
