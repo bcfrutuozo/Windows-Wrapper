@@ -1,14 +1,15 @@
+#include "Common.h"
 #include "Application.h"
 
 int CALLBACK WinMain(
-	_In_ HINSTANCE cInstance,
-	_In_opt_ HINSTANCE pInstance,
-	_In_ LPSTR cmdLine,
-	_In_ int cmdShow)
+	_In_ HINSTANCE hInstance,
+	_In_opt_ HINSTANCE pPrevInstance,
+	_In_ LPSTR lpCmdLine,
+	_In_ int nCmdShow)
 {
 	try
 	{
-
+		return Application().Start();
 	}
 	catch (const std::exception& e)
 	{
