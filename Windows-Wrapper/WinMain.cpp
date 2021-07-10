@@ -1,4 +1,3 @@
-#include "Common.h"
 #include "Application.h"
 
 int CALLBACK WinMain(

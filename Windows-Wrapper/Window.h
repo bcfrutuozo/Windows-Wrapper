@@ -1,10 +1,11 @@
 #pragma once
 
+#include "Common.h"
+#include "Color.h"
 #include "Exception.h"
 #include "Keyboard.h"
 #include "Mouse.h"
 
-#include <Windows.h>
 #include <memory>
 #include <vector>
 #include <optional>
@@ -70,9 +71,14 @@ private:
 	int m_Width;
 	int m_Height;
 	HWND m_Handle;
+	RECT m_Rectangle;
 	std::unique_ptr<Keyboard> m_Keyboard;
 	std::unique_ptr<Mouse> m_Mouse;
 	std::vector<BYTE> m_RawBuffer;
+
+	// Set default as white
+	Color m_ForeColor = Color::White();
+
 
 protected:
 
@@ -135,6 +141,8 @@ protected:
 
 	virtual void OnPaint() const {};
 
+	virtual void OnResize() const {};
+
 public:
 
 	Window(int width, int height, const char* name);
@@ -145,6 +153,8 @@ public:
 	void SetTitle(const char* title);
 	void EnableCursor() noexcept;
 	void DisableCursor() noexcept;
+	Color GetForeColor() noexcept;
+	void SetForeColor(const Color& color) noexcept;
 	bool IsCursorEnabled() const noexcept;
 	Keyboard& GetKeyboard() noexcept;
 	Mouse& GetMouse() noexcept;

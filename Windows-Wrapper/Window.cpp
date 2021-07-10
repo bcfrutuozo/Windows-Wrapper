@@ -12,7 +12,7 @@ Window::WndClass::WndClass() noexcept
 {
 	WNDCLASSEX wc = { 0 };
 	wc.cbSize = sizeof(wc);
-	wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+	wc.style = CS_HREDRAW | CS_VREDRAW;
 	wc.lpfnWndProc = HandleMessageSetup;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
@@ -51,29 +51,28 @@ Window::Window(int width, int height, const char* name)
 	m_Mouse(std::make_unique<Mouse>())
 {
 	// Calculate window size based on desired client region
-	RECT wr;
-	wr.left = 100;
-	wr.right = width + wr.left;
-	wr.top = 100;
-	wr.bottom = height + wr.top;
-	if (AdjustWindowRect(&wr, WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU, FALSE) == 0)
+	m_Rectangle.left = 100;
+	m_Rectangle.right = width + m_Rectangle.left;
+	m_Rectangle.top = 100;
+	m_Rectangle.bottom = height + m_Rectangle.top;
+	if (AdjustWindowRect(&m_Rectangle, WS_OVERLAPPEDWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU, FALSE) == 0)
 	{
 		throw WND_LAST_EXCEPT();
 	}
 
 	// Create window and get its handle
 	m_Handle = CreateWindow(
-		WndClass::GetName(),
-		name,
-		WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		(wr.right - wr.left),
-		(wr.bottom - wr.top),
-		nullptr,
-		nullptr,
-		WndClass::GetInstance(),
-		this										// Pointer to the window instance to work along with HandleMessageSetup function. THIS IS THE #SURPRIIISOOOOOOO
+		WndClass::GetName(),																// Class name
+		name,																				// Window title
+		WS_OVERLAPPEDWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU,	// Style values
+		CW_USEDEFAULT,																		// X position
+		CW_USEDEFAULT,																		// Y position
+		(m_Rectangle.right - m_Rectangle.left),																// Width
+		(m_Rectangle.bottom - m_Rectangle.top),																// Height
+		nullptr,																			// Parent handle
+		nullptr,																			// Menu handle
+		WndClass::GetInstance(),															// Module instance handle
+		this																				// Pointer to the window instance to work along with HandleMessageSetup function. THIS IS THE #SURPRIIISOOOOOOO
 	);
 
 	if (m_Handle == nullptr)
@@ -110,6 +109,8 @@ void Window::SetTitle(const char* title)
 	{
 		throw WND_LAST_EXCEPT();
 	}
+
+	RedrawWindow(m_Handle, NULL, NULL, RDW_INVALIDATE | RDW_ERASE);
 }
 
 void Window::EnableCursor() noexcept
@@ -174,6 +175,16 @@ bool Window::IsCursorEnabled() const noexcept
 	return m_IsCursorEnabled;
 }
 
+Color Window::GetForeColor() noexcept
+{
+	return m_ForeColor;
+}
+
+void Window::SetForeColor(const Color& color) noexcept
+{
+	m_ForeColor = color;
+}
+
 Keyboard& Window::GetKeyboard() noexcept
 {
 	if (!m_Keyboard)
@@ -184,6 +195,7 @@ Keyboard& Window::GetKeyboard() noexcept
 
 	return *m_Keyboard;
 }
+
 
 Mouse& Window::GetMouse() noexcept
 {
@@ -454,98 +466,52 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		/******************** RAW MOUSE MESSAGES ********************/
 	case WM_INPUT: OnRawInput_Impl(hWnd, msg, wParam, lParam); break;
 		/****************** END RAW MOUSE MESSAGES ******************/
-
 	case WM_SIZE:
 	{
-		int width = LOWORD(lParam);
-		int height = HIWORD(lParam);
+		//int width = LOWORD(lParam);
+		//int height = HIWORD(lParam);
 
-		// Get the window and client dimensions
-		RECT window;
-		RECT window2;
+		//// Get the window and client dimensions
+		//RECT window;
+		//RECT window2;
 
-		GetWindowRect(hWnd, &window);
-		GetClientRect(hWnd, &window2);
+		//GetWindowRect(hWnd, &window);
+		//GetClientRect(hWnd, &window2);
 
-		if (width < (height * m_Width) / m_Height)
-		{
-			// Calculate desired window width and height
-			int border = (window.right - window.left) -
-				window2.right;
-			int header = (window.bottom - window.top) -
-				window2.bottom;
-			width = ((height * m_Width) / m_Height) + border;
-			height = height + header; // + toolbar.rect.bottom
+		//if (width < (height * m_Width) / m_Height)
+		//{
+		//	// Calculate desired window width and height
+		//	int border = (window.right - window.left) -
+		//		window2.right;
+		//	int header = (window.bottom - window.top) -
+		//		window2.bottom;
+		//	width = ((height * m_Width) / m_Height) + border;
+		//	height = height + header; // + toolbar.rect.bottom
 
-			// Set new dimensions
-			SetWindowPos(hWnd, NULL, 0, 0,
-				width, height,
-				SWP_NOMOVE | SWP_NOZORDER);
-		}
+		//	// Set new dimensions
+		//	SetWindowPos(hWnd, NULL, 0, 0,
+		//		width, height,
+		//		SWP_NOMOVE | SWP_NOZORDER);
+		//}
 
+		//break;
 		break;
 	}
 	case WM_SIZING:
 	{
-		PRECT rectp = (PRECT)lParam;
+		PRECT r = (PRECT)lParam;
 
-		RECT window;
-		RECT window2;
+		HBRUSH brush = CreateSolidBrush(RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
+		SetClassLongPtr(m_Handle, GCLP_HBRBACKGROUND, (LONG_PTR)brush);
 
-		// Get the window and client dimensions
-		GetWindowRect(hWnd, &window);
-		GetClientRect(hWnd, &window2);
+		break;
+	}
+	case WM_PAINT:
+	{
+		PRECT r = (PRECT)lParam;
 
-		// Edges
-		int border = (window.right - window.left) -
-			window2.right;
-		int header = (window.bottom - window.top) -
-			window2.bottom;
-
-		// Window minimum width and height
-		int width = m_Width + border;
-		int height = m_Width + header; // + toolbar.rect.bottom +
-
-		// Minimum size
-		if (rectp->right - rectp->left < width)
-			rectp->right = rectp->left + width;
-
-		if (rectp->bottom - rectp->top < height)
-			rectp->bottom = rectp->top + height;
-
-		// Maximum width
-		if (rectp->right - rectp->left > 1 + border)
-			rectp->right = rectp->left + 1 + border;
-
-		// Offered width and height
-		width = rectp->right - rectp->left;
-		height = rectp->bottom - rectp->top;
-
-		switch (wParam)
-		{
-		case WMSZ_LEFT:
-		case WMSZ_RIGHT:
-			height = (((width - border) * m_Height) / m_Width) +
-				+header; // + toolbar.rect.bottom +
-			rectp->bottom = rectp->top + height;
-			break;
-
-		case WMSZ_TOP:
-		case WMSZ_BOTTOM:
-
-			//  width = ((((height - toolbar.rect.bottom) - header) *
-			width = ((((height)-header) *
-				m_Width) / m_Height) + border;
-			rectp->right = rectp->left + width;
-			break;
-
-		default:
-			// width = ((((height - toolbar.rect.bottom) - header) *
-			width = ((((height)-header) *
-				m_Width) / m_Height) + border;
-			rectp->right = rectp->left + width;
-			break;
-		}		
+		HBRUSH brush = CreateSolidBrush(RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
+		SetClassLongPtr(m_Handle, GCLP_HBRBACKGROUND, (LONG_PTR)brush);
 
 		break;
 	}

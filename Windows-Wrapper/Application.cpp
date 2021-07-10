@@ -65,28 +65,55 @@ void Application::HandleInput(float dt)
 
 	if (!m_Window.IsCursorEnabled())
 	{
-		if (m_Window.GetKeyboard().IsKeyPressed('W'))
+		if (m_Window.GetKeyboard().IsKeyPressed('Q'))
 		{
+			Color x = m_Window.GetForeColor();
+			x.SetR(x.GetR() - 1);
+			
+			if (x.GetR() >= 0) m_Window.SetForeColor(x);
 			//cameras->Translate({ 0.0f, 0.0f, dt });
 		}
 		if (m_Window.GetKeyboard().IsKeyPressed('A'))
 		{
+			Color x = m_Window.GetForeColor();
+			x.SetG(x.GetG() - 1);
+
+			if (x.GetG() >= 0) m_Window.SetForeColor(x);
 			//cameras->Translate({ -dt, 0.0f, 0.0f });
+		}
+		if (m_Window.GetKeyboard().IsKeyPressed('Z'))
+		{
+			Color x = m_Window.GetForeColor();
+			x.SetB(x.GetB() - 1);
+
+			if(x.GetB() >= 0) m_Window.SetForeColor(x);
+			//cameras->Translate({ 0.0f, 0.0f, -dt });
+		}
+		if (m_Window.GetKeyboard().IsKeyPressed('W'))
+		{
+			Color x = m_Window.GetForeColor();
+			x.SetR(x.GetR() + 1);
+
+			if (x.GetR() < 256) m_Window.SetForeColor(x);
+
+			//cameras->Translate({ dt, 0.0f, 0.0f });
 		}
 		if (m_Window.GetKeyboard().IsKeyPressed('S'))
 		{
-			//cameras->Translate({ 0.0f, 0.0f, -dt });
-		}
-		if (m_Window.GetKeyboard().IsKeyPressed('D'))
-		{
-			//cameras->Translate({ dt, 0.0f, 0.0f });
-		}
-		if (m_Window.GetKeyboard().IsKeyPressed('R'))
-		{
+			Color x = m_Window.GetForeColor();
+			x.SetG(x.GetG() + 1);
+
+			if (x.GetG() < 256) m_Window.SetForeColor(x);
+
 			//cameras->Translate({ 0.0f, dt, 0.0f });
 		}
-		if (m_Window.GetKeyboard().IsKeyPressed('F'))
+		if (m_Window.GetKeyboard().IsKeyPressed('X'))
 		{
+			Color x = m_Window.GetForeColor();
+			x.SetB(x.GetB() + 1);
+
+			if (x.GetB() < 256) m_Window.SetForeColor(x);
+
 			//cameras->Translate({ 0.0f, -dt, 0.0f });
 		}
 	}
