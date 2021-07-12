@@ -250,6 +250,13 @@ void Window::OnActivate_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 
 }
 
+void Window::OnCommand_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+{
+//	for(const auto& m : m_Menu)
+//		if(m_Menu.INDEX == wParam) // Localize the right action
+// 			m.func_pointer	// Invoke the function pointer
+}
+
 void Window::OnClose_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
 	PostQuitMessage(0);
@@ -439,7 +446,8 @@ void Window::OnRawInput_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
 	switch (msg)
-	{	
+	{
+	case WM_COMMAND: OnCommand_Impl(hWnd, msg, wParam, lParam); 
 	case WM_CLOSE: OnClose_Impl(hWnd, msg, wParam, lParam); OnClose(); return 0;		// Exit message to be handled in application class
 	case WM_DESTROY: OnClosing_Impl(hWnd, msg, wParam, lParam); OnClosing(); break;
 	case WM_NCDESTROY: OnClosed_Impl(hWnd, msg, wParam, lParam); OnClosed(); break;

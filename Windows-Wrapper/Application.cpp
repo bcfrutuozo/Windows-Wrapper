@@ -65,6 +65,11 @@ void Application::HandleInput(float dt)
 
 	if (!m_Window.IsCursorEnabled())
 	{
+		if (m_Window.GetKeyboard().IsKeyPressed('Y'))
+		{
+			m_Window.AddMenu();
+		}
+
 		if (m_Window.GetKeyboard().IsKeyPressed('Q'))
 		{
 			Color x = m_Window.GetForeColor();

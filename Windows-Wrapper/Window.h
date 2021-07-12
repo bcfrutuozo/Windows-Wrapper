@@ -3,6 +3,7 @@
 #include "Common.h"
 #include "Color.h"
 #include "Exception.h"
+#include "Menu.h"
 #include "Keyboard.h"
 #include "Mouse.h"
 
@@ -49,6 +50,7 @@ private:
 
 	// Events implementations
 	void OnActivate_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+	void OnCommand_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	void OnClose_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	void OnClosing_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	void OnClosed_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
@@ -75,6 +77,7 @@ private:
 	std::unique_ptr<Keyboard> m_Keyboard;
 	std::unique_ptr<Mouse> m_Mouse;
 	std::vector<BYTE> m_RawBuffer;
+	HMENU m_Menu;
 
 	// Set default as white
 	Color m_ForeColor = Color::White();
@@ -149,6 +152,30 @@ public:
 	~Window();
 	Window(const Window&) = delete;
 	Window& operator=(const Window&) = delete;
+
+#define IDM_FILE_NEW 1
+#define IDM_FILE_OPEN 2
+#define IDM_FILE_QUIT 3
+
+	bool AddMenu()
+	{
+		//x();
+		HMENU hMenubar;
+		HMENU hMenu;
+
+		hMenubar = CreateMenu();
+		hMenu = CreateMenu();
+
+		AppendMenuW(hMenu, MF_STRING, IDM_FILE_NEW, L"&New");
+		AppendMenuW(hMenu, MF_STRING, IDM_FILE_OPEN, L"&Open");
+		AppendMenuW(hMenu, MF_SEPARATOR, 0, NULL);
+		AppendMenuW(hMenu, MF_STRING, IDM_FILE_QUIT, L"&Quit");
+
+		AppendMenuW(hMenubar, MF_POPUP, (UINT_PTR)hMenu, L"&File");
+		SetMenu(m_Handle, hMenubar);
+
+		return true;
+	}
 
 	void SetTitle(const char* title);
 	void EnableCursor() noexcept;
