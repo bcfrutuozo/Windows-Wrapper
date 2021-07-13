@@ -1,11 +1,12 @@
 #pragma once
 
-#include "Common.h"
+#include "Control.h"
 #include "Event.h"
 #include "Color.h"
 #include "Exception.h"
 #include "Keyboard.h"
 #include "Mouse.h"
+#include "Menu.h"
 
 #include <memory>
 #include <vector>
@@ -18,7 +19,7 @@
 
 class Menu;
 
-class Window
+class Window : public Control
 {
 	friend class Menu;
 
@@ -44,7 +45,6 @@ private:
 		static HINSTANCE GetInstance() noexcept;
 	};
 
-	const HWND GetHandle() const noexcept;
 	EventDispatcher& GetEventDispatcher() const noexcept;
 	void EncloseCursor() const noexcept;
 	static void FreeCursor() noexcept;
@@ -73,12 +73,10 @@ private:
 	void OnMouseLeftDoubleClick_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	void OnMouseRightDoubleClick_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	void OnMouseWheel_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+	void OnNotify_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	void OnRawInput_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 
 	bool m_IsCursorEnabled;
-	int m_Width;
-	int m_Height;
-	HWND m_Handle;
 	RECT m_Rectangle;
 	std::unique_ptr<Keyboard> m_Keyboard;
 	std::unique_ptr<Mouse> m_Mouse;
@@ -149,22 +147,24 @@ protected:
 
 	virtual void OnMouseWheel() const {};
 
+	virtual void OnNotify() const {};
+
 	virtual void OnPaint() const {};
 
 	virtual void OnResize() const {};
 
 public:
 
-	Window(int width, int height, const char* name);
+	Window(const std::string& name, int width, int height);
 	~Window();
 	Window(const Window&) = delete;
 	Window& operator=(const Window&) = delete;
 
-	const Menu& CreateMenu(const std::string& header = {});
-	const void DestroyMenu();
-	const void SetMenuHeader(const std::string& header);
+	void CreateMenu(const std::string& text = {});
+	void DestroyMenu();
+	void SetMenuHeader(const std::string& text);
 
-	void SetTitle(const char* title);
+	void SetText(const std::string& text) override;
 	void EnableCursor() noexcept;
 	void DisableCursor() noexcept;
 	Color GetForeColor() noexcept;
@@ -197,72 +197,4 @@ public:
 
 		HRESULT hr;
 	};
-};
-
-class MenuItem
-{
-public:
-
-	enum Type
-	{
-		MENU_ITEMTYPE_DISABLED,
-		MENU_ITEMTYPE_STRING,
-		MENU_ITEMTYPE_SEPARATOR,
-	};
-
-private:
-
-	Type m_Type;
-	std::string m_Text;
-	IEvent* m_Callback;
-	std::optional<unsigned int> m_Index;
-
-public:
-
-	MenuItem(Type type, const std::string& text, IEvent* callback)
-		:
-		m_Type(type),
-		m_Text(text),
-		m_Callback(callback),
-		m_Index(0)
-	{
-	}
-
-	const Type& GetType() noexcept
-	{
-		return m_Type;
-	}
-
-	const std::string& GetText() noexcept
-	{
-		return m_Text;
-	}
-
-	void SetText(const std::string& text) noexcept
-	{
-		m_Text = text;
-	}
-};
-
-class Menu
-{
-	friend class Window;
-
-private:
-
-	std::string m_Header;
-	const Window* m_Parent;
-	HMENU m_MenuBar;
-	HMENU m_Menu;
-
-public:
-
-	Menu(const Window* parent);
-	Menu(const Window* parent, const std::string& header);
-	~Menu();
-
-	const std::string& GetHeader();
-	void SetHeader(const std::string& header);
-
-	void AddEntry(MenuItem::Type type, const std::string& text, IEvent* callback);
 };

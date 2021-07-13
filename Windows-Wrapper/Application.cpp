@@ -8,7 +8,7 @@
 
 Application::Application()
 	:
-	m_Window(1920, 1080, "Application")
+	m_Window("Application", 1920, 1080)
 {
 	m_Window.EnableCursor();
 	m_Window.GetMouse().DisableRaw();
@@ -74,8 +74,8 @@ void Application::HandleInput(float dt)
 	{
 		if (m_Window.GetKeyboard().IsKeyPressed('Y'))
 		{
-			auto m = m_Window.CreateMenu("Teste");
-			m.AddEntry(MenuItem::MENU_ITEMTYPE_STRING, "Arquivo", new Event<void()>("Teste", &OpenFileX));
+			m_Window.CreateMenu("Teste");
+			//m.AddEntry(MenuItem::MENU_ITEMTYPE_STRING, "Arquivo", new Event<void()>("Teste", &OpenFileX));
 		}
 
 		if (m_Window.GetKeyboard().IsKeyPressed('Q'))
@@ -147,7 +147,7 @@ void Application::Run(float dt)
 	//const float t = m_Timer.Peek();
 	std::ostringstream oss;
 	oss << "Timer elapsed: " << std::setprecision(1) << std::fixed << dt << "s";
-	m_Window.SetTitle(oss.str().c_str());
+	m_Window.SetText(oss.str().c_str());
 
 	// renderGraph.Execute(window.Gfx());
 

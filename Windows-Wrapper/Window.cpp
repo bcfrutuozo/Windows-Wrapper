@@ -42,10 +42,9 @@ HINSTANCE Window::WndClass::GetInstance() noexcept
 }
 
 // Window
-Window::Window(int width, int height, const char* name)
+Window::Window(const std::string& name, int width, int height)
 	:
-	m_Width(width),
-	m_Height(height),
+	Control(name, width, height, 0, 0),
 	m_IsCursorEnabled(true),
 	m_Keyboard(std::make_unique<Keyboard>()),
 	m_Mouse(std::make_unique<Mouse>())
@@ -59,11 +58,11 @@ Window::Window(int width, int height, const char* name)
 	{
 		throw WND_LAST_EXCEPT();
 	}
-
+	
 	// Create window and get its handle
-	m_Handle = CreateWindow(
+	Handle = IntPtr(CreateWindow(
 		WndClass::GetName(),																// Class name
-		name,																				// Window title
+		name.c_str(),																				// Window title
 		WS_OVERLAPPEDWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU,	// Style values
 		CW_USEDEFAULT,																		// X position
 		CW_USEDEFAULT,																		// Y position
@@ -73,14 +72,14 @@ Window::Window(int width, int height, const char* name)
 		nullptr,																			// Menu handle
 		WndClass::GetInstance(),															// Module instance handle
 		this																				// Pointer to the window instance to work along with HandleMessageSetup function. THIS IS THE #SURPRIIISOOOOOOO
-	);
+	));
 
-	if (m_Handle == nullptr)
+	if (Handle.IsNull())
 	{
 		throw WND_LAST_EXCEPT();
 	}
 
-	ShowWindow(m_Handle, SW_SHOWDEFAULT);
+	ShowWindow(static_cast<HWND>(Handle.ToPointer()), SW_SHOWDEFAULT);
 
 	// TODO: THIS IS WHERE THE GRAPHICS DEVICE, CONTEXT, RENDER TARGET, DEPTHSTENCIL (MAYBE) WILL BE INSTANTIATED.
 	// YES: THIS IS GONNA TAKE SOME TIME DO DESIGN
@@ -100,12 +99,7 @@ Window::Window(int width, int height, const char* name)
 
 Window::~Window()
 {
-	DestroyWindow(m_Handle);
-}
-
-const HWND Window::GetHandle() const noexcept
-{
-	return m_Handle;
+	DestroyWindow(static_cast<HWND>(Handle.ToPointer()));
 }
 
 EventDispatcher& Window::GetEventDispatcher() const noexcept
@@ -113,14 +107,15 @@ EventDispatcher& Window::GetEventDispatcher() const noexcept
 	return *m_Events;
 }
 
-void Window::SetTitle(const char* title)
+void Window::SetText(const std::string& title)
 {
-	if (SetWindowText(m_Handle, title) == 0)
+	if (SetWindowText(static_cast<HWND>(Handle.ToPointer()), title.c_str()) == 0)
 	{
 		throw WND_LAST_EXCEPT();
 	}
 
-	RedrawWindow(m_Handle, NULL, NULL, RDW_INVALIDATE | RDW_ERASE);
+	Text = title;
+	RedrawWindow(static_cast<HWND>(Handle.ToPointer()), NULL, NULL, RDW_INVALIDATE | RDW_ERASE);
 }
 
 void Window::EnableCursor() noexcept
@@ -160,8 +155,8 @@ const std::optional<int> Window::ProcessMessages()
 void Window::EncloseCursor() const noexcept
 {
 	RECT r;
-	GetClientRect(m_Handle, &r);
-	MapWindowPoints(m_Handle, nullptr, reinterpret_cast<POINT*>(&r), 2);
+	GetClientRect(static_cast<HWND>(Handle.ToPointer()), &r);
+	MapWindowPoints(static_cast<HWND>(Handle.ToPointer()), nullptr, reinterpret_cast<POINT*>(&r), 2);
 	ClipCursor(&r);
 }
 
@@ -269,9 +264,9 @@ void Window::OnActivate_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 
 void Window::OnCommand_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-//	for(const auto& m : m_Menu)
-//		if(m_Menu.INDEX == wParam) // Localize the right action
-// 			m.func_pointer	// Invoke the function pointer
+	//	for(const auto& m : m_Menu)
+	//		if(m_Menu-> == wParam) // Localize the right action
+	// 			m.func_pointer	// Invoke the function pointer
 }
 
 void Window::OnClose_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -334,7 +329,7 @@ void Window::OnMouseMove_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		if (!m_Mouse->IsInWindow())
 		{
-			SetCapture(m_Handle);
+			SetCapture(static_cast<HWND>(Handle.ToPointer()));
 			m_Mouse->OnMouseEnter();
 			HideCursor();
 		}
@@ -343,7 +338,7 @@ void Window::OnMouseMove_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 
 	// Inside client region -> log move, and log enter + capture mouse (if not previously in window)
-	if (pt.x >= 0 && pt.x < m_Width && pt.y >= 0 && pt.y < m_Height)
+	if (pt.x >= 0 && pt.x < Size.Width && pt.y >= 0 && pt.y < Size.Height)
 	{
 		m_Mouse->OnMouseMove(pt.x, pt.y);
 		if (!m_Mouse->IsInWindow())
@@ -372,7 +367,7 @@ void Window::OnMouseMove_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 void Window::OnMouseLeftDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-	SetForegroundWindow(m_Handle);
+	SetForegroundWindow(static_cast<HWND>(Handle.ToPointer()));
 
 	if (!m_IsCursorEnabled)
 	{
@@ -436,6 +431,12 @@ void Window::OnMouseWheel_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 	OnMouseWheel();
 }
 
+void Window::OnNotify_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+{
+
+	OnNotify();
+}
+
 void Window::OnRawInput_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
 	if (!m_Mouse->IsRawEnabled())
@@ -482,7 +483,7 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
-	case WM_COMMAND: OnCommand_Impl(hWnd, msg, wParam, lParam); 
+	case WM_COMMAND: OnCommand_Impl(hWnd, msg, wParam, lParam);
 	case WM_CLOSE: OnClose_Impl(hWnd, msg, wParam, lParam); return 0;		// Exit message to be handled in application class
 	case WM_DESTROY: OnClosing_Impl(hWnd, msg, wParam, lParam); break;
 	case WM_NCDESTROY: OnClosed_Impl(hWnd, msg, wParam, lParam); break;
@@ -491,10 +492,10 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_ACTIVATE: OnActivate_Impl(hWnd, msg, wParam, lParam); break;
 		/******************** KEYBOARD MESSAGES *********************/
 	case WM_KEYDOWN:
-	case WM_SYSKEYDOWN: OnKeyDown_Impl(hWnd, msg, wParam, lParam); OnKeyDown(); break;	// Syskey commands need to be handled to track ALT key (VK_MENU)
+	case WM_SYSKEYDOWN: OnKeyDown_Impl(hWnd, msg, wParam, lParam); break;	// Syskey commands need to be handled to track ALT key (VK_MENU)
 	case WM_KEYUP:
-	case WM_SYSKEYUP: OnKeyUp_Impl(hWnd, msg, wParam, lParam); OnKeyUp(); break;		// Syskey commands need to be handled to track ALT key (VK_MENU)
-	case WM_CHAR: OnKeyPressed_Impl(hWnd, msg, wParam, lParam); OnKeyPressed(); break;
+	case WM_SYSKEYUP: OnKeyUp_Impl(hWnd, msg, wParam, lParam); break;		// Syskey commands need to be handled to track ALT key (VK_MENU)
+	case WM_CHAR: OnKeyPressed_Impl(hWnd, msg, wParam, lParam); break;
 		/******************* END KEYBOARD MESSAGES ******************/
 		/********************** MOUSE MESSAGES **********************/
 	case WM_MOUSEMOVE: 	OnMouseMove_Impl(hWnd, msg, wParam, lParam); break;
@@ -505,6 +506,7 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_LBUTTONDBLCLK: OnMouseLeftDoubleClick_Impl(hWnd, msg, wParam, lParam); break;
 	case WM_RBUTTONDBLCLK: OnMouseRightDoubleClick_Impl(hWnd, msg, wParam, lParam); break;
 	case WM_MOUSEWHEEL: OnMouseWheel_Impl(hWnd, msg, wParam, lParam); break;
+	case WM_NOTIFY: OnNotify_Impl(hWnd, msg, wParam, lParam); break;
 		/******************** END MOUSE MESSAGES ********************/
 		/******************** RAW MOUSE MESSAGES ********************/
 	case WM_INPUT: OnRawInput_Impl(hWnd, msg, wParam, lParam); break;
@@ -545,7 +547,7 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		PRECT r = (PRECT)lParam;
 
 		HBRUSH brush = CreateSolidBrush(RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-		SetClassLongPtr(m_Handle, GCLP_HBRBACKGROUND, (LONG_PTR)brush);
+		SetClassLongPtr(static_cast<HWND>(Handle.ToPointer()), GCLP_HBRBACKGROUND, (LONG_PTR)brush);
 
 		break;
 	}
@@ -554,7 +556,7 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		PRECT r = (PRECT)lParam;
 
 		HBRUSH brush = CreateSolidBrush(RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-		SetClassLongPtr(m_Handle, GCLP_HBRBACKGROUND, (LONG_PTR)brush);
+		SetClassLongPtr(static_cast<HWND>(Handle.ToPointer()), GCLP_HBRBACKGROUND, (LONG_PTR)brush);
 
 		break;
 	}
@@ -631,61 +633,22 @@ const std::string& Window::HRException::GetErrorDescription() const noexcept
 	return WindowException::TranslateErrorCode(hr);
 }
 
-const Menu& Window::CreateMenu(const std::string& header)
+void Window::CreateMenu(const std::string& text)
 {
 	if (m_Menu != nullptr)
 	{
-		return *m_Menu;
+		return;
 	}
 
-	m_Menu = std::make_unique<Menu>(m_Handle, header);
-	return *m_Menu;
+	m_Menu = std::make_unique<Menu>(this, text);
 }
 
-const void Window::DestroyMenu()
+void Window::DestroyMenu()
 {
 	m_Menu.reset();
 }
 
-const void Window::SetMenuHeader(const std::string& header)
+void Window::SetMenuHeader(const std::string& text)
 {
-	m_Menu->SetHeader(header);
-}
-
-Menu::Menu(const Window* parent)
-	:
-	m_Parent(parent),
-	m_MenuBar(CreateMenu()),
-	m_Menu(CreateMenu())
-{
-	AppendMenu(m_MenuBar, MF_POPUP, (UINT_PTR)m_Menu, m_Header.c_str());
-	SetMenu(m_Parent->GetHandle(), m_Menu);
-};
-
-Menu::Menu(const Window* parent, const std::string& header)
-	:
-	m_Parent(parent),
-	m_MenuBar(CreateMenu()),
-	m_Header(header)
-{ };
-
-Menu::~Menu()
-{ 
-	DestroyMenu(m_Menu); 
-	DestroyMenu(m_MenuBar); 
-}
-
-const std::string& Menu::GetHeader()
-{ 
-	return m_Header; 
-}
-
-void Menu::SetHeader(const std::string& header)
-{ 
-	m_Header = header; 
-}
-
-void Menu::AddEntry(MenuItem::Type type, const std::string& text, IEvent* callback)
-{
-	MenuItem(type, text, callback);
+	m_Menu->SetText(text);
 }
