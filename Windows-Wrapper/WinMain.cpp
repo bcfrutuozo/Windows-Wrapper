@@ -8,6 +8,7 @@ int CALLBACK WinMain(
 {
 	try
 	{
+		SetProcessDPIAware();
 		return Application().Start();
 	}
 	catch (const std::exception& e)

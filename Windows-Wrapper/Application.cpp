@@ -1,8 +1,10 @@
 #include "Application.h"
+#include "Event.h"
 #include "Timer.h"
 
 #include <sstream>
 #include <iomanip>
+#include <functional>
 
 Application::Application()
 	:
@@ -39,6 +41,11 @@ int Application::Start()
 	}
 }
 
+void OpenFileX()
+{
+
+}
+
 void Application::HandleInput(float dt)
 {
 	while (const auto& e = m_Window.GetKeyboard().ReadKey())
@@ -67,7 +74,8 @@ void Application::HandleInput(float dt)
 	{
 		if (m_Window.GetKeyboard().IsKeyPressed('Y'))
 		{
-			m_Window.AddMenu();
+			auto m = m_Window.CreateMenu("Teste");
+			m.AddEntry(MenuItem::MENU_ITEMTYPE_STRING, "Arquivo", new Event<void()>("Teste", &OpenFileX));
 		}
 
 		if (m_Window.GetKeyboard().IsKeyPressed('Q'))

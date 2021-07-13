@@ -146,6 +146,7 @@
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="dxerr.cpp" />
     <ClCompile Include="DXGIInfoManager.cpp" />
+    <ClCompile Include="Event.cpp" />
     <ClCompile Include="Exception.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="Keyboard.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="Common.h" />
     <ClInclude Include="dxerr.h" />
     <ClInclude Include="DXGIInfoManager.h" />
+    <ClInclude Include="Event.h" />
     <ClInclude Include="Exception.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Keyboard.h" />

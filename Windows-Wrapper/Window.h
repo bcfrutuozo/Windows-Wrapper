@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Common.h"
+#include "Event.h"
 #include "Color.h"
 #include "Exception.h"
-#include "Menu.h"
 #include "Keyboard.h"
 #include "Mouse.h"
 
@@ -16,8 +16,12 @@
 #define WND_EXCEPT( hr ) Window::HRException( __LINE__,__FILE__,(hr) )
 #define WND_LAST_EXCEPT() Window::HRException( __LINE__,__FILE__,GetLastError() )
 
+class Menu;
+
 class Window
 {
+	friend class Menu;
+
 private:
 
 	// Singleton manages registration/cleanup of window class
@@ -40,6 +44,8 @@ private:
 		static HINSTANCE GetInstance() noexcept;
 	};
 
+	const HWND GetHandle() const noexcept;
+	EventDispatcher& GetEventDispatcher() const noexcept;
 	void EncloseCursor() const noexcept;
 	static void FreeCursor() noexcept;
 	static void HideCursor() noexcept;
@@ -77,7 +83,8 @@ private:
 	std::unique_ptr<Keyboard> m_Keyboard;
 	std::unique_ptr<Mouse> m_Mouse;
 	std::vector<BYTE> m_RawBuffer;
-	HMENU m_Menu;
+	std::unique_ptr<Menu> m_Menu;
+	std::unique_ptr<EventDispatcher> m_Events;
 
 	// Set default as white
 	Color m_ForeColor = Color::White();
@@ -153,29 +160,9 @@ public:
 	Window(const Window&) = delete;
 	Window& operator=(const Window&) = delete;
 
-#define IDM_FILE_NEW 1
-#define IDM_FILE_OPEN 2
-#define IDM_FILE_QUIT 3
-
-	bool AddMenu()
-	{
-		//x();
-		HMENU hMenubar;
-		HMENU hMenu;
-
-		hMenubar = CreateMenu();
-		hMenu = CreateMenu();
-
-		AppendMenuW(hMenu, MF_STRING, IDM_FILE_NEW, L"&New");
-		AppendMenuW(hMenu, MF_STRING, IDM_FILE_OPEN, L"&Open");
-		AppendMenuW(hMenu, MF_SEPARATOR, 0, NULL);
-		AppendMenuW(hMenu, MF_STRING, IDM_FILE_QUIT, L"&Quit");
-
-		AppendMenuW(hMenubar, MF_POPUP, (UINT_PTR)hMenu, L"&File");
-		SetMenu(m_Handle, hMenubar);
-
-		return true;
-	}
+	const Menu& CreateMenu(const std::string& header = {});
+	const void DestroyMenu();
+	const void SetMenuHeader(const std::string& header);
 
 	void SetTitle(const char* title);
 	void EnableCursor() noexcept;
@@ -212,3 +199,70 @@ public:
 	};
 };
 
+class MenuItem
+{
+public:
+
+	enum Type
+	{
+		MENU_ITEMTYPE_DISABLED,
+		MENU_ITEMTYPE_STRING,
+		MENU_ITEMTYPE_SEPARATOR,
+	};
+
+private:
+
+	Type m_Type;
+	std::string m_Text;
+	IEvent* m_Callback;
+	std::optional<unsigned int> m_Index;
+
+public:
+
+	MenuItem(Type type, const std::string& text, IEvent* callback)
+		:
+		m_Type(type),
+		m_Text(text),
+		m_Callback(callback),
+		m_Index(0)
+	{
+	}
+
+	const Type& GetType() noexcept
+	{
+		return m_Type;
+	}
+
+	const std::string& GetText() noexcept
+	{
+		return m_Text;
+	}
+
+	void SetText(const std::string& text) noexcept
+	{
+		m_Text = text;
+	}
+};
+
+class Menu
+{
+	friend class Window;
+
+private:
+
+	std::string m_Header;
+	const Window* m_Parent;
+	HMENU m_MenuBar;
+	HMENU m_Menu;
+
+public:
+
+	Menu(const Window* parent);
+	Menu(const Window* parent, const std::string& header);
+	~Menu();
+
+	const std::string& GetHeader();
+	void SetHeader(const std::string& header);
+
+	void AddEntry(MenuItem::Type type, const std::string& text, IEvent* callback);
+};

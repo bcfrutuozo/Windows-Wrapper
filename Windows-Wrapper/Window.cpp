@@ -103,6 +103,16 @@ Window::~Window()
 	DestroyWindow(m_Handle);
 }
 
+const HWND Window::GetHandle() const noexcept
+{
+	return m_Handle;
+}
+
+EventDispatcher& Window::GetEventDispatcher() const noexcept
+{
+	return *m_Events;
+}
+
 void Window::SetTitle(const char* title)
 {
 	if (SetWindowText(m_Handle, title) == 0)
@@ -247,7 +257,14 @@ LRESULT WINAPI Window::HandleMessageForwarder(HWND hWnd, UINT msg, WPARAM lParam
 // Event handling implementation
 void Window::OnActivate_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-
+	if (wParam & WA_ACTIVE)
+	{
+		OnActivation();
+	}
+	else
+	{
+		OnDeactivation();
+	}
 }
 
 void Window::OnCommand_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -260,27 +277,29 @@ void Window::OnCommand_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) n
 void Window::OnClose_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
 	PostQuitMessage(0);
+	OnClose();
 }
 
 void Window::OnClosing_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-
+	OnClosing();
 }
 
 void Window::OnClosed_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-
+	OnClosed();
 }
 
 void Window::OnFocusEnter_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-
+	OnFocusEnter();
 }
 
 void Window::OnFocusLeave_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
 	// Clear key state when window loses focus to prevent input getting "stuck" 
 	m_Keyboard->ClearState();
+	OnFocusLeave();
 }
 
 void Window::OnKeyDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -290,16 +309,20 @@ void Window::OnKeyDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) n
 	{
 		m_Keyboard->OnKeyPressed(static_cast<unsigned char>(wParam));
 	}
+
+	OnKeyDown();
 }
 
 void Window::OnKeyPressed_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
 	m_Keyboard->OnChar(static_cast<unsigned char>(wParam));
+	OnKeyPressed();
 }
 
 void Window::OnKeyUp_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
 	m_Keyboard->OnKeyReleased(static_cast<unsigned char>(wParam));
+	OnKeyUp();
 }
 
 void Window::OnMouseMove_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -343,6 +366,8 @@ void Window::OnMouseMove_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			m_Mouse->OnMouseLeave();
 		}
 	}
+
+	OnMouseMove();
 }
 
 void Window::OnMouseLeftDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -357,34 +382,42 @@ void Window::OnMouseLeftDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 
 	const POINTS pt = MAKEPOINTS(lParam);
 	m_Mouse->OnLeftPressed(pt.x, pt.y);
+
+	OnMouseLeftDown();
 }
 
 void Window::OnMouseLeftUp_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
 	const POINTS pt = MAKEPOINTS(lParam);
 	m_Mouse->OnLeftReleased(pt.x, pt.y);
+
+	OnMouseLeftUp();
 }
 
 void Window::OnMouseRightDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
 	const POINTS pt = MAKEPOINTS(lParam);
 	m_Mouse->OnRightPressed(pt.x, pt.y);
+
+	OnMouseRightDown();
 }
 
 void Window::OnMouseRightUp_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
 	const POINTS pt = MAKEPOINTS(lParam);
 	m_Mouse->OnRightReleased(pt.x, pt.y);
+
+	OnMouseRightUp();
 }
 
 void Window::OnMouseLeftDoubleClick_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-
+	OnMouseLeftDoubleClick();
 }
 
 void Window::OnMouseRightDoubleClick_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-
+	OnMouseRightDoubleClick();
 }
 
 void Window::OnMouseWheel_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -399,6 +432,8 @@ void Window::OnMouseWheel_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 	{
 		m_Mouse->OnWheelDown(pt.x, pt.y);
 	}
+
+	OnMouseWheel();
 }
 
 void Window::OnRawInput_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -448,12 +483,12 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	switch (msg)
 	{
 	case WM_COMMAND: OnCommand_Impl(hWnd, msg, wParam, lParam); 
-	case WM_CLOSE: OnClose_Impl(hWnd, msg, wParam, lParam); OnClose(); return 0;		// Exit message to be handled in application class
-	case WM_DESTROY: OnClosing_Impl(hWnd, msg, wParam, lParam); OnClosing(); break;
-	case WM_NCDESTROY: OnClosed_Impl(hWnd, msg, wParam, lParam); OnClosed(); break;
-	case WM_SETFOCUS: OnFocusEnter_Impl(hWnd, msg, wParam, lParam); OnFocusEnter(); break;
-	case WM_KILLFOCUS: OnFocusLeave_Impl(hWnd, msg, wParam, lParam); OnFocusLeave(); break;
-	case WM_ACTIVATE: OnActivate_Impl(hWnd, msg, wParam, lParam); (wParam & WA_ACTIVE) ? OnActivation() : OnDeactivation(); break;
+	case WM_CLOSE: OnClose_Impl(hWnd, msg, wParam, lParam); return 0;		// Exit message to be handled in application class
+	case WM_DESTROY: OnClosing_Impl(hWnd, msg, wParam, lParam); break;
+	case WM_NCDESTROY: OnClosed_Impl(hWnd, msg, wParam, lParam); break;
+	case WM_SETFOCUS: OnFocusEnter_Impl(hWnd, msg, wParam, lParam); break;
+	case WM_KILLFOCUS: OnFocusLeave_Impl(hWnd, msg, wParam, lParam); break;
+	case WM_ACTIVATE: OnActivate_Impl(hWnd, msg, wParam, lParam); break;
 		/******************** KEYBOARD MESSAGES *********************/
 	case WM_KEYDOWN:
 	case WM_SYSKEYDOWN: OnKeyDown_Impl(hWnd, msg, wParam, lParam); OnKeyDown(); break;	// Syskey commands need to be handled to track ALT key (VK_MENU)
@@ -462,14 +497,14 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_CHAR: OnKeyPressed_Impl(hWnd, msg, wParam, lParam); OnKeyPressed(); break;
 		/******************* END KEYBOARD MESSAGES ******************/
 		/********************** MOUSE MESSAGES **********************/
-	case WM_MOUSEMOVE: 	OnMouseMove_Impl(hWnd, msg, wParam, lParam); OnMouseMove(); break;
-	case WM_LBUTTONDOWN: OnMouseLeftDown_Impl(hWnd, msg, wParam, lParam); OnMouseLeftDown(); break;
-	case WM_LBUTTONUP: OnMouseLeftUp_Impl(hWnd, msg, wParam, lParam); OnMouseLeftUp(); break;
-	case WM_RBUTTONDOWN: OnMouseRightDown_Impl(hWnd, msg, wParam, lParam); OnMouseRightDown(); break;
-	case WM_RBUTTONUP: OnMouseRightUp_Impl(hWnd, msg, wParam, lParam); OnMouseRightUp(); break;
-	case WM_LBUTTONDBLCLK: OnMouseLeftDoubleClick_Impl(hWnd, msg, wParam, lParam); OnMouseLeftDoubleClick(); break;
-	case WM_RBUTTONDBLCLK: OnMouseRightDoubleClick_Impl(hWnd, msg, wParam, lParam); OnMouseRightDoubleClick(); break;
-	case WM_MOUSEWHEEL: OnMouseWheel_Impl(hWnd, msg, wParam, lParam); OnMouseWheel(); break;
+	case WM_MOUSEMOVE: 	OnMouseMove_Impl(hWnd, msg, wParam, lParam); break;
+	case WM_LBUTTONDOWN: OnMouseLeftDown_Impl(hWnd, msg, wParam, lParam); break;
+	case WM_LBUTTONUP: OnMouseLeftUp_Impl(hWnd, msg, wParam, lParam); break;
+	case WM_RBUTTONDOWN: OnMouseRightDown_Impl(hWnd, msg, wParam, lParam); break;
+	case WM_RBUTTONUP: OnMouseRightUp_Impl(hWnd, msg, wParam, lParam); break;
+	case WM_LBUTTONDBLCLK: OnMouseLeftDoubleClick_Impl(hWnd, msg, wParam, lParam); break;
+	case WM_RBUTTONDBLCLK: OnMouseRightDoubleClick_Impl(hWnd, msg, wParam, lParam); break;
+	case WM_MOUSEWHEEL: OnMouseWheel_Impl(hWnd, msg, wParam, lParam); break;
 		/******************** END MOUSE MESSAGES ********************/
 		/******************** RAW MOUSE MESSAGES ********************/
 	case WM_INPUT: OnRawInput_Impl(hWnd, msg, wParam, lParam); break;
@@ -594,4 +629,63 @@ HRESULT Window::HRException::GetErrorCode() const noexcept
 const std::string& Window::HRException::GetErrorDescription() const noexcept
 {
 	return WindowException::TranslateErrorCode(hr);
+}
+
+const Menu& Window::CreateMenu(const std::string& header)
+{
+	if (m_Menu != nullptr)
+	{
+		return *m_Menu;
+	}
+
+	m_Menu = std::make_unique<Menu>(m_Handle, header);
+	return *m_Menu;
+}
+
+const void Window::DestroyMenu()
+{
+	m_Menu.reset();
+}
+
+const void Window::SetMenuHeader(const std::string& header)
+{
+	m_Menu->SetHeader(header);
+}
+
+Menu::Menu(const Window* parent)
+	:
+	m_Parent(parent),
+	m_MenuBar(CreateMenu()),
+	m_Menu(CreateMenu())
+{
+	AppendMenu(m_MenuBar, MF_POPUP, (UINT_PTR)m_Menu, m_Header.c_str());
+	SetMenu(m_Parent->GetHandle(), m_Menu);
+};
+
+Menu::Menu(const Window* parent, const std::string& header)
+	:
+	m_Parent(parent),
+	m_MenuBar(CreateMenu()),
+	m_Header(header)
+{ };
+
+Menu::~Menu()
+{ 
+	DestroyMenu(m_Menu); 
+	DestroyMenu(m_MenuBar); 
+}
+
+const std::string& Menu::GetHeader()
+{ 
+	return m_Header; 
+}
+
+void Menu::SetHeader(const std::string& header)
+{ 
+	m_Header = header; 
+}
+
+void Menu::AddEntry(MenuItem::Type type, const std::string& text, IEvent* callback)
+{
+	MenuItem(type, text, callback);
 }
