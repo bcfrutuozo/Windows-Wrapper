@@ -1,4 +1,5 @@
 #include "Window.h"
+#include "Event.h"
 
 #include <sstream>
 
@@ -47,7 +48,8 @@ Window::Window(const std::string& name, int width, int height)
 	Control(name, width, height, 0, 0),
 	m_IsCursorEnabled(true),
 	m_Keyboard(std::make_unique<Keyboard>()),
-	m_Mouse(std::make_unique<Mouse>())
+	m_Mouse(std::make_unique<Mouse>()),
+	m_Menu(std::make_unique<MenuBar>(this))
 {
 	// Calculate window size based on desired client region
 	m_Rectangle.left = 100;
@@ -58,7 +60,7 @@ Window::Window(const std::string& name, int width, int height)
 	{
 		throw WND_LAST_EXCEPT();
 	}
-	
+
 	// Create window and get its handle
 	Handle = CreateWindow(
 		WndClass::GetName(),																// Class name
@@ -100,11 +102,6 @@ Window::Window(const std::string& name, int width, int height)
 Window::~Window()
 {
 	DestroyWindow(static_cast<HWND>(Handle.ToPointer()));
-}
-
-EventDispatcher& Window::GetEventDispatcher() const noexcept
-{
-	return *m_Events;
 }
 
 void Window::SetText(const std::string& title)
@@ -213,6 +210,17 @@ Mouse& Window::GetMouse() noexcept
 	return *m_Mouse;
 }
 
+MenuBar& Window::GetMenu() noexcept
+{
+	if (!m_Menu)
+	{
+		//TODO: MENU EXCEPTION
+		throw;
+	}
+
+	return *m_Menu;
+}
+
 // This function is responsible to change the default HandleMessage function pointer to the custom one.
 // It works as a Window class wrapper, allowing multiple Window instances to be easily instantiated.
 // YOU ARE NOT SUPPOSED TO UNDERSTAND THIS AS NEITHER DO I UNDERSTAND :'(
@@ -264,9 +272,11 @@ void Window::OnActivate_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 
 void Window::OnCommand_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-	//	for(const auto& m : m_Menu)
-	//		if(m_Menu-> == wParam) // Localize the right action
-	// 			m.func_pointer	// Invoke the function pointer
+	auto wNotifyCode = HIWORD(wParam); // notification code
+	auto wId = LOWORD(wParam); // item, control, or accelerator identifier
+	auto hwndCtl = (HWND)lParam; // handle of control
+
+	//Events.Dispatch<>((unsigned int)wParam);
 }
 
 void Window::OnClose_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -483,7 +493,7 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
-	case WM_COMMAND: OnCommand_Impl(hWnd, msg, wParam, lParam);
+	case WM_COMMAND: OnCommand_Impl(hWnd, msg, wParam, lParam); break;
 	case WM_CLOSE: OnClose_Impl(hWnd, msg, wParam, lParam); return 0;		// Exit message to be handled in application class
 	case WM_DESTROY: OnClosing_Impl(hWnd, msg, wParam, lParam); break;
 	case WM_NCDESTROY: OnClosed_Impl(hWnd, msg, wParam, lParam); break;
@@ -631,24 +641,4 @@ HRESULT Window::HRException::GetErrorCode() const noexcept
 const std::string& Window::HRException::GetErrorDescription() const noexcept
 {
 	return WindowException::TranslateErrorCode(hr);
-}
-
-MenuBar& Window::CreateMenuBar(const std::string& text) noexcept
-{
-	if (m_Menu == nullptr)
-	{
-		m_Menu = std::make_unique<MenuBar>(new MenuBar(this, text));
-	}
-
-	return *m_Menu;
-}
-
-void Window::DestroyMenu()
-{
-	m_Menu.reset();
-}
-
-void Window::SetMenuHeader(const std::string& text)
-{
-	m_Menu->SetText(text);
 }

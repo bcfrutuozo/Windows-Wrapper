@@ -1,39 +1,13 @@
 #include "Control.h"
+#include "Event.h"
 
-class MenuItem : public Control
-{
-	friend class Menu;
-
-public:
-
-	enum Type
-	{
-		MENU_ITEMTYPE_DISABLED,
-		MENU_ITEMTYPE_STRING,
-		MENU_ITEMTYPE_SEPARATOR,
-	};
-
-private:
-
-	Type m_Type;
-	IEvent* m_Callback;
-	
-
-	MenuItem(Control* parent, Type type, const std::string& text, IEvent* callback);
-
-public:
-
-	void SetText(const std::string& text) override
-	{
-		Text = text;
-	}
-};
+class MenuItem;
 
 class Menu : public Control
 {
 private:
 
-	std::vector<MenuItem> m_SubEntries;
+	std::vector<Menu> m_MenuItems;
 
 public:
 
@@ -42,24 +16,56 @@ public:
 	~Menu();
 
 	void SetText(const std::string& text) override;
+	virtual void Bind();
+	MenuItem& AddItem(const std::string& text, IEvent* callback);
 
-	void AddEntry(MenuItem::Type type, const std::string& text, IEvent* callback);
+	virtual void OnMouseLeftDown() const {};
+	virtual void OnMouseRightDown() const {};
+	virtual void OnMouseOver() const {}
+
+};
+
+class MenuItem : public Menu
+{
+
+public:
+
+	enum Type
+	{
+		MENU_ITEMTYPE_DISABLED,
+		MENU_ITEMTYPE_STRING,
+		MENU_ITEMTYPE_SEPARATOR,
+		MENU_ITEMTYPE_POPUP,
+	};
+
+public:
+
+	MenuItem(Control* parent, const std::string& text, IEvent* callback);
+
+	virtual void Bind() override;
+
+	void SetText(const std::string& text) override
+	{
+		Text = text;
+	}
 };
 
 class MenuBar : public Control
 {
-	friend class Window;
 
 private:
 
-	
+	MenuBar();
+
 public:
 
-	std::vector<Menu> m_Entries;
+	std::vector<Menu> m_MenuItems;
 
 	MenuBar(Control* parent);
-	MenuBar(Control* parent, const std::string& text);
 	~MenuBar();
+
+	Menu& AddMenu(const std::string& text);
+	MenuItem& AddItem(const std::string& text, IEvent* callback);
 
 	void SetText(const std::string& text) override;
 };

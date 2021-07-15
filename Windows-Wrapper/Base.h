@@ -2,6 +2,7 @@
 
 #include "Type.h"
 #include "uuid.h"
+#include "Event.h"
 
 #include <memory>
 #include <string>
@@ -15,6 +16,8 @@ private:
 	uuids::uuid m_UUID;
 
 protected:
+
+	//static EventDispatcher Events;
 
 	Base()
 		:

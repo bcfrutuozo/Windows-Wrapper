@@ -25,6 +25,7 @@ public:
 	Control(const std::string& text, int width, int height, int x, int y);
 	~Control();
 
+
 	const std::string& GetText() noexcept
 	{
 		return Text;

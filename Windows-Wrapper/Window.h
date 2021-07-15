@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Control.h"
-#include "Event.h"
 #include "Color.h"
 #include "Exception.h"
 #include "Keyboard.h"
@@ -45,7 +44,6 @@ private:
 		static HINSTANCE GetInstance() noexcept;
 	};
 
-	EventDispatcher& GetEventDispatcher() const noexcept;
 	void EncloseCursor() const noexcept;
 	static void FreeCursor() noexcept;
 	static void HideCursor() noexcept;
@@ -81,8 +79,6 @@ private:
 	std::unique_ptr<Keyboard> m_Keyboard;
 	std::unique_ptr<Mouse> m_Mouse;
 	std::vector<BYTE> m_RawBuffer;
-	std::unique_ptr<EventDispatcher> m_Events;
-
 	std::unique_ptr<MenuBar> m_Menu;
 
 	// Set default as white
@@ -90,6 +86,8 @@ private:
 
 
 protected:
+
+	
 
 	virtual void OnCreate()
 	{
@@ -161,9 +159,20 @@ public:
 	Window(const Window&) = delete;
 	Window& operator=(const Window&) = delete;
 
-	MenuBar& CreateMenuBar(const std::string& text = {}) noexcept;
-	void DestroyMenu();
-	void SetMenuHeader(const std::string& text);
+	template <typename T, typename = std::enable_if<std::is_base_of<Control, T>::value>::type>
+	void Bind(const T& control) noexcept;
+
+	template<>
+	void Bind<MenuBar>(const MenuBar& control) noexcept
+	{
+		SetMenu(static_cast<HWND>(Handle.ToPointer()), static_cast<HMENU>(control.Handle.ToPointer()));
+	}
+
+	template <typename T, typename = std::enable_if<std::is_base_of<Control, T>::value>::type>
+	T& Create(const std::string& text = {}) noexcept
+	{
+		return std::make_unique<T>(this, text);
+	}
 
 	void SetText(const std::string& text) override;
 	void EnableCursor() noexcept;
@@ -173,6 +182,7 @@ public:
 	bool IsCursorEnabled() const noexcept;
 	Keyboard& GetKeyboard() noexcept;
 	Mouse& GetMouse() noexcept;
+	MenuBar& GetMenu() noexcept;
 	static const std::optional<int> ProcessMessages();
 
 	// Window Exception
