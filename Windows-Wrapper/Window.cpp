@@ -60,7 +60,7 @@ Window::Window(const std::string& name, int width, int height)
 	}
 	
 	// Create window and get its handle
-	Handle = IntPtr(CreateWindow(
+	Handle = CreateWindow(
 		WndClass::GetName(),																// Class name
 		name.c_str(),																				// Window title
 		WS_OVERLAPPEDWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU,	// Style values
@@ -72,7 +72,7 @@ Window::Window(const std::string& name, int width, int height)
 		nullptr,																			// Menu handle
 		WndClass::GetInstance(),															// Module instance handle
 		this																				// Pointer to the window instance to work along with HandleMessageSetup function. THIS IS THE #SURPRIIISOOOOOOO
-	));
+	);
 
 	if (Handle.IsNull())
 	{
@@ -633,14 +633,14 @@ const std::string& Window::HRException::GetErrorDescription() const noexcept
 	return WindowException::TranslateErrorCode(hr);
 }
 
-void Window::CreateMenu(const std::string& text)
+MenuBar& Window::CreateMenuBar(const std::string& text) noexcept
 {
-	if (m_Menu != nullptr)
+	if (m_Menu == nullptr)
 	{
-		return;
+		m_Menu = std::make_unique<MenuBar>(new MenuBar(this, text));
 	}
 
-	m_Menu = std::make_unique<Menu>(this, text);
+	return *m_Menu;
 }
 
 void Window::DestroyMenu()

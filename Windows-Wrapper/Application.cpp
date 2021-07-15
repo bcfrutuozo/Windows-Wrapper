@@ -43,7 +43,7 @@ int Application::Start()
 
 void OpenFileX()
 {
-
+	OutputDebugString("AOOO CARAIUDOOOOOOOOOOOOOOOOOOOOOOOOOOOO!!! ESSA PORRA TA FUNFANDO PASSANDO POINNTERROOO NO BADAALOOOO :D");
 }
 
 void Application::HandleInput(float dt)
@@ -74,8 +74,8 @@ void Application::HandleInput(float dt)
 	{
 		if (m_Window.GetKeyboard().IsKeyPressed('Y'))
 		{
-			m_Window.CreateMenu("Teste");
-			//m.AddEntry(MenuItem::MENU_ITEMTYPE_STRING, "Arquivo", new Event<void()>("Teste", &OpenFileX));
+			auto& m = m_Window.CreateMenuBar("Teste");
+			m.m_Entries[0].AddEntry(MenuItem::MENU_ITEMTYPE_STRING, "Arquivo", new Event<void()>("Teste", &OpenFileX));
 		}
 
 		if (m_Window.GetKeyboard().IsKeyPressed('Q'))

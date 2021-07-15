@@ -1,7 +1,9 @@
 #include "Control.h"
 
-class MenuItem
+class MenuItem : public Control
 {
+	friend class Menu;
+
 public:
 
 	enum Type
@@ -14,43 +16,24 @@ public:
 private:
 
 	Type m_Type;
-	std::string m_Text;
 	IEvent* m_Callback;
+	
+
+	MenuItem(Control* parent, Type type, const std::string& text, IEvent* callback);
 
 public:
 
-	MenuItem(Type type, const std::string& text, IEvent* callback)
-		:
-		m_Type(type),
-		m_Text(text),
-		m_Callback(callback)
+	void SetText(const std::string& text) override
 	{
-	}
-
-	const Type& GetType() noexcept
-	{
-		return m_Type;
-	}
-
-	const std::string& GetText() noexcept
-	{
-		return m_Text;
-	}
-
-	void SetText(const std::string& text) noexcept
-	{
-		m_Text = text;
+		Text = text;
 	}
 };
 
 class Menu : public Control
 {
-	friend class Window;
-
 private:
 
-	HMENU m_MenuBar;
-	HMENU m_Menu;
+	std::vector<MenuItem> m_SubEntries;
 
 public:
 
@@ -61,4 +44,22 @@ public:
 	void SetText(const std::string& text) override;
 
 	void AddEntry(MenuItem::Type type, const std::string& text, IEvent* callback);
+};
+
+class MenuBar : public Control
+{
+	friend class Window;
+
+private:
+
+	
+public:
+
+	std::vector<Menu> m_Entries;
+
+	MenuBar(Control* parent);
+	MenuBar(Control* parent, const std::string& text);
+	~MenuBar();
+
+	void SetText(const std::string& text) override;
 };

@@ -81,8 +81,9 @@ private:
 	std::unique_ptr<Keyboard> m_Keyboard;
 	std::unique_ptr<Mouse> m_Mouse;
 	std::vector<BYTE> m_RawBuffer;
-	std::unique_ptr<Menu> m_Menu;
 	std::unique_ptr<EventDispatcher> m_Events;
+
+	std::unique_ptr<MenuBar> m_Menu;
 
 	// Set default as white
 	Color m_ForeColor = Color::White();
@@ -90,9 +91,9 @@ private:
 
 protected:
 
-	bool OnCreate(LPCREATESTRUCT lpCreateStruct)
+	virtual void OnCreate()
 	{
-		return true;
+		
 	}
 
 	virtual void OnActivation() const
@@ -160,7 +161,7 @@ public:
 	Window(const Window&) = delete;
 	Window& operator=(const Window&) = delete;
 
-	void CreateMenu(const std::string& text = {});
+	MenuBar& CreateMenuBar(const std::string& text = {}) noexcept;
 	void DestroyMenu();
 	void SetMenuHeader(const std::string& text);
 

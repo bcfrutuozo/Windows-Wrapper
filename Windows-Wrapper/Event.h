@@ -10,6 +10,7 @@ class IEvent
 {
 public:
 
+	virtual const unsigned int GetId() const = 0;
 	virtual const std::string& GetName() const = 0;
 };
 
@@ -21,6 +22,7 @@ class Event<R(Args...)> : public IEvent
 
 private:
 
+	unsigned int m_Id;
 	std::string m_Name;
 	std::function<R(Args...)> const m_Callback;
 
@@ -30,10 +32,19 @@ public:
 		:
 		m_Name(name),
 		m_Callback(callback)
-	{ 	}
+	{
+		// Automatically generate an incremental Id per callback function
+		static unsigned int m_IdHandler = 0;
+		m_Id = m_IdHandler++;
+	}
 
 	~Event()
 	{	}
+
+	virtual const unsigned int GetId() const override
+	{
+		return m_Id;
+	}
 
 	virtual const std::string& GetName() const override
 	{

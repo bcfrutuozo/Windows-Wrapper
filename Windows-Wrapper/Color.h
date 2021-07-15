@@ -2,7 +2,7 @@
 
 #include "Common.h"
 #include "IEquatable.h"
-#include "Math.h"
+#include "Mathlib.h"
 
 struct Color : public IEquatable<Color>
 {

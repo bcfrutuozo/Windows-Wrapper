@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -73,6 +73,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -152,7 +153,7 @@
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="IntPtr.cpp" />
     <ClCompile Include="Keyboard.cpp" />
-    <ClCompile Include="Math.cpp" />
+    <ClCompile Include="Mathlib.cpp" />
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="Point.cpp" />
@@ -163,6 +164,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="Base.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="Control.h" />
@@ -175,12 +177,14 @@
     <ClInclude Include="IHandle.h" />
     <ClInclude Include="IntPtr.h" />
     <ClInclude Include="Keyboard.h" />
-    <ClInclude Include="Math.h" />
+    <ClInclude Include="Mathlib.h" />
     <ClInclude Include="Menu.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="Size.h" />
     <ClInclude Include="Timer.h" />
+    <ClInclude Include="Type.h" />
+    <ClInclude Include="uuid.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

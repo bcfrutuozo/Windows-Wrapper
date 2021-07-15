@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Common.h"
 #include "IEquatable.h"
 
 struct IntPtr : IEquatable<IntPtr>
@@ -16,13 +17,22 @@ public:
 	~IntPtr();
 
 	inline bool Equals(IntPtr p) const noexcept override;
-	void* ToPointer() const noexcept;
 	int ToInt32() const noexcept;
 	long ToInt64() const noexcept;
+	void* ToPointer() const noexcept;
 	int Size() const noexcept;
 	bool IsNull() const noexcept;
+	IntPtr& operator=(int p) noexcept;
+	IntPtr& operator=(long p) noexcept;
+	IntPtr& operator=(void* p) noexcept;
+	bool operator==(int p) const noexcept;
+	bool operator==(long p) const noexcept;
+	bool operator==(void* p) const noexcept;
+	bool operator!=(int p) const noexcept;
+	bool operator!=(long p) const noexcept;
+	bool operator!=(void* p) const noexcept;
 
 	static IntPtr Zero() { return IntPtr(0); }
 	static IntPtr MaxValue() { return IntPtr(0x7fffffff); }
-	static IntPtr MinValue() { return IntPtr((int)0x80000000); }
+	static IntPtr MinValue() { return IntPtr(static_cast<int>(0x80000000)); }
 };

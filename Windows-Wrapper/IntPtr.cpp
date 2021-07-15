@@ -26,11 +26,6 @@ IntPtr::~IntPtr()
 {
 }
 
-void* IntPtr::ToPointer() const noexcept
-{
-	return m_Ptr;
-}
-
 bool IntPtr::Equals(IntPtr p) const noexcept
 {
 	return m_Ptr == p.m_Ptr;
@@ -46,6 +41,11 @@ long IntPtr::ToInt64() const noexcept
 	return reinterpret_cast<long>(m_Ptr);
 }
 
+void* IntPtr::ToPointer() const noexcept
+{
+	return m_Ptr;
+}
+
 int IntPtr::Size() const noexcept
 {
 #if _WIN32
@@ -57,5 +57,53 @@ int IntPtr::Size() const noexcept
 
 bool IntPtr::IsNull() const noexcept
 {
-	return m_Ptr == nullptr;
+	return (m_Ptr == nullptr || m_Ptr == 0);
+}
+
+IntPtr& IntPtr::operator=(int p) noexcept
+{
+	m_Ptr = reinterpret_cast<void*>(p);
+	return *this;
+}
+
+IntPtr& IntPtr::operator=(long p) noexcept
+{
+	m_Ptr = reinterpret_cast<void*>(p);
+	return *this;
+}
+
+IntPtr& IntPtr::operator=(void* p) noexcept
+{
+	m_Ptr = p;
+	return *this;
+}
+
+bool IntPtr::operator==(int p) const noexcept
+{
+	return m_Ptr == reinterpret_cast<void*>(p);
+}
+
+bool IntPtr::operator==(long p) const noexcept
+{
+	return m_Ptr == reinterpret_cast<void*>(p);
+}
+
+bool IntPtr::operator==(void* p) const noexcept
+{
+	return m_Ptr == p;
+}
+
+bool IntPtr::operator!=(int p) const noexcept
+{
+	return m_Ptr != reinterpret_cast<int*>(p);
+}
+
+bool IntPtr::operator!=(long p) const noexcept
+{
+	return m_Ptr != reinterpret_cast<int*>(p);
+}
+
+bool IntPtr::operator!=(void* p) const noexcept
+{
+	return m_Ptr != p;
 }

@@ -1,29 +1,31 @@
 #include "Menu.h"
 
+// MenuItem
+MenuItem::MenuItem(Control* parent, Type type, const std::string& text, IEvent* callback)
+	:
+	Control(parent, text),
+	m_Type(type),
+	m_Callback(callback)
+{	}
+
+// Menu
 Menu::Menu(Control* parent)
 	:
-	Control(parent, ""),
-	m_MenuBar(CreateMenu()),
-	m_Menu(CreateMenu())
+	Menu(parent, "")
 {
-	AppendMenu(m_MenuBar, MF_POPUP, (UINT_PTR)m_Menu, Text.c_str());
-	SetMenu(static_cast<HWND>(Parent->Handle.ToPointer()), m_MenuBar);
+
 };
 
 Menu::Menu(Control* parent, const std::string& text)
 	:
-	Control(parent, text),
-	m_MenuBar(CreateMenu()),
-	m_Menu(CreateMenu())
+	Control(parent, text)
 {
-	AppendMenu(m_MenuBar, MF_POPUP, (UINT_PTR)m_Menu, Text.c_str());
-	SetMenu(static_cast<HWND>(Parent->Handle.ToPointer()), m_MenuBar);
+	Handle = CreateMenu();
 };
 
 Menu::~Menu()
 {
-	DestroyMenu(m_Menu);
-	DestroyMenu(m_MenuBar);
+	DestroyMenu(static_cast<HMENU>(Handle.ToPointer()));
 }
 
 void Menu::SetText(const std::string& text)
@@ -33,5 +35,37 @@ void Menu::SetText(const std::string& text)
 
 void Menu::AddEntry(MenuItem::Type type, const std::string& text, IEvent* callback)
 {
-	MenuItem(type, text, callback);
+	AppendMenu(static_cast<HMENU>(Handle.ToPointer()), MF_STRING, callback->GetId(), text.c_str());
+	m_SubEntries.push_back(MenuItem(this, type, text, callback));
+	SetMenu(static_cast<HWND>(Parent->Parent->Handle.ToPointer()), static_cast<HMENU>(Parent->Handle.ToPointer()));
+	// Pointer to parent->parent (window), parent (menubar)
+}
+
+// MenuBar
+MenuBar::MenuBar(Control* parent)
+	:
+	MenuBar(parent, "")
+{
+
+};
+
+MenuBar::MenuBar(Control* parent, const std::string& text)
+	:
+	Control(parent, text)
+{
+	Handle = CreateMenu();
+	Menu m = Menu(this, text);
+	m_Entries.push_back(m);
+	AppendMenu(static_cast<HMENU>(Handle.ToPointer()), MF_POPUP, (UINT_PTR)m.GetHandle().ToPointer(), Text.c_str());
+	SetMenu(static_cast<HWND>(Parent->Handle.ToPointer()), static_cast<HMENU>(Handle.ToPointer()));
+};
+
+MenuBar::~MenuBar()
+{
+	DestroyMenu(static_cast<HMENU>(Handle.ToPointer()));
+}
+
+void MenuBar::SetText(const std::string& text)
+{
+	Text = text;
 }
