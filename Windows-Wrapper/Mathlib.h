@@ -224,9 +224,8 @@ namespace Math
 	// Ray-Triangle Intersection", Journal of Graphics Tools, vol. 2, no. 1, 
 	// pp 21-28, 1997.
 	//
-	//	Modified for CENgine to return barycentrics
+	//	Modified for Windows-Wrapper to return barycentrics
 	//-----------------------------------------------------------------------------
-	_Use_decl_annotations_
 		inline bool XM_CALLCONV RayTriangleIntersects(FXMVECTOR origin, FXMVECTOR direction, FXMVECTOR v0, GXMVECTOR v1, HXMVECTOR v2, float& distance, XMFLOAT2& bary)
 	{
 		const XMVECTOR g_RayEpsilon = XMVectorSet(1e-20f, 1e-20f, 1e-20f, 1e-20f);

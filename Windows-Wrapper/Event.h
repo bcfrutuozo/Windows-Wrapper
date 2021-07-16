@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Event.h"
+
 #include <string>
 #include <optional>
 #include <functional>
@@ -26,6 +28,7 @@ public:
 
 	explicit Event(const std::function<void(Args...)>& callback)
 		:
+		m_Id(0),
 		m_Callback(callback)
 	{
 
@@ -41,6 +44,7 @@ public:
 
 	void Trigger(Args... a)
 	{
+		assert(m_Callback != nullptr);
 		m_Callback(a...);
 	}
 };

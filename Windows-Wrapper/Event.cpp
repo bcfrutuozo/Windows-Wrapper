@@ -1,4 +1,7 @@
+#include "Common.h"
 #include "Event.h"
+
+#include <sstream>
 
 EventDispatcher::EventDispatcher()
 {

@@ -12,7 +12,9 @@ public:
 
 	class Event
 	{
+
 	public:
+
 		enum class Type
 		{
 			Press,
@@ -20,38 +22,18 @@ public:
 			Invalid
 		};
 
-		Event()
-			:
-			type(Type::Invalid),
-			code(0u) {}
+		Event();
+		Event(Type type, unsigned char code) noexcept;
 
-		Event(Type type, unsigned char code) noexcept
-			:
-			type(type),
-			code(code) {}
+		bool IsPress() const noexcept;
+		bool IsRelease() const noexcept;
+		bool IsValid() const noexcept;
+		unsigned char GetCode() const noexcept;
 
-		bool IsPress() const noexcept
-		{
-			return type == Type::Press;
-		}
-
-		bool IsRelease() const noexcept
-		{
-			return type == Type::Release;
-		}
-
-		bool IsValid() const noexcept
-		{
-			return type != Type::Invalid;
-		}
-
-		unsigned char GetCode() const noexcept
-		{
-			return code;
-		}
 	private:
-		Type type;
-		unsigned char code;
+
+		Type m_Type;
+		unsigned char m_Code;
 	};
 
 	Keyboard() = default;
@@ -76,6 +58,14 @@ public:
 	bool IsAutoRepeatEnabled() const noexcept;
 
 private:
+	
+	static constexpr unsigned int m_NumberOfKeys = 256u;
+	static constexpr unsigned int m_BufferSize = 16u;
+	bool m_IsAutoRepeatEnabled = false;
+	std::bitset<m_NumberOfKeys> m_KeyStates;
+	std::queue<Event> m_KeyBuffer;
+	std::queue<char> m_CharBuffer;
+
 	void OnKeyPressed(unsigned char keyCode) noexcept;
 	void OnKeyReleased(unsigned char keyCode) noexcept;
 	void OnChar(char c) noexcept;
@@ -83,12 +73,5 @@ private:
 
 	template<typename T>
 	static void TrimBuffer(std::queue<T>& buffer) noexcept;
-
-	static constexpr unsigned int m_NumberOfKeys = 256u;
-	static constexpr unsigned int m_BufferSize = 16u;
-	bool m_IsAutoRepeatEnabled = false;
-	std::bitset<m_NumberOfKeys> m_KeyStates;
-	std::queue<Event> m_KeyBuffer;
-	std::queue<char> m_CharBuffer;
 };
 

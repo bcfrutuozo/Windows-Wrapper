@@ -65,24 +65,3 @@ public:
 		}
 	};
 };
-
-//class MenuBar : public Control
-//{
-//
-//private:
-//
-//	MenuBar();
-//
-//public:
-//
-//	std::vector<Menu> m_MenuItems;
-//
-//	MenuBar(Control* parent);
-//	~MenuBar();
-//
-//	Menu& AddMenu(const std::string& text);
-//	MenuItem& AddItem(const std::string& text, const std::function<void()>& function);
-//	MenuItem& AddItem(const std::string& text);
-//
-//	void SetText(const std::string& text) override;
-//};

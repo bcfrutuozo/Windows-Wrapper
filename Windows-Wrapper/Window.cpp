@@ -272,10 +272,6 @@ void Window::OnActivate_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 
 void Window::OnCommand_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-	auto wNotifyCode = HIWORD(wParam); // notification code
-	auto wId = LOWORD(wParam); // item, control, or accelerator identifier
-	auto hwndCtl = (HWND)lParam; // handle of control
-
 	m_Menu->DispatchEvent(static_cast<unsigned int>(wParam));
 }
 

@@ -1,5 +1,36 @@
 #include "Keyboard.h"
 
+Keyboard::Event::Event()
+	:
+	m_Type(Type::Invalid),
+	m_Code(0u)
+{}
+
+Keyboard::Event::Event(Type type, unsigned char code) noexcept
+	:
+	m_Type(type),
+	m_Code(code) {}
+
+bool Keyboard::Event::IsPress() const noexcept
+{
+	return m_Type == Type::Press;
+}
+
+bool Keyboard::Event::IsRelease() const noexcept
+{
+	return m_Type == Type::Release;
+}
+
+bool Keyboard::Event::IsValid() const noexcept
+{
+	return m_Type != Type::Invalid;
+}
+
+unsigned char Keyboard::Event::GetCode() const noexcept
+{
+	return m_Code;
+}
+
 bool Keyboard::IsKeyPressed(unsigned char keyCode) const noexcept
 {
 	return m_KeyStates[keyCode];
