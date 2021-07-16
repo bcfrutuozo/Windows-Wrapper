@@ -8,7 +8,6 @@ class MenuBar : public Menu
 public:
 
 	MenuBar(Control* parent);
-	~MenuBar();
 
 	Menu& AddMenu(const std::string& text);
 

@@ -7,25 +7,20 @@ MenuBar::MenuBar(Control* parent)
 	Handle = CreateMenu();
 };
 
-MenuBar::~MenuBar()
-{
-	DestroyMenu(static_cast<HMENU>(Handle.ToPointer()));
-}
-
 Menu& MenuBar::AddMenu(const std::string& text)
 {
-	Menu* m = new Menu(this, text);
-	m_MenuItems.emplace_back(m);
+	auto m = std::make_shared<Menu>(this, text);
 	m->Bind();
+	m_MenuItems.push_back(m);
 	return *m;
 }
 
 
 MenuItem& MenuBar::AddItem(const std::string& text, const std::function<void()>& function)
 {
-	MenuItem* m = new MenuItem(this, text, function, m_CurrentIndex++);
-	m_MenuItems.emplace_back(m);
+	auto m = std::make_shared<MenuItem>(this, text, function, m_CurrentIndex++);
 	m->Bind();
+	m_MenuItems.push_back(m);
 	return *m;
 }
 

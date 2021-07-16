@@ -1,6 +1,8 @@
 #include "Control.h"
 #include "Event.h"
 
+#include <memory>
+
 class MenuItem;
 
 class Menu : public Control
@@ -9,8 +11,8 @@ class Menu : public Control
 protected:
 	
 	unsigned int m_Id;
-	std::vector<Menu> m_MenuItems;
-	Event<>* m_ClickDelegate;
+	std::vector<std::shared_ptr<Menu>> m_MenuItems;
+	std::unique_ptr<Event<>> m_ClickDelegate;
 	
 public:
 
@@ -52,7 +54,7 @@ public:
 
 	void OnClickSet(const std::function<void()>& function)
 	{
-		m_ClickDelegate = new Event<>(function);
+		m_ClickDelegate = std::make_unique<Event<>>(function);
 	}
 
 	virtual void OnClick() const

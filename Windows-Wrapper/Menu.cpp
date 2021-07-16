@@ -9,7 +9,7 @@ MenuItem::MenuItem(Control* parent, const std::string& text, const std::function
 	Menu(parent, text)
 {
 	m_Id = i;
-	m_ClickDelegate = new Event<>(function);
+	m_ClickDelegate = std::make_unique<Event<>>(function);
 }
 
 void MenuItem::Bind()
@@ -49,9 +49,9 @@ void Menu::SetText(const std::string& text)
 
 MenuItem& Menu::AddItem(const std::string& text, const std::function<void()>& function)
 {
-	MenuItem* m = new MenuItem(this, text, function, m_CurrentIndex++);
-	m_MenuItems.emplace_back(m);
+	auto m = std::make_shared<MenuItem>(this, text, function, m_CurrentIndex++);
 	m->Bind();
+	m_MenuItems.push_back(m);
 	return *m;
 }
 
@@ -62,16 +62,16 @@ MenuItem& Menu::AddItem(const std::string& text)
 
 void Menu::DispatchEvent(unsigned int id) const
 {
+	if (m_Id == id)
+	{
+		return m_ClickDelegate->Trigger();
+	}
+
 	for (auto& ch : m_MenuItems)
 	{
-		if (ch.m_Id == id)
+		if (typeid(ch) != typeid(MenuItem))
 		{
-			return ch.m_ClickDelegate->Trigger();
-		}
-
-		if (typeid(ch) != typeid(MenuItem) || ch.m_MenuItems.size() > 0)
-		{
-			return ch.DispatchEvent(id);
+			ch->DispatchEvent(id);
 		}
 	}
 };

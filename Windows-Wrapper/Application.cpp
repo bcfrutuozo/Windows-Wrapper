@@ -8,7 +8,7 @@
 
 Application::Application()
 	:
-	m_Window("Application", 1920, 1080)
+	m_Window("Application", 1024, 800)
 {
 	m_Window.EnableCursor();
 	m_Window.GetMouse().DisableRaw();
@@ -83,6 +83,11 @@ void Application::HandleInput(float dt)
 			menu1.AddItem("Submenu-Item2");
 			menu1.AddItem("Submenu-Item3", &OpenFileX);
 			m_Window.Bind(mb);
+		}
+
+		if (m_Window.GetKeyboard().IsKeyPressed('R'))
+		{
+			m_Window.RemoveMenu();
 		}
 
 		if (m_Window.GetKeyboard().IsKeyPressed('Q'))

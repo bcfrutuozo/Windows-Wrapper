@@ -169,6 +169,19 @@ public:
 	}
 
 	template <typename T, typename = std::enable_if<std::is_base_of<Control, T>::value>::type>
+	void Remove(const T& control) noexcept
+	{
+
+	}
+
+	void RemoveMenu() noexcept
+	{
+		SetMenu(static_cast<HWND>(Handle.ToPointer()), 0);
+		m_Menu.reset(new MenuBar(this));
+	}
+
+
+	template <typename T, typename = std::enable_if<std::is_base_of<Control, T>::value>::type>
 	T& Create(const std::string& text = {}) noexcept
 	{
 		return std::make_unique<T>(this, text);

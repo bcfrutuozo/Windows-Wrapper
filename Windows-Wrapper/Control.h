@@ -25,6 +25,9 @@ public:
 	Control(const std::string& text, int width, int height, int x, int y);
 	~Control();
 
+	void operator() (Control* p) {
+		delete p;
+	}
 
 	const std::string& GetText() noexcept
 	{
