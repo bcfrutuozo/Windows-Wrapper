@@ -5,42 +5,43 @@ class MenuItem;
 
 class Menu : public Control
 {
-private:
 
+protected:
+	
+	unsigned int m_Id;
 	std::vector<Menu> m_MenuItems;
-
+	Event<>* m_ClickDelegate;
+	
 public:
+
+	static unsigned int m_CurrentIndex;
 
 	Menu(Control* parent);
 	Menu(Control* parent, const std::string& text);
 	~Menu();
 
+	virtual unsigned int GetId()
+	{
+		return 0;
+	}
+
 	void SetText(const std::string& text) override;
 	virtual void Bind();
-	MenuItem& AddItem(const std::string& text, IEvent* callback);
 
-	virtual void OnMouseLeftDown() const {};
-	virtual void OnMouseRightDown() const {};
-	virtual void OnMouseOver() const {}
+	virtual void DispatchEvent(unsigned int id) const;
 
+	virtual MenuItem& AddItem(const std::string& text, const std::function<void()>& function);
+	virtual MenuItem& AddItem(const std::string& text);
 };
 
 class MenuItem : public Menu
 {
+private:
+	
 
 public:
 
-	enum Type
-	{
-		MENU_ITEMTYPE_DISABLED,
-		MENU_ITEMTYPE_STRING,
-		MENU_ITEMTYPE_SEPARATOR,
-		MENU_ITEMTYPE_POPUP,
-	};
-
-public:
-
-	MenuItem(Control* parent, const std::string& text, IEvent* callback);
+	MenuItem(Control* parent, const std::string& text, const std::function<void()>& function, unsigned int i);
 
 	virtual void Bind() override;
 
@@ -48,24 +49,38 @@ public:
 	{
 		Text = text;
 	}
+
+	void OnClickSet(const std::function<void()>& function)
+	{
+		m_ClickDelegate = new Event<>(function);
+	}
+
+	virtual void OnClick() const
+	{
+		if (m_ClickDelegate != nullptr)
+		{
+			m_ClickDelegate->Trigger();
+		}
+	};
 };
 
-class MenuBar : public Control
-{
-
-private:
-
-	MenuBar();
-
-public:
-
-	std::vector<Menu> m_MenuItems;
-
-	MenuBar(Control* parent);
-	~MenuBar();
-
-	Menu& AddMenu(const std::string& text);
-	MenuItem& AddItem(const std::string& text, IEvent* callback);
-
-	void SetText(const std::string& text) override;
-};
+//class MenuBar : public Control
+//{
+//
+//private:
+//
+//	MenuBar();
+//
+//public:
+//
+//	std::vector<Menu> m_MenuItems;
+//
+//	MenuBar(Control* parent);
+//	~MenuBar();
+//
+//	Menu& AddMenu(const std::string& text);
+//	MenuItem& AddItem(const std::string& text, const std::function<void()>& function);
+//	MenuItem& AddItem(const std::string& text);
+//
+//	void SetText(const std::string& text) override;
+//};

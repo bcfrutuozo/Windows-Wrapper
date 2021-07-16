@@ -75,12 +75,13 @@ void Application::HandleInput(float dt)
 		if (m_Window.GetKeyboard().IsKeyPressed('Y'))
 		{
 			auto& mb = m_Window.GetMenu();
-			auto& item1 = mb.AddItem("Arquivo", new Event<>(&OpenFileX));
-			auto& item2 = mb.AddItem("Arquivo2", new Event<>(&OpenFileX));
+			auto& item1 = mb.AddItem("Arquivo");
+			item1.OnClickSet(&OpenFileX);
+			auto& item2 = mb.AddItem("Arquivo2", &OpenFileX);
 			auto& menu1 = mb.AddMenu("Submenu");
-			menu1.AddItem("Submenu-Item1", new Event<>(&OpenFileX));
-			menu1.AddItem("Submenu-Item2", new Event<>(&OpenFileX));
-			menu1.AddItem("Submenu-Item3", new Event<>(&OpenFileX));
+			menu1.AddItem("Submenu-Item1", &OpenFileX);
+			menu1.AddItem("Submenu-Item2");
+			menu1.AddItem("Submenu-Item3", &OpenFileX);
 			m_Window.Bind(mb);
 		}
 

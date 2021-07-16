@@ -276,7 +276,7 @@ void Window::OnCommand_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) n
 	auto wId = LOWORD(wParam); // item, control, or accelerator identifier
 	auto hwndCtl = (HWND)lParam; // handle of control
 
-	//Events.Dispatch<>((unsigned int)wParam);
+	m_Menu->DispatchEvent(static_cast<unsigned int>(wParam));
 }
 
 void Window::OnClose_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept

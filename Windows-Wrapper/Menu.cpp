@@ -1,16 +1,20 @@
 #include "Menu.h"
 
+// Declare m_Index = 1 setting 0 as null function (NULL || nullptr)
+unsigned int Menu::m_CurrentIndex = 1;
+
 // MenuItem
-MenuItem::MenuItem(Control* parent, const std::string& text, IEvent* callback)
+MenuItem::MenuItem(Control* parent, const std::string& text, const std::function<void()>& function, unsigned int i)
 	:
 	Menu(parent, text)
 {
-	//Events.Register(callback);
+	m_Id = i;
+	m_ClickDelegate = new Event<>(function);
 }
 
 void MenuItem::Bind()
 {
-	AppendMenu(static_cast<HMENU>(Parent->Handle.ToPointer()), MF_STRING, 0, Text.c_str());
+	AppendMenu(static_cast<HMENU>(Parent->Handle.ToPointer()), MF_STRING, m_Id, Text.c_str());
 }
 
 // Menu
@@ -18,7 +22,7 @@ Menu::Menu(Control* parent)
 	:
 	Menu(parent, "")
 {
-
+	
 };
 
 Menu::Menu(Control* parent, const std::string& text)
@@ -43,51 +47,31 @@ void Menu::SetText(const std::string& text)
 	Text = text;
 }
 
-MenuItem& Menu::AddItem(const std::string& text, IEvent* callback)
+MenuItem& Menu::AddItem(const std::string& text, const std::function<void()>& function)
 {
-	MenuItem* m = new MenuItem(this, text, callback);
+	MenuItem* m = new MenuItem(this, text, function, m_CurrentIndex++);
 	m_MenuItems.emplace_back(m);
 	m->Bind();
 	return *m;
 }
 
-// MenuBar
-MenuBar::MenuBar()
-	:
-	Control(nullptr)
+MenuItem& Menu::AddItem(const std::string& text)
 {
-	Handle = CreateMenu();
+	return AddItem(text, nullptr);
 }
 
-MenuBar::MenuBar(Control* parent)
-	:
-	Control(parent, "")
+void Menu::DispatchEvent(unsigned int id) const
 {
-	Handle = CreateMenu();
+	for (auto& ch : m_MenuItems)
+	{
+		if (ch.m_Id == id)
+		{
+			return ch.m_ClickDelegate->Trigger();
+		}
+
+		if (typeid(ch) != typeid(MenuItem) || ch.m_MenuItems.size() > 0)
+		{
+			return ch.DispatchEvent(id);
+		}
+	}
 };
-
-MenuBar::~MenuBar()
-{
-	DestroyMenu(static_cast<HMENU>(Handle.ToPointer()));
-}
-
-Menu& MenuBar::AddMenu(const std::string& text)
-{
-	Menu* m = new Menu(this, text);
-	m_MenuItems.emplace_back(m);
-	m->Bind();
-	return *m;
-}
-
-MenuItem& MenuBar::AddItem(const std::string& text, IEvent* callback)
-{
-	MenuItem* m = new MenuItem(this, text, callback);
-	m_MenuItems.emplace_back(m);
-	m->Bind();
-	return *m;
-}
-
-void MenuBar::SetText(const std::string& text)
-{
-	Text = text;
-}
