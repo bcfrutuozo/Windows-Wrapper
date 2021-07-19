@@ -4,22 +4,26 @@
 #include <memory>
 
 class MenuItem;
+class MenuSeparator;
 
 class Menu : public Control
 {
 
 protected:
-	
+
+public:
+
 	unsigned int m_Id;
+	unsigned int m_SubItemIndex;
+	std::string m_IconPath;
+	HBITMAP m_Icon;
 	std::vector<std::shared_ptr<Menu>> m_MenuItems;
 	std::unique_ptr<Event<>> m_ClickDelegate;
-	
-public:
 
 	static unsigned int m_CurrentIndex;
 
-	Menu(Control* parent);
-	Menu(Control* parent, const std::string& text);
+	Menu(Control* parent, unsigned int subitemIndex, const std::string& iconPath = { });
+	Menu(Control* parent, const std::string& text, unsigned int subitemIndex, const std::string& iconPath = { });
 	~Menu();
 
 	virtual unsigned int GetId()
@@ -31,21 +35,29 @@ public:
 	virtual void Bind();
 
 	virtual void DispatchEvent(unsigned int id) const;
-
-	virtual MenuItem& AddItem(const std::string& text, const std::function<void()>& function);
-	virtual MenuItem& AddItem(const std::string& text);
+	void AddSeparator();
+	virtual Menu& AddMenu(const std::string& text);
+	virtual MenuItem& AddItem(const std::string& text, const std::function<void()>& function, const std::string& iconPath = {});
+	virtual MenuItem& AddItem(const std::string& text, const std::string& iconPath = { });
 };
+
+class MenuSeparator : public Menu
+{
+public:
+
+	MenuSeparator(Menu* parent, unsigned int subitemIndex);
+
+	void Bind() override;
+};
+
 
 class MenuItem : public Menu
 {
-private:
-	
-
 public:
 
-	MenuItem(Control* parent, const std::string& text, const std::function<void()>& function, unsigned int i);
+	MenuItem(Menu* parent, const std::string& text, const std::function<void()>& function, unsigned int i, unsigned int subitemIndex, const std::string& iconPath = { });
 
-	virtual void Bind() override;
+	void Bind() override;
 
 	void SetText(const std::string& text) override
 	{
