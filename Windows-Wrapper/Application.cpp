@@ -1,6 +1,10 @@
 #include "Application.h"
 #include "Event.h"
 #include "Timer.h"
+#include "Menu.h"
+#include "Menubar.h"
+#include "MenuSeparator.h"
+#include "MenuItem.h"
 
 #include <sstream>
 #include <iomanip>
@@ -85,6 +89,7 @@ void Application::HandleInput(float dt)
 			menu1.AddSeparator();
 			auto& menu2 = menu1.AddMenu("Submenu-Item3");
 			menu2.AddItem("Submenu2-Item1", &OpenFileX);
+			menu2.AddSeparator();
 			menu2.AddItem("Submenu2-Item2", &OpenFileX, "images\\1.bmp");
 			menu2.AddItem("Submenu2-Item3", &OpenFileX);
 			menu1.AddItem("Submenu-Item4", &OpenFileX);

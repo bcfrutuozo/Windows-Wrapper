@@ -1,4 +1,5 @@
 #include "MenuBar.h"
+#include "MenuItem.h"
 
 MenuBar::MenuBar(Control* parent)
 	:
@@ -7,14 +8,10 @@ MenuBar::MenuBar(Control* parent)
 	Handle = CreateMenu();
 };
 
-//Menu& MenuBar::AddMenu(const std::string& text)
-//{
-//	auto m = std::make_shared<Menu>(this, text, static_cast<unsigned int>(m_MenuItems.size()), ""); // Menubar doesn't have icons
-//	m->Bind();
-//	m_MenuItems.push_back(m);
-//	return *m_MenuItems.back();
-//}
-
+MenuBar::~MenuBar()
+{
+	
+};
 
 MenuItem& MenuBar::AddItem(const std::string& text, const std::function<void()>& function, const std::string& iconPath)
 {

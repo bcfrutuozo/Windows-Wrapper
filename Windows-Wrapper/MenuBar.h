@@ -2,16 +2,18 @@
 
 #include "Menu.h"
 
+class Window;
+
 class MenuBar : public Menu
 {
+	friend class Window;
 
 public:
 
 	MenuBar(Control* parent);
+	~MenuBar();
 
-	//Menu& AddMenu(const std::string& text);
-
-	virtual MenuItem& AddItem(const std::string& text, const std::function<void()>& function, const std::string& iconPath = { }) override;
-	virtual MenuItem& AddItem(const std::string& text, const std::string& iconPath = { }) override;
+	MenuItem& AddItem(const std::string& text, const std::function<void()>& function, const std::string& iconPath = { }) override;
+	MenuItem& AddItem(const std::string& text, const std::string& iconPath = { }) override;
 	void SetText(const std::string& text) override;
 };

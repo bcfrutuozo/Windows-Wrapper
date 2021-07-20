@@ -156,6 +156,8 @@
     <ClCompile Include="Mathlib.cpp" />
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="MenuBar.cpp" />
+    <ClCompile Include="MenuItem.cpp" />
+    <ClCompile Include="MenuSeparator.cpp" />
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="Point.cpp" />
     <ClCompile Include="Size.cpp" />
@@ -181,6 +183,8 @@
     <ClInclude Include="Mathlib.h" />
     <ClInclude Include="Menu.h" />
     <ClInclude Include="MenuBar.h" />
+    <ClInclude Include="MenuItem.h" />
+    <ClInclude Include="MenuSeparator.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="Size.h" />
