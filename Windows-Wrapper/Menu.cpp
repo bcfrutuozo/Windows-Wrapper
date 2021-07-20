@@ -10,15 +10,17 @@ unsigned int Menu::m_CurrentIndex = 1;
 Menu::Menu(Control* parent, unsigned int subitemIndex, const std::string& iconPath)
 	:
 	Menu(parent, "", subitemIndex, iconPath)
-{
 
+{
+	
 };
 
 Menu::Menu(Control* parent, const std::string& text, unsigned int subitemIndex, const std::string& iconPath)
 	:
 	Control(parent, text),
 	m_SubItemIndex(subitemIndex),
-	m_IconPath(iconPath)
+	m_IconPath(iconPath),
+	m_Id(0)				// No processing for default menu.
 {
 	Handle = CreatePopupMenu();
 };
@@ -81,7 +83,7 @@ void Menu::DispatchEvent(unsigned int id) const
 
 	for (auto& ch : m_MenuItems)
 	{
-		if (ch->GetType() != typeid(MenuItem))
+		if (typeid(ch) != typeid(MenuItem))
 		{
 			ch->DispatchEvent(id);
 		}

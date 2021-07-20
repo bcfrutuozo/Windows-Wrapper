@@ -48,8 +48,7 @@ Window::Window(const std::string& name, int width, int height)
 	Control(name, width, height, 0, 0),
 	m_IsCursorEnabled(true),
 	m_Keyboard(std::make_unique<Keyboard>()),
-	m_Mouse(std::make_unique<Mouse>()),
-	m_Menu(std::make_unique<MenuBar>(this))
+	m_Mouse(std::make_unique<Mouse>())
 {
 	// Calculate window size based on desired client region
 	m_Rectangle.left = 100;
@@ -210,17 +209,6 @@ Mouse& Window::GetMouse() noexcept
 	return *m_Mouse;
 }
 
-MenuBar& Window::GetMenu() noexcept
-{
-	if (!m_Menu)
-	{
-		//TODO: MENU EXCEPTION
-		throw;
-	}
-
-	return *m_Menu;
-}
-
 // This function is responsible to change the default HandleMessage function pointer to the custom one.
 // It works as a Window class wrapper, allowing multiple Window instances to be easily instantiated.
 // YOU ARE NOT SUPPOSED TO UNDERSTAND THIS AS NEITHER DO I UNDERSTAND :'(
@@ -272,7 +260,7 @@ void Window::OnActivate_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 
 void Window::OnCommand_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-	m_Menu->DispatchEvent(static_cast<unsigned int>(wParam));
+	m_MenuBar->DispatchEvent(static_cast<unsigned int>(wParam));
 }
 
 void Window::OnClose_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -519,33 +507,6 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		/****************** END RAW MOUSE MESSAGES ******************/
 	case WM_SIZE:
 	{
-		//int width = LOWORD(lParam);
-		//int height = HIWORD(lParam);
-
-		//// Get the window and client dimensions
-		//RECT window;
-		//RECT window2;
-
-		//GetWindowRect(hWnd, &window);
-		//GetClientRect(hWnd, &window2);
-
-		//if (width < (height * m_Width) / m_Height)
-		//{
-		//	// Calculate desired window width and height
-		//	int border = (window.right - window.left) -
-		//		window2.right;
-		//	int header = (window.bottom - window.top) -
-		//		window2.bottom;
-		//	width = ((height * m_Width) / m_Height) + border;
-		//	height = height + header; // + toolbar.rect.bottom
-
-		//	// Set new dimensions
-		//	SetWindowPos(hWnd, NULL, 0, 0,
-		//		width, height,
-		//		SWP_NOMOVE | SWP_NOZORDER);
-		//}
-
-		//break;
 		break;
 	}
 	case WM_SIZING:

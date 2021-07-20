@@ -16,7 +16,7 @@ public:
 
 	Size(int width, int height);
 	Size(Point p);
-	~Size();
+	~Size() = default;
 
 	inline bool Equals(Size s) const noexcept override;
 
@@ -40,12 +40,14 @@ public:
 
 struct SizeF : public IEquatable<SizeF>
 {
+public:
+
 	float Width;
 	float Height;
 
 	SizeF(float width, float height);
 	SizeF(PointF p);
-	~SizeF();
+	virtual ~SizeF() = default;
 
 	inline bool Equals(SizeF s) const noexcept override;
 

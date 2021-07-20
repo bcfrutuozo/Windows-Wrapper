@@ -18,7 +18,7 @@ public:
 	Point(int word);
 	Point(int x, int y);
 	Point(Size size);
-	~Point();
+	~Point() = default;
 
 	inline bool Equals(Point p) const noexcept override;
 
@@ -38,11 +38,13 @@ public:
 
 struct PointF : public IEquatable<PointF>
 {
+public:
+
 	float X;
 	float Y;
 
 	PointF(float x, float y);
-	~PointF();
+	virtual ~PointF() = default;
 
 	inline bool Equals(PointF p) const noexcept override;
 

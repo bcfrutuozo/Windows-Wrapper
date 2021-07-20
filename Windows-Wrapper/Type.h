@@ -13,38 +13,12 @@ private:
 
 public:
 
-	Type(const type_info& t)
-		:
-		m_Type(t)
-	{}
+	Type(const type_info& t);
 
-	bool Equals(Type t) const noexcept
-	{
-		return m_Type == t.m_Type;
-	}
-
-	bool operator==(Type t) const noexcept
-	{
-		return m_Type == t.m_Type;
-	}
-
-	bool operator==(const type_info& t)
-	{
-		return m_Type == t;
-	}
-
-	bool operator!=(Type t) const noexcept
-	{
-		return m_Type != t.m_Type;
-	}
-
-	bool operator!=(const type_info& t)
-	{
-		return m_Type != t;
-	}
-
-	const std::string ToString() const noexcept
-	{
-		return m_Type.name();
-	}
+	bool Equals(Type t) const noexcept;
+	bool operator==(Type t) const noexcept;
+	bool operator==(const type_info& t) const noexcept;
+	bool operator!=(Type t) const noexcept;
+	bool operator!=(const type_info& t) const noexcept;
+	const std::string ToString() const noexcept;
 };

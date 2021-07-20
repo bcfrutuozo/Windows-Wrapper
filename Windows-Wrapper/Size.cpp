@@ -20,11 +20,6 @@ Size::Size(Point p)
 
 }
 
-Size::~Size()
-{
-
-}
-
 bool Size::Equals(Size s) const noexcept
 {
 	if (Width == s.Width && Height == s.Height)
@@ -135,11 +130,6 @@ SizeF::SizeF(PointF p)
 	:
 	Width(p.X),
 	Height(p.Y)
-{
-
-}
-
-SizeF::~SizeF()
 {
 
 }

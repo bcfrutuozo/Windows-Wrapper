@@ -79,15 +79,13 @@ private:
 	std::unique_ptr<Keyboard> m_Keyboard;
 	std::unique_ptr<Mouse> m_Mouse;
 	std::vector<BYTE> m_RawBuffer;
-	std::unique_ptr<MenuBar> m_Menu;
+	std::unique_ptr<MenuBar> m_MenuBar;
 
 	// Set default as white
 	Color m_ForeColor = Color::White();
 
 
 protected:
-
-	
 
 	virtual void OnCreate()
 	{
@@ -177,14 +175,25 @@ public:
 	void RemoveMenu() noexcept
 	{
 		SetMenu(static_cast<HWND>(Handle.ToPointer()), 0);
-		m_Menu.reset(new MenuBar(this));
+		m_MenuBar.reset(new MenuBar(this));
 	}
 
-
 	template <typename T, typename = std::enable_if<std::is_base_of<Control, T>::value>::type>
-	T& Create(const std::string& text = {}) noexcept
+	T& Create() noexcept
 	{
-		return std::make_unique<T>(this, text);
+		return std::make_unique<T>(this);
+	}
+
+	template <>
+	MenuBar& Create() noexcept
+	{
+		// A window can have only one MenuBar. So it has a specialized function for its rules.
+		if (m_MenuBar == nullptr)
+		{
+			m_MenuBar = std::make_unique<MenuBar>(this);
+		}
+
+		return *m_MenuBar;
 	}
 
 	void SetText(const std::string& text) override;
@@ -195,7 +204,6 @@ public:
 	bool IsCursorEnabled() const noexcept;
 	Keyboard& GetKeyboard() noexcept;
 	Mouse& GetMouse() noexcept;
-	MenuBar& GetMenu() noexcept;
 	static const std::optional<int> ProcessMessages();
 
 	// Window Exception

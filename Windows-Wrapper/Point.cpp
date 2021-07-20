@@ -17,6 +17,7 @@ Point::Point(int x, int y)
 	X(x),
 	Y(y)
 {
+
 }
 
 Point::Point(Size size)
@@ -24,10 +25,7 @@ Point::Point(Size size)
 	X(size.Width),
 	Y(size.Height)
 {
-}
 
-Point::~Point()
-{
 }
 
 bool Point::Equals(Point p) const noexcept
@@ -105,11 +103,6 @@ PointF::PointF(float x, float y)
 	:
 	X(x),
 	Y(y)
-{
-
-}
-
-PointF::~PointF()
 {
 
 }

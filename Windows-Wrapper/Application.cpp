@@ -78,7 +78,7 @@ void Application::HandleInput(float dt)
 	{
 		if (m_Window.GetKeyboard().IsKeyPressed('Y'))
 		{
-			auto& mb = m_Window.GetMenu();
+			auto& mb = m_Window.Create<MenuBar>();
 			auto& item1 = mb.AddItem("Arquivo");
 			item1.OnClickSet(&OpenFileX);
 			auto& item2 = mb.AddItem("Arquivo2", &OpenFileX);
