@@ -28,9 +28,9 @@ public:
 
 	Menu(Control* parent, unsigned int subitemIndex, const std::string& iconPath = { });
 	Menu(Control* parent, const std::string& text, unsigned int subitemIndex, const std::string& iconPath = { });
-	~Menu();
-	virtual void Bind();
+	virtual ~Menu();
 
+	virtual void Bind();
 	void AddSeparator();
 	virtual Menu& AddMenu(const std::string& text);
 	virtual MenuItem& AddItem(const std::string& text, const std::function<void()>& function, const std::string& iconPath = {});

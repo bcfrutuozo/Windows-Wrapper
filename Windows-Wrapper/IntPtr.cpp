@@ -21,9 +21,9 @@ IntPtr::IntPtr(void* p)
 
 }
 
-
 IntPtr::~IntPtr()
 {
+	free(m_Ptr);
 }
 
 bool IntPtr::Equals(IntPtr p) const noexcept
@@ -31,15 +31,21 @@ bool IntPtr::Equals(IntPtr p) const noexcept
 	return m_Ptr == p.m_Ptr;
 }
 
+// Remove compile warnings regarding pointer conversions
+#pragma warning(push)
+#pragma warning(disable : 4244)
+
 int IntPtr::ToInt32() const noexcept
 {
-	return reinterpret_cast<int>(m_Ptr);
+	return reinterpret_cast<intptr_t>(m_Ptr);
 }
 
 long IntPtr::ToInt64() const noexcept
 {
-	return reinterpret_cast<long>(m_Ptr);
+	return reinterpret_cast<intptr_t>(m_Ptr);
 }
+
+#pragma warning(pop)
 
 void* IntPtr::ToPointer() const noexcept
 {
@@ -57,7 +63,12 @@ int IntPtr::Size() const noexcept
 
 bool IntPtr::IsNull() const noexcept
 {
-	return (m_Ptr == nullptr || m_Ptr == 0);
+	return m_Ptr == nullptr;
+}
+
+IntPtr IntPtr::Add(IntPtr p, int offset) noexcept
+{
+	return IntPtr(static_cast<long>(reinterpret_cast<intptr_t>(p.m_Ptr) + offset));
 }
 
 IntPtr& IntPtr::operator=(int p) noexcept
@@ -91,19 +102,4 @@ bool IntPtr::operator==(long p) const noexcept
 bool IntPtr::operator==(void* p) const noexcept
 {
 	return m_Ptr == p;
-}
-
-bool IntPtr::operator!=(int p) const noexcept
-{
-	return m_Ptr != reinterpret_cast<int*>(p);
-}
-
-bool IntPtr::operator!=(long p) const noexcept
-{
-	return m_Ptr != reinterpret_cast<int*>(p);
-}
-
-bool IntPtr::operator!=(void* p) const noexcept
-{
-	return m_Ptr != p;
 }

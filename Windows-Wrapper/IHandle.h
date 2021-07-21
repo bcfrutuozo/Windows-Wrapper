@@ -4,12 +4,14 @@
 
 class IHandle
 {
+protected:
+
+	~IHandle()
+	{
+		Handle = nullptr;
+	}
+
 public:
 
 	IntPtr Handle = 0;
-
-	virtual const IntPtr GetHandle() const noexcept
-	{
-		return Handle;
-	}
 };

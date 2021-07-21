@@ -46,7 +46,7 @@ void Menu::Bind()
 	mi.wID = m_Id;
 	mi.hSubMenu = (HMENU)Handle.ToPointer();
 	mi.dwTypeData = const_cast<char*>(Text.c_str());
-	InsertMenuItem(static_cast<HMENU>(Parent->Handle.ToPointer()), (UINT)Handle.ToPointer(), FALSE, &mi);
+	InsertMenuItem(static_cast<HMENU>(Parent->Handle.ToPointer()), Handle.ToInt32(), FALSE, &mi);
 }
 
 void Menu::SetText(const std::string& text)
@@ -83,7 +83,7 @@ void Menu::DispatchEvent(unsigned int id) const
 
 	for (auto& ch : m_MenuItems)
 	{
-		if (typeid(ch) != typeid(MenuItem))
+		if (ch->GetType() == typeid(MenuItem) || ch->GetType() == typeid(Menu))
 		{
 			ch->DispatchEvent(id);
 		}

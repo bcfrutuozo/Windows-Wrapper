@@ -23,7 +23,7 @@ public:
 	Control(Control* parent, const std::string& text, int width, int height, int x, int y);
 	Control(const std::string& text);
 	Control(const std::string& text, int width, int height, int x, int y);
-	~Control();
+	virtual ~Control();
 
 	void operator() (Control* p) {
 		delete p;

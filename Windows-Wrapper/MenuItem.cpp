@@ -35,7 +35,7 @@ void MenuItem::Bind()
 		mi.fMask = MIIM_STRING | MIIM_ID;
 		mi.wID = m_Id;
 		mi.dwTypeData = const_cast<char*>(Text.c_str());
-		InsertMenuItem(static_cast<HMENU>(Parent->Handle.ToPointer()), (UINT)Handle.ToPointer(), FALSE, &mi);
+		InsertMenuItem(static_cast<HMENU>(Parent->Handle.ToPointer()), Handle.ToInt32(), FALSE, &mi);
 	}
 }
 

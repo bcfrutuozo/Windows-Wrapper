@@ -153,7 +153,7 @@ protected:
 public:
 
 	Window(const std::string& name, int width, int height);
-	~Window();
+	virtual ~Window();
 	Window(const Window&) = delete;
 	Window& operator=(const Window&) = delete;
 

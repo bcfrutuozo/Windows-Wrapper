@@ -148,6 +148,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="Base.cpp" />
     <ClCompile Include="Control.cpp" />
     <ClCompile Include="dxerr.cpp" />
     <ClCompile Include="DXGIInfoManager.cpp" />

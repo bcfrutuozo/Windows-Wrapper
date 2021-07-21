@@ -7,7 +7,7 @@ class MenuSeparator : public Menu
 public:
 
 	MenuSeparator(Menu* parent, unsigned int subitemIndex);
-	~MenuSeparator();
+	virtual ~MenuSeparator();
 
 	void Bind() override;
 };
