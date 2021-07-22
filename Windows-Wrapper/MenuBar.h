@@ -13,7 +13,7 @@ public:
 	MenuBar(Control* parent);
 	~MenuBar();
 
-	MenuItem& AddItem(const std::string& text, const std::function<void()>& function, const std::string& iconPath = { }) override;
-	MenuItem& AddItem(const std::string& text, const std::string& iconPath = { }) override;
-	void SetText(const std::string& text) override;
+	// Delete AddCheckItem because menu bar can only have Menu and MenuItem
+	MenuItem& AddCheckItem(const std::string& text, const std::function<void()>& function, bool isChecked) = delete;
+	MenuItem& AddCheckItem(const std::string& text, bool isChecked) = delete;
 };

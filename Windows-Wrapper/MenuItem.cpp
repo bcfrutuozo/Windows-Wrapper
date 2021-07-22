@@ -1,8 +1,8 @@
 #include "MenuItem.h"
 
-MenuItem::MenuItem(Menu* parent, const std::string& text, const std::function<void()>& function, unsigned int i, unsigned int subitemIndex, const std::string& iconPath)
+MenuItem::MenuItem(Menu* parent, const std::string& text, const std::function<void()>& function, unsigned int i, unsigned int subitemIndex, int section, const std::string& iconPath)
 	:
-	Menu(parent, text, subitemIndex, iconPath)
+	Menu(parent, text, subitemIndex, section, iconPath)
 {
 	m_Id = i;
 	m_ClickDelegate = std::make_unique<Event<>>(function);

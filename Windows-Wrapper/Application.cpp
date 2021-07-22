@@ -84,14 +84,20 @@ void Application::HandleInput(float dt)
 			auto& item2 = mb.AddItem("Arquivo2", &OpenFileX);
 			auto& menu1 = mb.AddMenu("Submenu");
 			menu1.AddItem("Submenu-Item1", &OpenFileX);
+			menu1.AddCheckItem("Check-test01", &OpenFileX, true);
+			auto& it2 = menu1.AddCheckItem("Check-test02", false);
+			it2.OnClickSet(&OpenFileX);
 			menu1.AddSeparator();
 			menu1.AddItem("Submenu-Item2", &OpenFileX, "images\\1.bmp");
 			menu1.AddSeparator();
 			auto& menu2 = menu1.AddMenu("Submenu-Item3");
 			menu2.AddItem("Submenu2-Item1", &OpenFileX);
 			menu2.AddSeparator();
-			menu2.AddItem("Submenu2-Item2", &OpenFileX, "images\\1.bmp");
-			menu2.AddItem("Submenu2-Item3", &OpenFileX);
+			menu2.AddRadioItem("Radio1", &OpenFileX, true);
+			menu2.AddRadioItem("Radio2", &OpenFileX, true);
+			menu2.AddRadioItem("Radio3", &OpenFileX, false);
+			menu2.AddRadioItem("Radio4", &OpenFileX, true);
+			menu2.AddSeparator();
 			menu1.AddItem("Submenu-Item4", &OpenFileX);
 			m_Window.Bind(mb);
 		}
