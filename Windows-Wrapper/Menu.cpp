@@ -9,19 +9,18 @@
 // Declare m_Index = 1 setting 0 as null function (NULL || nullptr)
 unsigned int Menu::m_CurrentIndex = 1;
 
-Menu::Menu(Control* parent, unsigned int subitemIndex, int section, const std::string& iconPath)
+Menu::Menu(Control* parent, unsigned int subitemIndex, int section)
 	:
-	Menu(parent, "", subitemIndex, section, iconPath)
+	Menu(parent, "", subitemIndex, section)
 
 {
 
 };
 
-Menu::Menu(Control* parent, const std::string& text, unsigned int subitemIndex, int section, const std::string& iconPath)
+Menu::Menu(Control* parent, const std::string& text, unsigned int subitemIndex, int section)
 	:
 	Control(parent, text),
 	m_SubItemIndex(subitemIndex),
-	m_IconPath(iconPath),
 	m_Id(0),			// No processing for default menu.
 	m_Section(section)
 {
@@ -36,7 +35,7 @@ Menu::~Menu()
 Menu& Menu::AddMenu(const std::string& text)
 {
 	// New Menu doesn't have icons and Section index is always 0.
-	auto m = std::make_shared<Menu>(this, text, static_cast<unsigned int>(m_MenuItems.size()), 0, "");
+	auto m = std::make_shared<Menu>(this, text, static_cast<unsigned int>(m_MenuItems.size()), 0);
 	m->Bind();
 	m_MenuItems.push_back(m);
 	return *m_MenuItems.back();
@@ -97,6 +96,23 @@ std::tuple<int, int> Menu::InvalidateSection(int section)
 	return std::tuple(begin, end);
 }
 
+
+void Menu::DispatchEvent(unsigned int id)
+{
+	if (m_Id == id)
+	{
+		return m_ClickDelegate->Trigger();
+	}
+
+	for (auto& ch : m_MenuItems)
+	{
+		if (ch->GetType() != typeid(MenuSeparator))
+		{
+			ch->DispatchEvent(id);
+		}
+	}
+};
+
 void Menu::Bind()
 {
 	MENUITEMINFO mi = { 0 };
@@ -139,7 +155,6 @@ MenuItem& Menu::AddCheckItem(const std::string& text, bool isChecked)
 	return AddCheckItem(text, nullptr, isChecked);
 }
 
-// For MenuRadioItem
 MenuItem& Menu::AddRadioItem(const std::string& text, const std::function<void()>& function, bool isSelected)
 {
 	auto m = std::make_shared<MenuRadioItem>(this, text, function, m_CurrentIndex++, m_MenuItems.size(), m_Section, isSelected);
@@ -159,25 +174,4 @@ void Menu::AddSeparator()
 	m->Bind();
 	m_MenuItems.push_back(m);
 	m_Section++;	// Increment section for check/radio button option sections
-}
-
-void Menu::DispatchEvent(unsigned int id)
-{
-	if (m_Id == id)
-	{
-		return m_ClickDelegate->Trigger();
-	}
-
-	for (auto& ch : m_MenuItems)
-	{
-		if (ch->GetType() == typeid(MenuItem) || ch->GetType() == typeid(Menu) || ch->GetType() == typeid(MenuCheckItem) || ch->GetType() == typeid(MenuRadioItem))
-		{
-			ch->DispatchEvent(id);
-		}
-	}
-};
-
-unsigned int Menu::GetId()
-{
-	return 0;
 }

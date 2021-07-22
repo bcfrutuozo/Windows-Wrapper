@@ -15,28 +15,27 @@ class Menu : public Control
 
 protected:
 
+	// Fields for menu/submenu indexing
 	unsigned int m_Id;
 	unsigned int m_SubItemIndex;
 	int m_Section;
-	std::string m_IconPath;
-	HBITMAP m_Icon;
+
 	std::vector<std::shared_ptr<Menu>> m_MenuItems;
+
+	// Fields for callback binding
 	std::unique_ptr<Event<>> m_ClickDelegate;
 	static unsigned int m_CurrentIndex;
 	
 	std::tuple<int, int> InvalidateSection(int section);
-
-	virtual unsigned int GetId();	
 	virtual void DispatchEvent(unsigned int id);
 
 public:
 
-	Menu(Control* parent, unsigned int subitemIndex, int section, const std::string& iconPath = { });
-	Menu(Control* parent, const std::string& text, unsigned int subitemIndex, int section, const std::string& iconPath = { });
+	Menu(Control* parent, unsigned int subitemIndex, int section);
+	Menu(Control* parent, const std::string& text, unsigned int subitemIndex, int section);
 	virtual ~Menu();
 
 	virtual void Bind();
-	void AddSeparator();
 
 	// For MenuBar
 	Menu& AddMenu(const std::string& text);
@@ -52,6 +51,9 @@ public:
 	// For MenuRadioItem
 	MenuItem& AddRadioItem(const std::string& text, const std::function<void()>& function, bool isChecked);
 	MenuItem& AddRadioItem(const std::string& text, bool isChecked);
+
+	// For MenuSeparator
+	void AddSeparator();
 
 	void SetText(const std::string& text) override;
 };
