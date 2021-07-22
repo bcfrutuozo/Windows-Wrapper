@@ -20,7 +20,7 @@ protected:
 	unsigned int m_SubItemIndex;
 	int m_Section;
 
-	std::vector<std::shared_ptr<Menu>> m_MenuItems;
+	// std::vector<std::shared_ptr<Menu>> m_MenuItems;
 
 	// Fields for callback binding
 	std::unique_ptr<Event<>> m_ClickDelegate;
@@ -35,7 +35,7 @@ public:
 	Menu(Control* parent, const std::string& text, unsigned int subitemIndex, int section);
 	virtual ~Menu();
 
-	virtual void Bind();
+	virtual void Bind() noexcept override;
 
 	// For MenuBar
 	Menu& AddMenu(const std::string& text);
@@ -54,6 +54,4 @@ public:
 
 	// For MenuSeparator
 	void AddSeparator();
-
-	void SetText(const std::string& text) override;
 };

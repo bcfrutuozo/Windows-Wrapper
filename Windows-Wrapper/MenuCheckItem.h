@@ -9,10 +9,8 @@ public:
 	bool IsChecked;
 
 	MenuCheckItem(Menu* parent, const std::string& text, const std::function<void()>& function, unsigned int i, unsigned int subitemIndex, int section, bool isChecked);
-	virtual ~MenuCheckItem();
 
-	void Bind() override;
+	void Bind() noexcept override;
 	void DispatchEvent(unsigned int id);
-	void SetText(const std::string& text) override;
 };
 

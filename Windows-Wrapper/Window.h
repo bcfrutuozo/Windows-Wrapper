@@ -5,7 +5,7 @@
 #include "Exception.h"
 #include "Keyboard.h"
 #include "Mouse.h"
-#include "MenuBar.h"
+#include "MenuStrip.h"
 
 #include <memory>
 #include <vector>
@@ -75,11 +75,11 @@ private:
 	void OnRawInput_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 
 	bool m_IsCursorEnabled;
+	bool m_IsMenuStripEnabled;
 	RECT m_Rectangle;
 	std::unique_ptr<Keyboard> m_Keyboard;
 	std::unique_ptr<Mouse> m_Mouse;
 	std::vector<BYTE> m_RawBuffer;
-	std::unique_ptr<MenuBar> m_MenuBar;
 
 	// Set default as white
 	Color m_ForeColor = Color::White();
@@ -89,7 +89,7 @@ protected:
 
 	virtual void OnCreate()
 	{
-		
+
 	}
 
 	virtual void OnActivation() const
@@ -157,46 +157,16 @@ public:
 	Window(const Window&) = delete;
 	Window& operator=(const Window&) = delete;
 
-	template <typename T, typename = std::enable_if<std::is_base_of<Control, T>::value>::type>
-	void Bind(const T& control) noexcept;
+	void Bind() noexcept;
 
-	template<>
-	void Bind<MenuBar>(const MenuBar& control) noexcept
-	{
-		SetMenu(static_cast<HWND>(Handle.ToPointer()), static_cast<HMENU>(control.Handle.ToPointer()));
-	}
+	// MenuStrip functions
+	void ClearMenuStrip() noexcept;
+	void ShowMenuStrip() noexcept;
+	void HideMenuStrip() noexcept;
+	void UpdateMenuStrip() noexcept;
+	MenuStrip& GetMenuStrip() noexcept;
 
-	template <typename T, typename = std::enable_if<std::is_base_of<Control, T>::value>::type>
-	void Remove(const T& control) noexcept
-	{
-
-	}
-
-	void RemoveMenu() noexcept
-	{
-		SetMenu(static_cast<HWND>(Handle.ToPointer()), 0);
-		m_MenuBar.reset(new MenuBar(this));
-	}
-
-	template <typename T, typename = std::enable_if<std::is_base_of<Control, T>::value>::type>
-	T& Create() noexcept
-	{
-		return std::make_unique<T>(this);
-	}
-
-	template <>
-	MenuBar& Create() noexcept
-	{
-		// A window can have only one MenuBar. So it has a specialized function for its rules.
-		if (m_MenuBar == nullptr)
-		{
-			m_MenuBar = std::make_unique<MenuBar>(this);
-		}
-
-		return *m_MenuBar;
-	}
-
-	void SetText(const std::string& text) override;
+	void SetText(const std::string& text);
 	void EnableCursor() noexcept;
 	void DisableCursor() noexcept;
 	Color GetForeColor() noexcept;

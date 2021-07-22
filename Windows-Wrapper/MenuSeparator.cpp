@@ -7,12 +7,7 @@ MenuSeparator::MenuSeparator(Menu* parent, unsigned int subitemIndex)
 	m_Id = 0;
 }
 
-MenuSeparator::~MenuSeparator()
-{
-
-}
-
-void MenuSeparator::Bind()
+void MenuSeparator::Bind() noexcept
 {
 	MENUITEMINFO mi = { 0 };
 	mi.cbSize = sizeof(MENUITEMINFO);

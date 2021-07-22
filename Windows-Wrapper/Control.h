@@ -6,6 +6,8 @@
 #include "Size.h"
 #include "Event.h"
 
+class Window;
+
 class Control : public IHandle, public Base
 {
 protected:
@@ -17,23 +19,28 @@ protected:
 public:
 
 	Control* Parent;
+	std::vector<std::shared_ptr<Control>> Controls;
 
 	Control();
 	Control(Control* parent, const std::string& text);
 	Control(Control* parent, const std::string& text, int width, int height, int x, int y);
 	Control(const std::string& text);
 	Control(const std::string& text, int width, int height, int x, int y);
+	Control(Control&& other) = default;
+	Control& operator=(const Control&) = default;
+	Control& operator=(Control&&) = default;
 	virtual ~Control();
 
-	void operator() (Control* p) {
-		delete p;
-	}
+	virtual void Bind() noexcept = 0;
+	const std::string& GetText() const noexcept;
 
-	const std::string& GetText() noexcept
+	template<typename T, typename... Args>
+	T& Create(Args... a)
 	{
-		return Text;
+		auto obj = std::make_shared<T>(a...);
+		Controls.push_back(obj);
+		obj->Bind();
+		return dynamic_cast<T&>(*Controls.back());
 	}
-
-	virtual void SetText(const std::string& title) = 0;
 };
 

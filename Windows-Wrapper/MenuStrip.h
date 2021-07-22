@@ -4,14 +4,15 @@
 
 class Window;
 
-class MenuBar : public Menu
+class MenuStrip : public Menu
 {
 	friend class Window;
 
 public:
 
-	MenuBar(Control* parent);
-	~MenuBar();
+	MenuStrip(Control* parent);
+
+	void Bind() noexcept override;
 
 	// Delete AddCheckItem/AddRadioItem/AddSeparator because menu bar can only have Menu and MenuItem
 	MenuItem& AddCheckItem(const std::string& text, const std::function<void()>& function, bool isChecked) = delete;

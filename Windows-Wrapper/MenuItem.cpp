@@ -9,7 +9,7 @@ MenuItem::MenuItem(Menu* parent, const std::string& text, const std::function<vo
 	m_ClickDelegate = std::make_unique<Event<>>(function);
 }
 
-MenuItem::~MenuItem()
+MenuItem::~MenuItem() noexcept
 {
 	if (m_Icon != nullptr)
 	{
@@ -17,7 +17,7 @@ MenuItem::~MenuItem()
 	}
 }
 
-void MenuItem::Bind()
+void MenuItem::Bind() noexcept
 {
 	if (!m_IconPath.empty())
 	{
@@ -38,11 +38,6 @@ void MenuItem::Bind()
 		mi.dwTypeData = const_cast<char*>(Text.c_str());
 		InsertMenuItem(static_cast<HMENU>(Parent->Handle.ToPointer()), Handle.ToInt32(), FALSE, &mi);
 	}
-}
-
-void MenuItem::SetText(const std::string& text)
-{
-	Text = text;
 }
 
 void MenuItem::OnClickSet(const std::function<void()>& function)

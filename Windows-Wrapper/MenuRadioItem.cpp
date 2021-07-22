@@ -8,12 +8,7 @@ MenuRadioItem::MenuRadioItem(Menu* parent, const std::string& text, const std::f
 
 }
 
-MenuRadioItem::~MenuRadioItem()
-{
-
-}
-
-void MenuRadioItem::Bind()
+void MenuRadioItem::Bind() noexcept
 {
 	// Check if there's already a default set
 	int begin = 0;
@@ -34,11 +29,6 @@ void MenuRadioItem::Bind()
 		auto idx = InvalidateSection(m_Section);
 		CheckMenuRadioItem(static_cast<HMENU>(Parent->Handle.ToPointer()), std::get<0>(idx), std::get<1>(idx), m_SubItemIndex, MF_BYPOSITION);
 	}
-}
-
-void MenuRadioItem::SetText(const std::string& text)
-{
-	Text = text;
 }
 
 void MenuRadioItem::DispatchEvent(unsigned int id)

@@ -7,9 +7,8 @@ class MenuSeparator : public Menu
 public:
 
 	MenuSeparator(Menu* parent, unsigned int subitemIndex);
-	virtual ~MenuSeparator();
 
-	void Bind() override;
+	void Bind() noexcept override;
 
 	// Delete AddMenu/AddCheckItem/AddRadioItem/AddSeparator because menu bar can only have Menu and MenuItem
 	Menu& AddMenu(const std::string& text) = delete;

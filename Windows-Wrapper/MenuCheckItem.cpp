@@ -8,12 +8,7 @@ MenuCheckItem::MenuCheckItem(Menu* parent, const std::string& text, const std::f
 
 }
 
-MenuCheckItem::~MenuCheckItem()
-{
-
-}
-
-void MenuCheckItem::Bind()
+void MenuCheckItem::Bind() noexcept
 {
 	MENUITEMINFO mi = { 0 };
 	mi.cbSize = sizeof(MENUITEMINFO);
@@ -22,11 +17,6 @@ void MenuCheckItem::Bind()
 	mi.wID = m_Id;
 	mi.dwTypeData = const_cast<char*>(Text.c_str());
 	InsertMenuItem(static_cast<HMENU>(Parent->Handle.ToPointer()), m_SubItemIndex, true, &mi);
-}
-
-void MenuCheckItem::SetText(const std::string& text)
-{
-	Text = text;
 }
 
 void MenuCheckItem::DispatchEvent(unsigned int id)

@@ -22,8 +22,7 @@ public:
 	MenuItem& AddRadioItem(const std::string& text, bool isChecked) = delete;
 	void AddSeparator() = delete;
 
-	virtual void Bind() override;
-	virtual void SetText(const std::string& text) override;
+	virtual void Bind() noexcept override;
 
 	void OnClickSet(const std::function<void()>& function);
 	void OnClick() const;

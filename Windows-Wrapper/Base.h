@@ -15,7 +15,7 @@ private:
 protected:
 
 	Base();
-	~Base();
+	virtual ~Base();
 
 public:
 

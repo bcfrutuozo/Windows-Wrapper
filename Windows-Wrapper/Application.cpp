@@ -2,7 +2,7 @@
 #include "Event.h"
 #include "Timer.h"
 #include "Menu.h"
-#include "Menubar.h"
+#include "MenuStrip.h"
 #include "MenuSeparator.h"
 #include "MenuItem.h"
 
@@ -78,7 +78,7 @@ void Application::HandleInput(float dt)
 	{
 		if (m_Window.GetKeyboard().IsKeyPressed('Y'))
 		{
-			auto& mb = m_Window.Create<MenuBar>();
+			auto& mb = m_Window.GetMenuStrip();
 			auto& item1 = mb.AddItem("Arquivo");
 			item1.OnClickSet(&OpenFileX);
 			auto& item2 = mb.AddItem("Arquivo2", &OpenFileX);
@@ -98,13 +98,25 @@ void Application::HandleInput(float dt)
 			menu2.AddRadioItem("Radio3", &OpenFileX, false);
 			menu2.AddRadioItem("Radio4", &OpenFileX, true);
 			menu2.AddSeparator();
+			menu2.AddRadioItem("Radio1", &OpenFileX, false);
+			menu2.AddRadioItem("Radio2", &OpenFileX, true);
 			menu1.AddItem("Submenu-Item4", &OpenFileX);
-			m_Window.Bind(mb);
+			m_Window.UpdateMenuStrip();
 		}
 
 		if (m_Window.GetKeyboard().IsKeyPressed('R'))
 		{
-			m_Window.RemoveMenu();
+			m_Window.ClearMenuStrip();
+		}
+
+		if (m_Window.GetKeyboard().IsKeyPressed('O'))
+		{
+			m_Window.ShowMenuStrip();
+		}
+
+		if (m_Window.GetKeyboard().IsKeyPressed('P'))
+		{
+			m_Window.HideMenuStrip();
 		}
 
 		if (m_Window.GetKeyboard().IsKeyPressed('Q'))

@@ -81,6 +81,8 @@ Window::Window(const std::string& name, int width, int height)
 	}
 
 	ShowWindow(static_cast<HWND>(Handle.ToPointer()), SW_SHOWDEFAULT);
+	// Create the default menu strip for this window and binds it on.
+	Create<MenuStrip>(this);
 
 	// TODO: THIS IS WHERE THE GRAPHICS DEVICE, CONTEXT, RENDER TARGET, DEPTHSTENCIL (MAYBE) WILL BE INSTANTIATED.
 	// YES: THIS IS GONNA TAKE SOME TIME DO DESIGN
@@ -98,9 +100,71 @@ Window::Window(const std::string& name, int width, int height)
 	}
 }
 
+void Window::Bind() noexcept
+{
+	// Still don't know how I'll implement child windows. So this is just to not let an empty ugly function
+	SetParent(static_cast<HWND>(Handle.ToPointer()), static_cast<HWND>(Parent->Handle.ToPointer()));
+}
+
 Window::~Window()
 {
 	DestroyWindow(static_cast<HWND>(Handle.ToPointer()));
+}
+
+void Window::ClearMenuStrip() noexcept
+{
+	SetMenu(static_cast<HWND>(Handle.ToPointer()), NULL);
+
+	for (auto& c : Controls)
+	{
+		if (c->GetType() == typeid(MenuStrip))
+		{
+			Controls.erase(std::remove(Controls.begin(), Controls.end(), c), Controls.end());
+		}
+	}
+}
+
+void Window::ShowMenuStrip() noexcept
+{
+	if (!m_IsMenuStripEnabled)
+	{
+		UpdateMenuStrip();
+		m_IsMenuStripEnabled = true;
+	}
+}
+
+void Window::HideMenuStrip() noexcept
+{
+	if (m_IsMenuStripEnabled)
+	{
+		SetMenu(static_cast<HWND>(Handle.ToPointer()), NULL);
+		m_IsMenuStripEnabled = false;
+	}
+}
+
+void Window::UpdateMenuStrip() noexcept
+{
+	for (auto& c : Controls)
+	{
+		if (c->GetType() == typeid(MenuStrip))
+		{
+			SetMenu(static_cast<HWND>(Handle.ToPointer()), static_cast<HMENU>(c->Handle.ToPointer()));
+			m_IsMenuStripEnabled = true;
+		}
+	}
+}
+
+MenuStrip& Window::GetMenuStrip() noexcept
+{
+	for (auto& c : Controls)
+	{
+		if (c->GetType() == typeid(MenuStrip))
+		{
+			return dynamic_cast<MenuStrip&>(*c);
+		}
+	}
+
+	return Create<MenuStrip>(this);
 }
 
 void Window::SetText(const std::string& title)
@@ -260,7 +324,14 @@ void Window::OnActivate_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 
 void Window::OnCommand_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-	m_MenuBar->DispatchEvent(static_cast<unsigned int>(wParam));
+	for(const auto& c : Controls)
+	{
+		auto obj = dynamic_cast<MenuStrip*>(c.get());
+		if (obj != nullptr)
+		{
+			obj->DispatchEvent(static_cast<unsigned int>(wParam));
+		}
+	}
 }
 
 void Window::OnClose_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
