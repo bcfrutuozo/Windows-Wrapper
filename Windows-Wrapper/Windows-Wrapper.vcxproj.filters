@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Application.cpp" />
+    <ClCompile Include="Base.cpp" />
+    <ClCompile Include="Control.cpp" />
+    <ClCompile Include="dxerr.cpp" />
+    <ClCompile Include="DXGIInfoManager.cpp" />
+    <ClCompile Include="Event.cpp" />
+    <ClCompile Include="Exception.cpp" />
+    <ClCompile Include="Graphics.cpp" />
+    <ClCompile Include="IntPtr.cpp" />
+    <ClCompile Include="Keyboard.cpp" />
+    <ClCompile Include="Mathlib.cpp" />
+    <ClCompile Include="Menu.cpp" />
+    <ClCompile Include="MenuStrip.cpp" />
+    <ClCompile Include="MenuCheckItem.cpp" />
+    <ClCompile Include="MenuItem.cpp" />
+    <ClCompile Include="MenuRadioItem.cpp" />
+    <ClCompile Include="MenuSeparator.cpp" />
+    <ClCompile Include="Mouse.cpp" />
+    <ClCompile Include="Point.cpp" />
+    <ClCompile Include="Size.cpp" />
+    <ClCompile Include="Timer.cpp" />
+    <ClCompile Include="Type.cpp" />
+    <ClCompile Include="Window.cpp" />
+    <ClCompile Include="WinMain.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Application.h" />
+    <ClInclude Include="Base.h" />
+    <ClInclude Include="Color.h" />
+    <ClInclude Include="Common.h" />
+    <ClInclude Include="Control.h" />
+    <ClInclude Include="dxerr.h" />
+    <ClInclude Include="DXGIInfoManager.h" />
+    <ClInclude Include="Event.h" />
+    <ClInclude Include="Exception.h" />
+    <ClInclude Include="Graphics.h" />
+    <ClInclude Include="IntPtr.h" />
+    <ClInclude Include="Keyboard.h" />
+    <ClInclude Include="Mathlib.h" />
+    <ClInclude Include="Menu.h" />
+    <ClInclude Include="MenuStrip.h" />
+    <ClInclude Include="MenuCheckItem.h" />
+    <ClInclude Include="MenuItem.h" />
+    <ClInclude Include="MenuRadioItem.h" />
+    <ClInclude Include="MenuSeparator.h" />
+    <ClInclude Include="Mouse.h" />
+    <ClInclude Include="Point.h" />
+    <ClInclude Include="Size.h" />
+    <ClInclude Include="Timer.h" />
+    <ClInclude Include="Type.h" />
+    <ClInclude Include="uuid.h" />
+    <ClInclude Include="Window.h" />
+    <ClInclude Include="IHandle.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IEquatable.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Interfaces">
+      <UniqueIdentifier>{23d2fdbb-6f10-41e0-8b12-64052984b03f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

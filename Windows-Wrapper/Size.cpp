@@ -20,7 +20,7 @@ Size::Size(Point p)
 
 }
 
-bool Size::Equals(Size s) const noexcept
+bool Size::Equals(const Size& s) const noexcept
 {
 	if (Width == s.Width && Height == s.Height)
 	{
@@ -87,11 +87,6 @@ bool Size::operator==(Size s) noexcept
 	return (Width == s.Width && Height == s.Height);
 }
 
-bool Size::operator!=(Size s) noexcept
-{
-	return (Width != s.Width || Height != s.Height);
-}
-
 Size Size::operator*(int i) noexcept
 {
 	return Size(Width * i, Height * i);
@@ -134,7 +129,7 @@ SizeF::SizeF(PointF p)
 
 }
 
-bool SizeF::Equals(SizeF s) const noexcept
+bool SizeF::Equals(const SizeF& s) const noexcept
 {
 	if (Width == s.Width && Height == s.Height)
 	{
@@ -188,11 +183,6 @@ SizeF SizeF::operator/(float f) noexcept
 bool SizeF::operator==(SizeF s) noexcept
 {
 	return (Width == s.Width && Height == s.Height);
-}
-
-bool SizeF::operator!=(SizeF s) noexcept
-{
-	return (Width != s.Width || Height != s.Height);
 }
 
 SizeF SizeF::operator*(float f) noexcept

@@ -5,7 +5,7 @@ Type::Type(const type_info& t)
 	m_Type(t)
 {}
 
-bool Type::Equals(Type t) const noexcept
+bool Type::Equals(const Type& t) const noexcept
 {
 	return m_Type == t.m_Type;
 }

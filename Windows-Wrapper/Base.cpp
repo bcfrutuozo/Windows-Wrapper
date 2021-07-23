@@ -12,7 +12,7 @@ Base::~Base()
 
 }
 
-bool Base::Equals(Base b) const noexcept
+bool Base::Equals(const Base& b) const noexcept
 {
 	return m_UUID == b.m_UUID;
 }

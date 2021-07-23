@@ -28,7 +28,7 @@ Point::Point(Size size)
 
 }
 
-bool Point::Equals(Point p) const noexcept
+bool Point::Equals(const Point& p) const noexcept
 {
 	return (X == p.X && Y == p.Y);
 }
@@ -88,11 +88,6 @@ bool Point::operator==(Point p) noexcept
 	return (X == p.X && Y == p.Y);
 }
 
-bool Point::operator!=(Point p) noexcept
-{
-	return (X != p.X || Y != p.Y);
-}
-
 Point Point::operator-(Size s) noexcept
 {
 	return Point(X - s.Width, Y - s.Height);
@@ -107,7 +102,7 @@ PointF::PointF(float x, float y)
 
 }
 
-bool PointF::Equals(PointF p) const noexcept
+bool PointF::Equals(const PointF& p) const noexcept
 {
 	return (X == p.X && Y == p.Y);
 }
@@ -156,11 +151,6 @@ PointF PointF::operator+(SizeF s) noexcept
 bool PointF::operator==(PointF p) noexcept
 {
 	return (X == p.X && Y == p.Y);
-}
-
-bool PointF::operator!=(PointF p) noexcept
-{
-	return (X != p.X || Y != p.Y);
 }
 
 PointF PointF::operator-(Size s) noexcept

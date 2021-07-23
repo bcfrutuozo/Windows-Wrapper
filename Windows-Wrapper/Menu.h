@@ -16,13 +16,11 @@ class Menu : public Control
 protected:
 
 	// Fields for menu/submenu indexing
-	unsigned int m_Id;
 	unsigned int m_SubItemIndex;
 	int m_Section;
 
-	// std::vector<std::shared_ptr<Menu>> m_MenuItems;
-
 	// Fields for callback binding
+	unsigned int m_Id;
 	std::unique_ptr<Event<>> m_ClickDelegate;
 	static unsigned int m_CurrentIndex;
 	

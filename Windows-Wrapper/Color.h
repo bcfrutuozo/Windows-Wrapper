@@ -11,7 +11,7 @@ struct Color : public IEquatable<Color>
 	constexpr Color(uint32_t rgba) : rgba(rgba) {}
 	constexpr Color(uint8_t r = 0, uint8_t g = 0, uint8_t b = 0, uint8_t a = 255) : rgba((r << 0) | (g << 8) | (b << 16) | (a << 24)) {}
 
-	inline bool Equals(Color c) const noexcept override
+	inline bool Equals(const Color& c) const noexcept override
 	{
 		return rgba == c.rgba;
 	}

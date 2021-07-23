@@ -20,7 +20,7 @@ public:
 	Point(Size size);
 	~Point() = default;
 
-	inline bool Equals(Point p) const noexcept override;
+	inline bool Equals(const Point& p) const noexcept override;
 
 	const bool IsEmpty() const noexcept;
 	inline static Point Add(Point p, Size s) noexcept;
@@ -32,7 +32,6 @@ public:
 	inline static Point Truncate(PointF p) noexcept;
 	inline Point operator+(Size s) noexcept;
 	inline bool operator==(Point p) noexcept;
-	inline bool operator!=(Point p) noexcept;
 	inline Point operator-(Size s) noexcept;
 };
 
@@ -46,7 +45,7 @@ public:
 	PointF(float x, float y);
 	virtual ~PointF() = default;
 
-	inline bool Equals(PointF p) const noexcept override;
+	inline bool Equals(const PointF& p) const noexcept override;
 
 	const bool IsEmpty() const noexcept;
 	inline static PointF Add(Point p, Size s) noexcept;
@@ -56,7 +55,6 @@ public:
 	inline PointF operator+(Size s) noexcept;
 	inline PointF operator+(SizeF s) noexcept;
 	inline bool operator==(PointF p) noexcept;
-	inline bool operator!=(PointF p) noexcept;
 	inline PointF operator-(Size s) noexcept;
 	inline PointF operator-(SizeF s) noexcept;
 };

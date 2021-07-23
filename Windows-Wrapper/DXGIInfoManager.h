@@ -3,10 +3,6 @@
 #include "Common.h"
 #include "dxerr.h"
 
-#pragma warning(disable:4265)
-#include <wrl.h>
-#pragma warning(default:4265)
-
 #include <vector>
 #include <dxgidebug.h>
 #include <string>
@@ -16,7 +12,7 @@ class DXGIInfoManager
 private:
 
 	unsigned long long m_Next = 0u;
-	Microsoft::WRL::ComPtr<IDXGIInfoQueue> m_DXGIInfoQueue;
+	ComPtr<IDXGIInfoQueue> m_DXGIInfoQueue;
 
 public:
 

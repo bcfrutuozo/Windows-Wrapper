@@ -17,7 +17,7 @@ private:
 
 public:
 
-	bool Equals(Type t) const noexcept;
+	bool Equals(const Type& t) const noexcept;
 	bool operator==(Type t) const noexcept;
 	bool operator==(const type_info& t) const noexcept;
 	virtual const std::string ToString() const noexcept;

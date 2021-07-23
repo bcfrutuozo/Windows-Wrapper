@@ -10,13 +10,13 @@ class Window;
 
 class Control : public IHandle, public Base
 {
+	friend class Menu;
+
 protected:
 
 	std::string Text;
 	Size Size;
 	Point Location;
-
-public:
 
 	Control* Parent;
 	std::vector<std::shared_ptr<Control>> Controls;
@@ -32,7 +32,6 @@ public:
 	virtual ~Control();
 
 	virtual void Bind() noexcept = 0;
-	const std::string& GetText() const noexcept;
 
 	template<typename T, typename... Args>
 	T& Create(Args... a)
@@ -42,5 +41,9 @@ public:
 		obj->Bind();
 		return dynamic_cast<T&>(*Controls.back());
 	}
+
+public:
+
+	const std::string& GetText() const noexcept;
 };
 

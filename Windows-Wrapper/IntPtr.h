@@ -16,7 +16,7 @@ public:
 	IntPtr(void*);
 	virtual ~IntPtr();
 
-	inline bool Equals(IntPtr p) const noexcept override;
+	inline bool Equals(const IntPtr& p) const noexcept override;
 	int ToInt32() const noexcept;
 	long ToInt64() const noexcept;
 	void* ToPointer() const noexcept;

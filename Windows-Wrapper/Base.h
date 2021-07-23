@@ -19,7 +19,7 @@ protected:
 
 public:
 
-	bool Equals(Base b) const noexcept;
+	bool Equals(const Base& b) const noexcept;
 	const std::string& GetHashCode() const noexcept;
 	const Type GetType() const noexcept;
 	const bool ReferenceEquals(const Base& b) const noexcept;

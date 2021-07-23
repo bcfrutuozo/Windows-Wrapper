@@ -23,10 +23,10 @@ IntPtr::IntPtr(void* p)
 
 IntPtr::~IntPtr()
 {
-	free(m_Ptr);
+
 }
 
-bool IntPtr::Equals(IntPtr p) const noexcept
+bool IntPtr::Equals(const IntPtr& p) const noexcept
 {
 	return m_Ptr == p.m_Ptr;
 }

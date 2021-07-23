@@ -81,8 +81,6 @@ Window::Window(const std::string& name, int width, int height)
 	}
 
 	ShowWindow(static_cast<HWND>(Handle.ToPointer()), SW_SHOWDEFAULT);
-	// Create the default menu strip for this window and binds it on.
-	Create<MenuStrip>(this);
 
 	// TODO: THIS IS WHERE THE GRAPHICS DEVICE, CONTEXT, RENDER TARGET, DEPTHSTENCIL (MAYBE) WILL BE INSTANTIATED.
 	// YES: THIS IS GONNA TAKE SOME TIME DO DESIGN
