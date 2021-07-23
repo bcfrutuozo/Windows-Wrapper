@@ -1,5 +1,7 @@
 #include "MenuItem.h"
 
+#include <filesystem>
+
 MenuItem::MenuItem(Menu* parent, const std::string& text, const std::function<void()>& function, unsigned int i, unsigned int subitemIndex, int section, const std::string& iconPath)
 	:
 	Menu(parent, text, subitemIndex, section),
@@ -9,7 +11,7 @@ MenuItem::MenuItem(Menu* parent, const std::string& text, const std::function<vo
 	m_ClickDelegate = std::make_unique<Event<>>(function);
 }
 
-MenuItem::~MenuItem() noexcept
+MenuItem::~MenuItem()
 {
 	if (m_Icon != nullptr)
 	{

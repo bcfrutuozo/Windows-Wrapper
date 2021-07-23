@@ -17,7 +17,6 @@ protected:
 	std::string Text;
 	Size Size;
 	Point Location;
-
 	Control* Parent;
 	std::vector<std::shared_ptr<Control>> Controls;
 
@@ -46,4 +45,3 @@ public:
 
 	const std::string& GetText() const noexcept;
 };
-

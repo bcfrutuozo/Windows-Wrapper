@@ -1,9 +1,9 @@
 #include "MenuStrip.h"
-#include "MenuItem.h"
+#include "MenuRoot.h"
 
 MenuStrip::MenuStrip(Control* parent)
 	:
-	Menu(parent, 0, 0)
+	MenuRoot(parent, "", 0, 0)
 {
 	Handle = CreateMenu();
 };

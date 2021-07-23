@@ -15,7 +15,6 @@ class Menu : public Control
 
 protected:
 
-	// Fields for menu/submenu indexing
 	unsigned int m_SubItemIndex;
 	int m_Section;
 
@@ -23,33 +22,15 @@ protected:
 	unsigned int m_Id;
 	std::unique_ptr<Event<>> m_ClickDelegate;
 	static unsigned int m_CurrentIndex;
-	
+
+	Menu(Control* parent);
+	Menu(Control* parent, const std::string& text, unsigned int subItemIndex, int section);
+	virtual ~Menu();
+
 	std::tuple<int, int> InvalidateSection(int section);
 	virtual void DispatchEvent(unsigned int id);
 
 public:
 
-	Menu(Control* parent, unsigned int subitemIndex, int section);
-	Menu(Control* parent, const std::string& text, unsigned int subitemIndex, int section);
-	virtual ~Menu();
-
-	virtual void Bind() noexcept override;
-
-	// For MenuBar
-	Menu& AddMenu(const std::string& text);
-
-	// For MenuItem
-	MenuItem& AddItem(const std::string& text, const std::function<void()>& function, const std::string& iconPath = {});
-	MenuItem& AddItem(const std::string& text, const std::string& iconPath = { });
-
-	// For MenuCheckItem
-	MenuItem& AddCheckItem(const std::string& text, const std::function<void()>& function, bool isChecked);
-	MenuItem& AddCheckItem(const std::string& text, bool isChecked);
-
-	// For MenuRadioItem
-	MenuItem& AddRadioItem(const std::string& text, const std::function<void()>& function, bool isChecked);
-	MenuItem& AddRadioItem(const std::string& text, bool isChecked);
-
-	// For MenuSeparator
-	void AddSeparator();
+	virtual void Bind() noexcept override = 0;
 };

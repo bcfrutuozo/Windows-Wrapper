@@ -5,6 +5,7 @@
 #include "MenuStrip.h"
 #include "MenuSeparator.h"
 #include "MenuItem.h"
+#include "MenuLeaf.h"
 
 #include <sstream>
 #include <iomanip>
