@@ -1,9 +1,8 @@
 #include "MenuCheckItem.h"
 
-MenuCheckItem::MenuCheckItem(Menu* parent, const std::string& text, const std::function<void()>& function, unsigned int i, unsigned int subitemIndex, int section, bool isChecked)
+MenuCheckItem::MenuCheckItem(Menu* parent, const std::string& text, unsigned int subitemIndex, int section, bool isChecked)
 	:
-	MenuItem(parent, text, function, i, subitemIndex, section),
-	IsChecked(isChecked)
+	MenuItem(parent, text, subitemIndex, section)
 {
 
 }
@@ -19,28 +18,26 @@ void MenuCheckItem::Bind() noexcept
 	InsertMenuItem(static_cast<HMENU>(Parent->Handle.ToPointer()), m_SubItemIndex, true, &mi);
 }
 
-void MenuCheckItem::DispatchEvent(unsigned int id)
+// Dispatch is overridden to process the Check on the item after the callback
+void MenuCheckItem::Dispatch(const std::string& name)
 {
-	if (m_Id == id)
+	try
 	{
-		try
-		{
-			m_ClickDelegate->Trigger();
-		}
-		catch (...)
-		{
-			// Throw exception during processing and don't change MenuChangeItem behavior
-			throw;
-		}
-
-		// Change MenuItemChange only if callback is executed
-		IsChecked = !IsChecked;
-		MENUITEMINFO mi = { 0 };
-		mi.cbSize = sizeof(MENUITEMINFO);
-		mi.fMask = MIIM_ID | MIIM_STATE | MIIM_STRING;
-		mi.fState = IsChecked ? MF_CHECKED : MF_UNCHECKED;
-		mi.wID = m_Id;
-		mi.dwTypeData = const_cast<char*>(Text.c_str());
-		SetMenuItemInfo(static_cast<HMENU>(Parent->Handle.ToPointer()), m_SubItemIndex, true, &mi);
+		Control::Dispatch(name);
 	}
+	catch (...)
+	{
+		// Throw exception during processing and don't change MenuChangeItem behavior
+		throw;
+	}
+
+	// Change MenuItemChange only if callback is executed
+	IsChecked = !IsChecked;
+	MENUITEMINFO mi = { 0 };
+	mi.cbSize = sizeof(MENUITEMINFO);
+	mi.fMask = MIIM_ID | MIIM_STATE | MIIM_STRING;
+	mi.fState = IsChecked ? MF_CHECKED : MF_UNCHECKED;
+	mi.wID = m_Id;
+	mi.dwTypeData = const_cast<char*>(Text.c_str());
+	SetMenuItemInfo(static_cast<HMENU>(Parent->Handle.ToPointer()), m_SubItemIndex, true, &mi);
 }

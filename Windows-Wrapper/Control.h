@@ -11,6 +11,7 @@ class Window;
 class Control : public IHandle, public Base
 {
 	friend class Menu;
+	friend class MenuRadioItem;
 
 protected:
 
@@ -19,6 +20,7 @@ protected:
 	Point Location;
 	Control* Parent;
 	std::vector<std::shared_ptr<Control>> Controls;
+	EventDispatcher Events;
 
 	Control();
 	Control(Control* parent, const std::string& text);
@@ -41,7 +43,22 @@ protected:
 		return dynamic_cast<T&>(*Controls.back());
 	}
 
+	virtual void Dispatch(const std::string& event)
+	{
+		Events.Dispatch(event, this);
+	}
+
 public:
+
+	void OnClickSet(const std::function<void(Control*)>& callback)
+	{
+		Events.Register(new Event<Control*>("OnClick", callback));
+	}
+
+	void OnClick()
+	{
+		Events.Dispatch("OnClick");
+	}
 
 	const std::string& GetText() const noexcept;
 };

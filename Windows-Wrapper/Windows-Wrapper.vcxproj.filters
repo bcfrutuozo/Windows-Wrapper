@@ -12,12 +12,6 @@
     <ClCompile Include="IntPtr.cpp" />
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="Mathlib.cpp" />
-    <ClCompile Include="Menu.cpp" />
-    <ClCompile Include="MenuStrip.cpp" />
-    <ClCompile Include="MenuCheckItem.cpp" />
-    <ClCompile Include="MenuItem.cpp" />
-    <ClCompile Include="MenuRadioItem.cpp" />
-    <ClCompile Include="MenuSeparator.cpp" />
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="Point.cpp" />
     <ClCompile Include="Size.cpp" />
@@ -25,8 +19,30 @@
     <ClCompile Include="Type.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="WinMain.cpp" />
-    <ClCompile Include="MenuRoot.cpp" />
-    <ClCompile Include="MenuLeaf.cpp" />
+    <ClCompile Include="Menu.cpp">
+      <Filter>Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuCheckItem.cpp">
+      <Filter>Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuItem.cpp">
+      <Filter>Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuLeaf.cpp">
+      <Filter>Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuRadioItem.cpp">
+      <Filter>Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuRoot.cpp">
+      <Filter>Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuSeparator.cpp">
+      <Filter>Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuStrip.cpp">
+      <Filter>Menu</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -42,12 +58,6 @@
     <ClInclude Include="IntPtr.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Mathlib.h" />
-    <ClInclude Include="Menu.h" />
-    <ClInclude Include="MenuStrip.h" />
-    <ClInclude Include="MenuCheckItem.h" />
-    <ClInclude Include="MenuItem.h" />
-    <ClInclude Include="MenuRadioItem.h" />
-    <ClInclude Include="MenuSeparator.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="Size.h" />
@@ -61,12 +71,37 @@
     <ClInclude Include="IEquatable.h">
       <Filter>Interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="MenuRoot.h" />
-    <ClInclude Include="MenuLeaf.h" />
+    <ClInclude Include="Menu.h">
+      <Filter>Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuCheckItem.h">
+      <Filter>Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuItem.h">
+      <Filter>Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuLeaf.h">
+      <Filter>Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuRadioItem.h">
+      <Filter>Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuRoot.h">
+      <Filter>Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuSeparator.h">
+      <Filter>Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuStrip.h">
+      <Filter>Menu</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interfaces">
       <UniqueIdentifier>{23d2fdbb-6f10-41e0-8b12-64052984b03f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Menu">
+      <UniqueIdentifier>{92987fab-9fd4-469c-b685-2c702d1fcb10}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

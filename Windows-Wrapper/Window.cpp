@@ -322,12 +322,17 @@ void Window::OnActivate_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 
 void Window::OnCommand_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-	for(const auto& c : Controls)
+	for (const auto& item : Controls)
 	{
-		auto obj = dynamic_cast<MenuStrip*>(c.get());
-		if (obj != nullptr)
+		// Get the MenuStrip to search for the right item
+		auto menu = dynamic_cast<MenuStrip*>(item.get());
+		if (menu != nullptr)
 		{
-			obj->DispatchEvent(static_cast<unsigned int>(wParam));
+			auto entry = menu->GetById(static_cast<unsigned int>(wParam));
+			if (entry != nullptr)
+			{
+				entry->Dispatch("OnClick");
+			}
 		}
 	}
 }

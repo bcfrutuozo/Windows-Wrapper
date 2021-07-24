@@ -6,16 +6,13 @@ class MenuItem : public Menu
 {
 protected:
 
-	std::string m_IconPath;
-	HBITMAP m_Icon;
+	// Will be loaded in the constructor if the file path is not empty
+	HBITMAP m_Icon = nullptr;
 
 public:
 
-	MenuItem(Menu* parent, const std::string& text, const std::function<void()>& function, unsigned int i, unsigned int subitemIndex, int section, const std::string& iconPath = { });
+	MenuItem(Menu* parent, const std::string& text, unsigned int subitemIndex, int section, const std::string& iconPath = { });
 	virtual ~MenuItem();
 
 	virtual void Bind() noexcept override;
-
-	void OnClickSet(const std::function<void()>& function);
-	void OnClick() const;
 };

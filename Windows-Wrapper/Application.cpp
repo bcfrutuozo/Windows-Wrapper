@@ -46,9 +46,9 @@ int Application::Start()
 	}
 }
 
-void OpenFileX()
+void OpenFileX(const Control* control)
 {
-	OutputDebugString("TESTE AAAAAAAAAAA");
+	OutputDebugString("Eba");
 }
 
 void Application::HandleInput(float dt)
@@ -82,26 +82,28 @@ void Application::HandleInput(float dt)
 			auto& mb = m_Window.GetMenuStrip();
 			auto& item1 = mb.AddItem("Arquivo");
 			item1.OnClickSet(&OpenFileX);
-			auto& item2 = mb.AddItem("Arquivo2", &OpenFileX);
+			auto& item2 = mb.AddItem("Arquivo2");
+			item2.OnClickSet(&OpenFileX);
 			auto& menu1 = mb.AddMenu("Submenu");
-			menu1.AddItem("Submenu-Item1", &OpenFileX);
-			menu1.AddCheckItem("Check-test01", &OpenFileX, true);
+			menu1.AddItem("Submenu-Item1").OnClickSet(&OpenFileX);
+			menu1.AddCheckItem("Check-test01", true).OnClickSet(&OpenFileX);
 			auto& it2 = menu1.AddCheckItem("Check-test02", false);
 			it2.OnClickSet(&OpenFileX);
 			menu1.AddSeparator();
-			menu1.AddItem("Submenu-Item2", &OpenFileX, "images\\1.bmp");
+			menu1.AddItem("Submenu-Item2", "images\\1.bmp").OnClickSet(&OpenFileX);
 			menu1.AddSeparator();
 			auto& menu2 = menu1.AddMenu("Submenu-Item3");
-			menu2.AddItem("Submenu2-Item1", &OpenFileX);
+			menu2.AddItem("Submenu2-Item1", "images\\2.bmp").OnClickSet(&OpenFileX);
 			menu2.AddSeparator();
-			menu2.AddRadioItem("Radio1", &OpenFileX, true);
-			menu2.AddRadioItem("Radio2", &OpenFileX, true);
-			menu2.AddRadioItem("Radio3", &OpenFileX, false);
-			menu2.AddRadioItem("Radio4", &OpenFileX, true);
+			menu2.AddRadioItem("Radio1", true).OnClickSet(&OpenFileX);
+			menu2.AddRadioItem("Radio2", true).OnClickSet(&OpenFileX);
+			menu2.AddRadioItem("Radio3", false).OnClickSet(&OpenFileX);
+			menu2.AddRadioItem("Radio4", true).OnClickSet(&OpenFileX);
 			menu2.AddSeparator();
-			menu2.AddRadioItem("Radio1", &OpenFileX, false);
-			menu2.AddRadioItem("Radio2", &OpenFileX, true);
-			menu1.AddItem("Submenu-Item4", &OpenFileX);
+			menu2.AddRadioItem("Radio1", false).OnClickSet(&OpenFileX);
+			menu2.AddRadioItem("Radio2", true).OnClickSet(&OpenFileX);
+			menu1.AddItem("Submenu-Item4").OnClickSet(&OpenFileX);
+			menu1.AddItem("Submenu-Item5").OnClickSet(&OpenFileX);
 			m_Window.UpdateMenuStrip();
 		}
 
@@ -124,7 +126,7 @@ void Application::HandleInput(float dt)
 		{
 			Color x = m_Window.GetForeColor();
 			x.SetR(x.GetR() - 1);
-			
+
 			if (x.GetR() >= 0) m_Window.SetForeColor(x);
 			//cameras->Translate({ 0.0f, 0.0f, dt });
 		}
@@ -141,7 +143,7 @@ void Application::HandleInput(float dt)
 			Color x = m_Window.GetForeColor();
 			x.SetB(x.GetB() - 1);
 
-			if(x.GetB() >= 0) m_Window.SetForeColor(x);
+			if (x.GetB() >= 0) m_Window.SetForeColor(x);
 			//cameras->Translate({ 0.0f, 0.0f, -dt });
 		}
 		if (m_Window.GetKeyboard().IsKeyPressed('W'))

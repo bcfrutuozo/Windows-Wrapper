@@ -1,16 +1,16 @@
 #pragma once
 
 #include <string>
-#include <optional>
 #include <functional>
-#include <vector>
 #include <map>
+
+class Base;
 
 class IEvent
 {
 public:
 
-	virtual const unsigned int GetId() const = 0;
+	virtual const std::string& GetName() const noexcept = 0;
 };
 
 template<typename ...Args>
@@ -19,61 +19,51 @@ class Event : public IEvent
 
 private:
 
-	unsigned int m_Id;
+	std::string m_Name;
 	std::function<void(Args...)> const m_Callback;
 
 public:
 
-	explicit Event(const std::function<void(Args...)>& callback)
+	explicit Event(const std::string& name, const std::function<void(Args...)>& callback)
 		:
-		m_Id(0),
-		m_Callback(callback)
+		m_Callback(callback),
+		m_Name(name)
 	{
 
 	}
 
-	~Event()
-	{	}
-
-	const unsigned int GetId() const override
-	{
-		return m_Id;
-	}
-
-	void Trigger(Args... a)
-	{
-		assert(m_Callback != nullptr);
-		m_Callback(a...);
-	}
+	virtual const std::string& GetName() const noexcept override { return m_Name; }
+	void Trigger(Args... a) { assert(m_Callback != nullptr); m_Callback(a...); 	}
 };
 
 class EventDispatcher
 {
 private:
 
-	std::map<unsigned int, IEvent*> m_List;
+	std::map<std::string, IEvent*> m_List;
 
 public:
 
 	EventDispatcher();
 	~EventDispatcher();
 
-	unsigned int Register(IEvent* event);
-	void Unregister(unsigned int id);
+	void Register(IEvent* event) noexcept;
 
 	template<typename ...Args>
-	void Dispatch(unsigned int id, Args... a)
+	void Dispatch(const std::string& name, Args... a)
 	{
-		auto it_eventList = m_List.find(id);
-
-		if (it_eventList == m_List.end())
-		{
-			return;
-		}
-
-		if (Event<Args...>* event = dynamic_cast<Event<Args...>*>(it_eventList->second))
+		if (const auto event = dynamic_cast<Event<Args...>*>(m_List[name]))
 		{
 			event->Trigger(a...);
+		}
+	}
+
+	template<>
+	void Dispatch(const std::string& name, Base& b)
+	{
+		if (const auto event = dynamic_cast<Event<Base&>*>(m_List[name]))
+		{
+			event->Trigger(b);
 		}
 	}
 };

@@ -15,20 +15,20 @@ class Menu : public Control
 
 protected:
 
+	// Indices to help track menu item location
 	unsigned int m_SubItemIndex;
 	int m_Section;
 
-	// Fields for callback binding
+	// Fields for callback bindings to WinAPI
 	unsigned int m_Id;
-	std::unique_ptr<Event<>> m_ClickDelegate;
 	static unsigned int m_CurrentIndex;
 
-	Menu(Control* parent);
-	Menu(Control* parent, const std::string& text, unsigned int subItemIndex, int section);
+	Menu(Control* parent, unsigned int subitemIndex, int section);								// Base constructor for MenuStrip (CreateMenu())
+	Menu(Control* parent, const std::string& text, unsigned int subitemIndex, int section);		// Base constructor for other menu types (CreatePopupMenu())
 	virtual ~Menu();
-
-	std::tuple<int, int> InvalidateSection(int section);
-	virtual void DispatchEvent(unsigned int id);
+	
+	// Search the whole Menu tree recursively
+	Menu* GetById(unsigned int id) noexcept;
 
 public:
 

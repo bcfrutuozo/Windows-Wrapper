@@ -12,6 +12,4 @@ public:
 
 	MenuStrip(Control* parent);
 	virtual ~MenuStrip() = default;
-
-	void Bind() noexcept override;
 };

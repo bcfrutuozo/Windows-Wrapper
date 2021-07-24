@@ -3,12 +3,7 @@
 
 MenuStrip::MenuStrip(Control* parent)
 	:
-	MenuRoot(parent, "", 0, 0)
+	MenuRoot(parent, 0, 0)
 {
-	Handle = CreateMenu();
+
 };
-
-void MenuStrip::Bind() noexcept
-{
-
-}

@@ -10,25 +10,17 @@ MenuLeaf::MenuLeaf(Control* parent, const std::string& text, unsigned int subite
 
 }
 
-MenuItem& MenuLeaf::AddCheckItem(const std::string& text, const std::function<void()>& function, bool isChecked)
-{
-	return Create<MenuCheckItem>(this, text, function, m_CurrentIndex++, Controls.size(), m_Section, isChecked);
-}
-
 MenuItem& MenuLeaf::AddCheckItem(const std::string& text, bool isChecked)
 {
-	return AddCheckItem(text, nullptr, isChecked);
+	return Create<MenuCheckItem>(this, text, Controls.size(), m_Section, isChecked);
 }
 
-MenuItem& MenuLeaf::AddRadioItem(const std::string& text, const std::function<void()>& function, bool isSelected)
-{
-	return Create<MenuRadioItem>(this, text, function, m_CurrentIndex++, Controls.size(), m_Section, isSelected);
-}
 
 MenuItem& MenuLeaf::AddRadioItem(const std::string& text, bool isSelected)
 {
-	return AddRadioItem(text, nullptr, isSelected);
+	return Create<MenuRadioItem>(this, text, Controls.size(), m_Section, isSelected);
 }
+
 
 void MenuLeaf::AddSeparator()
 {

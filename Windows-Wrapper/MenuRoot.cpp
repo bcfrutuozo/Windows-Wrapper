@@ -2,6 +2,13 @@
 #include "MenuLeaf.h"
 #include "MenuItem.h"
 
+MenuRoot::MenuRoot(Control* parent, unsigned int subitemIndex, int section)
+	:
+	Menu(parent, subitemIndex, section)
+{
+
+}
+
 MenuRoot::MenuRoot(Control* parent, const std::string& text, unsigned int subitemIndex, int section)
 	:
 	Menu(parent, text, subitemIndex, section)
@@ -26,12 +33,7 @@ MenuLeaf& MenuRoot::AddMenu(const std::string& text)
 	return Create<MenuLeaf>(this, text, static_cast<unsigned int>(Controls.size()), 0);
 }
 
-MenuItem& MenuRoot::AddItem(const std::string& text, const std::function<void()>& function, const std::string& iconPath)
-{
-	return Create<MenuItem>(this, text, function, m_CurrentIndex++, Controls.size(), m_Section, iconPath);
-}
-
 MenuItem& MenuRoot::AddItem(const std::string& text, const std::string& iconPath)
 {
-	return AddItem(text, nullptr, iconPath);
+	return Create<MenuItem>(this, text, Controls.size(), m_Section, iconPath);
 }
