@@ -12,28 +12,38 @@ Base::~Base()
 
 }
 
-bool Base::Equals(const Base& b) const noexcept
+inline bool Base::operator==(const Base& b) const noexcept
 {
-	return m_UUID == b.m_UUID;
+	return *this == b;
 }
 
-const std::string& Base::GetHashCode() const noexcept
+inline bool Base::Equals(const Base& lhs, const Base& rhs) noexcept
+{
+	return lhs.Equals(rhs);
+}
+
+inline bool Base::Equals(const Base& b) const noexcept
+{
+	return *this == b;
+}
+
+inline const std::string& Base::GetHashCode() const noexcept
 {
 	return uuids::to_string(m_UUID);
 }
 
-const Type Base::GetType() const noexcept
+inline const Type Base::GetType() const noexcept
 {
 	return Type(typeid(*this));
 }
 
-const bool Base::ReferenceEquals(const Base& b) const noexcept
+inline const bool Base::ReferenceEquals(const Base& b) const noexcept
 {
 	return std::addressof(*this) == std::addressof(b);
 }
 
-const std::string Base::ToString() const noexcept
+inline const std::string Base::ToString() const noexcept
 {
-	// Default ToString method return it's type, unless the function is overriding in the derived class.
-	return Type(typeid(*this)).ToString();
+	// Default ToString method return it's type, unless the function is override in the derived class.
+	return GetType().ToString();
 }

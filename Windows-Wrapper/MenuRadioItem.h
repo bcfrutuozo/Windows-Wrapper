@@ -11,6 +11,8 @@ private:
 
 protected:
 
+	void Initialize() noexcept override;
+
 	// Dispatch is overridden to process the Radio submenu check after the callback
 	void Dispatch(const std::string& name) override;
 
@@ -20,6 +22,4 @@ public:
 
 	MenuRadioItem(Menu* parent, const std::string& text, unsigned int subitemIndex, int section, bool isChecked);
 	virtual ~MenuRadioItem() = default;
-
-	void Bind() noexcept override;
 };

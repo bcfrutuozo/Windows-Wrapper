@@ -6,17 +6,17 @@ MenuRoot::MenuRoot(Control* parent, unsigned int subitemIndex, int section)
 	:
 	Menu(parent, subitemIndex, section)
 {
-
+	Initialize();
 }
 
 MenuRoot::MenuRoot(Control* parent, const std::string& text, unsigned int subitemIndex, int section)
 	:
 	Menu(parent, text, subitemIndex, section)
 {
-
+	Initialize();
 }
 
-void MenuRoot::Bind() noexcept
+void MenuRoot::Initialize() noexcept
 {
 	MENUITEMINFO mi = { 0 };
 	mi.cbSize = sizeof(MENUITEMINFO);

@@ -13,11 +13,11 @@ protected:
 	MenuRoot(Control* parent, const std::string& text, unsigned int subitemIndex, int section);
 	virtual ~MenuRoot() = default;
 
+	void Initialize() noexcept override;
+
 public:
 
 	MenuLeaf& AddMenu(const std::string& text);
 	MenuItem& AddItem(const std::string& text, const std::string& iconPath = {});
-
-	void Bind() noexcept override;
 };
 

@@ -10,6 +10,8 @@ MenuItem::MenuItem(Menu* parent, const std::string& text, unsigned int subitemIn
 	{
 		m_Icon = static_cast<HBITMAP>(LoadImage(NULL, iconPath.c_str(), IMAGE_BITMAP, 16, 16, LR_LOADFROMFILE | LR_CREATEDIBSECTION));
 	}
+
+	Initialize();
 }
 
 MenuItem::~MenuItem()
@@ -20,7 +22,7 @@ MenuItem::~MenuItem()
 	}
 }
 
-void MenuItem::Bind() noexcept
+void MenuItem::Initialize() noexcept
 {
 	MENUITEMINFO mi = { 0 };
 	mi.cbSize = sizeof(MENUITEMINFO);

@@ -1,4 +1,5 @@
 #include "Control.h"
+#include "EventHandler.h"
 #include "MouseEventHandler.h"
 
 Control::Control()
@@ -23,8 +24,16 @@ Control::Control(Control* parent, const std::string& text, int width, int height
 	Location(x, y)
 {
 	// TODO: Register all default events
-	//auto f = new std::function<void(Control* const c, MouseEventArgs* const e)>([this](Control* const c, MouseEventArgs* const e) {OnClick(c, e); });
-	Events.Register(new MouseEventHandler("OnClick", std::function<void(Control* c, MouseEventArgs* e)>([this](Control* c, MouseEventArgs* e) {OnClick(c, e); })));
+	Events.Register(new EventHandler("OnClick", std::function<void(Control* c, EventArgs* e)>([this](Control* c, EventArgs* e) { OnClick(c, e); })));
+	Events.Register(new MouseEventHandler("OnMouseClick", std::function<void(Control* c, MouseEventArgs* e)>([this](Control* c, MouseEventArgs* e) { OnMouseClick(c, e); })));
+	Events.Register(new MouseEventHandler("OnMouseDoubleClick", std::function<void(Control* c, MouseEventArgs* e)>([this](Control* c, MouseEventArgs* e) { OnMouseDoubleClick(c, e); })));
+	Events.Register(new MouseEventHandler("OnMouseDown", std::function<void(Control* c, MouseEventArgs* e)>([this](Control* c, MouseEventArgs* e) { OnMouseDown(c, e); })));
+	Events.Register(new EventHandler("OnMouseEnter", std::function<void(Control* c, EventArgs* e)>([this](Control* c, EventArgs* e) { OnMouseEnter(c, e); })));
+	Events.Register(new EventHandler("OnMouseHover", std::function<void(Control* c, EventArgs* e)>([this](Control* c, EventArgs* e) { OnMouseHover(c, e); })));
+	Events.Register(new EventHandler("OnMouseLeave", std::function<void(Control* c, EventArgs* e)>([this](Control* c, EventArgs* e) { OnMouseLeave(c, e); })));
+	Events.Register(new MouseEventHandler("OnMouseMove", std::function<void(Control* c, MouseEventArgs* e)>([this](Control* c, MouseEventArgs* e) { OnMouseMove(c, e); })));
+	Events.Register(new MouseEventHandler("OnMouseUp", std::function<void(Control* c, MouseEventArgs* e)>([this](Control* c, MouseEventArgs* e) { OnMouseUp(c, e); })));
+	Events.Register(new MouseEventHandler("OnMouseWheel", std::function<void(Control* c, MouseEventArgs* e)>([this](Control* c, MouseEventArgs* e) { OnMouseWheel(c, e); })));
 }
 
 Control::Control(const std::string& text)

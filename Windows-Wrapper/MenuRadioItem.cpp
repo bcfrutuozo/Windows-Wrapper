@@ -5,10 +5,10 @@ MenuRadioItem::MenuRadioItem(Menu* parent, const std::string& text, unsigned int
 	MenuItem(parent, text, subitemIndex, section),
 	IsChecked(isChecked)
 {
-
+	Initialize();
 }
 
-void MenuRadioItem::Bind() noexcept
+void MenuRadioItem::Initialize() noexcept
 {
 	// Check if there's already a default set
 	int begin = 0;
@@ -22,7 +22,7 @@ void MenuRadioItem::Bind() noexcept
 	mi.wID = m_Id;
 	mi.dwTypeData = const_cast<char*>(Text.c_str());
 	InsertMenuItem(static_cast<HMENU>(Parent->Handle.ToPointer()), m_SubItemIndex, true, &mi);
-
+	
 	// Remove selection of other radio buttons on same submenu if any of them were create with IsSelected = TRUE
 	if (IsChecked)
 	{

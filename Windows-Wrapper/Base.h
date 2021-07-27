@@ -18,9 +18,11 @@ protected:
 
 public:
 
-	bool Equals(const Base& b) const noexcept;
-	const std::string& GetHashCode() const noexcept;
-	const Type GetType() const noexcept;
-	const bool ReferenceEquals(const Base& b) const noexcept;
-	virtual const std::string ToString() const noexcept;
+	inline bool operator==(const Base& b) const noexcept;
+	inline bool static Equals(const Base& lhs, const Base& rhs) noexcept;
+	inline virtual bool Equals(const Base& b) const noexcept;
+	inline const std::string& GetHashCode() const noexcept;
+	inline const Type GetType() const noexcept;
+	inline const bool ReferenceEquals(const Base& b) const noexcept;
+	inline virtual const std::string ToString() const noexcept;
 };

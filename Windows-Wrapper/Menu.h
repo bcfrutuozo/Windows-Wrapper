@@ -26,11 +26,7 @@ protected:
 	Menu(Control* parent, unsigned int subitemIndex, int section);								// Base constructor for MenuStrip (CreateMenu())
 	Menu(Control* parent, const std::string& text, unsigned int subitemIndex, int section);		// Base constructor for other menu types (CreatePopupMenu())
 	virtual ~Menu();
-	
-	// Search the whole Menu tree recursively
-	Menu* GetById(unsigned int id) noexcept;
 
-public:
-
-	virtual void Bind() noexcept override = 0;
+	virtual void Initialize() noexcept override = 0;
+	Menu* GetById(unsigned int id) noexcept;			// Search the whole Menu tree recursively
 };

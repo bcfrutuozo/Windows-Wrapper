@@ -18,7 +18,7 @@
 
 class Menu;
 
-class Window : public Control
+class Window : public Control, public IHidable
 {
 	friend class Menu;
 
@@ -86,6 +86,8 @@ private:
 
 
 protected:
+
+	void Initialize() noexcept override;
 
 	virtual void OnCreate()
 	{
@@ -157,12 +159,16 @@ public:
 	Window(const Window&) = delete;
 	Window& operator=(const Window&) = delete;
 
-	void Bind() noexcept;
+	void Hide() override;
+	void Show() override;
+
+	virtual void OnClick(Control* const sender, EventArgs* const args) override
+	{
+
+	}
 
 	// MenuStrip functions
 	void ClearMenuStrip() noexcept;
-	void ShowMenuStrip() noexcept;
-	void HideMenuStrip() noexcept;
 	void UpdateMenuStrip() noexcept;
 	MenuStrip& GetMenuStrip() noexcept;
 

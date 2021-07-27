@@ -184,10 +184,12 @@
     <ClInclude Include="DXGIInfoManager.h" />
     <ClInclude Include="Event.h" />
     <ClInclude Include="EventArgs.h" />
+    <ClInclude Include="EventHandler.h" />
     <ClInclude Include="Exception.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="IEquatable.h" />
     <ClInclude Include="IHandle.h" />
+    <ClInclude Include="IHidable.h" />
     <ClInclude Include="IntPtr.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Mathlib.h" />

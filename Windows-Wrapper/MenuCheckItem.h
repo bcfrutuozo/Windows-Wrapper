@@ -6,6 +6,8 @@ class MenuCheckItem : public MenuItem
 {
 protected:
 
+	void Initialize() noexcept override;
+
 	// Dispatch is overridden to process the Check on the item after the callback
 	void Dispatch(const std::string& name) override;
 
@@ -15,6 +17,4 @@ public:
 
 	MenuCheckItem(Menu* parent, const std::string& text, unsigned int subitemIndex, int section, bool isChecked);
 	virtual ~MenuCheckItem() = default;
-
-	void Bind() noexcept override;
 };

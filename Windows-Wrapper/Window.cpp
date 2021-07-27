@@ -48,13 +48,37 @@ Window::Window(const std::string& name, int width, int height)
 	Control(name, width, height, 0, 0),
 	m_IsCursorEnabled(true),
 	m_Keyboard(std::make_unique<Keyboard>()),
-	m_Mouse(std::make_unique<Mouse>())
+	m_Mouse(std::make_unique<Mouse>()),
+	m_IsMenuStripEnabled(false)
+{
+	Initialize();
+}
+
+void Window::Hide()
+{
+	if (IsShown())
+	{
+		IsVisible = false;
+		ShowWindow(static_cast<HWND>(Handle.ToPointer()), SW_HIDE);
+	}
+}
+
+void Window::Show()
+{
+	if (!IsShown())
+	{
+		IsVisible = true;
+		ShowWindow(static_cast<HWND>(Handle.ToPointer()), SW_SHOWDEFAULT);
+	}
+}
+
+void Window::Initialize() noexcept
 {
 	// Calculate window size based on desired client region
 	m_Rectangle.left = 100;
-	m_Rectangle.right = width + m_Rectangle.left;
+	m_Rectangle.right = Size.Width + m_Rectangle.left;
 	m_Rectangle.top = 100;
-	m_Rectangle.bottom = height + m_Rectangle.top;
+	m_Rectangle.bottom = Size.Height + m_Rectangle.top;
 	if (AdjustWindowRect(&m_Rectangle, WS_OVERLAPPEDWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU, FALSE) == 0)
 	{
 		throw WND_LAST_EXCEPT();
@@ -63,7 +87,7 @@ Window::Window(const std::string& name, int width, int height)
 	// Create window and get its handle
 	Handle = CreateWindow(
 		WndClass::GetName(),																// Class name
-		name.c_str(),																				// Window title
+		Text.c_str(),																				// Window title
 		WS_OVERLAPPEDWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU,	// Style values
 		CW_USEDEFAULT,																		// X position
 		CW_USEDEFAULT,																		// Y position
@@ -80,8 +104,6 @@ Window::Window(const std::string& name, int width, int height)
 		throw WND_LAST_EXCEPT();
 	}
 
-	ShowWindow(static_cast<HWND>(Handle.ToPointer()), SW_SHOWDEFAULT);
-
 	// TODO: THIS IS WHERE THE GRAPHICS DEVICE, CONTEXT, RENDER TARGET, DEPTHSTENCIL (MAYBE) WILL BE INSTANTIATED.
 	// YES: THIS IS GONNA TAKE SOME TIME DO DESIGN
 	// AND YES AS WELL: WILL BE PROBABLY POORLY DONE :( 
@@ -96,12 +118,8 @@ Window::Window(const std::string& name, int width, int height)
 	{
 		throw WND_LAST_EXCEPT();
 	}
-}
-
-void Window::Bind() noexcept
-{
 	// Still don't know how I'll implement child windows. So this is just to not let an empty ugly function
-	SetParent(static_cast<HWND>(Handle.ToPointer()), static_cast<HWND>(Parent->Handle.ToPointer()));
+	//SetParent(static_cast<HWND>(Handle.ToPointer()), static_cast<HWND>(Parent->Handle.ToPointer()));
 }
 
 Window::~Window()
@@ -119,24 +137,6 @@ void Window::ClearMenuStrip() noexcept
 		{
 			Controls.erase(std::remove(Controls.begin(), Controls.end(), c), Controls.end());
 		}
-	}
-}
-
-void Window::ShowMenuStrip() noexcept
-{
-	if (!m_IsMenuStripEnabled)
-	{
-		UpdateMenuStrip();
-		m_IsMenuStripEnabled = true;
-	}
-}
-
-void Window::HideMenuStrip() noexcept
-{
-	if (m_IsMenuStripEnabled)
-	{
-		SetMenu(static_cast<HWND>(Handle.ToPointer()), NULL);
-		m_IsMenuStripEnabled = false;
 	}
 }
 
@@ -167,13 +167,16 @@ MenuStrip& Window::GetMenuStrip() noexcept
 
 void Window::SetText(const std::string& title)
 {
-	if (SetWindowText(static_cast<HWND>(Handle.ToPointer()), title.c_str()) == 0)
+	if (IsShown())
 	{
-		throw WND_LAST_EXCEPT();
-	}
+		if (SetWindowText(static_cast<HWND>(Handle.ToPointer()), title.c_str()) == 0)
+		{
+			throw WND_LAST_EXCEPT();
+		}
 
-	Text = title;
-	RedrawWindow(static_cast<HWND>(Handle.ToPointer()), NULL, NULL, RDW_INVALIDATE | RDW_ERASE);
+		Text = title;
+		RedrawWindow(static_cast<HWND>(Handle.ToPointer()), NULL, NULL, RDW_INVALIDATE | RDW_ERASE);
+	}
 }
 
 void Window::EnableCursor() noexcept
@@ -331,7 +334,9 @@ void Window::OnCommand_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) n
 			auto entry = menu->GetById(static_cast<unsigned int>(wParam));
 			if (entry != nullptr)
 			{
-				entry->Dispatch("OnClick", dynamic_cast<Control*>(this), new MouseEventArgs(m_Mouse.get()));
+				// Dispatch both OnClick for common task and OnMouseClick which receives the cursor information
+				entry->Dispatch("OnClick", new EventArgs());
+				entry->Dispatch("OnMouseClick", new MouseEventArgs(m_Mouse.get()));
 			}
 		}
 	}
@@ -445,8 +450,7 @@ void Window::OnMouseLeftDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 
 	const POINTS pt = MAKEPOINTS(lParam);
 	m_Mouse->OnLeftPressed(pt.x, pt.y);
-
-	OnMouseLeftDown();
+	Dispatch("OnClick", new MouseEventArgs(m_Mouse.get()));
 }
 
 void Window::OnMouseLeftUp_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept

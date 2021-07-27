@@ -25,5 +25,5 @@ MenuItem& MenuLeaf::AddRadioItem(const std::string& text, bool isSelected)
 void MenuLeaf::AddSeparator()
 {
 	Create<MenuSeparator>(this, Controls.size());
-	m_Section++;	// Increment section for check/radio button option sections
+	++m_Section;	// Increment section for check/radio button option sections
 }

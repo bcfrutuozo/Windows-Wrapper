@@ -33,21 +33,26 @@ protected:
 	Control& operator=(Control&&) = default;
 	virtual ~Control();
 
-	virtual void Bind() noexcept = 0;
+	// Forces the implementation and call on individual childs because each WinApi control
+	// has it own creation method.
+	// ALL CHILD CLASS MUST CALL THIS METHOD ON ITS CONSTRUCTOR
+	virtual void Initialize() noexcept = 0;
 
 	template<typename T, typename... Args>
 	T& Create(Args... a)
 	{
-		auto obj = std::make_shared<T>(a...);
-		Controls.push_back(obj);
-		obj->Bind();
+		Controls.push_back(std::move(std::make_shared<T>(a...)));
 		return dynamic_cast<T&>(*Controls.back());
 	}
 
+	// Going to think a proper way to handle events
+	// Afterall, only EventArgs type are allowed instead of multiple types
 	template<typename ...Args>
 	void Dispatch(const std::string& event, Args... args)
 	{
-		Events.Dispatch(event, args...);
+		// Pass the event name, the control which will compose the "sender" parameter in the event
+		// and the arguments which will be an EventArgs type
+		Events.Dispatch(event, this, args...);
 	}
 
 	virtual void Dispatch(const std::string& name)
@@ -57,10 +62,54 @@ protected:
 
 public:
 
-
-	virtual void OnClick(Control* const sender, MouseEventArgs* const args)
+	virtual void OnClick(Control* const sender, EventArgs* const args)
 	{
 		
+	}
+
+	virtual void OnMouseClick(Control* const sender, MouseEventArgs* const args)
+	{
+
+	}
+
+	virtual void OnMouseDoubleClick(Control* const sender, MouseEventArgs* const args)
+	{
+
+	}
+
+	virtual void OnMouseDown(Control* const sender, MouseEventArgs* const args)
+	{
+
+	}
+
+	virtual void OnMouseEnter(Control* const sender, EventArgs* const args)
+	{
+
+	}
+
+	virtual void OnMouseHover(Control* const sender, EventArgs* const args)
+	{
+
+	}
+
+	virtual void OnMouseLeave(Control* const sender, EventArgs* const args)
+	{
+
+	}
+
+	virtual void OnMouseMove(Control* const sender, MouseEventArgs* const args)
+	{
+
+	}
+
+	virtual void OnMouseUp(Control* const sender, MouseEventArgs* const args)
+	{
+
+	}
+
+	virtual void OnMouseWheel(Control* const sender, MouseEventArgs* const args)
+	{
+
 	}
 
 	const std::string& GetText() const noexcept;

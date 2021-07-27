@@ -4,10 +4,10 @@ MenuCheckItem::MenuCheckItem(Menu* parent, const std::string& text, unsigned int
 	:
 	MenuItem(parent, text, subitemIndex, section)
 {
-
+	Initialize();
 }
 
-void MenuCheckItem::Bind() noexcept
+void MenuCheckItem::Initialize() noexcept
 {
 	MENUITEMINFO mi = { 0 };
 	mi.cbSize = sizeof(MENUITEMINFO);

@@ -17,6 +17,7 @@ Application::Application()
 {
 	m_Window.EnableCursor();
 	m_Window.GetMouse().DisableRaw();
+	m_Window.Show();
 }
 
 Application::~Application()
@@ -106,12 +107,22 @@ void Application::HandleInput(float dt)
 
 		if (m_Window.GetKeyboard().IsKeyPressed('O'))
 		{
-			m_Window.ShowMenuStrip();
+			m_Window.GetMenuStrip().Show();
 		}
 
 		if (m_Window.GetKeyboard().IsKeyPressed('P'))
 		{
-			m_Window.HideMenuStrip();
+			m_Window.GetMenuStrip().Hide();
+		}
+
+		if (m_Window.GetKeyboard().IsKeyPressed('B'))
+		{
+			m_Window.Hide();
+		}
+
+		if (m_Window.GetKeyboard().IsKeyPressed('N'))
+		{
+			m_Window.Show();
 		}
 
 		if (m_Window.GetKeyboard().IsKeyPressed('Q'))

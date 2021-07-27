@@ -35,7 +35,9 @@ Menu::~Menu()
 Menu* Menu::GetById(unsigned int id) noexcept
 {
 	if (m_Id == id)
+	{
 		return this;
+	}
 
 	for (const auto& c : Controls)
 	{
