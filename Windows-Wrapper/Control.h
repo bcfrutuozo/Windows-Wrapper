@@ -35,7 +35,7 @@ protected:
 
 	// Forces the implementation and call on individual childs because each WinApi control
 	// has it own creation method.
-	// ALL CHILD CLASS MUST CALL THIS METHOD ON ITS CONSTRUCTOR
+	// ALL DERIVED CLASSES MUST CALL THIS METHOD ON ITS CONSTRUCTOR
 	virtual void Initialize() noexcept = 0;
 
 	template<typename T, typename... Args>
