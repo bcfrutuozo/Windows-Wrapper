@@ -102,6 +102,12 @@
     <ClInclude Include="MouseEventHandler.h">
       <Filter>Events</Filter>
     </ClInclude>
+    <ClInclude Include="EventArgs.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="MouseEventArgs.h">
+      <Filter>Events</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interfaces">

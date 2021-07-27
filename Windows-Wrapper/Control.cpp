@@ -1,4 +1,5 @@
 #include "Control.h"
+#include "MouseEventHandler.h"
 
 Control::Control()
 	:
@@ -23,7 +24,7 @@ Control::Control(Control* parent, const std::string& text, int width, int height
 {
 	// TODO: Register all default events
 	//auto f = new std::function<void(Control* const c, MouseEventArgs* const e)>([this](Control* const c, MouseEventArgs* const e) {OnClick(c, e); });
-	Events.Register(new MouseEventHandler("OnClick", std::function<void(Control* const c, MouseEventArgs* const e)>([this](Control* const c, MouseEventArgs* const e) {OnClick(c, e); })));
+	Events.Register(new MouseEventHandler("OnClick", std::function<void(Control* c, MouseEventArgs* e)>([this](Control* c, MouseEventArgs* e) {OnClick(c, e); })));
 }
 
 Control::Control(const std::string& text)

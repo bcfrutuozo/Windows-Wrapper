@@ -1,13 +1,13 @@
 #pragma once
 
+#include "Base.h"
+
 #include <string>
 #include <functional>
 #include <map>
 
-#include "Mouse.h"
-
-class Base;
 class Control;
+class MouseEventArgs;
 
 class IEvent
 {
@@ -17,9 +17,8 @@ public:
 };
 
 template<typename ...Args>
-class Event : public IEvent
+class Event : public IEvent, public Base
 {
-
 private:
 
 	std::string m_Name;
@@ -32,14 +31,16 @@ public:
 		m_Callback(callback),
 		m_Name(name)
 	{
-
+		
 	}
 
+	virtual ~Event() = default;
+
 	virtual const std::string& GetName() const noexcept override { return m_Name; }
-	void Trigger(Args... a) { assert(m_Callback != nullptr); m_Callback(a...); 	}
+	void Trigger(Args... a) { assert(m_Callback != nullptr); m_Callback(a...);	}
 };
 
-class EventDispatcher
+class EventDispatcher : public Base
 {
 private:
 
@@ -59,39 +60,5 @@ public:
 		{
 			event->Trigger(a...);
 		}
-	}
-};
-
-class EventArgs
-{
-public:
-
-	EventArgs()
-	{
-
-	}
-};
-
-class MouseEventArgs : public EventArgs
-{
-public:
-
-	MouseEventArgs(const Mouse* mouse)
-		:
-		m(mouse)
-	{}
-
-	const Mouse* m;
-};
-
-class MouseEventHandler : public Event<Control* const, MouseEventArgs* const>
-{
-public:
-
-	MouseEventHandler(const std::string& name, const std::function<void(Control* const, MouseEventArgs* const)>& callback)
-		:
-		Event(name, callback)
-	{
-
 	}
 };

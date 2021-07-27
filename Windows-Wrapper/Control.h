@@ -5,6 +5,7 @@
 #include "IHandle.h"
 #include "Size.h"
 #include "Event.h"
+#include "MouseEventArgs.h"
 
 class Window;
 

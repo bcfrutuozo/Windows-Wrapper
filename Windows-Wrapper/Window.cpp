@@ -331,7 +331,7 @@ void Window::OnCommand_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) n
 			auto entry = menu->GetById(static_cast<unsigned int>(wParam));
 			if (entry != nullptr)
 			{
-				entry->Dispatch("OnClick", new MouseEventArgs(m_Mouse.get()));
+				entry->Dispatch("OnClick", dynamic_cast<Control*>(this), new MouseEventArgs(m_Mouse.get()));
 			}
 		}
 	}

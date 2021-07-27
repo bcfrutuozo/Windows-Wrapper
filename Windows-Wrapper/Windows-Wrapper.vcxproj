@@ -183,6 +183,7 @@
     <ClInclude Include="dxerr.h" />
     <ClInclude Include="DXGIInfoManager.h" />
     <ClInclude Include="Event.h" />
+    <ClInclude Include="EventArgs.h" />
     <ClInclude Include="Exception.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="IEquatable.h" />
@@ -199,6 +200,7 @@
     <ClInclude Include="MenuRadioItem.h" />
     <ClInclude Include="MenuSeparator.h" />
     <ClInclude Include="Mouse.h" />
+    <ClInclude Include="MouseEventArgs.h" />
     <ClInclude Include="MouseEventHandler.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="Size.h" />

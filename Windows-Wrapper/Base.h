@@ -2,7 +2,6 @@
 
 #include "Type.h"
 #include "uuid.h"
-#include "Event.h"
 
 #include <string>
 
