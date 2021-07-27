@@ -43,21 +43,23 @@ protected:
 		return dynamic_cast<T&>(*Controls.back());
 	}
 
-	virtual void Dispatch(const std::string& event)
+	template<typename ...Args>
+	void Dispatch(const std::string& event, Args... args)
 	{
-		Events.Dispatch(event, this);
+		Events.Dispatch(event, args...);
+	}
+
+	virtual void Dispatch(const std::string& name)
+	{
+		Events.Dispatch(name, this);
 	}
 
 public:
 
-	void OnClickSet(const std::function<void(Control*)>& callback)
-	{
-		Events.Register(new Event<Control*>("OnClick", callback));
-	}
 
-	void OnClick()
+	virtual void OnClick(Control* const sender, MouseEventArgs* const args)
 	{
-		Events.Dispatch("OnClick");
+		
 	}
 
 	const std::string& GetText() const noexcept;

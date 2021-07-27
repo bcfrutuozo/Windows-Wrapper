@@ -6,7 +6,6 @@
     <ClCompile Include="Control.cpp" />
     <ClCompile Include="dxerr.cpp" />
     <ClCompile Include="DXGIInfoManager.cpp" />
-    <ClCompile Include="Event.cpp" />
     <ClCompile Include="Exception.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="IntPtr.cpp" />
@@ -43,6 +42,9 @@
     <ClCompile Include="MenuStrip.cpp">
       <Filter>Menu</Filter>
     </ClCompile>
+    <ClCompile Include="Event.cpp">
+      <Filter>Events</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -52,7 +54,6 @@
     <ClInclude Include="Control.h" />
     <ClInclude Include="dxerr.h" />
     <ClInclude Include="DXGIInfoManager.h" />
-    <ClInclude Include="Event.h" />
     <ClInclude Include="Exception.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="IntPtr.h" />
@@ -95,6 +96,12 @@
     <ClInclude Include="MenuStrip.h">
       <Filter>Menu</Filter>
     </ClInclude>
+    <ClInclude Include="Event.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="MouseEventHandler.h">
+      <Filter>Events</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interfaces">
@@ -102,6 +109,9 @@
     </Filter>
     <Filter Include="Menu">
       <UniqueIdentifier>{92987fab-9fd4-469c-b685-2c702d1fcb10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Events">
+      <UniqueIdentifier>{68a18714-2cd9-4c42-ab2d-ea88c215dbd4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

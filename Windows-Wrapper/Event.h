@@ -4,7 +4,10 @@
 #include <functional>
 #include <map>
 
+#include "Mouse.h"
+
 class Base;
+class Control;
 
 class IEvent
 {
@@ -57,13 +60,38 @@ public:
 			event->Trigger(a...);
 		}
 	}
+};
 
-	template<>
-	void Dispatch(const std::string& name, Base& b)
+class EventArgs
+{
+public:
+
+	EventArgs()
 	{
-		if (const auto event = dynamic_cast<Event<Base&>*>(m_List[name]))
-		{
-			event->Trigger(b);
-		}
+
+	}
+};
+
+class MouseEventArgs : public EventArgs
+{
+public:
+
+	MouseEventArgs(const Mouse* mouse)
+		:
+		m(mouse)
+	{}
+
+	const Mouse* m;
+};
+
+class MouseEventHandler : public Event<Control* const, MouseEventArgs* const>
+{
+public:
+
+	MouseEventHandler(const std::string& name, const std::function<void(Control* const, MouseEventArgs* const)>& callback)
+		:
+		Event(name, callback)
+	{
+
 	}
 };

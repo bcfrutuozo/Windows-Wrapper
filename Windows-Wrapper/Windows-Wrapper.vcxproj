@@ -199,6 +199,7 @@
     <ClInclude Include="MenuRadioItem.h" />
     <ClInclude Include="MenuSeparator.h" />
     <ClInclude Include="Mouse.h" />
+    <ClInclude Include="MouseEventHandler.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="Size.h" />
     <ClInclude Include="Timer.h" />
