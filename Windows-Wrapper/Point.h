@@ -18,7 +18,6 @@ public:
 	Point(int word);
 	Point(int x, int y);
 	Point(Size size);
-	~Point() = default;
 
 	inline bool Equals(const Point& p) const noexcept override;
 
@@ -43,7 +42,6 @@ public:
 	float Y;
 
 	PointF(float x, float y);
-	virtual ~PointF() = default;
 
 	inline bool Equals(const PointF& p) const noexcept override;
 

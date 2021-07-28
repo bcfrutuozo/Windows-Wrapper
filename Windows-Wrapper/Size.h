@@ -16,7 +16,6 @@ public:
 
 	Size(int width, int height);
 	Size(Point p);
-	~Size() = default;
 
 	inline bool Equals(const Size& s) const noexcept override;
 
@@ -46,7 +45,6 @@ public:
 
 	SizeF(float width, float height);
 	SizeF(PointF p);
-	virtual ~SizeF() = default;
 
 	inline bool Equals(const SizeF& s) const noexcept override;
 

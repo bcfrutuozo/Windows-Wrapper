@@ -4,10 +4,12 @@
 
 class MenuEntryIconItem : public MenuItem
 {
-protected:
+private:
 
 	// Will be loaded in the constructor if the file path is not empty
 	HBITMAP m_Icon = nullptr;
+
+protected:
 
 	void Initialize() noexcept override;
 

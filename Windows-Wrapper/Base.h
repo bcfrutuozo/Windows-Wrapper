@@ -14,7 +14,11 @@ private:
 protected:
 
 	Base();
-	virtual ~Base();
+	Base(const Base&) = default;			// Copy constructor
+	Base(Base&&) = default;					// Move constructor
+	Base& operator=(const Base&) = default;	// Copy assignment constructor
+	Base& operator=(Base&&) = default;		// Move assignment constructor
+	virtual ~Base() = default;				// Destructor
 
 public:
 

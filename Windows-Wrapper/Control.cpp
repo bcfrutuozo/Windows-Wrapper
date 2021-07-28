@@ -50,11 +50,6 @@ Control::Control(const std::string& text, int width, int height, int x, int y)
 
 }
 
-Control::~Control()
-{
-
-}
-
 const std::string& Control::GetText() const noexcept
 {
 	return Text;

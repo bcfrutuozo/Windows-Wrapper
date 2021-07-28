@@ -33,10 +33,11 @@ protected:
 	Control(Control* parent, const std::string& text, int width, int height, int x, int y);
 	Control(const std::string& text);
 	Control(const std::string& text, int width, int height, int x, int y);
-	Control(Control&& other) = default;
-	Control& operator=(const Control&) = default;
-	Control& operator=(Control&&) = default;
-	virtual ~Control();
+	Control(const Control&) = default;														// Copy constructor
+	Control(Control&&) = default;															// Move constructor
+	Control& operator=(const Control&) = default;											// Copy assignment constructor
+	Control& operator=(Control&&) = default;												// Move assignment constructor
+	virtual ~Control() = default;															// Destructor
 
 	// Forces the implementation and call on individual childs because each WinApi control
 	// has it own creation method.

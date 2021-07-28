@@ -7,11 +7,6 @@ Base::Base()
 
 }
 
-Base::~Base()
-{
-
-}
-
 inline bool Base::operator==(const Base& b) const noexcept
 {
 	return *this == b;

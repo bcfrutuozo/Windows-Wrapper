@@ -12,10 +12,7 @@ MenuEntryIconItem::MenuEntryIconItem(Menu* parent, const std::string& text, unsi
 
 MenuEntryIconItem::~MenuEntryIconItem()
 {
-	if (m_Icon != nullptr)
-	{
-		DeleteObject(static_cast<HGDIOBJ>(m_Icon));
-	}
+	DeleteObject(static_cast<HGDIOBJ>(m_Icon));
 }
 
 void MenuEntryIconItem::Initialize() noexcept
