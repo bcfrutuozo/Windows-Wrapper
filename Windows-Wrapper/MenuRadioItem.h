@@ -6,15 +6,14 @@ class MenuRadioItem : public MenuItem
 {
 private:
 
+	virtual void OnInternalUpdate(Control* const sender, EventArgs* const args) override;
+
 	// Invalidates the whole Radio buttons section within a submenu
 	std::tuple<int, int> InvalidateSection(int section);
 
 protected:
 
 	void Initialize() noexcept override;
-
-	// Dispatch is overridden to process the Radio submenu check after the callback
-	void Dispatch(const std::string& name) override;
 
 public:
 

@@ -81,12 +81,12 @@ void Application::HandleInput(float dt)
 			auto& menu1 = mb.AddMenu("Submenu");
 			menu1.AddItem("Submenu-Item1");
 			menu1.AddCheckItem("Check-test01", true);
-			auto& it2 = menu1.AddCheckItem("Check-test02", false);
+			menu1.AddCheckItem("Check-test02", false);
 			menu1.AddSeparator();
-			menu1.AddItem("Submenu-Item2", "images\\1.bmp");
+			menu1.AddItemWithIcon("Submenu-Item2", "images\\1.bmp");
 			menu1.AddSeparator();
 			auto& menu2 = menu1.AddMenu("Submenu-Item3");
-			menu2.AddItem("Submenu2-Item1", "images\\2.bmp");
+			menu2.AddItemWithIcon("Submenu2-Item1", "images\\2.bmp");
 			menu2.AddSeparator();
 			menu2.AddRadioItem("Radio1", true);
 			menu2.AddRadioItem("Radio2", true);

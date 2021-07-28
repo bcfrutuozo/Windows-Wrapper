@@ -14,6 +14,11 @@ class Control : public IHandle, public Base
 	friend class Menu;
 	friend class MenuRadioItem;
 
+private:
+
+	// Used by some controls to trigger certain rules updates
+	virtual void OnInternalUpdate(Control* const sender, EventArgs* const args) {};
+
 protected:
 
 	std::string Text;
@@ -53,11 +58,6 @@ protected:
 		// Pass the event name, the control which will compose the "sender" parameter in the event
 		// and the arguments which will be an EventArgs type
 		Events.Dispatch(event, this, args...);
-	}
-
-	virtual void Dispatch(const std::string& name)
-	{
-		Events.Dispatch(name, this);
 	}
 
 public:

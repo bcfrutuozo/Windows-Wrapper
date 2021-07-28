@@ -1,50 +1,9 @@
 #include "MenuRadioItem.h"
+#include "EventHandler.h"
 
-MenuRadioItem::MenuRadioItem(Menu* parent, const std::string& text, unsigned int subitemIndex, int section, bool isChecked)
-	:
-	MenuItem(parent, text, subitemIndex, section),
-	IsChecked(isChecked)
+// Triggered after all event dispatch
+void MenuRadioItem::OnInternalUpdate(Control* const sender, EventArgs* const args)
 {
-	Initialize();
-}
-
-void MenuRadioItem::Initialize() noexcept
-{
-	// Check if there's already a default set
-	int begin = 0;
-	int end = 0;
-
-	MENUITEMINFO mi = { 0 };
-	mi.cbSize = sizeof(MENUITEMINFO);
-	mi.fMask = MIIM_ID | MIIM_STATE | MIIM_STRING | MIIM_FTYPE;
-	mi.fState = IsChecked ? MF_CHECKED : MF_UNCHECKED;
-	mi.fType = MFT_RADIOCHECK;
-	mi.wID = m_Id;
-	mi.dwTypeData = const_cast<char*>(Text.c_str());
-	InsertMenuItem(static_cast<HMENU>(Parent->Handle.ToPointer()), m_SubItemIndex, true, &mi);
-	
-	// Remove selection of other radio buttons on same submenu if any of them were create with IsSelected = TRUE
-	if (IsChecked)
-	{
-		auto idx = InvalidateSection(m_Section);
-		CheckMenuRadioItem(static_cast<HMENU>(Parent->Handle.ToPointer()), std::get<0>(idx), std::get<1>(idx), m_SubItemIndex, MF_BYPOSITION);
-	}
-}
-
-// Dispatch is overridden to process the Radio submenu check after the callback
-void MenuRadioItem::Dispatch(const std::string& name)
-{
-	try
-	{
-		Control::Dispatch(name);
-	}
-	catch (...)
-	{
-		// Throw exception during processing and don't change MenuChangeItem behavior
-		throw;
-	}
-
-	// Change MenuItemChange only if callback is executed
 	IsChecked = !IsChecked;
 	auto idx = InvalidateSection(m_Section);
 	CheckMenuRadioItem(static_cast<HMENU>(Parent->Handle.ToPointer()), std::get<0>(idx), std::get<1>(idx), m_SubItemIndex, MF_BYPOSITION);
@@ -94,4 +53,35 @@ std::tuple<int, int> MenuRadioItem::InvalidateSection(int section)
 	}
 
 	return std::tuple(begin, end);
+}
+
+MenuRadioItem::MenuRadioItem(Menu* parent, const std::string& text, unsigned int subitemIndex, int section, bool isChecked)
+	:
+	MenuItem(parent, text, subitemIndex, section),
+	IsChecked(isChecked)
+{
+	Initialize();
+
+	// The OnInternalUpdate() event could be registered in Control class. However, it's registered on each child class who implement
+	// the function to avoid unnecessary calls for the other classes
+	Events.Register(new EventHandler("OnInternalUpdate", std::function<void(Control* c, EventArgs* e)>([this](Control* c, EventArgs* e) { OnInternalUpdate(c, e); })));
+}
+
+void MenuRadioItem::Initialize() noexcept
+{
+	MENUITEMINFO mi = { 0 };
+	mi.cbSize = sizeof(MENUITEMINFO);
+	mi.fMask = MIIM_ID | MIIM_STATE | MIIM_STRING | MIIM_FTYPE;
+	mi.fState = IsChecked ? MF_CHECKED : MF_UNCHECKED;
+	mi.fType = MFT_RADIOCHECK;
+	mi.wID = m_Id;
+	mi.dwTypeData = const_cast<char*>(Text.c_str());
+	InsertMenuItem(static_cast<HMENU>(Parent->Handle.ToPointer()), m_SubItemIndex, true, &mi);
+
+	// Remove selection of other radio buttons on same submenu if any of them were create with IsSelected = TRUE
+	if (IsChecked)
+	{
+		auto idx = InvalidateSection(m_Section);
+		CheckMenuRadioItem(static_cast<HMENU>(Parent->Handle.ToPointer()), std::get<0>(idx), std::get<1>(idx), m_SubItemIndex, MF_BYPOSITION);
+	}
 }

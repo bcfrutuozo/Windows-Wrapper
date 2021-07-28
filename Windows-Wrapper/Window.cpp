@@ -337,6 +337,9 @@ void Window::OnCommand_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) n
 				// Dispatch both OnClick for common task and OnMouseClick which receives the cursor information
 				entry->Dispatch("OnClick", new EventArgs());
 				entry->Dispatch("OnMouseClick", new MouseEventArgs(m_Mouse.get()));
+
+				// Force the update of the controls
+				entry->Dispatch("OnInternalUpdate", new EventArgs());
 			}
 		}
 	}

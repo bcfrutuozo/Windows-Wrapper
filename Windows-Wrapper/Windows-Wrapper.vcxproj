@@ -159,6 +159,8 @@
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="Mathlib.cpp" />
     <ClCompile Include="Menu.cpp" />
+    <ClCompile Include="MenuEntryIconItem.cpp" />
+    <ClCompile Include="MenuEntryItem.cpp" />
     <ClCompile Include="MenuLeaf.cpp" />
     <ClCompile Include="MenuRoot.cpp" />
     <ClCompile Include="MenuStrip.cpp" />
@@ -194,6 +196,8 @@
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Mathlib.h" />
     <ClInclude Include="Menu.h" />
+    <ClInclude Include="MenuEntryIconItem.h" />
+    <ClInclude Include="MenuEntryItem.h" />
     <ClInclude Include="MenuLeaf.h" />
     <ClInclude Include="MenuRoot.h" />
     <ClInclude Include="MenuStrip.h" />

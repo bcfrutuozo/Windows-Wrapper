@@ -1,4 +1,5 @@
 #include "MenuLeaf.h"
+#include "MenuEntryIconItem.h"
 #include "MenuCheckItem.h"
 #include "MenuRadioItem.h"
 #include "MenuSeparator.h"
@@ -10,17 +11,20 @@ MenuLeaf::MenuLeaf(Control* parent, const std::string& text, unsigned int subite
 
 }
 
+MenuItem& MenuLeaf::AddItemWithIcon(const std::string& text, const std::string& iconPath)
+{
+	return Create<MenuEntryIconItem>(this, text, Controls.size(), m_Section, iconPath);
+}
+
 MenuItem& MenuLeaf::AddCheckItem(const std::string& text, bool isChecked)
 {
 	return Create<MenuCheckItem>(this, text, Controls.size(), m_Section, isChecked);
 }
 
-
 MenuItem& MenuLeaf::AddRadioItem(const std::string& text, bool isSelected)
 {
 	return Create<MenuRadioItem>(this, text, Controls.size(), m_Section, isSelected);
 }
-
 
 void MenuLeaf::AddSeparator()
 {

@@ -4,12 +4,13 @@
 
 class MenuCheckItem : public MenuItem
 {
+private:
+
+	virtual void OnInternalUpdate(Control* const sender, EventArgs* const args) override;
+
 protected:
 
 	void Initialize() noexcept override;
-
-	// Dispatch is overridden to process the Check on the item after the callback
-	void Dispatch(const std::string& name) override;
 
 public:
 

@@ -45,6 +45,12 @@
     <ClCompile Include="Event.cpp">
       <Filter>Events</Filter>
     </ClCompile>
+    <ClCompile Include="MenuEntryItem.cpp">
+      <Filter>Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuEntryIconItem.cpp">
+      <Filter>Menu</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -113,6 +119,12 @@
     </ClInclude>
     <ClInclude Include="EventHandler.h">
       <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuEntryItem.h">
+      <Filter>Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuEntryIconItem.h">
+      <Filter>Menu</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
