@@ -5,7 +5,11 @@
 #include "IHandle.h"
 #include "Size.h"
 #include "Event.h"
+#include "EventHandler.h"
 #include "MouseEventArgs.h"
+
+#include <memory>
+#include <functional>
 
 class Window;
 
@@ -27,17 +31,6 @@ protected:
 	Control* Parent;
 	std::vector<std::shared_ptr<Control>> Controls;
 	EventDispatcher Events;
-
-	Control();
-	Control(Control* parent, const std::string& text);
-	Control(Control* parent, const std::string& text, int width, int height, int x, int y);
-	Control(const std::string& text);
-	Control(const std::string& text, int width, int height, int x, int y);
-	Control(const Control&) = default;														// Copy constructor
-	Control(Control&&) = default;															// Move constructor
-	Control& operator=(const Control&) = default;											// Copy assignment constructor
-	Control& operator=(Control&&) = default;												// Move assignment constructor
-	virtual ~Control() = default;															// Destructor
 
 	// Forces the implementation and call on individual childs because each WinApi control
 	// has it own creation method.
@@ -63,55 +56,29 @@ protected:
 
 public:
 
-	virtual void OnClick(Control* const sender, EventArgs* const args)
-	{
-		
-	}
+	Control();
+	Control(Control* parent, const std::string& text);
+	Control(Control* parent, const std::string& text, int width, int height, int x, int y);
+	Control(const std::string& text);
+	Control(const std::string& text, int width, int height, int x, int y);
+	Control(const Control&) = default;														// Copy constructor
+	Control(Control&&) = default;															// Move constructor
+	Control& operator=(const Control&) = default;											// Copy assignment constructor
+	Control& operator=(Control&&) = default;												// Move assignment constructor
+	virtual ~Control() = default;															// Destructor
 
-	virtual void OnMouseClick(Control* const sender, MouseEventArgs* const args)
-	{
+	void Delete();
 
-	}
-
-	virtual void OnMouseDoubleClick(Control* const sender, MouseEventArgs* const args)
-	{
-
-	}
-
-	virtual void OnMouseDown(Control* const sender, MouseEventArgs* const args)
-	{
-
-	}
-
-	virtual void OnMouseEnter(Control* const sender, EventArgs* const args)
-	{
-
-	}
-
-	virtual void OnMouseHover(Control* const sender, EventArgs* const args)
-	{
-
-	}
-
-	virtual void OnMouseLeave(Control* const sender, EventArgs* const args)
-	{
-
-	}
-
-	virtual void OnMouseMove(Control* const sender, MouseEventArgs* const args)
-	{
-
-	}
-
-	virtual void OnMouseUp(Control* const sender, MouseEventArgs* const args)
-	{
-
-	}
-
-	virtual void OnMouseWheel(Control* const sender, MouseEventArgs* const args)
-	{
-
-	}
+	void OnClickSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
+	void OnMouseClickSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept;
+	void OnMouseDoubleClick(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept;
+	void OnMouseDown(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept;
+	void OnMouseEnter(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
+	void OnMouseHover(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
+	void OnMouseLeave(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
+	void OnMouseMove(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept;
+	void OnMouseUp(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept;
+	void OnMouseWheel(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept;
 
 	const std::string& GetText() const noexcept;
 };

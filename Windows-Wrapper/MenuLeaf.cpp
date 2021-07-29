@@ -11,6 +11,36 @@ MenuLeaf::MenuLeaf(Control* parent, const std::string& text, unsigned int subite
 
 }
 
+void MenuLeaf::Enable() noexcept
+{
+	if (!Enabled)
+	{
+		EnableMenuItem(static_cast<HMENU>(Parent->Handle.ToPointer()), m_SubItemIndex, MF_BYPOSITION | MF_ENABLED);
+		Enabled = true;
+		Grayed = false;
+	}
+}
+
+void MenuLeaf::Disable() noexcept
+{
+	if (Enabled || !Grayed)
+	{
+		EnableMenuItem(static_cast<HMENU>(Parent->Handle.ToPointer()), m_SubItemIndex, MF_BYPOSITION | MF_DISABLED);
+		Enabled = false;
+		Grayed = false;
+	}
+}
+
+void MenuLeaf::Gray() noexcept
+{
+	if (!Grayed)
+	{
+		EnableMenuItem(static_cast<HMENU>(Parent->Handle.ToPointer()), m_SubItemIndex, MF_BYPOSITION | MF_GRAYED);
+		Enabled = false;
+		Grayed = true;
+	}
+}
+
 MenuItem& MenuLeaf::AddItemWithIcon(const std::string& text, const std::string& iconPath)
 {
 	return Create<MenuEntryIconItem>(this, text, Controls.size(), m_Section, iconPath);

@@ -189,6 +189,7 @@
     <ClInclude Include="EventHandler.h" />
     <ClInclude Include="Exception.h" />
     <ClInclude Include="Graphics.h" />
+    <ClInclude Include="IActivableMenu.h" />
     <ClInclude Include="IEquatable.h" />
     <ClInclude Include="IHandle.h" />
     <ClInclude Include="IHidable.h" />

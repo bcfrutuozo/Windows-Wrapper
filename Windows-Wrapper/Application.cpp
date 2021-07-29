@@ -13,11 +13,11 @@
 
 Application::Application()
 	:
-	m_Window("Application", 1024, 800)
+	m_Window(std::make_unique<Window>("Application", 1024, 800))
 {
-	m_Window.EnableCursor();
-	m_Window.GetMouse().DisableRaw();
-	m_Window.Show();
+	m_Window->EnableCursor();
+	m_Window->GetMouse().DisableRaw();
+	m_Window->Show();
 }
 
 Application::~Application()
@@ -49,33 +49,35 @@ int Application::Start()
 
 void Application::HandleInput(float dt)
 {
-	while (const auto& e = m_Window.GetKeyboard().ReadKey())
+	while (const auto& e = m_Window->GetKeyboard().ReadKey())
 	{
 		if (!e->IsPress())
 		{
 			switch (e->GetCode())
 			{
 			case VK_ESCAPE:
-				if (m_Window.IsCursorEnabled())
+				if (m_Window->IsCursorEnabled())
 				{
-					m_Window.DisableCursor();
-					m_Window.GetMouse().EnableRaw();
+					m_Window->DisableCursor();
+					m_Window->GetMouse().EnableRaw();
 				}
 				else
 				{
-					m_Window.EnableCursor();
-					m_Window.GetMouse().DisableRaw();
+					m_Window->EnableCursor();
+					m_Window->GetMouse().DisableRaw();
 				}
 				break;
 			}
 		}
 	}
 
-	if (!m_Window.IsCursorEnabled())
+	if (!m_Window->IsCursorEnabled())
 	{
-		if (m_Window.GetKeyboard().IsKeyPressed('Y'))
+		
+
+		if (m_Window->GetKeyboard().IsKeyPressed('Y'))
 		{
-			auto& mb = m_Window.GetMenuStrip();
+			auto& mb = m_Window->GetMenuStrip();
 			auto& item1 = mb.AddItem("Arquivo");
 			auto& item2 = mb.AddItem("Arquivo2");
 			auto& menu1 = mb.AddMenu("Submenu");
@@ -88,8 +90,8 @@ void Application::HandleInput(float dt)
 			auto& menu2 = menu1.AddMenu("Submenu-Item3");
 			menu2.AddItemWithIcon("Submenu2-Item1", "images\\2.bmp");
 			menu2.AddSeparator();
-			menu2.AddRadioItem("Radio1", true);
-			menu2.AddRadioItem("Radio2", true);
+			menu2.AddRadioItem("Radio1", true).Disable();
+			menu2.AddRadioItem("Radio2", true).Gray();
 			menu2.AddRadioItem("Radio3", false);
 			menu2.AddRadioItem("Radio4", true);
 			menu2.AddSeparator();
@@ -97,91 +99,94 @@ void Application::HandleInput(float dt)
 			menu2.AddRadioItem("Radio2", true);
 			menu1.AddItem("Submenu-Item4");
 			menu1.AddItem("Submenu-Item5");
-			m_Window.UpdateMenuStrip();
+			m_Window->UpdateMenuStrip();
+			p = &item1;
 		}
 
-		if (m_Window.GetKeyboard().IsKeyPressed('R'))
+		if (m_Window->GetKeyboard().IsKeyPressed('R'))
 		{
-			m_Window.ClearMenuStrip();
+			m_Window->ClearMenuStrip();
 		}
 
-		if (m_Window.GetKeyboard().IsKeyPressed('O'))
+		if (m_Window->GetKeyboard().IsKeyPressed('O'))
 		{
-			m_Window.GetMenuStrip().Show();
+			m_Window->GetMenuStrip().Show();
 		}
 
-		if (m_Window.GetKeyboard().IsKeyPressed('P'))
+		if (m_Window->GetKeyboard().IsKeyPressed('P'))
 		{
-			m_Window.GetMenuStrip().Hide();
+			m_Window->GetMenuStrip().Hide();
 		}
 
-		if (m_Window.GetKeyboard().IsKeyPressed('B'))
+		if (m_Window->GetKeyboard().IsKeyPressed('B'))
 		{
-			m_Window.Hide();
+			p->Enable();
+			DrawMenuBar((HWND)m_Window->Handle.ToPointer());
 		}
 
-		if (m_Window.GetKeyboard().IsKeyPressed('N'))
+		if (m_Window->GetKeyboard().IsKeyPressed('N'))
 		{
-			m_Window.Show();
+			p->Disable();
+			DrawMenuBar((HWND)m_Window->Handle.ToPointer());
 		}
 
-		if (m_Window.GetKeyboard().IsKeyPressed('Q'))
+		if (m_Window->GetKeyboard().IsKeyPressed('Q'))
 		{
-			Color x = m_Window.GetForeColor();
+			Color x = m_Window->GetForeColor();
 			x.SetR(x.GetR() - 1);
 
-			if (x.GetR() >= 0) m_Window.SetForeColor(x);
+			if (x.GetR() >= 0) m_Window->SetForeColor(x);
 			//cameras->Translate({ 0.0f, 0.0f, dt });
 		}
-		if (m_Window.GetKeyboard().IsKeyPressed('A'))
+		if (m_Window->GetKeyboard().IsKeyPressed('A'))
 		{
-			Color x = m_Window.GetForeColor();
+			Color x = m_Window->GetForeColor();
 			x.SetG(x.GetG() - 1);
 
-			if (x.GetG() >= 0) m_Window.SetForeColor(x);
+			if (x.GetG() >= 0) m_Window->SetForeColor(x);
 			//cameras->Translate({ -dt, 0.0f, 0.0f });
 		}
-		if (m_Window.GetKeyboard().IsKeyPressed('Z'))
+		if (m_Window->GetKeyboard().IsKeyPressed('Z'))
 		{
-			Color x = m_Window.GetForeColor();
+			Color x = m_Window->GetForeColor();
 			x.SetB(x.GetB() - 1);
 
-			if (x.GetB() >= 0) m_Window.SetForeColor(x);
+			if (x.GetB() >= 0) m_Window->SetForeColor(x);
 			//cameras->Translate({ 0.0f, 0.0f, -dt });
 		}
-		if (m_Window.GetKeyboard().IsKeyPressed('W'))
+		if (m_Window->GetKeyboard().IsKeyPressed('W'))
 		{
-			Color x = m_Window.GetForeColor();
+			Color x = m_Window->GetForeColor();
 			x.SetR(x.GetR() + 1);
 
-			if (x.GetR() < 256) m_Window.SetForeColor(x);
+			if (x.GetR() < 256) m_Window->SetForeColor(x);
 
 			//cameras->Translate({ dt, 0.0f, 0.0f });
 		}
-		if (m_Window.GetKeyboard().IsKeyPressed('S'))
+		if (m_Window->GetKeyboard().IsKeyPressed('S'))
 		{
-			Color x = m_Window.GetForeColor();
+			Color x = m_Window->GetForeColor();
 			x.SetG(x.GetG() + 1);
 
-			if (x.GetG() < 256) m_Window.SetForeColor(x);
+			if (x.GetG() < 256) m_Window->SetForeColor(x);
 
 			//cameras->Translate({ 0.0f, dt, 0.0f });
 		}
-		if (m_Window.GetKeyboard().IsKeyPressed('X'))
+		if (m_Window->GetKeyboard().IsKeyPressed('X'))
 		{
-			Color x = m_Window.GetForeColor();
+			Color x = m_Window->GetForeColor();
 			x.SetB(x.GetB() + 1);
 
-			if (x.GetB() < 256) m_Window.SetForeColor(x);
+			if (x.GetB() < 256) m_Window->SetForeColor(x);
 
 			//cameras->Translate({ 0.0f, -dt, 0.0f });
 		}
 	}
 
 
-	while (const auto& delta = m_Window.GetMouse().ReadRawDelta())
+	while (const auto& delta = m_Window->GetMouse().ReadRawDelta())
 	{
-		if (!m_Window.IsCursorEnabled())
+		if (!m_Window->IsCursorEnabled())
 		{
 			//cameras->Rotate(static_cast<float>(delta->x), static_cast<float>(delta->y));
 		}
@@ -194,7 +199,7 @@ void Application::Run(float dt)
 	//const float t = m_Timer.Peek();
 	std::ostringstream oss;
 	oss << "Timer elapsed: " << std::setprecision(1) << std::fixed << dt << "s";
-	m_Window.SetText(oss.str().c_str());
+	m_Window->SetText(oss.str().c_str());
 
 	// renderGraph.Execute(window.Gfx());
 

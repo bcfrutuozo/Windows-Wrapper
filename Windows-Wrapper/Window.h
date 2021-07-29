@@ -24,19 +24,28 @@ class Window : public Control, public IHidable
 
 private:
 
+	bool m_IsCursorEnabled;
+	bool m_IsMenuStripEnabled;
+	std::unique_ptr<Keyboard> m_Keyboard;
+	std::unique_ptr<Mouse> m_Mouse;
+	std::vector<BYTE> m_RawBuffer;
+
+	// Set default as white
+	Color m_ForeColor = Color::White();
+
 	// Singleton manages registration/cleanup of window class
 	class WndClass
 	{
 	private:
 
+		static constexpr const char* m_ClassName = "Window Class";
+		static WndClass m_WndClass;
+		HINSTANCE m_Instance;
+
 		WndClass() noexcept;
 		~WndClass() noexcept;
 		WndClass(const WndClass&) = delete;
 		WndClass& operator=(const WndClass&) = delete;
-
-		static constexpr const char* m_ClassName = "Window Class";
-		static WndClass m_WndClass;
-		HINSTANCE m_Instance;
 
 	public:
 
@@ -73,17 +82,6 @@ private:
 	void OnMouseWheel_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	void OnNotify_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	void OnRawInput_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-
-	bool m_IsCursorEnabled;
-	bool m_IsMenuStripEnabled;
-	RECT m_Rectangle;
-	std::unique_ptr<Keyboard> m_Keyboard;
-	std::unique_ptr<Mouse> m_Mouse;
-	std::vector<BYTE> m_RawBuffer;
-
-	// Set default as white
-	Color m_ForeColor = Color::White();
-
 
 protected:
 
@@ -161,11 +159,6 @@ public:
 
 	void Hide() override;
 	void Show() override;
-
-	virtual void OnClick(Control* const sender, EventArgs* const args) override
-	{
-
-	}
 
 	// MenuStrip functions
 	void ClearMenuStrip() noexcept;

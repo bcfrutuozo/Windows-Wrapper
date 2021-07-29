@@ -14,6 +14,6 @@ public:
 	MenuStrip(Control* parent);
 	virtual ~MenuStrip() = default;
 
-	void Hide() noexcept;
-	void Show() noexcept;
+	void Hide() noexcept override;
+	void Show() noexcept override;
 };

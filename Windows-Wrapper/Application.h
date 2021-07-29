@@ -3,6 +3,8 @@
 #include "Window.h"
 #include "Timer.h"
 
+#include <memory>
+
 constexpr auto SPEEDFACTOR = 1.0f;
 
 class Application
@@ -13,7 +15,8 @@ private:
 	void HandleInput(float dt);
 
 	Timer m_Timer;
-	Window m_Window;
+	std::unique_ptr<Window> m_Window;
+	MenuItem* p = nullptr;
 
 public:
 	Application();

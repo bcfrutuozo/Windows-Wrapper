@@ -11,7 +11,7 @@ private:
 
 	uuids::uuid m_UUID;
 
-protected:
+public:
 
 	Base();
 	Base(const Base&) = default;			// Copy constructor
@@ -19,8 +19,6 @@ protected:
 	Base& operator=(const Base&) = default;	// Copy assignment constructor
 	Base& operator=(Base&&) = default;		// Move assignment constructor
 	virtual ~Base() = default;				// Destructor
-
-public:
 
 	inline bool operator==(const Base& b) const noexcept;
 	inline bool static Equals(const Base& lhs, const Base& rhs) noexcept;

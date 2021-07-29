@@ -45,7 +45,7 @@ HINSTANCE Window::WndClass::GetInstance() noexcept
 // Window
 Window::Window(const std::string& name, int width, int height)
 	:
-	Control(name, width, height, 0, 0),
+	Control(nullptr, name, width, height, 0, 0),
 	m_IsCursorEnabled(true),
 	m_Keyboard(std::make_unique<Keyboard>()),
 	m_Mouse(std::make_unique<Mouse>()),
@@ -75,11 +75,12 @@ void Window::Show()
 void Window::Initialize() noexcept
 {
 	// Calculate window size based on desired client region
-	m_Rectangle.left = 100;
-	m_Rectangle.right = Size.Width + m_Rectangle.left;
-	m_Rectangle.top = 100;
-	m_Rectangle.bottom = Size.Height + m_Rectangle.top;
-	if (AdjustWindowRect(&m_Rectangle, WS_OVERLAPPEDWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU, FALSE) == 0)
+	RECT r;
+	r.left = 100;
+	r.right = Size.Width + r.left;
+	r.top = 100;
+	r.bottom = Size.Height + r.top;
+	if (AdjustWindowRect(&r, WS_OVERLAPPEDWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU, FALSE) == 0)
 	{
 		throw WND_LAST_EXCEPT();
 	}
@@ -87,12 +88,12 @@ void Window::Initialize() noexcept
 	// Create window and get its handle
 	Handle = CreateWindow(
 		WndClass::GetName(),																// Class name
-		Text.c_str(),																				// Window title
+		Text.c_str(),																		// Window title
 		WS_OVERLAPPEDWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU,	// Style values
 		CW_USEDEFAULT,																		// X position
 		CW_USEDEFAULT,																		// Y position
-		(m_Rectangle.right - m_Rectangle.left),																// Width
-		(m_Rectangle.bottom - m_Rectangle.top),																// Height
+		(r.right - r.left),																	// Width
+		(r.bottom - r.top),																	// Height
 		nullptr,																			// Parent handle
 		nullptr,																			// Menu handle
 		WndClass::GetInstance(),															// Module instance handle
@@ -135,6 +136,7 @@ void Window::ClearMenuStrip() noexcept
 	{
 		if (c->GetType() == typeid(MenuStrip))
 		{
+			c->Delete();
 			Controls.erase(std::remove(Controls.begin(), Controls.end(), c), Controls.end());
 		}
 	}

@@ -126,6 +126,9 @@
     <ClInclude Include="MenuEntryIconItem.h">
       <Filter>Menu</Filter>
     </ClInclude>
+    <ClInclude Include="IActivableMenu.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interfaces">

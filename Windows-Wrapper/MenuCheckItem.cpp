@@ -16,13 +16,14 @@ void MenuCheckItem::OnInternalUpdate(Control* const sender, EventArgs* const arg
 
 MenuCheckItem::MenuCheckItem(Menu* parent, const std::string& text, unsigned int subitemIndex, int section, bool isChecked)
 	:
-	MenuItem(parent, text, subitemIndex, section)
+	MenuItem(parent, text, subitemIndex, section),
+	IsChecked(isChecked)
 {
 	Initialize();
 
 	// The OnInternalUpdate() event could be registered in Control class. However, it's registered on each child class who implement
 	// the function to avoid unnecessary calls for the other classes
-	Events.Register(new EventHandler("OnInternalUpdate", std::function<void(Control* c, EventArgs* e)>([this](Control* c, EventArgs* e) { OnInternalUpdate(c, e); })));
+	Events.Register(std::make_unique<EventHandler>("OnInternalUpdate", std::function<void(Control* c, EventArgs* e)>([this](Control* c, EventArgs* e) { OnInternalUpdate(c, e); })));
 }
 
 void MenuCheckItem::Initialize() noexcept
