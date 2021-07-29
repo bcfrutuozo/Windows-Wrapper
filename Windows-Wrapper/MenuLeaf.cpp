@@ -3,6 +3,7 @@
 #include "MenuCheckItem.h"
 #include "MenuRadioItem.h"
 #include "MenuSeparator.h"
+#include "Window.h"
 
 MenuLeaf::MenuLeaf(Control* parent, const std::string& text, unsigned int subitemIndex, int section)
 	:
@@ -11,33 +12,33 @@ MenuLeaf::MenuLeaf(Control* parent, const std::string& text, unsigned int subite
 
 }
 
-void MenuLeaf::Enable() noexcept
-{
-	if (!Enabled)
-	{
-		EnableMenuItem(static_cast<HMENU>(Parent->Handle.ToPointer()), m_SubItemIndex, MF_BYPOSITION | MF_ENABLED);
-		Enabled = true;
-		Grayed = false;
-	}
-}
-
 void MenuLeaf::Disable() noexcept
 {
-	if (Enabled || !Grayed)
+	if (IsEnabled())
 	{
 		EnableMenuItem(static_cast<HMENU>(Parent->Handle.ToPointer()), m_SubItemIndex, MF_BYPOSITION | MF_DISABLED);
+
+		if (const auto wnd = GetWindow())
+		{
+			DrawMenuBar(static_cast<HWND>(wnd->Handle.ToPointer()));
+		}
+
 		Enabled = false;
-		Grayed = false;
 	}
 }
 
-void MenuLeaf::Gray() noexcept
+void MenuLeaf::Enable() noexcept
 {
-	if (!Grayed)
+	if (!IsEnabled())
 	{
-		EnableMenuItem(static_cast<HMENU>(Parent->Handle.ToPointer()), m_SubItemIndex, MF_BYPOSITION | MF_GRAYED);
-		Enabled = false;
-		Grayed = true;
+		EnableMenuItem(static_cast<HMENU>(Parent->Handle.ToPointer()), m_SubItemIndex, MF_BYPOSITION | MF_ENABLED);
+
+		if (const auto wnd = GetWindow())
+		{
+			DrawMenuBar(static_cast<HWND>(wnd->Handle.ToPointer()));
+		}
+
+		Enabled = true;
 	}
 }
 

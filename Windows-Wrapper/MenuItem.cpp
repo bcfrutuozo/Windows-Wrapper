@@ -1,45 +1,44 @@
 #include "MenuItem.h"
-
-#include <filesystem>
+#include "Window.h"
 
 MenuItem::MenuItem(Menu* parent, const std::string& text, unsigned int subitemIndex, int section, const std::string& iconPath)
 	:
 	Menu(parent, text, subitemIndex, section)
 {
-	
+
 }
 
 MenuItem::~MenuItem()
 {
-	
-}
 
-void MenuItem::Enable() noexcept
-{
-	if (!Enabled)
-	{
-		EnableMenuItem(static_cast<HMENU>(Parent->Handle.ToPointer()), m_SubItemIndex, MF_BYPOSITION | MF_ENABLED);
-		Enabled = true;
-		Grayed = false;
-	}
 }
 
 void MenuItem::Disable() noexcept
 {
-	if (Enabled || !Grayed)
+	if (IsEnabled())
 	{
 		EnableMenuItem(static_cast<HMENU>(Parent->Handle.ToPointer()), m_SubItemIndex, MF_BYPOSITION | MF_DISABLED);
+
+		if (const auto wnd = GetWindow())
+		{
+			DrawMenuBar(static_cast<HWND>(wnd->Handle.ToPointer()));
+		}
+
 		Enabled = false;
-		Grayed = false;
 	}
 }
 
-void MenuItem::Gray() noexcept
+void MenuItem::Enable() noexcept
 {
-	if (!Grayed)
+	if (!IsEnabled())
 	{
-		EnableMenuItem(static_cast<HMENU>(Parent->Handle.ToPointer()), m_SubItemIndex, MF_BYPOSITION | MF_GRAYED);
-		Enabled = false;
-		Grayed = true;
+		EnableMenuItem(static_cast<HMENU>(Parent->Handle.ToPointer()), m_SubItemIndex, MF_BYPOSITION | MF_ENABLED);
+
+		if (const auto wnd = GetWindow())
+		{
+			DrawMenuBar(static_cast<HWND>(wnd->Handle.ToPointer()));
+		}
+
+		Enabled = true;
 	}
 }

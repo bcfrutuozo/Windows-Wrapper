@@ -10,10 +10,8 @@ public:
 	MenuLeaf(Control* parent, const std::string& text, unsigned int subitemIndex, int section);
 	virtual ~MenuLeaf() = default;
 
-
-	void Enable() noexcept;
-	void Disable() noexcept;
-	void Gray() noexcept;
+	void Disable() noexcept override;
+	void Enable() noexcept override;
 
 	MenuItem& AddItemWithIcon(const std::string& text, const std::string& iconPath);
 	MenuItem& AddCheckItem(const std::string& text, bool isChecked);

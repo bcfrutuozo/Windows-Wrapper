@@ -91,7 +91,7 @@ void Application::HandleInput(float dt)
 			menu2.AddItemWithIcon("Submenu2-Item1", "images\\2.bmp");
 			menu2.AddSeparator();
 			menu2.AddRadioItem("Radio1", true).Disable();
-			menu2.AddRadioItem("Radio2", true).Gray();
+			menu2.AddRadioItem("Radio2", true);
 			menu2.AddRadioItem("Radio3", false);
 			menu2.AddRadioItem("Radio4", true);
 			menu2.AddSeparator();
@@ -100,7 +100,6 @@ void Application::HandleInput(float dt)
 			menu1.AddItem("Submenu-Item4");
 			menu1.AddItem("Submenu-Item5");
 			m_Window->UpdateMenuStrip();
-			p = &item1;
 		}
 
 		if (m_Window->GetKeyboard().IsKeyPressed('R'))
@@ -116,18 +115,6 @@ void Application::HandleInput(float dt)
 		if (m_Window->GetKeyboard().IsKeyPressed('P'))
 		{
 			m_Window->GetMenuStrip().Hide();
-		}
-
-		if (m_Window->GetKeyboard().IsKeyPressed('B'))
-		{
-			p->Enable();
-			DrawMenuBar((HWND)m_Window->Handle.ToPointer());
-		}
-
-		if (m_Window->GetKeyboard().IsKeyPressed('N'))
-		{
-			p->Disable();
-			DrawMenuBar((HWND)m_Window->Handle.ToPointer());
 		}
 
 		if (m_Window->GetKeyboard().IsKeyPressed('Q'))

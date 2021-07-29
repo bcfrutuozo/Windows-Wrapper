@@ -16,7 +16,6 @@ private:
 
 	Timer m_Timer;
 	std::unique_ptr<Window> m_Window;
-	MenuItem* p = nullptr;
 
 public:
 	Application();

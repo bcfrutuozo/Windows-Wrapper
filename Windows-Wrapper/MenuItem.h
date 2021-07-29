@@ -10,7 +10,6 @@ public:
 	MenuItem(Menu* parent, const std::string& text, unsigned int subitemIndex, int section, const std::string& iconPath = { });
 	virtual ~MenuItem();
 
-	void Enable() noexcept override;
 	void Disable() noexcept override;
-	void Gray() noexcept override;
+	void Enable() noexcept override;
 };

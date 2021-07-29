@@ -29,4 +29,5 @@ protected:
 
 	virtual void Initialize() noexcept override = 0;
 	Menu* GetById(unsigned int id) noexcept;			// Search the whole Menu tree recursively
+	Window* GetWindow() const noexcept;
 };
