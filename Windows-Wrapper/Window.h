@@ -2,25 +2,25 @@
 
 #include "Control.h"
 #include "Color.h"
-#include "Exception.h"
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "MenuStrip.h"
+#include "Button.h"
+#include "WinControl.h"
 
 #include <memory>
 #include <vector>
 #include <optional>
 #include <string>
 
-// Error exception helper macro
-#define WND_EXCEPT( hr ) Window::HRException( __LINE__,__FILE__,(hr) )
-#define WND_LAST_EXCEPT() Window::HRException( __LINE__,__FILE__,GetLastError() )
+
 
 class Menu;
 
-class Window : public Control, public IHidable
+class Window : public Control, public WinControl<Window>, public IHidable
 {
 	friend class Menu;
+	friend class WinControl;
 
 private:
 
@@ -57,9 +57,9 @@ private:
 	static void FreeCursor() noexcept;
 	static void HideCursor() noexcept;
 	static void ShowCursor() noexcept;
-	static LRESULT WINAPI HandleMessageSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-	static LRESULT WINAPI HandleMessageForwarder(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-	LRESULT WINAPI HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+
+	// Member function for message handling 
+	LRESULT WINAPI HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept override;
 
 	// Events implementations
 	void OnActivate_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
@@ -165,6 +165,9 @@ public:
 	void UpdateMenuStrip() noexcept;
 	MenuStrip& GetMenuStrip() noexcept;
 
+	// Buttons
+	Button& AddButton(const std::string& name, int width, int height, int x, int y) noexcept;
+
 	void SetText(const std::string& text);
 	void EnableCursor() noexcept;
 	void DisableCursor() noexcept;
@@ -173,29 +176,4 @@ public:
 	bool IsCursorEnabled() const noexcept;
 	Keyboard& GetKeyboard() noexcept;
 	Mouse& GetMouse() noexcept;
-	static const std::optional<int> ProcessMessages();
-
-	// Window Exception
-	class WindowException : public Exception
-	{
-	public:
-		static const std::string& TranslateErrorCode(HRESULT hr) noexcept;
-	};
-
-	// HRException
-	class HRException : public Exception
-	{
-	public:
-
-		HRException(int line, const char* file, HRESULT hr) noexcept;
-
-		const char* what() const noexcept override;
-		const char* GetType() const noexcept;
-		HRESULT GetErrorCode() const noexcept;
-		const std::string& GetErrorDescription() const noexcept;
-
-	private:
-
-		HRESULT hr;
-	};
 };

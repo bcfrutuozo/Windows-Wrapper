@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Menu.h"
-#include "IActivableMenu.h"
+#include "IActivable.h"
 
-class MenuItem : public Menu, public IActivableMenu
+class MenuItem : public Menu, public IActivable
 {
 public:
 

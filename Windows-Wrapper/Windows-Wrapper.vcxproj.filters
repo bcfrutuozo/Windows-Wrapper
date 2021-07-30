@@ -51,6 +51,8 @@
     <ClCompile Include="MenuEntryIconItem.cpp">
       <Filter>Menu</Filter>
     </ClCompile>
+    <ClCompile Include="Button.cpp" />
+    <ClCompile Include="WinControl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -126,9 +128,11 @@
     <ClInclude Include="MenuEntryIconItem.h">
       <Filter>Menu</Filter>
     </ClInclude>
-    <ClInclude Include="IActivableMenu.h">
+    <ClInclude Include="IActivable.h">
       <Filter>Interfaces</Filter>
     </ClInclude>
+    <ClInclude Include="Button.h" />
+    <ClInclude Include="WinControl.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interfaces">

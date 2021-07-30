@@ -6,6 +6,7 @@
 #include "MenuSeparator.h"
 #include "MenuItem.h"
 #include "MenuLeaf.h"
+#include "WinControl.h"
 
 #include <sstream>
 #include <iomanip>
@@ -28,7 +29,7 @@ int Application::Start()
 	while (true)
 	{
 		// Process all messages pending but doesn't block new messages
-		if (const auto& ecode = Window::ProcessMessages())
+		if (const auto& ecode = ProcessMessages())
 		{
 			// if return option has value exits the application
 			return *ecode;
@@ -73,33 +74,33 @@ void Application::HandleInput(float dt)
 
 	if (!m_Window->IsCursorEnabled())
 	{
-		
-
 		if (m_Window->GetKeyboard().IsKeyPressed('Y'))
 		{
-			auto& mb = m_Window->GetMenuStrip();
-			auto& item1 = mb.AddItem("Arquivo");
-			auto& item2 = mb.AddItem("Arquivo2");
-			auto& menu1 = mb.AddMenu("Submenu");
-			menu1.AddItem("Submenu-Item1");
-			menu1.AddCheckItem("Check-test01", true);
-			menu1.AddCheckItem("Check-test02", false);
-			menu1.AddSeparator();
-			menu1.AddItemWithIcon("Submenu-Item2", "images\\1.bmp");
-			menu1.AddSeparator();
-			auto& menu2 = menu1.AddMenu("Submenu-Item3");
-			menu2.AddItemWithIcon("Submenu2-Item1", "images\\2.bmp");
-			menu2.AddSeparator();
-			menu2.AddRadioItem("Radio1", true).Disable();
-			menu2.AddRadioItem("Radio2", true);
-			menu2.AddRadioItem("Radio3", false);
-			menu2.AddRadioItem("Radio4", true);
-			menu2.AddSeparator();
-			menu2.AddRadioItem("Radio1", false);
-			menu2.AddRadioItem("Radio2", true);
-			menu1.AddItem("Submenu-Item4");
-			menu1.AddItem("Submenu-Item5");
-			m_Window->UpdateMenuStrip();
+			m_Window->AddButton("Teste", 100, 40, 10, 20);
+
+			//auto& mb = m_Window->GetMenuStrip();
+			//auto& item1 = mb.AddItem("Arquivo");
+			//auto& item2 = mb.AddItem("Arquivo2");
+			//auto& menu1 = mb.AddMenu("Submenu");
+			//menu1.AddItem("Submenu-Item1");
+			//menu1.AddCheckItem("Check-test01", true);
+			//menu1.AddCheckItem("Check-test02", false);
+			//menu1.AddSeparator();
+			//menu1.AddItemWithIcon("Submenu-Item2", "images\\1.bmp");
+			//menu1.AddSeparator();
+			//auto& menu2 = menu1.AddMenu("Submenu-Item3");
+			//menu2.AddItemWithIcon("Submenu2-Item1", "images\\2.bmp");
+			//menu2.AddSeparator();
+			//menu2.AddRadioItem("Radio1", true).Disable();
+			//menu2.AddRadioItem("Radio2", true);
+			//menu2.AddRadioItem("Radio3", false);
+			//menu2.AddRadioItem("Radio4", true);
+			//menu2.AddSeparator();
+			//menu2.AddRadioItem("Radio1", false);
+			//menu2.AddRadioItem("Radio2", true);
+			//menu1.AddItem("Submenu-Item4");
+			//menu1.AddItem("Submenu-Item5");
+			//m_Window->UpdateMenuStrip();
 		}
 
 		if (m_Window->GetKeyboard().IsKeyPressed('R'))

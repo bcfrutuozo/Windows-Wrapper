@@ -149,6 +149,7 @@
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="Base.cpp" />
+    <ClCompile Include="Button.cpp" />
     <ClCompile Include="Control.cpp" />
     <ClCompile Include="dxerr.cpp" />
     <ClCompile Include="DXGIInfoManager.cpp" />
@@ -173,12 +174,14 @@
     <ClCompile Include="Size.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Type.cpp" />
+    <ClCompile Include="WinControl.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
     <ClInclude Include="Base.h" />
+    <ClInclude Include="Button.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="Control.h" />
@@ -189,11 +192,12 @@
     <ClInclude Include="EventHandler.h" />
     <ClInclude Include="Exception.h" />
     <ClInclude Include="Graphics.h" />
-    <ClInclude Include="IActivableMenu.h" />
+    <ClInclude Include="IActivable.h" />
     <ClInclude Include="IEquatable.h" />
     <ClInclude Include="IHandle.h" />
     <ClInclude Include="IHidable.h" />
     <ClInclude Include="IntPtr.h" />
+    <ClInclude Include="WinControl.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Mathlib.h" />
     <ClInclude Include="Menu.h" />

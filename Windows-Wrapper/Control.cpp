@@ -120,3 +120,70 @@ const std::string& Control::GetText() const noexcept
 {
 	return Text;
 }
+
+// Exceptions
+const std::string& Control::ControlException::TranslateErrorCode(HRESULT hr) noexcept
+{
+	char* pMessageBuffer = nullptr;
+
+	// Windows will allocate memory for error string and make our pointer point to it
+	const DWORD nMessageLength = FormatMessage(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER |
+		FORMAT_MESSAGE_FROM_SYSTEM |
+		FORMAT_MESSAGE_IGNORE_INSERTS,
+		nullptr,
+		hr,
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		reinterpret_cast<LPSTR>(&pMessageBuffer),
+		0,
+		nullptr);
+
+	// String length as 0 indicates a failure
+	if (nMessageLength == 0)
+	{
+		return "Unidentified error code";
+	}
+
+	// Copy error string from windows allocated buffer to string
+	std::string errorString = pMessageBuffer;
+
+	// Free windows buffer
+	LocalFree(pMessageBuffer);
+
+	return errorString;
+}
+
+Control::HRException::HRException(int line, const char* file, HRESULT hr) noexcept
+	:
+	Exception(line, file),
+	hr(hr)
+{ }
+
+const char* Control::HRException::what() const noexcept
+{
+	std::ostringstream oss;
+
+	oss << GetType() << std::endl
+		<< "Error Code: 0x" << std::hex << std::uppercase << GetErrorCode()
+		<< std::dec << " (" << static_cast<unsigned long>(GetErrorCode()) << ")" << std::endl
+		<< "Description: " << GetErrorDescription() << std::endl
+		<< GetErrorSpot();
+	m_WhatBuffer = oss.str();
+
+	return m_WhatBuffer.c_str();
+}
+
+const char* Control::HRException::GetType() const noexcept
+{
+	return "Window Exception";
+}
+
+HRESULT Control::HRException::GetErrorCode() const noexcept
+{
+	return hr;
+}
+
+const std::string& Control::HRException::GetErrorDescription() const noexcept
+{
+	return ControlException::TranslateErrorCode(hr);
+}

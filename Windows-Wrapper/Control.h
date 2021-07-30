@@ -2,6 +2,7 @@
 
 #include "Base.h"
 #include "Common.h"
+#include "Exception.h"
 #include "IHandle.h"
 #include "Size.h"
 #include "Event.h"
@@ -10,6 +11,10 @@
 
 #include <memory>
 #include <functional>
+
+// Error exception helper macro
+#define CTL_EXCEPT( hr ) Control::HRException( __LINE__,__FILE__,(hr) )
+#define CTL_LAST_EXCEPT() Control::HRException( __LINE__,__FILE__,GetLastError() )
 
 class Window;
 
@@ -81,4 +86,29 @@ public:
 	void OnMouseWheel(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept;
 
 	const std::string& GetText() const noexcept;
+
+	// Control Exception
+	class ControlException : public Exception
+	{
+	public:
+
+		static const std::string& TranslateErrorCode(HRESULT hr) noexcept;
+	};
+
+	// HRException
+	class HRException : public Exception
+	{
+	private:
+
+		HRESULT hr;
+
+	public:
+
+		HRException(int line, const char* file, HRESULT hr) noexcept;
+
+		const char* what() const noexcept override;
+		const char* GetType() const noexcept;
+		HRESULT GetErrorCode() const noexcept;
+		const std::string& GetErrorDescription() const noexcept;
+	};
 };

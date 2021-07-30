@@ -13,7 +13,7 @@ Window::WndClass::WndClass() noexcept
 {
 	WNDCLASSEX wc = { 0 };
 	wc.cbSize = sizeof(wc);
-	wc.style = CS_HREDRAW | CS_VREDRAW;
+	wc.style = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;
 	wc.lpfnWndProc = HandleMessageSetup;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
@@ -82,7 +82,7 @@ void Window::Initialize() noexcept
 	r.bottom = Size.Height + r.top;
 	if (AdjustWindowRect(&r, WS_OVERLAPPEDWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU, FALSE) == 0)
 	{
-		throw WND_LAST_EXCEPT();
+		throw CTL_LAST_EXCEPT();
 	}
 
 	// Create window and get its handle
@@ -97,12 +97,12 @@ void Window::Initialize() noexcept
 		nullptr,																			// Parent handle
 		nullptr,																			// Menu handle
 		WndClass::GetInstance(),															// Module instance handle
-		this																				// Pointer to the window instance to work along with HandleMessageSetup function. THIS IS THE #SURPRIIISOOOOOOO
+		this																				// Pointer to the window instance to work along with HandleMessageSetup function.
 	);
 
 	if (Handle.IsNull())
 	{
-		throw WND_LAST_EXCEPT();
+		throw CTL_LAST_EXCEPT();
 	}
 
 	// TODO: THIS IS WHERE THE GRAPHICS DEVICE, CONTEXT, RENDER TARGET, DEPTHSTENCIL (MAYBE) WILL BE INSTANTIATED.
@@ -117,7 +117,7 @@ void Window::Initialize() noexcept
 	rid.hwndTarget = nullptr;
 	if (RegisterRawInputDevices(&rid, 1, sizeof(rid)) == FALSE)
 	{
-		throw WND_LAST_EXCEPT();
+		throw CTL_LAST_EXCEPT();
 	}
 	// Still don't know how I'll implement child windows. So this is just to not let an empty ugly function
 	//SetParent(static_cast<HWND>(Handle.ToPointer()), static_cast<HWND>(Parent->Handle.ToPointer()));
@@ -137,7 +137,13 @@ void Window::ClearMenuStrip() noexcept
 		if (c->GetType() == typeid(MenuStrip))
 		{
 			c->Delete();
-			Controls.erase(std::remove(Controls.begin(), Controls.end(), c), Controls.end());
+			const auto it = std::find(Controls.begin(), Controls.end(), c);
+			Controls.erase(it);
+
+			// Break processing to avoid exception.
+			// We are removing an element inside a for loop which will break the for iterator.
+			// And as we have just one MenuStrip per Window. It's a valid assumption.
+			break;
 		}
 	}
 }
@@ -167,13 +173,18 @@ MenuStrip& Window::GetMenuStrip() noexcept
 	return Create<MenuStrip>(this);
 }
 
+Button& Window::AddButton(const std::string& name, int width, int height, int x, int y) noexcept
+{
+	return Create<Button>(this, name, width, height, x, y);
+}
+
 void Window::SetText(const std::string& title)
 {
 	if (IsShown())
 	{
 		if (SetWindowText(static_cast<HWND>(Handle.ToPointer()), title.c_str()) == 0)
 		{
-			throw WND_LAST_EXCEPT();
+			throw CTL_LAST_EXCEPT();
 		}
 
 		Text = title;
@@ -193,26 +204,6 @@ void Window::DisableCursor() noexcept
 	m_IsCursorEnabled = false;
 	HideCursor();
 	EncloseCursor();
-}
-
-const std::optional<int> Window::ProcessMessages()
-{
-	MSG msg;
-
-	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
-	{
-		// Check for quit message because PeekMessage doesn't signal it via return val
-		if (msg.message == WM_QUIT)
-		{
-			return static_cast<int>(msg.wParam);
-		}
-
-		// Translate and dispatch messages
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	}
-
-	return{};
 }
 
 void Window::EncloseCursor() const noexcept
@@ -274,42 +265,6 @@ Mouse& Window::GetMouse() noexcept
 	}
 
 	return *m_Mouse;
-}
-
-// This function is responsible to change the default HandleMessage function pointer to the custom one.
-// It works as a Window class wrapper, allowing multiple Window instances to be easily instantiated.
-// YOU ARE NOT SUPPOSED TO UNDERSTAND THIS AS NEITHER DO I UNDERSTAND :'(
-// LOTS OF THANKS TO STACKOVERFLOW :D
-LRESULT WINAPI Window::HandleMessageSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
-{
-	// Use create parameter passed in from CreateWindow() to store window class pointer at WinAPI side
-	if (msg == WM_NCCREATE)
-	{
-		// Extract pointer to window class from creation data
-		const CREATESTRUCTW* const pCreate = reinterpret_cast<CREATESTRUCTW*>(lParam);
-		Window* const pWnd = static_cast<Window*>(pCreate->lpCreateParams);
-
-		// Set WinAPI-managed user data do store pointer to window class
-		SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWnd));
-
-		// Set message function to normal (non-setup) handler now that setup is finished
-		SetWindowLongPtr(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&Window::HandleMessageForwarder));
-
-		// Forward message to window class member function
-		return pWnd->HandleMessage(hWnd, msg, wParam, lParam);
-	}
-
-	// If we get a message before the WM_NCCREATE message, handle with default handler
-	return DefWindowProc(hWnd, msg, wParam, lParam);
-}
-
-LRESULT WINAPI Window::HandleMessageForwarder(HWND hWnd, UINT msg, WPARAM lParam, LPARAM wParam) noexcept
-{
-	// Retrieve pointer to window class
-	Window* const pWnd = reinterpret_cast<Window*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
-
-	// Forward message to window class member function
-	return pWnd->HandleMessage(hWnd, msg, lParam, wParam);
 }
 
 // Event handling implementation
@@ -614,71 +569,4 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 
 	return DefWindowProc(hWnd, msg, wParam, lParam);
-}
-
-// Exceptions
-const std::string& Window::WindowException::TranslateErrorCode(HRESULT hr) noexcept
-{
-	char* pMessageBuffer = nullptr;
-
-	// Windows will allocate memory for error string and make our pointer point to it
-	const DWORD nMessageLength = FormatMessage(
-		FORMAT_MESSAGE_ALLOCATE_BUFFER |
-		FORMAT_MESSAGE_FROM_SYSTEM |
-		FORMAT_MESSAGE_IGNORE_INSERTS,
-		nullptr,
-		hr,
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		reinterpret_cast<LPSTR>(&pMessageBuffer),
-		0,
-		nullptr);
-
-	// String length as 0 indicates a failure
-	if (nMessageLength == 0)
-	{
-		return "Unidentified error code";
-	}
-
-	// Copy error string from windows allocated buffer to string
-	std::string errorString = pMessageBuffer;
-
-	// Free windows buffer
-	LocalFree(pMessageBuffer);
-
-	return errorString;
-}
-
-Window::HRException::HRException(int line, const char* file, HRESULT hr) noexcept
-	:
-	Exception(line, file),
-	hr(hr)
-{ }
-
-const char* Window::HRException::what() const noexcept
-{
-	std::ostringstream oss;
-
-	oss << GetType() << std::endl
-		<< "Error Code: 0x" << std::hex << std::uppercase << GetErrorCode()
-		<< std::dec << " (" << static_cast<unsigned long>(GetErrorCode()) << ")" << std::endl
-		<< "Description: " << GetErrorDescription() << std::endl
-		<< GetErrorSpot();
-	m_WhatBuffer = oss.str();
-
-	return m_WhatBuffer.c_str();
-}
-
-const char* Window::HRException::GetType() const noexcept
-{
-	return "Window Exception";
-}
-
-HRESULT Window::HRException::GetErrorCode() const noexcept
-{
-	return hr;
-}
-
-const std::string& Window::HRException::GetErrorDescription() const noexcept
-{
-	return WindowException::TranslateErrorCode(hr);
 }
