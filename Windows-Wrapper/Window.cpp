@@ -1,5 +1,7 @@
 #include "Window.h"
 #include "Event.h"
+#include "OnClosedEventHandler.h"
+#include "OnClosingEventHandler.h"
 
 #include <sstream>
 
@@ -18,12 +20,10 @@ Window::WndClass::WndClass() noexcept
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hInstance = GetInstance();
-	//wc.hIcon = static_cast<HICON>(LoadImage(GetInstance(), MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 32, 32, 0));
 	wc.hCursor = nullptr;
 	wc.hbrBackground = nullptr;
 	wc.lpszMenuName = nullptr;
 	wc.lpszClassName = GetName();
-	//wc.hIconSm = static_cast<HICON>(LoadImage(GetInstance(), MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 16, 16, 0));
 	RegisterClassEx(&wc);
 }
 
@@ -42,10 +42,9 @@ HINSTANCE Window::WndClass::GetInstance() noexcept
 	return m_WndClass.m_Instance;
 }
 
-// Window
 Window::Window(const std::string& name, int width, int height)
 	:
-	Control(nullptr, name, width, height, 0, 0),
+	IWinControl(nullptr, name, width, height, 0, 0),
 	m_IsCursorEnabled(true),
 	m_Keyboard(std::make_unique<Keyboard>()),
 	m_Mouse(std::make_unique<Mouse>()),
@@ -72,6 +71,16 @@ void Window::Show()
 	}
 }
 
+void Window::OnClosingSet(const std::function<void(Control* const c, OnClosingEventArgs* const e)>& callback) noexcept
+{
+	Events.Register(std::make_unique<OnClosingEventHandler>("OnClosing", callback));
+}
+
+void Window::OnClosedSet(const std::function<void(Control* const c, OnClosedEventArgs* const e)>& callback) noexcept
+{
+	Events.Register(std::make_unique<OnClosedEventHandler>("OnClosing", callback));
+}
+
 void Window::Initialize() noexcept
 {
 	// Calculate window size based on desired client region
@@ -80,7 +89,7 @@ void Window::Initialize() noexcept
 	r.right = Size.Width + r.left;
 	r.top = 100;
 	r.bottom = Size.Height + r.top;
-	if (AdjustWindowRect(&r, WS_OVERLAPPEDWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU, FALSE) == 0)
+	if (AdjustWindowRect(&r, WS_OVERLAPPEDWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU | WS_CLIPCHILDREN | WS_VISIBLE, FALSE) == 0)
 	{
 		throw CTL_LAST_EXCEPT();
 	}
@@ -89,7 +98,7 @@ void Window::Initialize() noexcept
 	Handle = CreateWindow(
 		WndClass::GetName(),																// Class name
 		Text.c_str(),																		// Window title
-		WS_OVERLAPPEDWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU,	// Style values
+		WS_OVERLAPPEDWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU | WS_CLIPCHILDREN | WS_VISIBLE,	// Style values
 		CW_USEDEFAULT,																		// X position
 		CW_USEDEFAULT,																		// Y position
 		(r.right - r.left),																	// Width
@@ -272,11 +281,11 @@ void Window::OnActivate_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 {
 	if (wParam & WA_ACTIVE)
 	{
-		OnActivation();
+		Events.Dispatch("OnActivate");
 	}
 	else
 	{
-		OnDeactivation();
+		Events.Dispatch("OnDeactivate");
 	}
 }
 
@@ -305,29 +314,33 @@ void Window::OnCommand_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) n
 void Window::OnClose_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
 	PostQuitMessage(0);
-	OnClose();
 }
 
 void Window::OnClosing_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-	OnClosing();
+	bool cancel = false;
+	Dispatch("OnClosing", new OnClosingEventArgs(CloseReason::UserClosing, cancel));
+
+	if (cancel)
+	{
+		// TODO: CANCEL FORM CLOSING
+	}
 }
 
 void Window::OnClosed_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-	OnClosed();
+	Dispatch("OnClosing", new OnClosedEventArgs(CloseReason::UserClosing));
 }
 
 void Window::OnFocusEnter_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-	OnFocusEnter();
+	//OnFocusEnter();
 }
 
 void Window::OnFocusLeave_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
 	// Clear key state when window loses focus to prevent input getting "stuck" 
 	m_Keyboard->ClearState();
-	OnFocusLeave();
 }
 
 void Window::OnKeyDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -338,19 +351,19 @@ void Window::OnKeyDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) n
 		m_Keyboard->OnKeyPressed(static_cast<unsigned char>(wParam));
 	}
 
-	OnKeyDown();
+	Dispatch("OnKeyDown", new KeyEventArgs(m_Keyboard.get()));
 }
 
 void Window::OnKeyPressed_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
 	m_Keyboard->OnChar(static_cast<unsigned char>(wParam));
-	OnKeyPressed();
+	Dispatch("OnKeyPress", new KeyPressEventArgs(static_cast<unsigned char>(wParam)));
 }
 
 void Window::OnKeyUp_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
 	m_Keyboard->OnKeyReleased(static_cast<unsigned char>(wParam));
-	OnKeyUp();
+	Dispatch("OnKeyUp", new KeyEventArgs(m_Keyboard.get()));
 }
 
 void Window::OnMouseMove_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -380,6 +393,7 @@ void Window::OnMouseMove_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			m_Mouse->OnMouseEnter();
 		}
 	}
+
 	// Out of client region -> log move / maintain capture if button down
 	else
 	{
@@ -395,7 +409,7 @@ void Window::OnMouseMove_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 	}
 
-	OnMouseMove();
+	Dispatch("OnMouseMove", new MouseEventArgs(m_Mouse.get()));
 }
 
 void Window::OnMouseLeftDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -410,7 +424,7 @@ void Window::OnMouseLeftDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 
 	const POINTS pt = MAKEPOINTS(lParam);
 	m_Mouse->OnLeftPressed(pt.x, pt.y);
-	Dispatch("OnClick", new MouseEventArgs(m_Mouse.get()));
+	Dispatch("OnMouseLeftDown", new MouseEventArgs(m_Mouse.get()));
 }
 
 void Window::OnMouseLeftUp_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -418,7 +432,10 @@ void Window::OnMouseLeftUp_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 	const POINTS pt = MAKEPOINTS(lParam);
 	m_Mouse->OnLeftReleased(pt.x, pt.y);
 
-	OnMouseLeftUp();
+	// OnClick event is always executed before the MouseUp event with both buttons
+	Dispatch("OnClick", new EventArgs());
+
+	Dispatch("OnMouseLeftUp", new MouseEventArgs(m_Mouse.get()));;
 }
 
 void Window::OnMouseRightDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -426,7 +443,7 @@ void Window::OnMouseRightDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
 	const POINTS pt = MAKEPOINTS(lParam);
 	m_Mouse->OnRightPressed(pt.x, pt.y);
 
-	OnMouseRightDown();
+	Dispatch("OnMouseRightDown", new MouseEventArgs(m_Mouse.get()));;
 }
 
 void Window::OnMouseRightUp_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -434,17 +451,20 @@ void Window::OnMouseRightUp_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 	const POINTS pt = MAKEPOINTS(lParam);
 	m_Mouse->OnRightReleased(pt.x, pt.y);
 
-	OnMouseRightUp();
+	// OnClick event is always executed before the MouseUp event with both buttons
+	Dispatch("OnClick", new EventArgs());
+
+	Dispatch("OnMouseRightUp", new MouseEventArgs(m_Mouse.get()));;
 }
 
 void Window::OnMouseLeftDoubleClick_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-	OnMouseLeftDoubleClick();
+	Dispatch("OnMouseLeftDoubleClick", new MouseEventArgs(m_Mouse.get()));;
 }
 
 void Window::OnMouseRightDoubleClick_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-	OnMouseRightDoubleClick();
+	Dispatch("OnMouseRightDoubleClick", new MouseEventArgs(m_Mouse.get()));;
 }
 
 void Window::OnMouseWheel_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -460,13 +480,16 @@ void Window::OnMouseWheel_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 		m_Mouse->OnWheelDown(pt.x, pt.y);
 	}
 
-	OnMouseWheel();
+	Dispatch("OnMouseWheel", new MouseEventArgs(m_Mouse.get()));
 }
 
 void Window::OnNotify_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-
-	OnNotify();
+	if (Parent != nullptr)
+	{
+		SendMessage(static_cast<HWND>(Parent->Handle.ToPointer()), WM_NOTIFY, wParam, lParam);
+		Dispatch("OnNotify", new EventArgs());
+	}
 }
 
 void Window::OnRawInput_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -515,8 +538,9 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
+	case WM_CREATE: OutputDebugString("aaa"); break;
 	case WM_COMMAND: OnCommand_Impl(hWnd, msg, wParam, lParam); break;
-	case WM_CLOSE: OnClose_Impl(hWnd, msg, wParam, lParam); return 0;		// Exit message to be handled in application class
+	case WM_CLOSE: OnClose_Impl(hWnd, msg, wParam, lParam); return  0;		// Exit message to be handled in application class
 	case WM_DESTROY: OnClosing_Impl(hWnd, msg, wParam, lParam); break;
 	case WM_NCDESTROY: OnClosed_Impl(hWnd, msg, wParam, lParam); break;
 	case WM_SETFOCUS: OnFocusEnter_Impl(hWnd, msg, wParam, lParam); break;
@@ -549,11 +573,10 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 	case WM_SIZING:
 	{
-		PRECT r = (PRECT)lParam;
+		//PRECT r = (PRECT)lParam;
 
-		HBRUSH brush = CreateSolidBrush(RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-		SetClassLongPtr(static_cast<HWND>(Handle.ToPointer()), GCLP_HBRBACKGROUND, (LONG_PTR)brush);
-
+		//HBRUSH brush = CreateSolidBrush(RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
+		//SetClassLongPtr(static_cast<HWND>(Handle.ToPointer()), GCLP_HBRBACKGROUND, (LONG_PTR)brush);
 		break;
 	}
 	case WM_PAINT:

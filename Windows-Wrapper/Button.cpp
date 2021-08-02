@@ -1,47 +1,42 @@
 #include "Button.h"
 
-// Singleton WinButton
-Button::WinButton Button::WinButton::m_WinButton;
+// Singleton WndClass
+Button::BtnClass Button::BtnClass::m_BtnClass;
 
 // Window class declarations
-Button::WinButton::WinButton() noexcept
+Button::BtnClass::BtnClass() noexcept
 	:
 	m_Instance(GetModuleHandle(nullptr))
 {
 	WNDCLASSEX wc = { 0 };
 	wc.cbSize = sizeof(wc);
-	wc.style = CS_DBLCLKS | CS_PARENTDC | CS_NOCLOSE | CS_HREDRAW | CS_VREDRAW;
+	wc.style = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;
 	wc.lpfnWndProc = HandleMessageSetup;
-	wc.cbClsExtra = 0;
-	wc.cbWndExtra = 0;
 	wc.hInstance = GetInstance();
-	//wc.hIcon = static_cast<HICON>(LoadImage(GetInstance(), MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 32, 32, 0));
-	wc.hCursor = nullptr;
-	wc.hbrBackground = nullptr;
-	wc.lpszMenuName = nullptr;
 	wc.lpszClassName = GetName();
-	//wc.hIconSm = static_cast<HICON>(LoadImage(GetInstance(), MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 16, 16, 0));
+	RegisterClassEx(&wc);
+
 	RegisterClassEx(&wc);
 }
 
-Button::WinButton::~WinButton()
+Button::BtnClass::~BtnClass()
 {
 	UnregisterClass(m_ClassName, GetInstance());
 }
 
-const char* Button::WinButton::GetName() noexcept
+const char* Button::BtnClass::GetName() noexcept
 {
 	return m_ClassName;
 }
 
-HINSTANCE Button::WinButton::GetInstance() noexcept
+HINSTANCE Button::BtnClass::GetInstance() noexcept
 {
-	return m_WinButton.m_Instance;
+	return m_BtnClass.m_Instance;
 }
 
 Button::Button(Control* parent, const std::string& name, int width, int height, int x, int y)
 	:
-	Control(parent, name, width, height, x, y)
+	IWinControl(parent, name, width, height, x, y)
 {
 	Initialize();
 }
@@ -55,6 +50,7 @@ LRESULT Button::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
+	case WM_LBUTTONDOWN: OutputDebugString("aaa"); break;
 	case BM_CLICK: break;
 	case BM_GETCHECK: break;
 	case BM_GETIMAGE: break;
@@ -64,6 +60,22 @@ LRESULT Button::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case BM_SETIMAGE: break;
 	case BM_SETSTATE: break;
 	case BM_SETSTYLE: break;
+	case WM_PAINT:
+	{
+		PAINTSTRUCT ps;
+		HDC hdc;
+		RECT rect;
+
+		GetClientRect(hWnd, &rect);
+
+		hdc = BeginPaint(hWnd, &ps);
+		SetTextColor(hdc, RGB(0, 0, 0));
+		//SetBkMode(hdc, TRANSPARENT);
+		DrawText(hdc, Text.c_str(), -1, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+		EndPaint(hWnd, &ps);
+		break;
+	}
+		
 	}
 
 	return DefWindowProc(hWnd, msg, wParam, lParam);
@@ -73,16 +85,16 @@ void Button::Initialize() noexcept
 {
 	// Create window and get its handle
 	Handle = CreateWindow(
-		WinButton::GetName(),																// Class name
+		Button::BtnClass::GetName(),														// Class name
 		Text.c_str(),																		// Window title
-		WS_TABSTOP | WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON	,								// Style values
+		WS_CHILD | WS_VISIBLE | WS_TABSTOP | SS_CENTER | BS_DEFPUSHBUTTON | WS_BORDER,		// Style values
 		Location.X,																			// X position
 		Location.Y,																			// Y position
 		Size.Width,																			// Width
 		Size.Height,																		// Height
 		static_cast<HWND>(Parent->Handle.ToPointer()),										// Parent handle
-		nullptr,																			// Menu handle
-		WinButton::GetInstance(),															// Module instance handle
+		(HMENU)1,																			// Menu handle
+		Button::BtnClass::GetInstance(),													// Module instance handle
 		this																				// Pointer to the button instance to work along with HandleMessageSetup function.
 	);
 
@@ -91,8 +103,7 @@ void Button::Initialize() noexcept
 		throw CTL_LAST_EXCEPT();
 	}
 
-	// Creates and show the button
-	Show();
+	//(WNDPROC)SetWindowLongPtr(static_cast<HWND>(Handle.ToPointer()), GWLP_WNDPROC, (LONG_PTR)&HandleMessageSetup);
 }
 
 void Button::Disable() noexcept

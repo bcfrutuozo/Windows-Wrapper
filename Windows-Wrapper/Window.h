@@ -6,21 +6,22 @@
 #include "Mouse.h"
 #include "MenuStrip.h"
 #include "Button.h"
-#include "WinControl.h"
+#include "IWinControl.h"
+#include "OnClosedEventArgs.h"
+#include "OnClosingEventArgs.h"
 
 #include <memory>
 #include <vector>
 #include <optional>
 #include <string>
 
-
-
 class Menu;
 
-class Window : public Control, public WinControl<Window>, public IHidable
+class Window : public IWinControl<Window>, public IHidable
 {
+	friend class Button;
 	friend class Menu;
-	friend class WinControl;
+	friend class IWinControl;
 
 private:
 
@@ -29,29 +30,7 @@ private:
 	std::unique_ptr<Keyboard> m_Keyboard;
 	std::unique_ptr<Mouse> m_Mouse;
 	std::vector<BYTE> m_RawBuffer;
-
-	// Set default as white
 	Color m_ForeColor = Color::White();
-
-	// Singleton manages registration/cleanup of window class
-	class WndClass
-	{
-	private:
-
-		static constexpr const char* m_ClassName = "Window Class";
-		static WndClass m_WndClass;
-		HINSTANCE m_Instance;
-
-		WndClass() noexcept;
-		~WndClass() noexcept;
-		WndClass(const WndClass&) = delete;
-		WndClass& operator=(const WndClass&) = delete;
-
-	public:
-
-		static const char* GetName() noexcept;
-		static HINSTANCE GetInstance() noexcept;
-	};
 
 	void EncloseCursor() const noexcept;
 	static void FreeCursor() noexcept;
@@ -87,70 +66,27 @@ protected:
 
 	void Initialize() noexcept override;
 
-	virtual void OnCreate()
-	{
-
-	}
-
-	virtual void OnActivation() const
-	{
-		if (m_IsCursorEnabled)
-		{
-			EncloseCursor();
-			HideCursor();
-		}
-	};
-
-	virtual void OnDeactivation() const
-	{
-		if (m_IsCursorEnabled)
-		{
-			FreeCursor();
-			ShowCursor();
-		}
-	};
-
-	virtual void OnClose() const {};
-
-	virtual void OnClosed() const {};
-
-	virtual void OnClosing() const {};
-
-	virtual void OnDestroy() const {};
-
-	virtual void OnFocusEnter() const {};
-
-	virtual void OnFocusLeave() const {};
-
-	virtual void OnKeyDown() const {};
-
-	virtual void OnKeyPressed() const {};
-
-	virtual void OnKeyUp() const {};
-
-	virtual void OnMouseMove() const {};
-
-	virtual void OnMouseLeftDown() const {};
-
-	virtual void OnMouseLeftUp() const {};
-
-	virtual void OnMouseRightDown() const {};
-
-	virtual void OnMouseRightUp() const {};
-
-	virtual void OnMouseLeftDoubleClick() const {};
-
-	virtual void OnMouseRightDoubleClick() const {};
-
-	virtual void OnMouseWheel() const {};
-
-	virtual void OnNotify() const {};
-
-	virtual void OnPaint() const {};
-
-	virtual void OnResize() const {};
-
 public:
+
+	// Singleton manages registration/cleanup of window class
+	class WndClass
+	{
+	private:
+
+		static constexpr const char* m_ClassName = "Window Class";
+		static WndClass m_WndClass;
+		HINSTANCE m_Instance;
+
+		WndClass() noexcept;
+		~WndClass() noexcept;
+		WndClass(const WndClass&) = delete;
+		WndClass& operator=(const WndClass&) = delete;
+
+	public:
+
+		static const char* GetName() noexcept;
+		static HINSTANCE GetInstance() noexcept;
+	};
 
 	Window(const std::string& name, int width, int height);
 	virtual ~Window();
@@ -159,6 +95,9 @@ public:
 
 	void Hide() override;
 	void Show() override;
+
+	void OnClosedSet(const std::function<void(Control* const c, OnClosedEventArgs* const e)>& callback) noexcept;
+	void OnClosingSet(const std::function<void(Control* const c, OnClosingEventArgs* const e)>& callback) noexcept;
 
 	// MenuStrip functions
 	void ClearMenuStrip() noexcept;

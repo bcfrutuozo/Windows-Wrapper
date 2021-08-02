@@ -52,21 +52,3 @@ Menu* Menu::GetById(unsigned int id) noexcept
 	// Returning nullptr is extremely important, otherwise it will be a trash pointer and will launch an exception trying to process it
 	return nullptr;
 }
-
-Window* Menu::GetWindow() const noexcept
-{
-	if (Parent != nullptr)
-	{
-		if (Parent->GetType() == typeid(Window))
-		{
-			return dynamic_cast<Window*>(Parent);
-		}
-
-		if (const auto c = dynamic_cast<Menu*>(Parent))
-		{
-			return c->GetWindow();
-		}
-	}
-
-	return nullptr;
-}

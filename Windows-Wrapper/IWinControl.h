@@ -1,13 +1,20 @@
 #pragma once
 
-#include <Common.h>
+#include "Common.h"
 
 #include <optional>
 
 template<typename T>
-class WinControl
+class IWinControl : public Control
 {
 protected:
+
+	IWinControl(Control* parent, const std::string& text, int width, int height, int x, int y)
+		:
+		Control(parent, text, width, height, x, y)
+	{}
+
+	virtual ~IWinControl() = default;
 
 	// Static functions which handle WinAPI messages to corresponding member function of the control
 	static LRESULT WINAPI HandleMessageSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -23,7 +30,7 @@ protected:
 			SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWnd));
 
 			// Set message function to normal (non-setup) handler now that setup is finished
-			SetWindowLongPtr(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&WinControl::HandleMessageForwarder));
+			SetWindowLongPtr(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&IWinControl::HandleMessageForwarder));
 
 			// Forward message to window class member function
 			return pWnd->HandleMessage(hWnd, msg, wParam, lParam);

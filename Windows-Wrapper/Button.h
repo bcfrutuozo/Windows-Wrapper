@@ -3,35 +3,35 @@
 #include "Control.h"
 #include "IActivable.h"
 #include "IHidable.h"
-#include "WinControl.h"
+#include "IWinControl.h"
 
-class Button : public Control, public WinControl<Button>, public IHidable, public IActivable
+class Button : public IWinControl<Button>, public IHidable, public IActivable
 {
-	friend class WinControl;
+	friend class IWinControl;
 
 private:
 
-	LRESULT WINAPI HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept override;
-
-	// Singleton manages registration/cleanup of button class
-	class WinButton
+	// Singleton manages registration/cleanup of window class
+	class BtnClass
 	{
 	private:
 
 		static constexpr const char* m_ClassName = "Button Class";
-		static WinButton m_WinButton;
+		static BtnClass m_BtnClass;
 		HINSTANCE m_Instance;
 
-		WinButton() noexcept;
-		~WinButton() noexcept;
-		WinButton(const WinButton&) = delete;
-		WinButton& operator=(const WinButton&) = delete;
+		BtnClass() noexcept;
+		~BtnClass() noexcept;
+		BtnClass(const BtnClass&) = delete;
+		BtnClass& operator=(const BtnClass&) = delete;
 
 	public:
 
 		static const char* GetName() noexcept;
 		static HINSTANCE GetInstance() noexcept;
 	};
+
+	LRESULT WINAPI HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept override;
 
 public:
 

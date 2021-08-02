@@ -174,7 +174,6 @@
     <ClCompile Include="Size.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Type.cpp" />
-    <ClCompile Include="WinControl.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
@@ -182,6 +181,7 @@
     <ClInclude Include="Application.h" />
     <ClInclude Include="Base.h" />
     <ClInclude Include="Button.h" />
+    <ClInclude Include="Enums.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="Control.h" />
@@ -197,8 +197,12 @@
     <ClInclude Include="IHandle.h" />
     <ClInclude Include="IHidable.h" />
     <ClInclude Include="IntPtr.h" />
-    <ClInclude Include="WinControl.h" />
+    <ClInclude Include="IWinControl.h" />
     <ClInclude Include="Keyboard.h" />
+    <ClInclude Include="KeyEventArgs.h" />
+    <ClInclude Include="KeyEventHandler.h" />
+    <ClInclude Include="KeyPressEventArgs.h" />
+    <ClInclude Include="KeyPressEventHandler.h" />
     <ClInclude Include="Mathlib.h" />
     <ClInclude Include="Menu.h" />
     <ClInclude Include="MenuEntryIconItem.h" />
@@ -213,6 +217,10 @@
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="MouseEventArgs.h" />
     <ClInclude Include="MouseEventHandler.h" />
+    <ClInclude Include="OnClosedEventArgs.h" />
+    <ClInclude Include="OnClosedEventHandler.h" />
+    <ClInclude Include="OnClosingEventArgs.h" />
+    <ClInclude Include="OnClosingEventHandler.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="Size.h" />
     <ClInclude Include="Timer.h" />

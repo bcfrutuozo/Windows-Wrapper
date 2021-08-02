@@ -1,6 +1,9 @@
 #include "Control.h"
+#include "Window.h"
 #include "EventHandler.h"
+#include "KeyEventHandler.h"
 #include "MouseEventHandler.h"
+#include "KeyPressEventHandler.h"
 
 Control::Control()
 	:
@@ -23,18 +26,7 @@ Control::Control(Control* parent, const std::string& text, int width, int height
 	Size(width, height),
 	Location(x, y)
 {
-	// TODO: Register all default events
-	//OnClickSet(std::function<void(Control* c, EventArgs* e)>([this](Control* c, EventArgs* e) { OnClick(c, e); }));
-	//Events.Register(std::make_unique<EventHandler>("OnClick", std::function<void(Control* c, EventArgs* e)>([this](Control* c, EventArgs* e) { OnClick(c, e); })));
-	//Events.Register(std::make_unique<MouseEventHandler>("OnMouseClick", std::function<void(Control* c, MouseEventArgs* e)>([this](Control* c, MouseEventArgs* e) { OnMouseClick(c, e); })));
-	//Events.Register(std::make_unique<MouseEventHandler>("OnMouseDoubleClick", std::function<void(Control* c, MouseEventArgs* e)>([this](Control* c, MouseEventArgs* e) { OnMouseDoubleClick(c, e); })));
-	//Events.Register(std::make_unique<MouseEventHandler>("OnMouseDown", std::function<void(Control* c, MouseEventArgs* e)>([this](Control* c, MouseEventArgs* e) { OnMouseDown(c, e); })));
-	//Events.Register(std::make_unique<EventHandler>("OnMouseEnter", std::function<void(Control* c, EventArgs* e)>([this](Control* c, EventArgs* e) { OnMouseEnter(c, e); })));
-	//Events.Register(std::make_unique<EventHandler>("OnMouseHover", std::function<void(Control* c, EventArgs* e)>([this](Control* c, EventArgs* e) { OnMouseHover(c, e); })));
-	//Events.Register(std::make_unique<EventHandler>("OnMouseLeave", std::function<void(Control* c, EventArgs* e)>([this](Control* c, EventArgs* e) { OnMouseLeave(c, e); })));
-	//Events.Register(std::make_unique<MouseEventHandler>("OnMouseMove", std::function<void(Control* c, MouseEventArgs* e)>([this](Control* c, MouseEventArgs* e) { OnMouseMove(c, e); })));
-	//Events.Register(std::make_unique<MouseEventHandler>("OnMouseUp", std::function<void(Control* c, MouseEventArgs* e)>([this](Control* c, MouseEventArgs* e) { OnMouseUp(c, e); })));
-	//Events.Register(std::make_unique<MouseEventHandler>("OnMouseWheel", std::function<void(Control* c, MouseEventArgs* e)>([this](Control* c, MouseEventArgs* e) { OnMouseWheel(c, e); })));
+
 }
 
 Control::Control(const std::string& text)
@@ -66,9 +58,34 @@ void Control::Delete()
 	Controls.shrink_to_fit();
 }
 
+void Control::OnActivateSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept
+{
+	Events.Register(std::make_unique<EventHandler>("OnActivate", callback));
+}
+
 void Control::OnClickSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept
 {
 	Events.Register(std::make_unique<EventHandler>("OnClick", callback));
+}
+
+void Control::OnDeactivateSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept
+{
+	Events.Register(std::make_unique<EventHandler>("OnDeactivate", callback));
+}
+
+void Control::OnKeyDownSet(const std::function<void(Control* const c, KeyEventArgs* const e)>& callback) noexcept
+{
+	Events.Register(std::make_unique<KeyEventHandler>("OnKeyDown", callback));
+}
+
+void Control::OnKeyPressSet(const std::function<void(Control* const c, KeyPressEventArgs* const e)>& callback) noexcept
+{
+	Events.Register(std::make_unique<KeyPressEventHandler>("OnKeyPress", callback));
+}
+
+void Control::OnKeyUpSet(const std::function<void(Control* const c, KeyEventArgs* const e)>& callback) noexcept
+{
+	Events.Register(std::make_unique<KeyEventHandler>("OnKeyDown", callback));
 }
 
 void Control::OnMouseClickSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept
@@ -76,44 +93,54 @@ void Control::OnMouseClickSet(const std::function<void(Control* const c, MouseEv
 	Events.Register(std::make_unique<MouseEventHandler>("OnMouseClick", callback));
 }
 
-void Control::OnMouseDoubleClick(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept
-{
-	Events.Register(std::make_unique<MouseEventHandler>("OnMouseDoubleClick", callback));
-}
-
-void Control::OnMouseDown(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept
+void Control::OnMouseDownSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept
 {
 	Events.Register(std::make_unique<MouseEventHandler>("OnMouseDown", callback));
 }
 
-void Control::OnMouseEnter(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept
+void Control::OnMouseEnterSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept
 {
-	Events.Register(std::make_unique<MouseEventHandler>("OnMouseEnter", callback));
+	Events.Register(std::make_unique<EventHandler>("OnMouseEnter", callback));
 }
 
-void Control::OnMouseHover(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept
+void Control::OnMouseHoverSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept
 {
-	Events.Register(std::make_unique<MouseEventHandler>("OnMouseHover", callback));
+	Events.Register(std::make_unique<EventHandler>("OnMouseHover", callback));
 }
 
-void Control::OnMouseLeave(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept
+void Control::OnMouseLeaveSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept
 {
-	Events.Register(std::make_unique<MouseEventHandler>("OnMouseLeave", callback));
+	Events.Register(std::make_unique<EventHandler>("OnMouseLeave", callback));
 }
 
-void Control::OnMouseMove(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept
+void Control::OnMouseLeftDoubleClickSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept
+{
+	Events.Register(std::make_unique<MouseEventHandler>("OnMouseLeftDoubleClick", callback));
+}
+
+void Control::OnMouseMoveSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept
 {
 	Events.Register(std::make_unique<MouseEventHandler>("OnMouseMove", callback));
 }
 
-void Control::OnMouseUp(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept
+void Control::OnMouseRightDoubleClickSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept
+{
+	Events.Register(std::make_unique<MouseEventHandler>("OnMouseRightDoubleClick", callback));
+}
+
+void Control::OnMouseUpSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept
 {
 	Events.Register(std::make_unique<MouseEventHandler>("OnMouseUp", callback));
 }
 
-void Control::OnMouseWheel(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept
+void Control::OnMouseWheelSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept
 {
 	Events.Register(std::make_unique<MouseEventHandler>("OnMouseWheel", callback));
+}
+
+void Control::OnShowSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept
+{
+	Events.Register(std::make_unique<EventHandler>("OnShow", callback));
 }
 
 const std::string& Control::GetText() const noexcept
@@ -186,4 +213,22 @@ HRESULT Control::HRException::GetErrorCode() const noexcept
 const std::string& Control::HRException::GetErrorDescription() const noexcept
 {
 	return ControlException::TranslateErrorCode(hr);
+}
+
+Window* Control::GetWindow() const noexcept
+{
+	if (Parent != nullptr)
+	{
+		if (Parent->GetType() == typeid(Window))
+		{
+			return dynamic_cast<Window*>(Parent);
+		}
+
+		if (const auto c = dynamic_cast<Menu*>(Parent))
+		{
+			return c->GetWindow();
+		}
+	}
+
+	return nullptr;
 }

@@ -52,7 +52,6 @@
       <Filter>Menu</Filter>
     </ClCompile>
     <ClCompile Include="Button.cpp" />
-    <ClCompile Include="WinControl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -132,7 +131,32 @@
       <Filter>Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="Button.h" />
-    <ClInclude Include="WinControl.h" />
+    <ClInclude Include="IWinControl.h" />
+    <ClInclude Include="KeyEventHandler.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyEventArgs.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyPressEventArgs.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyPressEventHandler.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="OnClosingEventArgs.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="OnClosingEventHandler.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Enums.h" />
+    <ClInclude Include="OnClosedEventArgs.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="OnClosedEventHandler.h">
+      <Filter>Events</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interfaces">

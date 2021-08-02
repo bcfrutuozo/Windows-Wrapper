@@ -7,7 +7,9 @@
 #include "Size.h"
 #include "Event.h"
 #include "EventHandler.h"
+#include "KeyEventArgs.h"
 #include "MouseEventArgs.h"
+#include "KeyPressEventArgs.h"
 
 #include <memory>
 #include <functional>
@@ -74,18 +76,26 @@ public:
 
 	void Delete();
 
+	void OnActivateSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
 	void OnClickSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
+	void OnDeactivateSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
+	void OnKeyDownSet(const std::function<void(Control* const c, KeyEventArgs* const e) >& callback) noexcept;
+	void OnKeyPressSet(const std::function<void(Control* const c, KeyPressEventArgs* const e) >& callback) noexcept;
+	void OnKeyUpSet(const std::function<void(Control* const c, KeyEventArgs* const e) >& callback) noexcept;
 	void OnMouseClickSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept;
-	void OnMouseDoubleClick(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept;
-	void OnMouseDown(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept;
-	void OnMouseEnter(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
-	void OnMouseHover(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
-	void OnMouseLeave(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
-	void OnMouseMove(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept;
-	void OnMouseUp(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept;
-	void OnMouseWheel(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept;
+	void OnMouseDownSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept;
+	void OnMouseEnterSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
+	void OnMouseHoverSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
+	void OnMouseLeaveSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
+	void OnMouseLeftDoubleClickSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept;
+	void OnMouseMoveSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept;
+	void OnMouseRightDoubleClickSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept;
+	void OnMouseUpSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept;
+	void OnMouseWheelSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept;
+	void OnShowSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
 
 	const std::string& GetText() const noexcept;
+	Window* GetWindow() const noexcept;
 
 	// Control Exception
 	class ControlException : public Exception
