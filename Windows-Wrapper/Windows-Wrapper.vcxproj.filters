@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Application.cpp" />
+    <ClCompile Include="RealTimeApplication.cpp" />
     <ClCompile Include="Base.cpp" />
     <ClCompile Include="Control.cpp" />
     <ClCompile Include="dxerr.cpp" />
@@ -52,9 +52,11 @@
       <Filter>Menu</Filter>
     </ClCompile>
     <ClCompile Include="Button.cpp" />
+    <ClCompile Include="Application.cpp" />
+    <ClCompile Include="UserApplication.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Application.h" />
+    <ClInclude Include="RealTimeApplication.h" />
     <ClInclude Include="Base.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="Common.h" />
@@ -157,6 +159,8 @@
     <ClInclude Include="OnClosedEventHandler.h">
       <Filter>Events</Filter>
     </ClInclude>
+    <ClInclude Include="Application.h" />
+    <ClInclude Include="UserApplication.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interfaces">

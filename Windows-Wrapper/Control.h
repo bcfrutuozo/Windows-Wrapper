@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Base.h"
+#include "Color.h"
 #include "Common.h"
 #include "Exception.h"
 #include "IHandle.h"
@@ -22,10 +23,15 @@ class Window;
 
 class Control : public IHandle, public Base
 {
+	friend class Window;
 	friend class Menu;
 	friend class MenuRadioItem;
 
 private:
+
+	// Fields for callback bindings to WinAPI
+	unsigned int m_Id;
+	static unsigned int m_CurrentIndex;
 
 	// Used by some controls to trigger certain rules updates
 	virtual void OnInternalUpdate(Control* const sender, EventArgs* const args) {};
@@ -60,6 +66,9 @@ protected:
 		// and the arguments which will be an EventArgs type
 		Events.Dispatch(event, this, args...);
 	}
+
+	Control* GetById(unsigned int id) noexcept;
+	const unsigned int GetId() const noexcept;
 
 public:
 

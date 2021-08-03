@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="RealTimeApplication.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="Base.cpp" />
     <ClCompile Include="Button.cpp" />
@@ -174,11 +175,12 @@
     <ClCompile Include="Size.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Type.cpp" />
+    <ClCompile Include="UserApplication.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Application.h" />
+    <ClInclude Include="RealTimeApplication.h" />
     <ClInclude Include="Base.h" />
     <ClInclude Include="Button.h" />
     <ClInclude Include="Enums.h" />
@@ -193,6 +195,7 @@
     <ClInclude Include="Exception.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="IActivable.h" />
+    <ClInclude Include="Application.h" />
     <ClInclude Include="IEquatable.h" />
     <ClInclude Include="IHandle.h" />
     <ClInclude Include="IHidable.h" />
@@ -225,6 +228,7 @@
     <ClInclude Include="Size.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Type.h" />
+    <ClInclude Include="UserApplication.h" />
     <ClInclude Include="uuid.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>

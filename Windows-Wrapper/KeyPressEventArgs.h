@@ -9,8 +9,8 @@ public:
 
 	KeyPressEventArgs(const char keyChar)
 		:
-		m_KeyChar(keyChar)
+		KeyChar(keyChar)
 	{}
 
-	char m_KeyChar;
+	char KeyChar;
 };

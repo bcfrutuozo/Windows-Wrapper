@@ -21,7 +21,7 @@ void MenuRoot::Initialize() noexcept
 	MENUITEMINFO mi = { 0 };
 	mi.cbSize = sizeof(MENUITEMINFO);
 	mi.fMask = MIIM_STRING | MIIM_ID | MIIM_SUBMENU;
-	mi.wID = m_Id;
+	mi.wID = GetId();
 	mi.hSubMenu = (HMENU)Handle.ToPointer();
 	mi.dwTypeData = const_cast<char*>(Text.c_str());
 	InsertMenuItem(static_cast<HMENU>(Parent->Handle.ToPointer()), m_SubItemIndex, true, &mi);

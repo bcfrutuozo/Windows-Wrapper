@@ -1,25 +1,21 @@
 #pragma once
 
 #include "Window.h"
-#include "Timer.h"
-
-#include <memory>
-
-constexpr auto SPEEDFACTOR = 1.0f;
 
 class Application
 {
+protected:
 
-private:
-	void Run(float dt);
-	void HandleInput(float dt);
-
-	Timer m_Timer;
 	std::unique_ptr<Window> m_Window;
 
 public:
+
 	Application();
 	~Application();
-
-	int Start();
+	Application(const Application&) = delete;				// Copy constructor
+	Application(Application&&) = delete;					// Move constructor
+	Application& operator=(const Application&) = delete;	// Copy assignment constructor
+	Application& operator=(Application&&) = delete;		// Move assignment constructor
+		
+	virtual const int Start() = 0;
 };

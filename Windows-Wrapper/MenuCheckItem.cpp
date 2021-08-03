@@ -9,7 +9,7 @@ void MenuCheckItem::OnInternalUpdate(Control* const sender, EventArgs* const arg
 	mi.cbSize = sizeof(MENUITEMINFO);
 	mi.fMask = MIIM_ID | MIIM_STATE | MIIM_STRING;
 	mi.fState = IsChecked ? MF_CHECKED : MF_UNCHECKED;
-	mi.wID = m_Id;
+	mi.wID = GetId();
 	mi.dwTypeData = const_cast<char*>(Text.c_str());
 	SetMenuItemInfo(static_cast<HMENU>(Parent->Handle.ToPointer()), m_SubItemIndex, true, &mi);
 }
@@ -32,7 +32,7 @@ void MenuCheckItem::Initialize() noexcept
 	mi.cbSize = sizeof(MENUITEMINFO);
 	mi.fMask = MIIM_ID | MIIM_STATE | MIIM_STRING;
 	mi.fState = IsChecked ? MF_CHECKED : MF_UNCHECKED;
-	mi.wID = m_Id;
+	mi.wID = GetId();
 	mi.dwTypeData = const_cast<char*>(Text.c_str());
 	InsertMenuItem(static_cast<HMENU>(Parent->Handle.ToPointer()), m_SubItemIndex, true, &mi);
 }

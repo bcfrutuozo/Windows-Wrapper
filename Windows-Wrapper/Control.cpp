@@ -5,6 +5,9 @@
 #include "MouseEventHandler.h"
 #include "KeyPressEventHandler.h"
 
+// Declare m_Index = 1 setting 0 as null function (NULL || nullptr)
+unsigned int Control::m_CurrentIndex = 1;
+
 Control::Control()
 	:
 	Control(nullptr, "")
@@ -24,7 +27,8 @@ Control::Control(Control* parent, const std::string& text, int width, int height
 	Parent(parent),
 	Text(text),
 	Size(width, height),
-	Location(x, y)
+	Location(x, y),
+	m_Id(m_CurrentIndex++)
 {
 
 }
@@ -58,6 +62,31 @@ void Control::Delete()
 	Controls.shrink_to_fit();
 }
 
+Control* Control::GetById(unsigned int id) noexcept
+{
+	if (m_Id == id)
+	{
+		return this;
+	}
+
+	for (const auto& c : Controls)
+	{
+		Control* ret = c->GetById(id);
+		if (ret != nullptr)
+		{
+			return ret;
+		}
+	}
+
+	// Returning nullptr is extremely important, otherwise it will be a trash pointer and will launch an exception trying to process it
+	return nullptr;
+}
+
+const unsigned int Control::GetId() const noexcept
+{
+	return m_Id;
+}
+
 void Control::OnActivateSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept
 {
 	Events.Register(std::make_unique<EventHandler>("OnActivate", callback));
@@ -85,7 +114,7 @@ void Control::OnKeyPressSet(const std::function<void(Control* const c, KeyPressE
 
 void Control::OnKeyUpSet(const std::function<void(Control* const c, KeyEventArgs* const e)>& callback) noexcept
 {
-	Events.Register(std::make_unique<KeyEventHandler>("OnKeyDown", callback));
+	Events.Register(std::make_unique<KeyEventHandler>("OnKeyUp", callback));
 }
 
 void Control::OnMouseClickSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept

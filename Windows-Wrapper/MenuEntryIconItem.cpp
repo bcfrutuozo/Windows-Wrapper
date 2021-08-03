@@ -19,7 +19,7 @@ void MenuEntryIconItem::Initialize() noexcept
 {
 	MENUITEMINFO mi = { 0 };
 	mi.cbSize = sizeof(MENUITEMINFO);
-	InsertMenu(static_cast<HMENU>(Parent->Handle.ToPointer()), m_SubItemIndex, MF_BYPOSITION | MF_POPUP, m_Id, Text.c_str());
+	InsertMenu(static_cast<HMENU>(Parent->Handle.ToPointer()), m_SubItemIndex, MF_BYPOSITION | MF_POPUP, GetId(), Text.c_str());
 	mi.fMask = MIIM_BITMAP;
 	mi.hbmpItem = m_Icon;
 	SetMenuItemInfo(static_cast<HMENU>(Parent->Handle.ToPointer()), m_SubItemIndex, true, &mi);

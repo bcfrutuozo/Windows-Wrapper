@@ -66,6 +66,11 @@ int Mouse::GetPosY() const noexcept
 	return m_Y;
 }
 
+int Mouse::GetDelta() const noexcept
+{
+	return m_WheelDeltaCarry;
+}
+
 bool Mouse::IsInWindow() const noexcept
 {
 	return m_IsInWindow;

@@ -15,7 +15,7 @@ Window::WndClass::WndClass() noexcept
 {
 	WNDCLASSEX wc = { 0 };
 	wc.cbSize = sizeof(wc);
-	wc.style = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;
+	wc.style = CS_DBLCLKS;
 	wc.lpfnWndProc = HandleMessageSetup;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
@@ -203,16 +203,22 @@ void Window::SetText(const std::string& title)
 
 void Window::EnableCursor() noexcept
 {
-	m_IsCursorEnabled = true;
-	ShowCursor();
-	FreeCursor();
+	if (m_Mouse != nullptr)
+	{
+		m_IsCursorEnabled = true;
+		ShowCursor();
+		FreeCursor();
+	}
 }
 
 void Window::DisableCursor() noexcept
 {
-	m_IsCursorEnabled = false;
-	HideCursor();
-	EncloseCursor();
+	if (m_Mouse != nullptr)
+	{
+		m_IsCursorEnabled = false;
+		HideCursor();
+		EncloseCursor();
+	}
 }
 
 void Window::EncloseCursor() const noexcept
@@ -291,23 +297,32 @@ void Window::OnActivate_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 
 void Window::OnCommand_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-	for (const auto& item : Controls)
-	{
-		// Get the MenuStrip to search for the right item
-		auto menu = dynamic_cast<MenuStrip*>(item.get());
-		if (menu != nullptr)
-		{
-			auto entry = menu->GetById(static_cast<unsigned int>(wParam));
-			if (entry != nullptr)
-			{
-				// Dispatch both OnClick for common task and OnMouseClick which receives the cursor information
-				entry->Dispatch("OnClick", new EventArgs());
-				entry->Dispatch("OnMouseClick", new MouseEventArgs(m_Mouse.get()));
+	//for (const auto& item : Controls)
+	//{
+	//	// Get the MenuStrip to search for the right item
+	//	auto menu = dynamic_cast<MenuStrip*>(item.get());
+	//	if (menu != nullptr)
+	//	{
+	//		auto entry = menu->GetById(static_cast<unsigned int>(wParam));
+	//		if (entry != nullptr)
+	//		{
+	//			// Dispatch both OnClick for common task and OnMouseClick which receives the cursor information
+	//			entry->Dispatch("OnClick", new EventArgs());
+	//			entry->Dispatch("OnMouseClick", new MouseEventArgs(m_Mouse.get()));
 
-				// Force the update of the controls
-				entry->Dispatch("OnInternalUpdate", new EventArgs());
-			}
-		}
+	//			// Force the update of the controls
+	//			entry->Dispatch("OnInternalUpdate", new EventArgs());
+	//		}
+	//	}
+	//}
+	if (const auto& c = GetById(static_cast<unsigned int>(wParam)))
+	{
+		// Dispatch both OnClick for common task and OnMouseClick which receives the cursor information
+		c->Dispatch("OnClick", new EventArgs());
+		c->Dispatch("OnMouseClick", new MouseEventArgs(m_Mouse.get()));
+
+		// Force the update of the controls
+		c->Dispatch("OnInternalUpdate", new EventArgs());
 	}
 }
 
@@ -339,16 +354,23 @@ void Window::OnFocusEnter_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 
 void Window::OnFocusLeave_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-	// Clear key state when window loses focus to prevent input getting "stuck" 
-	m_Keyboard->ClearState();
+	// Clear key state when window loses focus to prevent input getting "stuck"
+
+	if (m_Keyboard != nullptr)
+	{
+		m_Keyboard->ClearState();
+	}
 }
 
 void Window::OnKeyDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
 	// Filter AutoRepeat key events
-	if (!(lParam & 0x40000000) || m_Keyboard->IsAutoRepeatEnabled())
+	if (m_Keyboard != nullptr)
 	{
-		m_Keyboard->OnKeyPressed(static_cast<unsigned char>(wParam));
+		if (!(lParam & 0x40000000) || m_Keyboard->IsAutoRepeatEnabled())
+		{
+			m_Keyboard->OnKeyPressed(static_cast<unsigned char>(wParam));
+		}
 	}
 
 	Dispatch("OnKeyDown", new KeyEventArgs(m_Keyboard.get()));
@@ -356,13 +378,21 @@ void Window::OnKeyDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) n
 
 void Window::OnKeyPressed_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-	m_Keyboard->OnChar(static_cast<unsigned char>(wParam));
+	if (m_Keyboard != nullptr)
+	{
+		m_Keyboard->OnChar(static_cast<unsigned char>(wParam));
+	}
+
 	Dispatch("OnKeyPress", new KeyPressEventArgs(static_cast<unsigned char>(wParam)));
 }
 
 void Window::OnKeyUp_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-	m_Keyboard->OnKeyReleased(static_cast<unsigned char>(wParam));
+	if (m_Keyboard != nullptr)
+	{
+		m_Keyboard->OnKeyReleased(static_cast<unsigned char>(wParam));
+	}
+
 	Dispatch("OnKeyUp", new KeyEventArgs(m_Keyboard.get()));
 }
 
@@ -370,18 +400,45 @@ void Window::OnMouseMove_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	const POINTS pt = MAKEPOINTS(lParam);
 
+	// COMMENTED LOGIC USED FOR REALTIME APPLICATION. GOING TO FIGURE OUT HOW TO SEPARATE IN TWO WINDOWS MAYBE?
 	// Cursorless exclusive gets first dibs
-	if (!m_IsCursorEnabled)
-	{
-		if (!m_Mouse->IsInWindow())
-		{
-			SetCapture(static_cast<HWND>(Handle.ToPointer()));
-			m_Mouse->OnMouseEnter();
-			HideCursor();
-		}
+	//if (!m_IsCursorEnabled)
+	//{
+	//	if (!m_Mouse->IsInWindow())
+	//	{
+	//		SetCapture(static_cast<HWND>(Handle.ToPointer()));
+	//		m_Mouse->OnMouseEnter();
+	//		HideCursor();
+	//	}
+	//
+	//	return;
+	//}
 
-		return;
-	}
+	// Inside client region -> log move, and log enter + capture mouse (if not previously in window)
+	//if (pt.x >= 0 && pt.x < Size.Width && pt.y >= 0 && pt.y < Size.Height)
+	//{
+	//	m_Mouse->OnMouseMove(pt.x, pt.y);
+	//	if (!m_Mouse->IsInWindow())
+	//	{
+	//		SetCapture(hWnd);
+	//		m_Mouse->OnMouseEnter();
+	//	}
+	//}
+	//
+	//// Out of client region -> log move / maintain capture if button down
+	//else
+	//{
+	//	if (wParam & (MK_LBUTTON | MK_RBUTTON))
+	//	{
+	//		m_Mouse->OnMouseMove(pt.x, pt.y);
+	//	}
+	//	// Button up -> release capture / log event for leaving
+	//	else
+	//	{
+	//		ReleaseCapture();
+	//		m_Mouse->OnMouseLeave();
+	//	}
+	//}
 
 	// Inside client region -> log move, and log enter + capture mouse (if not previously in window)
 	if (pt.x >= 0 && pt.x < Size.Width && pt.y >= 0 && pt.y < Size.Height)
@@ -389,11 +446,11 @@ void Window::OnMouseMove_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		m_Mouse->OnMouseMove(pt.x, pt.y);
 		if (!m_Mouse->IsInWindow())
 		{
-			SetCapture(hWnd);
 			m_Mouse->OnMouseEnter();
+			Dispatch("OnMouseEnter", new MouseEventArgs(m_Mouse.get()));
 		}
 	}
-
+	
 	// Out of client region -> log move / maintain capture if button down
 	else
 	{
@@ -404,8 +461,8 @@ void Window::OnMouseMove_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		// Button up -> release capture / log event for leaving
 		else
 		{
-			ReleaseCapture();
 			m_Mouse->OnMouseLeave();
+			Dispatch("OnMouseLeave", new MouseEventArgs(m_Mouse.get()));
 		}
 	}
 
@@ -414,23 +471,31 @@ void Window::OnMouseMove_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 void Window::OnMouseLeftDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-	SetForegroundWindow(static_cast<HWND>(Handle.ToPointer()));
+	//SetForegroundWindow(static_cast<HWND>(Handle.ToPointer()));
 
-	if (!m_IsCursorEnabled)
+	if (m_Mouse != nullptr)
 	{
-		EncloseCursor();
-		HideCursor();
+		if (!m_IsCursorEnabled)
+		{
+			EncloseCursor();
+			HideCursor();
+		}
+
+		const POINTS pt = MAKEPOINTS(lParam);
+		m_Mouse->OnLeftPressed(pt.x, pt.y);
 	}
 
-	const POINTS pt = MAKEPOINTS(lParam);
-	m_Mouse->OnLeftPressed(pt.x, pt.y);
 	Dispatch("OnMouseLeftDown", new MouseEventArgs(m_Mouse.get()));
 }
 
 void Window::OnMouseLeftUp_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
 	const POINTS pt = MAKEPOINTS(lParam);
-	m_Mouse->OnLeftReleased(pt.x, pt.y);
+
+	if (m_Mouse != nullptr)
+	{
+		m_Mouse->OnLeftReleased(pt.x, pt.y);
+	}
 
 	// OnClick event is always executed before the MouseUp event with both buttons
 	Dispatch("OnClick", new EventArgs());
@@ -441,7 +506,11 @@ void Window::OnMouseLeftUp_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 void Window::OnMouseRightDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
 	const POINTS pt = MAKEPOINTS(lParam);
-	m_Mouse->OnRightPressed(pt.x, pt.y);
+
+	if (m_Mouse != nullptr)
+	{
+		m_Mouse->OnRightPressed(pt.x, pt.y);
+	}
 
 	Dispatch("OnMouseRightDown", new MouseEventArgs(m_Mouse.get()));;
 }
@@ -449,7 +518,11 @@ void Window::OnMouseRightDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
 void Window::OnMouseRightUp_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
 	const POINTS pt = MAKEPOINTS(lParam);
-	m_Mouse->OnRightReleased(pt.x, pt.y);
+
+	if (m_Mouse != nullptr)
+	{
+		m_Mouse->OnRightReleased(pt.x, pt.y);
+	}
 
 	// OnClick event is always executed before the MouseUp event with both buttons
 	Dispatch("OnClick", new EventArgs());
@@ -473,11 +546,17 @@ void Window::OnMouseWheel_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 
 	if (GET_WHEEL_DELTA_WPARAM(wParam) > 0)
 	{
-		m_Mouse->OnWheelUp(pt.x, pt.y);
+		if (m_Mouse != nullptr)
+		{
+			m_Mouse->OnWheelUp(pt.x, pt.y);
+		}
 	}
 	else if (GET_WHEEL_DELTA_WPARAM(wParam) < 0)
 	{
-		m_Mouse->OnWheelDown(pt.x, pt.y);
+		if (m_Mouse != nullptr)
+		{
+			m_Mouse->OnWheelDown(pt.x, pt.y);
+		}
 	}
 
 	Dispatch("OnMouseWheel", new MouseEventArgs(m_Mouse.get()));
@@ -494,7 +573,7 @@ void Window::OnNotify_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) no
 
 void Window::OnRawInput_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-	if (!m_Mouse->IsRawEnabled())
+	if (m_Mouse == nullptr && !m_Mouse->IsRawEnabled())
 	{
 		return;
 	}
@@ -530,7 +609,10 @@ void Window::OnRawInput_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 	if (ri.header.dwType == RIM_TYPEMOUSE &&
 		(ri.data.mouse.lLastX != 0 || ri.data.mouse.lLastY != 0))
 	{
-		m_Mouse->OnRawDelta(ri.data.mouse.lLastX, ri.data.mouse.lLastY);
+		if (m_Mouse != nullptr)
+		{
+			m_Mouse->OnRawDelta(ri.data.mouse.lLastX, ri.data.mouse.lLastY);
+		}
 	}
 }
 
@@ -538,9 +620,8 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
-	case WM_CREATE: OutputDebugString("aaa"); break;
 	case WM_COMMAND: OnCommand_Impl(hWnd, msg, wParam, lParam); break;
-	case WM_CLOSE: OnClose_Impl(hWnd, msg, wParam, lParam); return  0;		// Exit message to be handled in application class
+	case WM_CLOSE: OnClose_Impl(hWnd, msg, wParam, lParam); return 0;		// Exit message to be handled in application class
 	case WM_DESTROY: OnClosing_Impl(hWnd, msg, wParam, lParam); break;
 	case WM_NCDESTROY: OnClosed_Impl(hWnd, msg, wParam, lParam); break;
 	case WM_SETFOCUS: OnFocusEnter_Impl(hWnd, msg, wParam, lParam); break;
@@ -561,34 +642,13 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_RBUTTONUP: OnMouseRightUp_Impl(hWnd, msg, wParam, lParam); break;
 	case WM_LBUTTONDBLCLK: OnMouseLeftDoubleClick_Impl(hWnd, msg, wParam, lParam); break;
 	case WM_RBUTTONDBLCLK: OnMouseRightDoubleClick_Impl(hWnd, msg, wParam, lParam); break;
+	case WM_PARENTNOTIFY: break;
 	case WM_MOUSEWHEEL: OnMouseWheel_Impl(hWnd, msg, wParam, lParam); break;
 	case WM_NOTIFY: OnNotify_Impl(hWnd, msg, wParam, lParam); break;
 		/******************** END MOUSE MESSAGES ********************/
 		/******************** RAW MOUSE MESSAGES ********************/
 	case WM_INPUT: OnRawInput_Impl(hWnd, msg, wParam, lParam); break;
 		/****************** END RAW MOUSE MESSAGES ******************/
-	case WM_SIZE:
-	{
-		break;
-	}
-	case WM_SIZING:
-	{
-		//PRECT r = (PRECT)lParam;
-
-		//HBRUSH brush = CreateSolidBrush(RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-		//SetClassLongPtr(static_cast<HWND>(Handle.ToPointer()), GCLP_HBRBACKGROUND, (LONG_PTR)brush);
-		break;
-	}
-	case WM_PAINT:
-	{
-		PRECT r = (PRECT)lParam;
-
-		HBRUSH brush = CreateSolidBrush(RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-		SetClassLongPtr(static_cast<HWND>(Handle.ToPointer()), GCLP_HBRBACKGROUND, (LONG_PTR)brush);
-
-		break;
-	}
-
 	}
 
 	return DefWindowProc(hWnd, msg, wParam, lParam);

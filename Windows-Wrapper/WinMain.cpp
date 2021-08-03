@@ -1,4 +1,5 @@
-#include "Application.h"
+#include "RealTimeApplication.h"
+#include "UserApplication.h"
 
 #ifdef _DEBUG
 #define _CRTDBG_MAP_ALLOC
@@ -28,7 +29,7 @@ int CALLBACK WinMain(
 	try
 	{
 		SetProcessDPIAware();
-		int ret = Application().Start();
+		int ret = UserApplication().Start();
 
 #ifdef _DEBUG
 		_CrtMemState ShutdownMemState;
