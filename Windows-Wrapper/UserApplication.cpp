@@ -13,8 +13,8 @@
 
 void TesteBotaoEnter(Control* const c, EventArgs* const e)
 {
-	c->SetBackgroundColor(Color::Default());
-	c->SetForeColor(Color::White());
+	c->SetBackgroundColor(Color::Blue());
+	c->SetForeColor(Color::Red());
 }
 
 void TesteBotaoLeave(Control* const c, EventArgs* const e)
@@ -55,7 +55,7 @@ void TestKeyPress(Control* const c, KeyEventArgs* e)
 	menu1.AddItem("Submenu-Item4");
 	menu1.AddItem("Submenu-Item5");
 	window->UpdateMenuStrip();
-	window->SetBackgroundColor(Color(0, 255, 0));
+	window->SetBackgroundColor(Color(128, 128, 128));
 
 	Button& b = window->AddButton("Abc", 200, 80, 50, 100);
 	b.OnClickSet(&TesteBotaoClick);

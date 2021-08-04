@@ -48,6 +48,11 @@ Control::Control(const std::string& text, int width, int height, int x, int y)
 
 }
 
+Control::~Control()
+{
+	DeleteObject(m_Brush);
+}
+
 void Control::Delete()
 {
 	// Recursive delete is necessary to avoid a parent destruction prior to children

@@ -15,7 +15,7 @@ Window::WndClass::WndClass() noexcept
 {
 	WNDCLASSEX wc = { 0 };
 	wc.cbSize = sizeof(wc);
-	wc.style = CS_DBLCLKS;
+	wc.style = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;
 	wc.lpfnWndProc = HandleMessageSetup;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
@@ -76,6 +76,12 @@ void Window::OnClosingSet(const std::function<void(Control* const c, OnClosingEv
 	Events.Register(std::make_unique<OnClosingEventHandler>("OnClosing", callback));
 }
 
+void Window::SetBackgroundColor(const Color& color) noexcept
+{
+	m_BackgroundColor = color;
+	InvalidateRect(static_cast<HWND>(Handle.ToPointer()), nullptr, TRUE);
+}
+
 void Window::OnClosedSet(const std::function<void(Control* const c, OnClosedEventArgs* const e)>& callback) noexcept
 {
 	Events.Register(std::make_unique<OnClosedEventHandler>("OnClosing", callback));
@@ -130,6 +136,9 @@ void Window::Initialize() noexcept
 	}
 	// Still don't know how I'll implement child windows. So this is just to not let an empty ugly function
 	//SetParent(static_cast<HWND>(Handle.ToPointer()), static_cast<HWND>(Parent->Handle.ToPointer()));
+
+	// Force window redraw to set Background color
+	InvalidateRect(static_cast<HWND>(Handle.ToPointer()), nullptr, TRUE);
 }
 
 Window::~Window()
@@ -305,10 +314,17 @@ void Window::OnClose_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 void Window::OnCreate_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
 
+
+	Dispatch("OnCreate");
 }
 
-void Window::OnEraseBackground_Impl(HWND hWnd, UINT msg, WPARAM wPara, LPARAM lParam) noexcept
+void Window::OnEraseBackground_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
+	HDC hdc = (HDC)(wParam);
+	RECT rc; GetClientRect(static_cast<HWND>(Handle.ToPointer()), &rc);
+	HBRUSH brush = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+	FillRect(hdc, &rc, brush);
+
 	Dispatch("OnErase");
 }
 
@@ -323,12 +339,7 @@ void Window::OnDestroy_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) n
 	}
 	else
 	{
-		// TODO: PROCEED WITH FORM DESTRO
 
-		// Delete objects created on WM_CREATE
-		DeleteObject(selectbrush);
-		DeleteObject(hotbrush);
-		DeleteObject(defaultbrush);
 	}
 }
 
@@ -586,81 +597,43 @@ int Window::OnNotify_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 	}
 
 	// Cancel design if button style is the default one
-	if (control->m_BackgroundColor == Color::Default() && control->m_ForeColor == Color::Black())
+	/*if (control->m_BackgroundColor == Color::Default() && control->m_ForeColor == Color::Black())
 	{
-		return 0;
-	}
+		return CDRF_DODEFAULT;
+	}*/
+
+	// Select color when the button is selected
+	m_Brush = CreateGradientBrush(control->m_BackgroundColor, control->m_BackgroundColor, item);
+
+	//Create pen for button border
+	HPEN pen = CreatePen(PS_INSIDEFRAME, 0, RGB(0, 0, 0));
+
+	//Select our brush into hDC
+	HGDIOBJ old_pen = SelectObject(item->hdc, pen);
+	HGDIOBJ old_brush = SelectObject(item->hdc, m_Brush);
+
+	// GOING TO THINK A WAY OF IMPLEMENT NORMAL AND ROUNDED BORDER BUTTON
+	
+	//If you want rounded button, then use this, otherwise use FillRect().
+	//RoundRect(item->hdc, item->rc.left, item->rc.top, item->rc.right, item->rc.bottom, 10, 10);
+	Rectangle(item->hdc, item->rc.left, item->rc.top, item->rc.right, item->rc.bottom);
+	//FillRect(item->hdc, &item->rc, m_Brush);
+
+	//Clean up
+	SelectObject(item->hdc, old_pen);
+	SelectObject(item->hdc, old_brush);
+	DeleteObject(pen);
+
+	SetBkMode(item->hdc, TRANSPARENT);
+	SetTextColor(item->hdc, RGB(control->m_ForeColor.GetR(), control->m_ForeColor.GetB(), control->m_ForeColor.GetB()));
+	DrawText(item->hdc, control->GetText().c_str(), -1, &item->rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 
 	if (item->uItemState & CDIS_SELECTED)
 	{
-		// Select color when the button is selected
-		selectbrush = CreateGradientBrush(control->m_BackgroundColor, control->m_BackgroundColor, item);
-
-		//Create pen for button border
-		HPEN pen = CreatePen(PS_INSIDEFRAME, 0, RGB(0, 0, 0));
-
-		//Select our brush into hDC
-		HGDIOBJ old_pen = SelectObject(item->hdc, pen);
-		HGDIOBJ old_brush = SelectObject(item->hdc, selectbrush);
-
-		//If you want rounded button, then use this, otherwise use FillRect().
-		//RoundRect(item->hdc, item->rc.left, item->rc.top, item->rc.right, item->rc.bottom, 25, 25);
-		Rectangle(item->hdc, item->rc.left, item->rc.top, item->rc.right, item->rc.bottom);
-		//FillRect(item->hdc, &item->rc, selectbrush);
-
-		//Clean up
-		SelectObject(item->hdc, old_pen);
-		SelectObject(item->hdc, old_brush);
-		DeleteObject(pen);
-
-		SetBkMode(item->hdc, TRANSPARENT);
-		SetTextColor(item->hdc, RGB(control->m_ForeColor.GetR(), control->m_ForeColor.GetB(), control->m_ForeColor.GetB()));
-		DrawText(item->hdc, control->GetText().c_str(), -1, &item->rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-
 		return CDRF_DODEFAULT;
 	}
 	else
 	{
-		if (item->uItemState & CDIS_HOT) //Our mouse is over the button
-		{
-			//Select our color when the mouse hovers our button
-			hotbrush = CreateGradientBrush(control->m_BackgroundColor, control->m_BackgroundColor, item);
-
-			HPEN pen = CreatePen(PS_INSIDEFRAME, 0, RGB(0, 0, 0));
-
-			HGDIOBJ old_pen = SelectObject(item->hdc, pen);
-			HGDIOBJ old_brush = SelectObject(item->hdc, hotbrush);
-
-			Rectangle(item->hdc, item->rc.left, item->rc.top, item->rc.right, item->rc.bottom);
-
-			SelectObject(item->hdc, old_pen);
-			SelectObject(item->hdc, old_brush);
-			DeleteObject(pen);
-
-			SetBkMode(item->hdc, TRANSPARENT);
-			SetTextColor(item->hdc, RGB(control->m_ForeColor.GetR(), control->m_ForeColor.GetB(), control->m_ForeColor.GetB()));
-			DrawText(item->hdc, control->GetText().c_str(), -1, &item->rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-			return CDRF_SKIPDEFAULT;
-		}
-
-		//Select our color when our button is doing nothing
-		defaultbrush = CreateGradientBrush(control->m_BackgroundColor, control->m_BackgroundColor, item);
-
-		HPEN pen = CreatePen(PS_INSIDEFRAME, 0, RGB(0, 0, 0));
-
-		HGDIOBJ old_pen = SelectObject(item->hdc, pen);
-		HGDIOBJ old_brush = SelectObject(item->hdc, defaultbrush);
-
-		Rectangle(item->hdc, item->rc.left, item->rc.top, item->rc.right, item->rc.bottom);
-
-		SelectObject(item->hdc, old_pen);
-		SelectObject(item->hdc, old_brush);
-		DeleteObject(pen);
-
-		SetBkMode(item->hdc, TRANSPARENT);
-		SetTextColor(item->hdc, RGB(control->m_ForeColor.GetR(), control->m_ForeColor.GetB(), control->m_ForeColor.GetB()));
-		DrawText(item->hdc, control->GetText().c_str(), -1, &item->rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-
 		return CDRF_SKIPDEFAULT;
 	}
 
@@ -721,6 +694,18 @@ void Window::OnSetCursor_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 }
 
+void Window::OnShowWindow_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+{
+	if (wParam == TRUE)
+	{
+		Dispatch("OnShow", new EventArgs());
+	}
+	else
+	{
+		Dispatch("OnHide", new EventArgs());
+	}
+}
+
 LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
 	OutputDebugString(Mapper(msg, wParam, lParam).c_str());
@@ -738,10 +723,12 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_KILLFOCUS: OnFocusLeave_Impl(hWnd, msg, wParam, lParam); break;
 	case WM_ACTIVATE: OnActivate_Impl(hWnd, msg, wParam, lParam); break;
 	case WM_NOTIFY: return OnNotify_Impl(hWnd, msg, wParam, lParam);
-	//case WM_CTLCOLORBTN: //In order to make those edges invisble when we use RoundRect(),
-	//{                //we make the color of our button's background match window's background
-	//	return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
-	//}
+
+	// Set the button border color inside window control to match the same color as the BackgroundColor
+	case WM_CTLCOLORBTN: 
+	{                
+		return (LRESULT)CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+	}
 	/******************** KEYBOARD MESSAGES *********************/
 	case WM_KEYDOWN:
 	case WM_SYSKEYDOWN: OnKeyDown_Impl(hWnd, msg, wParam, lParam); break;	// Syskey commands need to be handled to track ALT key (VK_MENU)
@@ -750,7 +737,6 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_CHAR: OnKeyPressed_Impl(hWnd, msg, wParam, lParam); break;
 		/******************* END KEYBOARD MESSAGES ******************/
 		/********************** MOUSE MESSAGES **********************/
-	case WM_MOUSELEAVE: break;
 	case WM_MOUSEMOVE: 	OnMouseMove_Impl(hWnd, msg, wParam, lParam); break;
 	case WM_LBUTTONDOWN: OnMouseLeftDown_Impl(hWnd, msg, wParam, lParam); break;
 	case WM_LBUTTONUP: OnMouseLeftUp_Impl(hWnd, msg, wParam, lParam); break;
@@ -758,8 +744,9 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_RBUTTONUP: OnMouseRightUp_Impl(hWnd, msg, wParam, lParam); break;
 	case WM_LBUTTONDBLCLK: OnMouseLeftDoubleClick_Impl(hWnd, msg, wParam, lParam); break;
 	case WM_RBUTTONDBLCLK: OnMouseRightDoubleClick_Impl(hWnd, msg, wParam, lParam); break;
-	case WM_PARENTNOTIFY: break;
 	case WM_MOUSEWHEEL: OnMouseWheel_Impl(hWnd, msg, wParam, lParam); break;
+	case WM_SHOWWINDOW: OnShowWindow_Impl(hWnd, msg, wParam, lParam); break;
+		break;
 		/******************** END MOUSE MESSAGES ********************/
 		/******************** RAW MOUSE MESSAGES ********************/
 	case WM_INPUT: OnRawInput_Impl(hWnd, msg, wParam, lParam); break;

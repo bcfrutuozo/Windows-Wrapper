@@ -31,10 +31,6 @@ private:
 	std::unique_ptr<Mouse> m_Mouse;
 	std::vector<BYTE> m_RawBuffer;
 
-	HBRUSH selectbrush;
-	HBRUSH hotbrush;
-	HBRUSH defaultbrush;
-
 	void EncloseCursor() const noexcept;
 	static void FreeCursor() noexcept;
 	static void HideCursor() noexcept;
@@ -67,6 +63,7 @@ private:
 	void OnMouseWheel_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	int OnNotify_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	void OnRawInput_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+	void OnShowWindow_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 
 protected:
 
@@ -101,6 +98,7 @@ public:
 
 	void Hide() override;
 	void Show() override;
+	void SetBackgroundColor(const Color& color) noexcept override;
 
 	void OnClosedSet(const std::function<void(Control* const c, OnClosedEventArgs* const e)>& callback) noexcept;
 	void OnClosingSet(const std::function<void(Control* const c, OnClosingEventArgs* const e)>& callback) noexcept;

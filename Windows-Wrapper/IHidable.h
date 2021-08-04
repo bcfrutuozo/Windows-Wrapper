@@ -6,7 +6,7 @@ class IHidable
 {
 protected:
 
-	bool IsVisible = false;
+	bool IsVisible = true;
 
 public:
 

@@ -84,6 +84,7 @@ protected:
 	Color m_ForeColor = Color::Black();
 	Color m_BackgroundColor = Color::Default();
 	static MessageMapper Mapper;
+	HBRUSH m_Brush;
 
 	// Forces the implementation and call on individual childs because each WinApi control
 	// has it own creation method.
@@ -122,7 +123,7 @@ public:
 	Control(Control&&) = default;															// Move constructor
 	Control& operator=(const Control&) = default;											// Copy assignment constructor
 	Control& operator=(Control&&) = default;												// Move assignment constructor
-	virtual ~Control() = default;															// Destructor
+	virtual ~Control();																		// Destructor
 
 	void Delete();
 
@@ -145,7 +146,7 @@ public:
 	void OnShowSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
 
 	void SetForeColor(const Color& color) noexcept;
-	void SetBackgroundColor(const Color& color) noexcept;
+	virtual void SetBackgroundColor(const Color& color) noexcept;
 	const std::string& GetText() const noexcept;
 	Window* GetWindow() const noexcept;
 
