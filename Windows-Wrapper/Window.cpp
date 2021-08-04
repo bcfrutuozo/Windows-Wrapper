@@ -196,6 +196,11 @@ Button& Window::AddButton(const std::string& name, int width, int height, int x,
 	return Create<Button>(this, name, width, height, x, y);
 }
 
+TextBox& Window::AddTextBox(const std::string& name, int width, int height, int x, int y) noexcept
+{
+	return Create<TextBox>(this, name, width, height, x, y);
+}
+
 void Window::SetText(const std::string& title)
 {
 	if (IsShown())
@@ -295,14 +300,46 @@ void Window::OnActivate_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 
 void Window::OnCommand_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-	if (const auto& c = GetById(static_cast<unsigned int>(wParam)))
-	{
-		// Dispatch both OnClick for common task and OnMouseClick which receives the cursor information
-		c->Dispatch("OnClick", new EventArgs());
-		c->Dispatch("OnMouseClick", new MouseEventArgs(m_Mouse.get()));
+	// Menu
+	auto cmd = HIWORD(wParam);
 
-		// Force the update of the controls
-		c->Dispatch("OnInternalUpdate", new EventArgs());
+	if (cmd == 0)
+	{
+		if (const auto& c = GetById(static_cast<unsigned int>(wParam)))
+		{
+			// Dispatch both OnClick for common task and OnMouseClick which receives the cursor information
+			c->Dispatch("OnClick", new EventArgs());
+			c->Dispatch("OnMouseClick", new MouseEventArgs(m_Mouse.get()));
+
+			// Force the update of the controls
+			c->Dispatch("OnInternalUpdate", new EventArgs());
+		}
+	}
+
+	// Accelerators
+	else if (cmd == 1)
+	{
+
+	}
+
+	// Controls
+	else
+	{
+		if (const auto& c = GetByHandle((HWND)(lParam)))
+		{
+			// TextBox events
+			switch (cmd)
+			{
+			case EN_SETFOCUS: c->Dispatch("OnFocus", new EventArgs()); break;
+			case EN_KILLFOCUS: OutputDebugString("a"); break;
+			case EN_CHANGE: OutputDebugString("a"); break;
+			case EN_UPDATE: OutputDebugString("a"); break;
+			case EN_ERRSPACE: OutputDebugString("a"); break;
+			case EN_MAXTEXT: OutputDebugString("a"); break;
+			case EN_HSCROLL: OutputDebugString("a"); break;
+			case EN_VSCROLL: OutputDebugString("a"); break;
+			}
+		}
 	}
 }
 
@@ -597,10 +634,10 @@ int Window::OnNotify_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 	}
 
 	// Cancel design if button style is the default one
-	/*if (control->m_BackgroundColor == Color::Default() && control->m_ForeColor == Color::Black())
+	if (control->m_BackgroundColor == Color::Default() && control->m_ForeColor == Color::Black())
 	{
 		return CDRF_DODEFAULT;
-	}*/
+	}
 
 	// Select color when the button is selected
 	m_Brush = CreateGradientBrush(control->m_BackgroundColor, control->m_BackgroundColor, item);
@@ -613,7 +650,7 @@ int Window::OnNotify_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 	HGDIOBJ old_brush = SelectObject(item->hdc, m_Brush);
 
 	// GOING TO THINK A WAY OF IMPLEMENT NORMAL AND ROUNDED BORDER BUTTON
-	
+
 	//If you want rounded button, then use this, otherwise use FillRect().
 	//RoundRect(item->hdc, item->rc.left, item->rc.top, item->rc.right, item->rc.bottom, 10, 10);
 	Rectangle(item->hdc, item->rc.left, item->rc.top, item->rc.right, item->rc.bottom);
@@ -724,9 +761,9 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_ACTIVATE: OnActivate_Impl(hWnd, msg, wParam, lParam); break;
 	case WM_NOTIFY: return OnNotify_Impl(hWnd, msg, wParam, lParam);
 
-	// Set the button border color inside window control to match the same color as the BackgroundColor
-	case WM_CTLCOLORBTN: 
-	{                
+		// Set the button border color inside window control to match the same color as the BackgroundColor
+	case WM_CTLCOLORBTN:
+	{
 		return (LRESULT)CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
 	}
 	/******************** KEYBOARD MESSAGES *********************/

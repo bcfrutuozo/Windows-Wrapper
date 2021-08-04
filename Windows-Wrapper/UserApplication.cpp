@@ -53,7 +53,7 @@ void TestKeyPress(Control* const c, KeyEventArgs* e)
 	menu2.AddRadioItem("Radio1", false);
 	menu2.AddRadioItem("Radio2", true);
 	menu1.AddItem("Submenu-Item4");
-	menu1.AddItem("Submenu-Item5");
+	menu1.AddItem("Submenu-Item5").OnMouseEnterSet(&TesteBotaoEnter);
 	window->UpdateMenuStrip();
 	window->SetBackgroundColor(Color(128, 128, 128));
 
@@ -61,6 +61,11 @@ void TestKeyPress(Control* const c, KeyEventArgs* e)
 	b.OnClickSet(&TesteBotaoClick);
 	b.OnMouseEnterSet(&TesteBotaoEnter);
 	b.OnMouseLeaveSet(&TesteBotaoLeave);
+
+	Button& b2 = window->AddButton("XYZ", 100, 40, 200, 200);
+	b2.OnClickSet(&TesteBotaoClick);
+
+	TextBox& t = window->AddTextBox("TextBox", 400, 30, 20, 400);
 }
 
 
