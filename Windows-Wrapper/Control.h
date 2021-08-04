@@ -11,6 +11,7 @@
 #include "KeyEventArgs.h"
 #include "MouseEventArgs.h"
 #include "KeyPressEventArgs.h"
+#include "MessageMapper.h"
 
 #include <memory>
 #include <functional>
@@ -36,6 +37,42 @@ private:
 	// Used by some controls to trigger certain rules updates
 	virtual void OnInternalUpdate(Control* const sender, EventArgs* const args) {};
 
+	HBRUSH CreateGradientBrush(Color top, Color bottom, LPNMCUSTOMDRAW item)
+	{	
+		if (top == bottom)
+		{
+			return CreateSolidBrush(RGB(top.GetR(), top.GetG(), top.GetB()));
+		}
+
+		HBRUSH Brush;
+		HDC hdcmem = CreateCompatibleDC(item->hdc);
+		HBITMAP hbitmap = CreateCompatibleBitmap(item->hdc, item->rc.right - item->rc.left, item->rc.bottom - item->rc.top);
+		SelectObject(hdcmem, hbitmap);
+
+		int r1 = top.GetR(), r2 = bottom.GetR(), g1 = top.GetG(), g2 = bottom.GetG(), b1 = top.GetB(), b2 = bottom.GetB();
+		for (int i = 0; i < item->rc.bottom - item->rc.top; i++)
+		{
+			RECT temp;
+			int r, g, b;
+			r = int(r1 + double(i * (r2 - r1) / item->rc.bottom - item->rc.top));
+			g = int(g1 + double(i * (g2 - g1) / item->rc.bottom - item->rc.top));
+			b = int(b1 + double(i * (b2 - b1) / item->rc.bottom - item->rc.top));
+			Brush = CreateSolidBrush(RGB(r, g, b));
+			temp.left = 0;
+			temp.top = i;
+			temp.right = item->rc.right - item->rc.left;
+			temp.bottom = i + 1;
+			FillRect(hdcmem, &temp, Brush);
+			DeleteObject(Brush);
+		}
+		HBRUSH pattern = CreatePatternBrush(hbitmap);
+
+		DeleteDC(hdcmem);
+		DeleteObject(hbitmap);
+
+		return pattern;
+	}
+
 protected:
 
 	std::string Text;
@@ -44,6 +81,9 @@ protected:
 	Control* Parent;
 	std::vector<std::shared_ptr<Control>> Controls;
 	EventDispatcher Events;
+	Color m_ForeColor = Color::Black();
+	Color m_BackgroundColor = Color::Default();
+	static MessageMapper Mapper;
 
 	// Forces the implementation and call on individual childs because each WinApi control
 	// has it own creation method.
@@ -68,6 +108,7 @@ protected:
 	}
 
 	Control* GetById(unsigned int id) noexcept;
+	Control* GetByHandle(const IntPtr p) noexcept;
 	const unsigned int GetId() const noexcept;
 
 public:
@@ -103,6 +144,8 @@ public:
 	void OnMouseWheelSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept;
 	void OnShowSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
 
+	void SetForeColor(const Color& color) noexcept;
+	void SetBackgroundColor(const Color& color) noexcept;
 	const std::string& GetText() const noexcept;
 	Window* GetWindow() const noexcept;
 

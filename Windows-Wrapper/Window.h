@@ -30,7 +30,10 @@ private:
 	std::unique_ptr<Keyboard> m_Keyboard;
 	std::unique_ptr<Mouse> m_Mouse;
 	std::vector<BYTE> m_RawBuffer;
-	Color m_ForeColor = Color::White();
+
+	HBRUSH selectbrush;
+	HBRUSH hotbrush;
+	HBRUSH defaultbrush;
 
 	void EncloseCursor() const noexcept;
 	static void FreeCursor() noexcept;
@@ -42,9 +45,12 @@ private:
 
 	// Events implementations
 	void OnActivate_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+	void OnSetCursor_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	void OnCommand_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	void OnClose_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-	void OnClosing_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+	void OnCreate_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+	void OnEraseBackground_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+	void OnDestroy_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	void OnClosed_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	void OnFocusEnter_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	void OnFocusLeave_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
@@ -59,7 +65,7 @@ private:
 	void OnMouseLeftDoubleClick_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	void OnMouseRightDoubleClick_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	void OnMouseWheel_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-	void OnNotify_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+	int OnNotify_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	void OnRawInput_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 
 protected:
@@ -110,8 +116,6 @@ public:
 	void SetText(const std::string& text);
 	void EnableCursor() noexcept;
 	void DisableCursor() noexcept;
-	Color GetForeColor() noexcept;
-	void SetForeColor(const Color& color) noexcept;
 	bool IsCursorEnabled() const noexcept;
 	Keyboard& GetKeyboard() noexcept;
 	Mouse& GetMouse() noexcept;

@@ -249,16 +249,6 @@ bool Window::IsCursorEnabled() const noexcept
 	return m_IsCursorEnabled;
 }
 
-Color Window::GetForeColor() noexcept
-{
-	return m_ForeColor;
-}
-
-void Window::SetForeColor(const Color& color) noexcept
-{
-	m_ForeColor = color;
-}
-
 Keyboard& Window::GetKeyboard() noexcept
 {
 	if (!m_Keyboard)
@@ -269,7 +259,6 @@ Keyboard& Window::GetKeyboard() noexcept
 
 	return *m_Keyboard;
 }
-
 
 Mouse& Window::GetMouse() noexcept
 {
@@ -297,24 +286,6 @@ void Window::OnActivate_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 
 void Window::OnCommand_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-	//for (const auto& item : Controls)
-	//{
-	//	// Get the MenuStrip to search for the right item
-	//	auto menu = dynamic_cast<MenuStrip*>(item.get());
-	//	if (menu != nullptr)
-	//	{
-	//		auto entry = menu->GetById(static_cast<unsigned int>(wParam));
-	//		if (entry != nullptr)
-	//		{
-	//			// Dispatch both OnClick for common task and OnMouseClick which receives the cursor information
-	//			entry->Dispatch("OnClick", new EventArgs());
-	//			entry->Dispatch("OnMouseClick", new MouseEventArgs(m_Mouse.get()));
-
-	//			// Force the update of the controls
-	//			entry->Dispatch("OnInternalUpdate", new EventArgs());
-	//		}
-	//	}
-	//}
 	if (const auto& c = GetById(static_cast<unsigned int>(wParam)))
 	{
 		// Dispatch both OnClick for common task and OnMouseClick which receives the cursor information
@@ -331,7 +302,17 @@ void Window::OnClose_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 	PostQuitMessage(0);
 }
 
-void Window::OnClosing_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+void Window::OnCreate_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+{
+
+}
+
+void Window::OnEraseBackground_Impl(HWND hWnd, UINT msg, WPARAM wPara, LPARAM lParam) noexcept
+{
+	Dispatch("OnErase");
+}
+
+void Window::OnDestroy_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
 	bool cancel = false;
 	Dispatch("OnClosing", new OnClosingEventArgs(CloseReason::UserClosing, cancel));
@@ -339,6 +320,15 @@ void Window::OnClosing_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) n
 	if (cancel)
 	{
 		// TODO: CANCEL FORM CLOSING
+	}
+	else
+	{
+		// TODO: PROCEED WITH FORM DESTRO
+
+		// Delete objects created on WM_CREATE
+		DeleteObject(selectbrush);
+		DeleteObject(hotbrush);
+		DeleteObject(defaultbrush);
 	}
 }
 
@@ -450,7 +440,7 @@ void Window::OnMouseMove_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			Dispatch("OnMouseEnter", new MouseEventArgs(m_Mouse.get()));
 		}
 	}
-	
+
 	// Out of client region -> log move / maintain capture if button down
 	else
 	{
@@ -465,8 +455,6 @@ void Window::OnMouseMove_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			Dispatch("OnMouseLeave", new MouseEventArgs(m_Mouse.get()));
 		}
 	}
-
-	Dispatch("OnMouseMove", new MouseEventArgs(m_Mouse.get()));
 }
 
 void Window::OnMouseLeftDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -562,13 +550,121 @@ void Window::OnMouseWheel_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 	Dispatch("OnMouseWheel", new MouseEventArgs(m_Mouse.get()));
 }
 
-void Window::OnNotify_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+int Window::OnNotify_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-	if (Parent != nullptr)
+	LPNMHDR some_item = (LPNMHDR)lParam;
+	LPNMCUSTOMDRAW item = (LPNMCUSTOMDRAW)some_item;
+
+	SetBkMode(item->hdc, OPAQUE);
+
+	auto control = GetByHandle(some_item->hwndFrom);
+
+	switch (some_item->code)
 	{
-		SendMessage(static_cast<HWND>(Parent->Handle.ToPointer()), WM_NOTIFY, wParam, lParam);
-		Dispatch("OnNotify", new EventArgs());
+	case BCN_HOTITEMCHANGE:
+	{
+		NMBCHOTITEM* hot_item = reinterpret_cast<NMBCHOTITEM*>(lParam);
+
+		// Handle to the button
+		HWND button_handle = some_item->hwndFrom;
+
+		// ID of the button, if you're using resources
+		UINT_PTR button_id = some_item->idFrom;
+
+		// You can check if the mouse is entering or leaving the hover area
+		bool entering = hot_item->dwFlags & HICF_ENTERING;
+
+		if (entering)
+		{
+			control->Dispatch("OnMouseEnter", new EventArgs());
+		}
+		else
+		{
+			control->Dispatch("OnMouseLeave", new EventArgs());
+		}
 	}
+	}
+
+	// Cancel design if button style is the default one
+	if (control->m_BackgroundColor == Color::Default() && control->m_ForeColor == Color::Black())
+	{
+		return 0;
+	}
+
+	if (item->uItemState & CDIS_SELECTED)
+	{
+		// Select color when the button is selected
+		selectbrush = CreateGradientBrush(control->m_BackgroundColor, control->m_BackgroundColor, item);
+
+		//Create pen for button border
+		HPEN pen = CreatePen(PS_INSIDEFRAME, 0, RGB(0, 0, 0));
+
+		//Select our brush into hDC
+		HGDIOBJ old_pen = SelectObject(item->hdc, pen);
+		HGDIOBJ old_brush = SelectObject(item->hdc, selectbrush);
+
+		//If you want rounded button, then use this, otherwise use FillRect().
+		//RoundRect(item->hdc, item->rc.left, item->rc.top, item->rc.right, item->rc.bottom, 25, 25);
+		Rectangle(item->hdc, item->rc.left, item->rc.top, item->rc.right, item->rc.bottom);
+		//FillRect(item->hdc, &item->rc, selectbrush);
+
+		//Clean up
+		SelectObject(item->hdc, old_pen);
+		SelectObject(item->hdc, old_brush);
+		DeleteObject(pen);
+
+		SetBkMode(item->hdc, TRANSPARENT);
+		SetTextColor(item->hdc, RGB(control->m_ForeColor.GetR(), control->m_ForeColor.GetB(), control->m_ForeColor.GetB()));
+		DrawText(item->hdc, control->GetText().c_str(), -1, &item->rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+
+		return CDRF_DODEFAULT;
+	}
+	else
+	{
+		if (item->uItemState & CDIS_HOT) //Our mouse is over the button
+		{
+			//Select our color when the mouse hovers our button
+			hotbrush = CreateGradientBrush(control->m_BackgroundColor, control->m_BackgroundColor, item);
+
+			HPEN pen = CreatePen(PS_INSIDEFRAME, 0, RGB(0, 0, 0));
+
+			HGDIOBJ old_pen = SelectObject(item->hdc, pen);
+			HGDIOBJ old_brush = SelectObject(item->hdc, hotbrush);
+
+			Rectangle(item->hdc, item->rc.left, item->rc.top, item->rc.right, item->rc.bottom);
+
+			SelectObject(item->hdc, old_pen);
+			SelectObject(item->hdc, old_brush);
+			DeleteObject(pen);
+
+			SetBkMode(item->hdc, TRANSPARENT);
+			SetTextColor(item->hdc, RGB(control->m_ForeColor.GetR(), control->m_ForeColor.GetB(), control->m_ForeColor.GetB()));
+			DrawText(item->hdc, control->GetText().c_str(), -1, &item->rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+			return CDRF_SKIPDEFAULT;
+		}
+
+		//Select our color when our button is doing nothing
+		defaultbrush = CreateGradientBrush(control->m_BackgroundColor, control->m_BackgroundColor, item);
+
+		HPEN pen = CreatePen(PS_INSIDEFRAME, 0, RGB(0, 0, 0));
+
+		HGDIOBJ old_pen = SelectObject(item->hdc, pen);
+		HGDIOBJ old_brush = SelectObject(item->hdc, defaultbrush);
+
+		Rectangle(item->hdc, item->rc.left, item->rc.top, item->rc.right, item->rc.bottom);
+
+		SelectObject(item->hdc, old_pen);
+		SelectObject(item->hdc, old_brush);
+		DeleteObject(pen);
+
+		SetBkMode(item->hdc, TRANSPARENT);
+		SetTextColor(item->hdc, RGB(control->m_ForeColor.GetR(), control->m_ForeColor.GetB(), control->m_ForeColor.GetB()));
+		DrawText(item->hdc, control->GetText().c_str(), -1, &item->rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+
+		return CDRF_SKIPDEFAULT;
+	}
+
+	return 0;
 }
 
 void Window::OnRawInput_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -616,18 +712,37 @@ void Window::OnRawInput_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 	}
 }
 
+void Window::OnSetCursor_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+{
+	if (const auto& c = GetByHandle((HWND)(wParam)))
+	{
+		// Dispatch both OnClick for common task and OnMouseClick which receives the cursor information
+		c->Dispatch("OnMouseMove", new MouseEventArgs(m_Mouse.get()));
+	}
+}
+
 LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
+	OutputDebugString(Mapper(msg, wParam, lParam).c_str());
+
 	switch (msg)
 	{
+	case WM_SETCURSOR: OnSetCursor_Impl(hWnd, msg, wParam, lParam); break;
+	case WM_CREATE: OnCreate_Impl(hWnd, msg, wParam, lParam); break;
+	case WM_ERASEBKGND: OnEraseBackground_Impl(hWnd, msg, wParam, lParam); break;
 	case WM_COMMAND: OnCommand_Impl(hWnd, msg, wParam, lParam); break;
 	case WM_CLOSE: OnClose_Impl(hWnd, msg, wParam, lParam); return 0;		// Exit message to be handled in application class
-	case WM_DESTROY: OnClosing_Impl(hWnd, msg, wParam, lParam); break;
+	case WM_DESTROY: OnDestroy_Impl(hWnd, msg, wParam, lParam); break;
 	case WM_NCDESTROY: OnClosed_Impl(hWnd, msg, wParam, lParam); break;
 	case WM_SETFOCUS: OnFocusEnter_Impl(hWnd, msg, wParam, lParam); break;
 	case WM_KILLFOCUS: OnFocusLeave_Impl(hWnd, msg, wParam, lParam); break;
 	case WM_ACTIVATE: OnActivate_Impl(hWnd, msg, wParam, lParam); break;
-		/******************** KEYBOARD MESSAGES *********************/
+	case WM_NOTIFY: return OnNotify_Impl(hWnd, msg, wParam, lParam);
+	//case WM_CTLCOLORBTN: //In order to make those edges invisble when we use RoundRect(),
+	//{                //we make the color of our button's background match window's background
+	//	return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
+	//}
+	/******************** KEYBOARD MESSAGES *********************/
 	case WM_KEYDOWN:
 	case WM_SYSKEYDOWN: OnKeyDown_Impl(hWnd, msg, wParam, lParam); break;	// Syskey commands need to be handled to track ALT key (VK_MENU)
 	case WM_KEYUP:
@@ -635,6 +750,7 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_CHAR: OnKeyPressed_Impl(hWnd, msg, wParam, lParam); break;
 		/******************* END KEYBOARD MESSAGES ******************/
 		/********************** MOUSE MESSAGES **********************/
+	case WM_MOUSELEAVE: break;
 	case WM_MOUSEMOVE: 	OnMouseMove_Impl(hWnd, msg, wParam, lParam); break;
 	case WM_LBUTTONDOWN: OnMouseLeftDown_Impl(hWnd, msg, wParam, lParam); break;
 	case WM_LBUTTONUP: OnMouseLeftUp_Impl(hWnd, msg, wParam, lParam); break;
@@ -644,7 +760,6 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_RBUTTONDBLCLK: OnMouseRightDoubleClick_Impl(hWnd, msg, wParam, lParam); break;
 	case WM_PARENTNOTIFY: break;
 	case WM_MOUSEWHEEL: OnMouseWheel_Impl(hWnd, msg, wParam, lParam); break;
-	case WM_NOTIFY: OnNotify_Impl(hWnd, msg, wParam, lParam); break;
 		/******************** END MOUSE MESSAGES ********************/
 		/******************** RAW MOUSE MESSAGES ********************/
 	case WM_INPUT: OnRawInput_Impl(hWnd, msg, wParam, lParam); break;

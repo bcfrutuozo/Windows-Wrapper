@@ -29,6 +29,7 @@ public:
 	bool operator==(int p) const noexcept;
 	bool operator==(long p) const noexcept;
 	bool operator==(void* p) const noexcept;
+	bool operator==(IntPtr p) const noexcept;
 
 	static IntPtr Zero() { return IntPtr(0); }
 	static IntPtr MaxValue() { return IntPtr(0x7fffffff); }

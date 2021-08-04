@@ -103,3 +103,8 @@ bool IntPtr::operator==(void* p) const noexcept
 {
 	return m_Ptr == p;
 }
+
+bool IntPtr::operator==(IntPtr p) const noexcept
+{
+	return m_Ptr == p.m_Ptr;
+}

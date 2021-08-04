@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="MessageMapper.cpp" />
     <ClCompile Include="RealTimeApplication.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="Base.cpp" />
@@ -180,6 +181,7 @@
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="MessageMapper.h" />
     <ClInclude Include="RealTimeApplication.h" />
     <ClInclude Include="Base.h" />
     <ClInclude Include="Button.h" />

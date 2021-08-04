@@ -12,7 +12,6 @@ public:
 	Button(Control* parent, const std::string& name, int width, int height, int x, int y);
 	virtual ~Button();
 
-	void ChangeColor(Color color) noexcept;
 	void Disable() noexcept override;
 	void Enable() noexcept override;
 	void Hide() override;

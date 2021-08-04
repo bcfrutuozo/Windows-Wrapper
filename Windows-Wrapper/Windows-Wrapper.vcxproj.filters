@@ -54,6 +54,7 @@
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="UserApplication.cpp" />
+    <ClCompile Include="MessageMapper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RealTimeApplication.h" />
@@ -161,6 +162,7 @@
     </ClInclude>
     <ClInclude Include="Application.h" />
     <ClInclude Include="UserApplication.h" />
+    <ClInclude Include="MessageMapper.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interfaces">

@@ -16,6 +16,11 @@ struct Color : public IEquatable<Color>
 		return rgba == c.rgba;
 	}
 
+	inline bool operator==(const Color& c) const noexcept
+	{
+		return rgba == c.rgba;
+	}
+
 	uint8_t GetR() const { return (rgba >> 0) & 0xFF; }
 	uint8_t GetG() const { return (rgba >> 8) & 0xFF; }
 	uint8_t GetB() const { return (rgba >> 16) & 0xFF; }
@@ -65,4 +70,7 @@ struct Color : public IEquatable<Color>
 	static constexpr Color Transparent() { return Color(0, 0, 0, 0); }
 	static constexpr Color Gray() { return Color(127, 127, 127, 255); }
 	static constexpr Color Ghost() { return Color(127, 127, 127, 127); }
+
+	// Windows defaul control color
+	static constexpr Color Default() { return Color(212, 208, 200, 255); }
 };

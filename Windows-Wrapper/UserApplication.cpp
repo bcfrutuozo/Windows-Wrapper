@@ -11,9 +11,21 @@
 #include <iomanip>
 #include <functional>
 
-void TesteBotao(Control* const c, EventArgs* e)
+void TesteBotaoEnter(Control* const c, EventArgs* const e)
 {
-	OutputDebugString("AAAAAAAOOOO!");
+	c->SetBackgroundColor(Color::Default());
+	c->SetForeColor(Color::White());
+}
+
+void TesteBotaoLeave(Control* const c, EventArgs* const e)
+{
+	c->SetBackgroundColor(Color::Default());
+	c->SetForeColor(Color::Black());
+}
+
+void TesteBotaoClick(Control* const c, EventArgs* const e)
+{
+	OutputDebugString("FUNFOUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU");
 }
 
 void TestKeyPress(Control* const c, KeyEventArgs* e)
@@ -43,10 +55,12 @@ void TestKeyPress(Control* const c, KeyEventArgs* e)
 	menu1.AddItem("Submenu-Item4");
 	menu1.AddItem("Submenu-Item5");
 	window->UpdateMenuStrip();
+	window->SetBackgroundColor(Color(0, 255, 0));
 
-	Button& b = window->AddButton("Teste", 200, 80, 50, 100);
-	b.ChangeColor(Color(255, 255, 255));
-	b.OnClickSet(&TesteBotao);
+	Button& b = window->AddButton("Abc", 200, 80, 50, 100);
+	b.OnClickSet(&TesteBotaoClick);
+	b.OnMouseEnterSet(&TesteBotaoEnter);
+	b.OnMouseLeaveSet(&TesteBotaoLeave);
 }
 
 

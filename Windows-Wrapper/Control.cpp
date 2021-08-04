@@ -7,6 +7,7 @@
 
 // Declare m_Index = 1 setting 0 as null function (NULL || nullptr)
 unsigned int Control::m_CurrentIndex = 1;
+MessageMapper Control::Mapper = MessageMapper();
 
 Control::Control()
 	:
@@ -80,6 +81,27 @@ Control* Control::GetById(unsigned int id) noexcept
 
 	// Returning nullptr is extremely important, otherwise it will be a trash pointer and will launch an exception trying to process it
 	return nullptr;
+}
+
+Control* Control::GetByHandle(const IntPtr p) noexcept
+{
+	if (Handle == p)
+	{
+		return this;
+	}
+
+	for (const auto& c : Controls)
+	{
+		Control* ret = c->GetByHandle(p);
+		if (ret != nullptr)
+		{
+			return ret;
+		}
+	}
+
+	// Returning nullptr is extremely important, otherwise it will be a trash pointer and will launch an exception trying to process it
+	return nullptr;
+
 }
 
 const unsigned int Control::GetId() const noexcept
@@ -170,6 +192,16 @@ void Control::OnMouseWheelSet(const std::function<void(Control* const c, MouseEv
 void Control::OnShowSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept
 {
 	Events.Register(std::make_unique<EventHandler>("OnShow", callback));
+}
+
+void Control::SetForeColor(const Color& color) noexcept
+{
+	m_ForeColor = color;
+}
+
+void Control::SetBackgroundColor(const Color& color) noexcept
+{
+	m_BackgroundColor = color;
 }
 
 const std::string& Control::GetText() const noexcept

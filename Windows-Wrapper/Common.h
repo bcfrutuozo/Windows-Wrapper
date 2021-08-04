@@ -8,38 +8,38 @@
 // (or all) of these defines (it will increase build time though).
 #ifndef APPLICATION
 #define WIN32_LEAN_AND_MEAN
-#define NOGDICAPMASKS
+//#define NOGDICAPMASKS
 //#define NOSYSMETRICS
 //#define NOMENUS
-#define NOICONS
-#define NOSYSCOMMANDS
-#define NORASTEROPS
-#define OEMRESOURCE
-#define NOATOM
-#define NOCLIPBOARD
-#define NOCOLOR
-#define NOCTLMGR
-#define NODRAWTEXT
-#define NOKERNEL
-#define NONLS
-#define NOMEMMGR
-#define NOMETAFILE
-#define NOOPENFILE
-#define NOSCROLL
-#define NOSERVICE
-#define NOSOUND
-#define NOTEXTMETRIC
-#define NOWH
-#define NOCOMM
-#define NOKANJI
-#define NOHELP
-#define NOPROFILER
-#define NODEFERWINDOWPOS
-#define NOMCX
-#define NORPC
-#define NOPROXYSTUB
-#define NOIMAGE
-#define NOTAPE
+//#define NOICONS
+//#define NOSYSCOMMANDS
+//#define NORASTEROPS
+//#define OEMRESOURCE
+//#define NOATOM
+//#define NOCLIPBOARD
+//#define NOCOLOR
+//#define NOCTLMGR
+//#define NODRAWTEXT
+//#define NOKERNEL
+//#define NONLS
+//#define NOMEMMGR
+//#define NOMETAFILE
+//#define NOOPENFILE
+//#define NOSCROLL
+//#define NOSERVICE
+//#define NOSOUND
+//#define NOTEXTMETRIC
+//#define NOWH
+//#define NOCOMM
+//#define NOKANJI
+//#define NOHELP
+//#define NOPROFILER
+//#define NODEFERWINDOWPOS
+//#define NOMCX
+//#define NORPC
+//#define NOPROXYSTUB
+//#define NOIMAGE
+//#define NOTAPE
 #endif
 
 // Globalize IntPtr.h struct
@@ -67,4 +67,11 @@ static const XMFLOAT4X4 IDENTITYMATRIX = XMFLOAT4X4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0
 #define NOMINMAX
 #define ALIGN_16 void* operator new(size_t i) { return _mm_malloc(i, 16); } void operator delete(void* p) { _mm_free(p); }
 
+#pragma comment(linker,"\"/manifestdependency:type='win32' \
+name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
+processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"") 
+
+#pragma comment(lib, "comctl32.lib")
+
 #include <Windows.h>
+#include <Commctrl.h>

@@ -19,7 +19,7 @@ void Button::Initialize() noexcept
 	Handle = CreateWindow(
 		"Button",																							// Class name
 		Text.c_str(),																						// Window title
-		WS_CHILD | WS_VISIBLE | WS_TABSTOP | SS_CENTER | BS_PUSHBUTTON | WS_CLIPSIBLINGS,					// Style values
+	 	WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_CENTER | BS_PUSHBUTTON | WS_CLIPSIBLINGS | BS_PUSHLIKE,		// Style values
 		Location.X,																							// X position
 		Location.Y,																							// Y position
 		Size.Width,																							// Width
@@ -34,11 +34,6 @@ void Button::Initialize() noexcept
 	{
 		throw CTL_LAST_EXCEPT();
 	}
-}
-
-void Button::ChangeColor(Color color) noexcept
-{
-
 }
 
 void Button::Disable() noexcept
