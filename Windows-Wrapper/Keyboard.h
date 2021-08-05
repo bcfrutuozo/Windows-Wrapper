@@ -58,7 +58,7 @@ public:
 	bool IsAutoRepeatEnabled() const noexcept;
 
 private:
-	
+
 	static constexpr unsigned int m_NumberOfKeys = 256u;
 	static constexpr unsigned int m_BufferSize = 16u;
 	bool m_IsAutoRepeatEnabled = false;

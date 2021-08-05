@@ -103,6 +103,7 @@ public:
 
 	void OnClosedSet(const std::function<void(Control* const c, OnClosedEventArgs* const e)>& callback) noexcept;
 	void OnClosingSet(const std::function<void(Control* const c, OnClosingEventArgs* const e)>& callback) noexcept;
+	void OnShownSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
 
 	// MenuStrip functions
 	void ClearMenuStrip() noexcept;

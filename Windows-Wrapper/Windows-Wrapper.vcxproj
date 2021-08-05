@@ -182,7 +182,11 @@
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CancelEventArgs.h" />
+    <ClInclude Include="CancelEventHandler.h" />
+    <ClInclude Include="Keys.h" />
     <ClInclude Include="MessageMapper.h" />
+    <ClInclude Include="MouseButtons.h" />
     <ClInclude Include="RealTimeApplication.h" />
     <ClInclude Include="Base.h" />
     <ClInclude Include="Button.h" />

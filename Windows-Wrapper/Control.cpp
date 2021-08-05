@@ -4,6 +4,7 @@
 #include "KeyEventHandler.h"
 #include "MouseEventHandler.h"
 #include "KeyPressEventHandler.h"
+#include "CancelEventHandler.h"
 
 // Declare m_Index = 1 setting 0 as null function (NULL || nullptr)
 unsigned int Control::m_CurrentIndex = 1;
@@ -129,6 +130,16 @@ void Control::OnDeactivateSet(const std::function<void(Control* const c, EventAr
 	Events.Register(std::make_unique<EventHandler>("OnDeactivate", callback));
 }
 
+void Control::OnGotFocusSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept
+{
+	Events.Register(std::make_unique<EventHandler>("OnGotFocus", callback));
+}
+
+void Control::OnLostFocusSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept
+{
+	Events.Register(std::make_unique<EventHandler>("OnLostFocus", callback));
+}
+
 void Control::OnKeyDownSet(const std::function<void(Control* const c, KeyEventArgs* const e)>& callback) noexcept
 {
 	Events.Register(std::make_unique<KeyEventHandler>("OnKeyDown", callback));
@@ -194,9 +205,9 @@ void Control::OnMouseWheelSet(const std::function<void(Control* const c, MouseEv
 	Events.Register(std::make_unique<MouseEventHandler>("OnMouseWheel", callback));
 }
 
-void Control::OnShowSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept
+void Control::OnVisibleChangedSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept
 {
-	Events.Register(std::make_unique<EventHandler>("OnShow", callback));
+	Events.Register(std::make_unique<EventHandler>("OnVisibledChanged", callback));
 }
 
 void Control::SetForeColor(const Color& color) noexcept

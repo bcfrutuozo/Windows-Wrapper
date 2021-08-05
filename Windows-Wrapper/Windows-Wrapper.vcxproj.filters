@@ -165,6 +165,14 @@
     <ClInclude Include="UserApplication.h" />
     <ClInclude Include="MessageMapper.h" />
     <ClInclude Include="TextBox.h" />
+    <ClInclude Include="CancelEventArgs.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="CancelEventHandler.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Keys.h" />
+    <ClInclude Include="MouseButtons.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interfaces">

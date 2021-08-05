@@ -76,6 +76,11 @@ void Window::OnClosingSet(const std::function<void(Control* const c, OnClosingEv
 	Events.Register(std::make_unique<OnClosingEventHandler>("OnClosing", callback));
 }
 
+void Window::OnShownSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept
+{
+	Events.Register(std::make_unique<EventHandler>("OnShown", callback));
+}
+
 void Window::SetBackgroundColor(const Color& color) noexcept
 {
 	m_BackgroundColor = color;
@@ -309,7 +314,7 @@ void Window::OnCommand_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) n
 		{
 			// Dispatch both OnClick for common task and OnMouseClick which receives the cursor information
 			c->Dispatch("OnClick", new EventArgs());
-			c->Dispatch("OnMouseClick", new MouseEventArgs(m_Mouse.get()));
+			c->Dispatch("OnMouseClick", new MouseEventArgs(MouseButtons::Left, 1, 0, 0, 0));
 
 			// Force the update of the controls
 			c->Dispatch("OnInternalUpdate", new EventArgs());
@@ -330,8 +335,20 @@ void Window::OnCommand_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) n
 			// TextBox events
 			switch (cmd)
 			{
-			case EN_SETFOCUS: c->Dispatch("OnFocus", new EventArgs()); break;
-			case EN_KILLFOCUS: OutputDebugString("a"); break;
+
+			case BCN_DROPDOWN:break;
+			case BCN_HOTITEMCHANGE:break;
+			case BN_CLICKED: c->Dispatch("OnClick", new EventArgs()); break;
+			case BN_DBLCLK:break;
+			case BN_DISABLE:break;
+			case BN_KILLFOCUS:break;
+			case BN_PAINT:break;
+			case BN_PUSHED:break;
+			case BN_SETFOCUS:break;
+			case BN_UNPUSHED:break;
+
+			case EN_SETFOCUS: c->Dispatch("OnGotFocus", new EventArgs()); break;
+			case EN_KILLFOCUS: c->Dispatch("OnLostFocus", new EventArgs()); break;
 			case EN_CHANGE: OutputDebugString("a"); break;
 			case EN_UPDATE: OutputDebugString("a"); break;
 			case EN_ERRSPACE: OutputDebugString("a"); break;
@@ -387,13 +404,14 @@ void Window::OnClosed_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) no
 
 void Window::OnFocusEnter_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-	//OnFocusEnter();
+	Dispatch("OnGotFocus", new EventArgs());
 }
 
 void Window::OnFocusLeave_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-	// Clear key state when window loses focus to prevent input getting "stuck"
+	Dispatch("OnLostFocus", new EventArgs());
 
+	// Clear key state when window loses focus to prevent input getting "stuck"
 	if (m_Keyboard != nullptr)
 	{
 		m_Keyboard->ClearState();
@@ -411,7 +429,7 @@ void Window::OnKeyDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) n
 		}
 	}
 
-	Dispatch("OnKeyDown", new KeyEventArgs(m_Keyboard.get()));
+	Dispatch("OnKeyDown", new KeyEventArgs(static_cast<Keys>(wParam)));
 }
 
 void Window::OnKeyPressed_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -431,7 +449,7 @@ void Window::OnKeyUp_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 		m_Keyboard->OnKeyReleased(static_cast<unsigned char>(wParam));
 	}
 
-	Dispatch("OnKeyUp", new KeyEventArgs(m_Keyboard.get()));
+	Dispatch("OnKeyUp", new KeyEventArgs(static_cast<Keys>(wParam)));
 }
 
 void Window::OnMouseMove_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -485,7 +503,7 @@ void Window::OnMouseMove_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		if (!m_Mouse->IsInWindow())
 		{
 			m_Mouse->OnMouseEnter();
-			Dispatch("OnMouseEnter", new MouseEventArgs(m_Mouse.get()));
+			Dispatch("OnMouseEnter", new MouseEventArgs(MouseButtons::Left, 1, 0, 0, 0));
 		}
 	}
 
@@ -500,7 +518,7 @@ void Window::OnMouseMove_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		else
 		{
 			m_Mouse->OnMouseLeave();
-			Dispatch("OnMouseLeave", new MouseEventArgs(m_Mouse.get()));
+			Dispatch("OnMouseLeave", new MouseEventArgs(MouseButtons::Left, 1, 0, 0, 0));
 		}
 	}
 }
@@ -521,7 +539,7 @@ void Window::OnMouseLeftDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 		m_Mouse->OnLeftPressed(pt.x, pt.y);
 	}
 
-	Dispatch("OnMouseLeftDown", new MouseEventArgs(m_Mouse.get()));
+	Dispatch("OnMouseLeftDown", new MouseEventArgs(MouseButtons::Left, 1, 0, 0, 0));
 }
 
 void Window::OnMouseLeftUp_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -536,7 +554,7 @@ void Window::OnMouseLeftUp_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 	// OnClick event is always executed before the MouseUp event with both buttons
 	Dispatch("OnClick", new EventArgs());
 
-	Dispatch("OnMouseLeftUp", new MouseEventArgs(m_Mouse.get()));;
+	Dispatch("OnMouseLeftUp", new MouseEventArgs(MouseButtons::Left, 1, 0, 0, 0));
 }
 
 void Window::OnMouseRightDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -548,7 +566,7 @@ void Window::OnMouseRightDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
 		m_Mouse->OnRightPressed(pt.x, pt.y);
 	}
 
-	Dispatch("OnMouseRightDown", new MouseEventArgs(m_Mouse.get()));;
+	Dispatch("OnMouseRightDown", new MouseEventArgs(MouseButtons::Left, 1, 0, 0, 0));
 }
 
 void Window::OnMouseRightUp_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -563,17 +581,17 @@ void Window::OnMouseRightUp_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 	// OnClick event is always executed before the MouseUp event with both buttons
 	Dispatch("OnClick", new EventArgs());
 
-	Dispatch("OnMouseRightUp", new MouseEventArgs(m_Mouse.get()));;
+	Dispatch("OnMouseRightUp", new MouseEventArgs(MouseButtons::Left, 1, 0, 0, 0));
 }
 
 void Window::OnMouseLeftDoubleClick_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-	Dispatch("OnMouseLeftDoubleClick", new MouseEventArgs(m_Mouse.get()));;
+	Dispatch("OnMouseLeftDoubleClick", new MouseEventArgs(MouseButtons::Left, 1, 0, 0, 0));
 }
 
 void Window::OnMouseRightDoubleClick_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-	Dispatch("OnMouseRightDoubleClick", new MouseEventArgs(m_Mouse.get()));;
+	Dispatch("OnMouseRightDoubleClick", new MouseEventArgs(MouseButtons::Left, 1, 0, 0, 0));
 }
 
 void Window::OnMouseWheel_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -595,7 +613,7 @@ void Window::OnMouseWheel_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 		}
 	}
 
-	Dispatch("OnMouseWheel", new MouseEventArgs(m_Mouse.get()));
+	Dispatch("OnMouseWheel", new MouseEventArgs(MouseButtons::Left, 1, 0, 0, 0));
 }
 
 int Window::OnNotify_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -727,7 +745,7 @@ void Window::OnSetCursor_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	if (const auto& c = GetByHandle((HWND)(wParam)))
 	{
 		// Dispatch both OnClick for common task and OnMouseClick which receives the cursor information
-		c->Dispatch("OnMouseMove", new MouseEventArgs(m_Mouse.get()));
+		c->Dispatch("OnMouseMove", new MouseEventArgs(MouseButtons::Left, 1, 0, 0, 0));
 	}
 }
 
@@ -735,7 +753,7 @@ void Window::OnShowWindow_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 {
 	if (wParam == TRUE)
 	{
-		Dispatch("OnShow", new EventArgs());
+		Dispatch("OnShown", new EventArgs());
 	}
 	else
 	{
@@ -745,7 +763,7 @@ void Window::OnShowWindow_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 
 LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-	OutputDebugString(Mapper(msg, wParam, lParam).c_str());
+	//OutputDebugString(Mapper(msg, wParam, lParam).c_str());
 
 	switch (msg)
 	{

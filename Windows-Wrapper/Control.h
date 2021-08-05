@@ -12,6 +12,7 @@
 #include "MouseEventArgs.h"
 #include "KeyPressEventArgs.h"
 #include "MessageMapper.h"
+#include "CancelEventArgs.h"
 
 #include <memory>
 #include <functional>
@@ -130,6 +131,8 @@ public:
 	void OnActivateSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
 	void OnClickSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
 	void OnDeactivateSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
+	void OnGotFocusSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
+	void OnLostFocusSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
 	void OnKeyDownSet(const std::function<void(Control* const c, KeyEventArgs* const e) >& callback) noexcept;
 	void OnKeyPressSet(const std::function<void(Control* const c, KeyPressEventArgs* const e) >& callback) noexcept;
 	void OnKeyUpSet(const std::function<void(Control* const c, KeyEventArgs* const e) >& callback) noexcept;
@@ -143,7 +146,7 @@ public:
 	void OnMouseRightDoubleClickSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept;
 	void OnMouseUpSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept;
 	void OnMouseWheelSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept;
-	void OnShowSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
+	void OnVisibleChangedSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
 
 	void SetForeColor(const Color& color) noexcept;
 	virtual void SetBackgroundColor(const Color& color) noexcept;

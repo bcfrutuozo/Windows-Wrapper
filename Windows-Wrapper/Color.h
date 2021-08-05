@@ -41,6 +41,11 @@ struct Color : public IEquatable<Color>
 		return XMFLOAT4(((rgba >> 0) & 0xFF) / 255.0f, ((rgba >> 8) & 0xFF) / 255.0f, ((rgba >> 16) & 0xFF) / 255.0f, ((rgba >> 24) & 0xFF) / 255.0f);
 	}
 
+	constexpr uint32_t ToRGB() const
+	{
+		return (rgba << 0 | rgba << 8 | rgba << 16);
+	}
+
 	constexpr operator XMFLOAT3() const { return ToFloat3(); }
 	constexpr operator XMFLOAT4() const { return ToFloat4(); }
 
@@ -72,5 +77,7 @@ struct Color : public IEquatable<Color>
 	static constexpr Color Ghost() { return Color(127, 127, 127, 127); }
 
 	// Windows defaul control color
+	static constexpr Color Border() { return Color(225, 225, 225, 255); }
+	static constexpr Color Control() { return Color(240, 240, 240, 255); }
 	static constexpr Color Default() { return Color(212, 208, 200, 255); }
 };
