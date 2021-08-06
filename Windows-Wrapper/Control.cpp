@@ -10,6 +10,42 @@
 unsigned int Control::m_CurrentIndex = 1;
 MessageMapper Control::Mapper = MessageMapper();
 
+HBRUSH Control::CreateGradientBrush(Color top, Color bottom, LPNMCUSTOMDRAW item)
+{
+	if (top == bottom)
+	{
+		return CreateSolidBrush(RGB(top.GetR(), top.GetG(), top.GetB()));
+	}
+
+	HBRUSH Brush;
+	HDC hdcmem = CreateCompatibleDC(item->hdc);
+	HBITMAP hbitmap = CreateCompatibleBitmap(item->hdc, item->rc.right - item->rc.left, item->rc.bottom - item->rc.top);
+	SelectObject(hdcmem, hbitmap);
+
+	int r1 = top.GetR(), r2 = bottom.GetR(), g1 = top.GetG(), g2 = bottom.GetG(), b1 = top.GetB(), b2 = bottom.GetB();
+	for (int i = 0; i < item->rc.bottom - item->rc.top; i++)
+	{
+		RECT temp;
+		int r, g, b;
+		r = int(r1 + double(i * (r2 - r1) / item->rc.bottom - item->rc.top));
+		g = int(g1 + double(i * (g2 - g1) / item->rc.bottom - item->rc.top));
+		b = int(b1 + double(i * (b2 - b1) / item->rc.bottom - item->rc.top));
+		Brush = CreateSolidBrush(RGB(r, g, b));
+		temp.left = 0;
+		temp.top = i;
+		temp.right = item->rc.right - item->rc.left;
+		temp.bottom = i + 1;
+		FillRect(hdcmem, &temp, Brush);
+		DeleteObject(Brush);
+	}
+	HBRUSH pattern = CreatePatternBrush(hbitmap);
+
+	DeleteDC(hdcmem);
+	DeleteObject(hbitmap);
+
+	return pattern;
+}
+
 Control::Control()
 	:
 	Control(nullptr, "")
@@ -113,6 +149,16 @@ Control* Control::GetByHandle(const IntPtr p) noexcept
 const unsigned int Control::GetId() const noexcept
 {
 	return m_Id;
+}
+
+void Control::SetMouseOverState(bool state) noexcept
+{
+	m_IsMouseOver = state;
+}
+
+void Control::SetClickingState(bool state) noexcept
+{
+	m_IsClicking = state;
 }
 
 void Control::OnActivateSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept
@@ -308,4 +354,14 @@ Window* Control::GetWindow() const noexcept
 	}
 
 	return nullptr;
+}
+
+bool Control::IsMouseOver() const noexcept
+{
+	return m_IsMouseOver;
+}
+
+bool Control::IsClicking() const noexcept
+{
+	return m_IsClicking;
 }

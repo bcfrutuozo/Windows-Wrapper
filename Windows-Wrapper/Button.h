@@ -4,39 +4,35 @@
 #include "IHidable.h"
 #include "IWinControl.h"
 
-class Button : public IWinControl<Button>, public IHidable, public IActivable
+class Button : public WinControl, public IHidable, public IActivable
 {
-	friend class IWinControl;
+	friend class WinControl;
 
 private:
 
-	bool IsMouseOver = false;
-	bool IsClicking = false;
-
-	// Member function responsible to handle the messages of each different type of control 
-	LRESULT WINAPI HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept override;
-
-public:
-
 	// Singleton manages registration/cleanup of window class
-	class BtnClass
+	class ButtonClass
 	{
 	private:
 
 		static constexpr const char* m_ClassName = "Button Class";
-		static BtnClass m_BtnClass;
+		static ButtonClass m_ButtonClass;
 		HINSTANCE m_Instance;
 
-		BtnClass() noexcept;
-		~BtnClass() noexcept;
-		BtnClass(const BtnClass&) = delete;
-		BtnClass& operator=(const BtnClass&) = delete;
+		ButtonClass() noexcept;
+		~ButtonClass() noexcept;
+		ButtonClass(const ButtonClass&) = delete;
+		ButtonClass& operator=(const ButtonClass&) = delete;
 
 	public:
 
 		static const char* GetName() noexcept;
 		static HINSTANCE GetInstance() noexcept;
 	};
+
+	void OnPaint_Impl(HWND hwnd) noexcept override;
+
+public:
 
 	class FlatButtonAppearance : public Base
 	{

@@ -1,13 +1,12 @@
 #pragma once
 
-#include "Control.h"
+#include "IWinControl.h"
 #include "Color.h"
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "MenuStrip.h"
 #include "Button.h"
 #include "TextBox.h"
-#include "IWinControl.h"
 #include "OnClosedEventArgs.h"
 #include "OnClosingEventArgs.h"
 
@@ -18,13 +17,33 @@
 
 class Menu;
 
-class Window : public IWinControl<Window>, public IHidable
+class Window : public WinControl, public IHidable
 {
 	friend class Button;
 	friend class Menu;
 	friend class IWinControl;
 
 private:
+
+	// Singleton manages registration/cleanup of window class
+	class WindowClass
+	{
+	private:
+
+		static constexpr const char* m_ClassName = "Window Class";
+		static WindowClass m_WindowClass;
+		HINSTANCE m_Instance;
+
+		WindowClass() noexcept;
+		~WindowClass() noexcept;
+		WindowClass(const WindowClass&) = delete;
+		WindowClass& operator=(const WindowClass&) = delete;
+
+	public:
+
+		static const char* GetName() noexcept;
+		static HINSTANCE GetInstance() noexcept;
+	};
 
 	bool m_IsCursorEnabled;
 	bool m_IsMenuStripEnabled;
@@ -37,60 +56,14 @@ private:
 	static void HideCursor() noexcept;
 	static void ShowCursor() noexcept;
 
-	// Member function for message handling 
-	LRESULT WINAPI HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept override;
-
 	// Events implementations
-	void OnActivate_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-	void OnSetCursor_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-	void OnCommand_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-	void OnClose_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-	void OnCreate_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-	void OnEraseBackground_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-	void OnDestroy_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-	void OnClosed_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-	void OnFocusEnter_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-	void OnFocusLeave_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-	void OnKeyDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-	void OnKeyPressed_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-	void OnKeyUp_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-	void OnMouseMove_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-	void OnMouseLeftDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-	void OnMouseLeftUp_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-	void OnMouseRightDown_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-	void OnMouseRightUp_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-	void OnMouseLeftDoubleClick_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-	void OnMouseRightDoubleClick_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-	void OnMouseWheel_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-	int OnNotify_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-	void OnRawInput_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-	void OnShowWindow_Impl(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+	void OnCommand_Impl(HWND hwnd, int id, HWND hwndCtl, unsigned int codeNotify) noexcept override;
 
 protected:
 
 	void Initialize() noexcept override;
 
 public:
-
-	// Singleton manages registration/cleanup of window class
-	class WndClass
-	{
-	private:
-
-		static constexpr const char* m_ClassName = "Window Class";
-		static WndClass m_WndClass;
-		HINSTANCE m_Instance;
-
-		WndClass() noexcept;
-		~WndClass() noexcept;
-		WndClass(const WndClass&) = delete;
-		WndClass& operator=(const WndClass&) = delete;
-
-	public:
-
-		static const char* GetName() noexcept;
-		static HINSTANCE GetInstance() noexcept;
-	};
 
 	Window(const std::string& name, int width, int height);
 	virtual ~Window();

@@ -13,6 +13,8 @@
 #include "KeyPressEventArgs.h"
 #include "MessageMapper.h"
 #include "CancelEventArgs.h"
+#include "OnClosedEventArgs.h"
+#include "OnClosingEventArgs.h"
 
 #include <memory>
 #include <functional>
@@ -28,8 +30,12 @@ class Control : public IHandle, public Base
 	friend class Window;
 	friend class Menu;
 	friend class MenuRadioItem;
+	friend class Button;
 
 private:
+
+	bool m_IsMouseOver = false;
+	bool m_IsClicking = false;
 
 	// Fields for callback bindings to WinAPI
 	unsigned int m_Id;
@@ -38,41 +44,7 @@ private:
 	// Used by some controls to trigger certain rules updates
 	virtual void OnInternalUpdate(Control* const sender, EventArgs* const args) {};
 
-	HBRUSH CreateGradientBrush(Color top, Color bottom, LPNMCUSTOMDRAW item)
-	{	
-		if (top == bottom)
-		{
-			return CreateSolidBrush(RGB(top.GetR(), top.GetG(), top.GetB()));
-		}
-
-		HBRUSH Brush;
-		HDC hdcmem = CreateCompatibleDC(item->hdc);
-		HBITMAP hbitmap = CreateCompatibleBitmap(item->hdc, item->rc.right - item->rc.left, item->rc.bottom - item->rc.top);
-		SelectObject(hdcmem, hbitmap);
-
-		int r1 = top.GetR(), r2 = bottom.GetR(), g1 = top.GetG(), g2 = bottom.GetG(), b1 = top.GetB(), b2 = bottom.GetB();
-		for (int i = 0; i < item->rc.bottom - item->rc.top; i++)
-		{
-			RECT temp;
-			int r, g, b;
-			r = int(r1 + double(i * (r2 - r1) / item->rc.bottom - item->rc.top));
-			g = int(g1 + double(i * (g2 - g1) / item->rc.bottom - item->rc.top));
-			b = int(b1 + double(i * (b2 - b1) / item->rc.bottom - item->rc.top));
-			Brush = CreateSolidBrush(RGB(r, g, b));
-			temp.left = 0;
-			temp.top = i;
-			temp.right = item->rc.right - item->rc.left;
-			temp.bottom = i + 1;
-			FillRect(hdcmem, &temp, Brush);
-			DeleteObject(Brush);
-		}
-		HBRUSH pattern = CreatePatternBrush(hbitmap);
-
-		DeleteDC(hdcmem);
-		DeleteObject(hbitmap);
-
-		return pattern;
-	}
+	static HBRUSH CreateGradientBrush(Color top, Color bottom, LPNMCUSTOMDRAW item);
 
 protected:
 
@@ -112,6 +84,8 @@ protected:
 	Control* GetById(unsigned int id) noexcept;
 	Control* GetByHandle(const IntPtr p) noexcept;
 	const unsigned int GetId() const noexcept;
+	void SetMouseOverState(bool state) noexcept;
+	void SetClickingState(bool state) noexcept;
 
 public:
 
@@ -152,6 +126,8 @@ public:
 	virtual void SetBackgroundColor(const Color& color) noexcept;
 	const std::string& GetText() const noexcept;
 	Window* GetWindow() const noexcept;
+	bool IsMouseOver() const noexcept;
+	bool IsClicking() const noexcept;
 
 	// Control Exception
 	class ControlException : public Exception

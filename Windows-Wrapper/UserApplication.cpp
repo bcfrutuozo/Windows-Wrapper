@@ -65,7 +65,7 @@ void TestKeyPress(Control* const c, KeyEventArgs* e)
 	Button& b2 = window->AddButton("XYZ", 100, 40, 200, 200);
 	b2.OnClickSet(&TesteBotaoClick);
 
-	//TextBox& t = window->AddTextBox("TextBox", 400, 30, 20, 400);
+	TextBox& t = window->AddTextBox("TextBox", 400, 30, 20, 400);
 }
 
 
