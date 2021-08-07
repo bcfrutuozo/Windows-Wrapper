@@ -2,7 +2,7 @@
 
 Application::Application()
 	:
-	m_Window(std::make_unique<Window>("Application", 1920, 1080))
+	m_Window(std::make_unique<Window>("Application", 1024, 1000))
 {
 
 }

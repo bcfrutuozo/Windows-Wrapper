@@ -108,7 +108,7 @@ void Button::Initialize() noexcept
 	Handle = CreateWindow(
 		ButtonClass::GetName(),																				// Class name
 		Text.c_str(),																						// Window title
-		WS_CHILD | WS_VISIBLE,																				// Style values
+		WS_CHILD | WS_VISIBLE | WS_TABSTOP,																	// Style values
 		Location.X,																							// X position
 		Location.Y,																							// Y position
 		Size.Width,																							// Width

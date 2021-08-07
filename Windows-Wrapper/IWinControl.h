@@ -2,8 +2,14 @@
 
 #include "Control.h"
 
+#include <functional>
+
 class WinControl : public Control
 {
+	friend class Window;
+	friend class Button;
+	friend class TextBox;
+
 private:
 
 	// Global events implementations
@@ -19,9 +25,9 @@ private:
 
 			1 = WA_ACTIVE: Activated by some method other than a mouse click (for example, by a call to the
 			SetActiveWindow function or by use of the keyboard interface to select the window).
-			
+
 			2 = WA_CLICKACTIVE: Activated by a mouse click.
-			
+
 			0 = WA_INACTIVE: Deactivated.
 
 		A handle to the window being activated or deactivated, depending on the value of the wParam]
@@ -49,37 +55,37 @@ private:
 	{
 		bool cancel = false;
 		Dispatch("OnClosing", new OnClosingEventArgs(CloseReason::UserClosing, cancel));
-	
+
 		// If cancel is false and doesn't have Parent Control, means that it's the main window
 		// and application must post quit
 		if (!cancel && Parent == nullptr)
 		{
 			PostQuitMessage(0);
 		}
-	
+
 		return 0;
 	}
-	
+
 	virtual void OnClosed_Impl(HWND hwnd) noexcept
 	{
 		Dispatch("OnClosed", new OnClosedEventArgs(CloseReason::UserClosing));
 	}
-	
+
 	virtual HBRUSH OnColorControl_Impl(HWND hwnd, HDC hdc, HWND hwndChild, int type)
 	{
 		return CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
 	}
-	
+
 	virtual void OnCreate_Impl(HWND hwnd, LPCREATESTRUCT lpCreateStruct) noexcept
 	{
 		Dispatch("OnCreate", new EventArgs());
 	}
-	
+
 	virtual void OnEnable_Impl(HWND hwnd, bool fEnable)
 	{
-	
+
 	}
-	
+
 	virtual int OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept
 	{
 		// 0 always redraw
@@ -87,7 +93,7 @@ private:
 
 		return 0;
 	}
-	
+
 	virtual void OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept
 	{
 		/**************************************************************************************************/
@@ -95,31 +101,31 @@ private:
 			When you change the focus by using the keyboard(TAB, SHIFT + TAB, and so on), by calling the
 			Select or SelectNextControl methods, or by setting the ContainerControl.ActiveControl property
 			to the current form, focus events occur in the following order:
-	
+
 				Enter
 				GotFocus
 				Leave
 				Validating
 				Validated
 				LostFocus
-	
+
 			When you change the focus by using the mouse or by calling the Focus method, focus events occur
 			in the following order:
-	
+
 				Enter
 				GotFocus
 				LostFocus
 				Leave
 				Validating
 				Validated
-	
+
 			If the CausesValidation property is set to false, the Validatingand Validated events are
 			suppressed.
 		/**************************************************************************************************/
-	
+
 		Dispatch("OnGotFocus", new EventArgs());
 	}
-	
+
 	virtual void OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept
 	{
 		Dispatch("OnLostFocus", new EventArgs());
@@ -129,27 +135,27 @@ private:
 	{
 		return 0;
 	}
-	
+
 	virtual void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept
 	{
 		Dispatch("OnKeyDown", new KeyEventArgs(static_cast<Keys>(vk)));
 	}
-	
+
 	virtual void OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat) noexcept
 	{
 		Dispatch("OnKeyPress", new KeyPressEventArgs(c));
 	}
-	
+
 	virtual void OnKeyUp_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept
 	{
 		Dispatch("OnKeyUp", new KeyEventArgs(static_cast<Keys>(vk)));
 	}
-	
+
 	virtual void OnMove_Impl(HWND hwnd, int x, int y) noexcept
 	{
-	
+
 	}
-	
+
 	virtual void OnMouseLeave_Impl(HWND hwnd) noexcept
 	{
 		SetClickingState(false);
@@ -157,7 +163,7 @@ private:
 		InvalidateRect(hwnd, nullptr, TRUE);
 		Dispatch("OnMouseLeave", new EventArgs());
 	}
-	
+
 	virtual void OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
 	{
 		/**************************************************************************************************/
@@ -167,20 +173,20 @@ private:
 		If the return value is assigned to a variable, you can use the MAKEPOINTS macro to obtain a POINTS
 		structure from the return value.
 		You can also use the GET_X_LPARAM or GET_Y_LPARAM macro to extract the x - or y - coordinate.
-	
+
 		Important
-	
+
 		Do not use the LOWORD or HIWORD macros to extract the x - and y - coordinates of the cursor position
 		because these macros return incorrect results on systems with multiple monitors.
 		Systems with multiple monitors can have negative x - and y - coordinates, and LOWORDand HIWORD treat
 		the coordinates as unsigned quantities.
 		/**************************************************************************************************/
-	
+
 		if (!IsMouseOver())
 		{
 			Dispatch("OnMouseEnter", new EventArgs());
 		}
-	
+
 		TRACKMOUSEEVENT tme;
 		tme.cbSize = sizeof(TRACKMOUSEEVENT); //Monitor mouse to leave
 		tme.dwFlags = TME_LEAVE;
@@ -190,10 +196,10 @@ private:
 			SetMouseOverState(true);
 			InvalidateRect(hwnd, nullptr, TRUE);
 		}
-	
+
 		Dispatch("OnMouseMove", new MouseEventArgs(MouseButtons::None, 0, 0, x, y));
 	}
-	
+
 	virtual void OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
 	{
 		SetMouseOverState(true);
@@ -201,7 +207,7 @@ private:
 		InvalidateRect(hwnd, nullptr, TRUE);
 		Dispatch("OnMouseDown", new MouseEventArgs(MouseButtons::Left, 1, 0, x, y));
 	}
-	
+
 	virtual void OnMouseLeftUp_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
 	{
 		SetClickingState(false);
@@ -211,28 +217,28 @@ private:
 		Dispatch("OnMouseClick", new MouseEventArgs(MouseButtons::Left, 1, 0, x, y));
 		Dispatch("OnMouseUp", new MouseEventArgs(MouseButtons::Left, 1, 0, x, y));
 	}
-	
+
 	virtual void OnMouseRightDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
 	{
 		Dispatch("OnMouseDown", new MouseEventArgs(MouseButtons::Right, 1, 0, x, y));
 	}
-	
+
 	virtual void OnMouseRightUp_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
 	{
 		Dispatch("OnMouseUp", new MouseEventArgs(MouseButtons::Right, 1, 0, x, y));
 	}
-	
+
 	virtual void OnMouseLeftDoubleClick_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
 	{
 		Dispatch("OnDoubleClick", new EventArgs());
 		Dispatch("OnMouseDoubleClick", new MouseEventArgs(MouseButtons::Left, 2, 0, x, y));
 	}
-	
+
 	virtual void OnMouseRightDoubleClick_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
 	{
 		Dispatch("OnMouseDoubleClick", new MouseEventArgs(MouseButtons::Right, 2, 0, x, y));
 	}
-	
+
 	virtual void OnMouseWheel_Impl(HWND hwnd, int x, int y, int delta, unsigned int fwKeys) noexcept
 	{
 		switch (fwKeys)
@@ -245,12 +251,12 @@ private:
 		default: Dispatch("OnMouseWheel", new MouseEventArgs(MouseButtons::None, 0, delta, x, y)); break;
 		}
 	}
-	
+
 	virtual int OnNotify_Impl(HWND hwnd, int xPos, int yPos, int zDelta, unsigned int fwKeys) noexcept
 	{
 		return 1;
 	}
-	
+
 	virtual void OnPaint_Impl(HWND hwnd) noexcept
 	{
 		PAINTSTRUCT ps;
@@ -263,22 +269,22 @@ private:
 		FillRect(hdc, &ps.rcPaint, CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB())));
 		EndPaint(hwnd, &ps);
 	}
-	
+
 	virtual void OnRawInput_Impl(HWND hWnd, unsigned int inputCode, HRAWINPUT hRawInput) noexcept
 	{
-	
+
 	}
-	
+
 	virtual int OnSetCursor_Impl(HWND hwnd, HWND hwndCursor, unsigned int codeHitTest, unsigned int msg) noexcept
 	{
 		return 0;
 	}
-	
+
 	virtual void OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy) noexcept
 	{
-	
+
 	}
-	
+
 	virtual void OnShowWindow_Impl(HWND hwnd, bool fShow, unsigned int status) noexcept
 	{
 		if (fShow)
@@ -289,7 +295,7 @@ private:
 		{
 			Dispatch("OnHide");
 		}
-	
+
 		Dispatch("OnVisibleChanged", new EventArgs());
 	}
 
@@ -383,7 +389,7 @@ protected:
 			OnActivate_Impl(hWnd, static_cast<unsigned int>(LOWORD(wParam)), (HWND)(lParam), static_cast<bool> (HIWORD(wParam)));
 			break;
 		}
-		
+
 		/******************** KEYBOARD MESSAGES *********************/
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:	// Syskey commands need to be handled to track ALT key (VK_MENU)
@@ -403,7 +409,7 @@ protected:
 			break;
 		}
 		/******************* END KEYBOARD MESSAGES ******************/
-		
+
 		case WM_GETDLGCODE:
 		{
 			return OnGetDLGCode(hWnd, (LPMSG)(lParam));
@@ -466,7 +472,7 @@ protected:
 			break;
 		}
 		/******************** END MOUSE MESSAGES ********************/
-		
+
 		/******************** RAW MOUSE MESSAGES ********************/
 		case WM_INPUT:
 		{
