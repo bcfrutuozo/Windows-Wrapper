@@ -53,7 +53,7 @@ void TextBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 	/* This is the most important function of the TextBox class. It's responsible to manage the user
 	input between the cursor and selection. By doing it so, it manages all navigation inside the TextBox
 	while handles and stores the indices for common delete operations, using Backspace and Delete keys.
-	
+
 	To understand how selection and cursor index works:
 
 		OnEnter
@@ -117,7 +117,7 @@ void TextBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 			OpenClipboard(NULL);
 			HANDLE h = GetClipboardData(CF_TEXT);
 
-			InputDelete(hwnd, DeleteInputType::Delete);
+			InputDelete(hwnd, DeleteInputType::Paste);
 
 			// Paste data from clipboard
 			std::ostringstream cb;
@@ -125,7 +125,10 @@ void TextBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 
 			if (cb)
 			{
-				Text.append(cb.str());
+				Text.insert(m_CursorIndex, cb.str());
+
+				m_CursorIndex += cb.str().length();
+				m_SelectIndex = m_CursorIndex;
 			}
 
 			GlobalUnlock(h);
@@ -177,10 +180,17 @@ void TextBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 		if (m_CursorIndex >= MAXINPUTBUF || m_CursorIndex == Text.length())
 			break;
 
-		m_CursorIndex++;
+		if ((GetKeyState(VK_CONTROL) & 0x8000))
+		{
+			m_SelectIndex = m_CursorIndex = Text.length();
+		}
+		else
+		{
+			m_CursorIndex++;
 
-		if (!(GetKeyState(VK_SHIFT) & 0x8000))
-			m_SelectIndex = m_CursorIndex;
+			if (!(GetKeyState(VK_SHIFT) & 0x8000))
+				m_SelectIndex = m_CursorIndex;
+		}
 
 		InputRedraw(hwnd);
 
@@ -219,10 +229,17 @@ void TextBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 		if (m_CursorIndex == 0)
 			break;
 
-		m_CursorIndex--;
+		if ((GetKeyState(VK_CONTROL) & 0x8000))
+		{
+			m_SelectIndex = m_CursorIndex = 0;
+		}
+		else
+		{
+			m_CursorIndex--;
 
-		if (!(GetKeyState(VK_SHIFT) & 0x8000))
-			m_SelectIndex = m_CursorIndex;
+			if (!(GetKeyState(VK_SHIFT) & 0x8000))
+				m_SelectIndex = m_CursorIndex;
+		}
 
 		InputRedraw(hwnd);
 
@@ -268,6 +285,13 @@ void TextBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 	}
 	case VK_BACK:	// Gives the TextBox the feature to remove backward keys by pressing Backspace
 	{
+		// If CTRL+Backspace is pressed, clear the whole TextBox
+		if (0x8000 & GetKeyState(VK_CONTROL))
+		{
+			m_SelectIndex = 0;
+			m_CursorIndex = Text.length();
+		}
+
 		InputDelete(hwnd, DeleteInputType::Backspace);
 		InputRedraw(hwnd);
 #if _DEBUG
@@ -286,7 +310,7 @@ void TextBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 
 void TextBox::OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat) noexcept
 {
-	if (c < VK_SPACE)
+	if (c < VK_SPACE || c > VK_DIVIDE)
 		return;
 
 	if (Text.length() + 1 < MAXINPUTBUF)
@@ -315,14 +339,17 @@ void TextBox::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlag
 
 void TextBox::OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept
 {
+	// Set the cursor at the end when entering the control
+	m_CursorIndex = Text.length();
+
 	RECT r;
 	GetClientRect(hwnd, &r);
 	// Create a solid black caret. 
-	CreateCaret(hwnd, (HBITMAP)NULL, 2, r.bottom - r.top);
+	CreateCaret(hwnd, (HBITMAP)NULL, 2, Font.Size);
 
 	ShowCaret(hwnd);
 	InputRedraw(hwnd);
-	InvalidateRect(hwnd, nullptr, TRUE);
+	InvalidateRect(hwnd, nullptr, true);
 
 #ifdef _DEBUG
 	std::ostringstream oss;
@@ -338,7 +365,7 @@ void TextBox::OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept
 	SetFocus(hwndNewFocus);
 	HideCaret(hwnd);
 	DestroyCaret();
-	InvalidateRect(hwndNewFocus, nullptr, TRUE);
+	InvalidateRect(hwndNewFocus, nullptr, true);
 
 #ifdef _DEBUG
 	std::ostringstream oss;
@@ -439,6 +466,11 @@ void TextBox::InputDelete(HWND hWnd, DeleteInputType deleteType) noexcept
 	}
 	case DeleteInputType::Paste:
 	{
+		if (m_SelectIndex == m_CursorIndex)
+		{
+			return;
+		}
+
 		if (m_SelectIndex < m_CursorIndex)
 		{
 			Text.erase(m_SelectIndex, GetSelectionLenght());
@@ -473,6 +505,10 @@ void TextBox::InputDraw(HWND hWnd, HDC hdc) noexcept
 
 	HPEN pen;
 	RECT r, cr;
+
+	HFONT hFont = CreateFont(Font.Size, 0, 0, 0, Font.IsBold ? FW_BOLD : FW_NORMAL, Font.IsItalic, Font.IsUnderline, Font.IsStrikeout, ANSI_CHARSET,
+		OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+		DEFAULT_PITCH | FF_DONTCARE, Font.Name.c_str());
 
 	GetClientRect(hWnd, &cr);
 
@@ -514,9 +550,9 @@ void TextBox::InputDraw(HWND hWnd, HDC hdc) noexcept
 		break;
 	}
 	case BorderStyle::Fixed3D:
-	{ 
+	{
 		pen = CreatePen(PS_INSIDEFRAME, 1, RGB(122, 122, 122));
-		
+
 		HGDIOBJ old_pen = SelectObject(hdc, pen);
 		HGDIOBJ old_inner;
 
@@ -552,6 +588,7 @@ void TextBox::InputDraw(HWND hWnd, HDC hdc) noexcept
 
 	SetBkMode(hdc, TRANSPARENT);
 	CopyRect(&r, &cr);
+	SelectObject(hdc, hFont);
 	DrawText(hdc, Text.c_str(), -1, &r, DT_LEFT | DT_TOP);
 
 	if (m_CursorIndex)
@@ -566,6 +603,8 @@ void TextBox::InputDraw(HWND hWnd, HDC hdc) noexcept
 		else
 			SetCaretPos(r.right, cr.top);
 	}
+
+	DeleteObject(hFont);
 }
 
 TextBox::TextBox(Control* parent, int width, int height, int x, int y)

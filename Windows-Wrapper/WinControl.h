@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Control.h"
+#include "Font.h"
 
 #include <functional>
 
@@ -76,6 +77,8 @@ protected:
 	WinControl* GetNextControl() noexcept;
 
 public:
+
+	Font Font;
 
 	int GetTabIndex() const noexcept;
 	void SetTabIndex(const unsigned int& index) noexcept;

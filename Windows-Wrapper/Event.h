@@ -2,10 +2,8 @@
 
 #include "Base.h"
 
-#include <string>
 #include <functional>
 #include <map>
-#include <memory>
 
 class IEvent
 {

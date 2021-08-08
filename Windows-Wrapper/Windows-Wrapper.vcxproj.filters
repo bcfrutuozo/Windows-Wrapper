@@ -58,6 +58,7 @@
     <ClCompile Include="TextBox.cpp" />
     <ClCompile Include="WinControl.cpp" />
     <ClCompile Include="Padding.cpp" />
+    <ClCompile Include="Font.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RealTimeApplication.h" />
@@ -176,6 +177,7 @@
     <ClInclude Include="Keys.h" />
     <ClInclude Include="MouseButtons.h" />
     <ClInclude Include="Padding.h" />
+    <ClInclude Include="Font.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interfaces">
@@ -187,5 +189,8 @@
     <Filter Include="Events">
       <UniqueIdentifier>{68a18714-2cd9-4c42-ab2d-ea88c215dbd4}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
 </Project>

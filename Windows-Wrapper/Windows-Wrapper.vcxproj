@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Font.cpp" />
     <ClCompile Include="MessageMapper.cpp" />
     <ClCompile Include="Padding.cpp" />
     <ClCompile Include="RealTimeApplication.cpp" />
@@ -186,6 +187,7 @@
   <ItemGroup>
     <ClInclude Include="CancelEventArgs.h" />
     <ClInclude Include="CancelEventHandler.h" />
+    <ClInclude Include="Font.h" />
     <ClInclude Include="Keys.h" />
     <ClInclude Include="MessageMapper.h" />
     <ClInclude Include="MouseButtons.h" />
@@ -242,6 +244,9 @@
     <ClInclude Include="UserApplication.h" />
     <ClInclude Include="uuid.h" />
     <ClInclude Include="Window.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

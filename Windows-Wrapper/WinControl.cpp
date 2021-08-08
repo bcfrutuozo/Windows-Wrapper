@@ -329,6 +329,12 @@ void WinControl::OnPaint_Impl(HWND hwnd) noexcept
 	// to let the user customize the control.
 	//Dispatch("OnPaint", new PaintEventArgs());
 
+	HFONT hFont = CreateFont(Font.Size, 0, 0, 0, Font.IsBold ? FW_BOLD: FW_NORMAL, Font.IsItalic, Font.IsUnderline, Font.IsStrikeout, ANSI_CHARSET,
+		OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+		DEFAULT_PITCH | FF_DONTCARE, Font.Name.c_str());
+	
+	SendMessage(hwnd, WM_SETFONT, (WPARAM)hFont, TRUE);
+
 	FillRect(hdc, &ps.rcPaint, CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB())));
 	EndPaint(hwnd, &ps);
 }
@@ -389,7 +395,8 @@ WinControl::WinControl(Control* parent, const std::string& text, int width, int 
 	:
 	Control(parent, text, width, height, x, y),
 	m_TabIndex(m_IncrementalTabIndex++),
-	m_IsTabSelected(false)
+	m_IsTabSelected(false),
+	Font("Segoe", 9.0f, false, false, false, false)		// Default application font for controls
 {
 
 }

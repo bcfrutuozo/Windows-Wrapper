@@ -1,7 +1,6 @@
 #pragma once
 
 #include "EventArgs.h"
-#include "Mouse.h"
 #include "Enums.h"
 
 class OnClosedEventArgs : public EventArgs

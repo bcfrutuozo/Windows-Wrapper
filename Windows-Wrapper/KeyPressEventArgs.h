@@ -1,7 +1,6 @@
 #pragma once
 
 #include "EventArgs.h"
-#include "Keyboard.h"
 
 class KeyPressEventArgs : public EventArgs
 {

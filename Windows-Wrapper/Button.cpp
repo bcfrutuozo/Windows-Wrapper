@@ -145,7 +145,12 @@ void Button::OnPaint_Impl(HWND hwnd) noexcept
 
 	SetBkMode(hdc, TRANSPARENT);
 	SetTextColor(hdc, m_ForeColor.ToRGB());
+	HFONT hFont = CreateFont(Font.Size, 0, 0, 0, Font.IsBold ? FW_BOLD : FW_NORMAL, Font.IsItalic, Font.IsUnderline, Font.IsStrikeout, ANSI_CHARSET,
+		OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+		DEFAULT_PITCH | FF_DONTCARE, Font.Name.c_str());
+	SelectObject(hdc, hFont);
 	DrawText(hdc, GetText().c_str(), -1, &rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	DeleteObject(hFont);
 
 	EndPaint(hwnd, &ps);
 	// NEED TO IMPLEMENT A LARGE GRAPHICS CLASS TO HANDLE EVENTARGS TO THE USER.
