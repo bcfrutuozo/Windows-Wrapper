@@ -10,7 +10,7 @@
 unsigned int Control::m_CurrentIndex = 1;
 MessageMapper Control::Mapper = MessageMapper();
 
-HBRUSH Control::CreateGradientBrush(Color top, Color bottom, LPNMCUSTOMDRAW item)
+HBRUSH Control::CreateGradientBrush(Color top, Color bottom, LPNMCUSTOMDRAW item) noexcept
 {
 	if (top == bottom)
 	{
@@ -46,46 +46,48 @@ HBRUSH Control::CreateGradientBrush(Color top, Color bottom, LPNMCUSTOMDRAW item
 	return pattern;
 }
 
-Control::Control()
+Control::Control() noexcept
 	:
 	Control(nullptr, "")
 {
 
 }
 
-Control::Control(Control* parent, const std::string& text)
+Control::Control(Control* parent, const std::string& text) noexcept
 	:
 	Control(parent, text, 0, 0, 0, 0)
 {
 
 }
 
-Control::Control(Control* parent, const std::string& text, int width, int height, int x, int y)
+Control::Control(Control* parent, const std::string& text, int width, int height, int x, int y) noexcept
 	:
 	Parent(parent),
 	Text(text),
 	Size(width, height),
 	Location(x, y),
-	m_Id(m_CurrentIndex++)
+	m_Id(m_CurrentIndex++),
+	Padding(0),
+	Margin(0)
 {
 
 }
 
-Control::Control(const std::string& text)
+Control::Control(const std::string& text) noexcept
 	:
 	Control(nullptr, text, 0, 0, 0, 0)
 {
 
 }
 
-Control::Control(const std::string& text, int width, int height, int x, int y)
+Control::Control(const std::string& text, int width, int height, int x, int y) noexcept
 	:
 	Control(nullptr, text, width, height, x, y)
 {
 
 }
 
-Control::~Control()
+Control::~Control() noexcept
 {
 	DeleteObject(m_Brush);
 }
@@ -143,7 +145,6 @@ Control* Control::GetByHandle(const IntPtr p) noexcept
 
 	// Returning nullptr is extremely important, otherwise it will be a trash pointer and will launch an exception trying to process it
 	return nullptr;
-
 }
 
 const unsigned int Control::GetId() const noexcept
@@ -338,7 +339,7 @@ const std::string& Control::HRException::GetErrorDescription() const noexcept
 	return ControlException::TranslateErrorCode(hr);
 }
 
-Window* Control::GetWindow() const noexcept
+Window* Control::GetWindow() noexcept
 {
 	if (Parent != nullptr)
 	{
@@ -351,6 +352,11 @@ Window* Control::GetWindow() const noexcept
 		{
 			return c->GetWindow();
 		}
+	}
+	else	// If the current control is already the window
+	{
+		if (GetType() == typeid(Window))
+			return dynamic_cast<Window*>(this);
 	}
 
 	return nullptr;

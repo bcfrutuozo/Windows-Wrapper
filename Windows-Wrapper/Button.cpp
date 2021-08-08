@@ -41,6 +41,7 @@ void Button::OnPaint_Impl(HWND hwnd) noexcept
 {
 	PAINTSTRUCT ps;
 	HDC hdc = BeginPaint(hwnd, &ps);
+	SetBkMode(hdc, OPAQUE);
 	RECT rc;
 	GetClientRect(hwnd, &rc);
 

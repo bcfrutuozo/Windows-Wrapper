@@ -2,7 +2,7 @@
 
 #include "IActivable.h"
 #include "IHidable.h"
-#include "IWinControl.h"
+#include "WinControl.h"
 
 class Button : public WinControl, public IHidable, public IActivable
 {

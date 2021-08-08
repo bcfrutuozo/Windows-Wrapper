@@ -148,6 +148,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="MessageMapper.cpp" />
+    <ClCompile Include="Padding.cpp" />
     <ClCompile Include="RealTimeApplication.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="Base.cpp" />
@@ -178,6 +179,7 @@
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Type.cpp" />
     <ClCompile Include="UserApplication.cpp" />
+    <ClCompile Include="WinControl.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
@@ -187,6 +189,7 @@
     <ClInclude Include="Keys.h" />
     <ClInclude Include="MessageMapper.h" />
     <ClInclude Include="MouseButtons.h" />
+    <ClInclude Include="Padding.h" />
     <ClInclude Include="RealTimeApplication.h" />
     <ClInclude Include="Base.h" />
     <ClInclude Include="Button.h" />
@@ -207,7 +210,7 @@
     <ClInclude Include="IHandle.h" />
     <ClInclude Include="IHidable.h" />
     <ClInclude Include="IntPtr.h" />
-    <ClInclude Include="IWinControl.h" />
+    <ClInclude Include="WinControl.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="KeyEventArgs.h" />
     <ClInclude Include="KeyEventHandler.h" />

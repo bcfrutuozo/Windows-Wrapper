@@ -30,42 +30,49 @@ void TesteBotaoClick(Control* const c, EventArgs* const e)
 
 void TestKeyPress(Control* const c, KeyEventArgs* e)
 {
-	auto window = dynamic_cast<Window*>(c);
+	if (e->KeyData == Keys::Y)
+	{
+		auto window = dynamic_cast<Window*>(c);
 
-	auto& mb = window->GetMenuStrip();
-	auto& item1 = mb.AddItem("Arquivo");
-	auto& item2 = mb.AddItem("Arquivo2");
-	auto& menu1 = mb.AddMenu("Submenu");
-	menu1.AddItem("Submenu-Item1");
-	menu1.AddCheckItem("Check-test01", true);
-	menu1.AddCheckItem("Check-test02", false);
-	menu1.AddSeparator();
-	menu1.AddItemWithIcon("Submenu-Item2", "images\\1.bmp");
-	menu1.AddSeparator();
-	auto& menu2 = menu1.AddMenu("Submenu-Item3");
-	menu2.AddItemWithIcon("Submenu2-Item1", "images\\2.bmp");
-	menu2.AddSeparator();
-	menu2.AddRadioItem("Radio1", true).Disable();
-	menu2.AddRadioItem("Radio2", true);
-	menu2.AddRadioItem("Radio3", false);
-	menu2.AddRadioItem("Radio4", true);
-	menu2.AddSeparator();
-	menu2.AddRadioItem("Radio1", false);
-	menu2.AddRadioItem("Radio2", true);
-	menu1.AddItem("Submenu-Item4");
-	menu1.AddItem("Submenu-Item5").OnMouseEnterSet(&TesteBotaoEnter);
-	window->UpdateMenuStrip();
-	window->SetBackgroundColor(Color(128, 128, 128));
+		auto& mb = window->GetMenuStrip();
+		auto& item1 = mb.AddItem("Arquivo");
+		auto& item2 = mb.AddItem("Arquivo2");
+		auto& menu1 = mb.AddMenu("Submenu");
+		menu1.AddItem("Submenu-Item1");
+		menu1.AddCheckItem("Check-test01", true);
+		menu1.AddCheckItem("Check-test02", false);
+		menu1.AddSeparator();
+		menu1.AddItemWithIcon("Submenu-Item2", "images\\1.bmp");
+		menu1.AddSeparator();
+		auto& menu2 = menu1.AddMenu("Submenu-Item3");
+		menu2.AddItemWithIcon("Submenu2-Item1", "images\\2.bmp");
+		menu2.AddSeparator();
+		menu2.AddRadioItem("Radio1", true).Disable();
+		menu2.AddRadioItem("Radio2", true);
+		menu2.AddRadioItem("Radio3", false);
+		menu2.AddRadioItem("Radio4", true);
+		menu2.AddSeparator();
+		menu2.AddRadioItem("Radio1", false);
+		menu2.AddRadioItem("Radio2", true);
+		menu1.AddItem("Submenu-Item4");
+		menu1.AddItem("Submenu-Item5").OnMouseEnterSet(&TesteBotaoEnter);
+		window->UpdateMenuStrip();
+		window->SetBackgroundColor(Color(128, 128, 128));
 
-	Button& b = window->AddButton("Abc", 200, 80, 50, 100);
-	b.OnClickSet(&TesteBotaoClick);
-	b.OnMouseEnterSet(&TesteBotaoEnter);
-	b.OnMouseLeaveSet(&TesteBotaoLeave);
+		Button& b = window->AddButton("Abc", 200, 80, 50, 100);
+		b.OnClickSet(&TesteBotaoClick);
+		b.OnMouseEnterSet(&TesteBotaoEnter);
+		b.OnMouseLeaveSet(&TesteBotaoLeave);
 
-	Button& b2 = window->AddButton("XYZ", 100, 40, 200, 200);
-	b2.OnClickSet(&TesteBotaoClick);
+		Button& b2 = window->AddButton("XYZ", 100, 40, 200, 200);
+		b2.OnClickSet(&TesteBotaoClick);
 
-	TextBox& t = window->AddTextBox("TextBox", 400, 30, 20, 400);
+		TextBox& t = window->AddTextBox("TextBox", 400, 30, 20, 400);
+		t.SetBackgroundColor(Color(0, 255, 255));
+
+		TextBox& t2 = window->AddTextBox("TextBox2", 400, 30, 20, 460);
+		t2.SetBackgroundColor(Color(0, 0, 255));
+	}
 }
 
 

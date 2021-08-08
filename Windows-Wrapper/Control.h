@@ -6,6 +6,7 @@
 #include "Exception.h"
 #include "IHandle.h"
 #include "Size.h"
+#include "Padding.h"
 #include "Event.h"
 #include "EventHandler.h"
 #include "KeyEventArgs.h"
@@ -43,8 +44,7 @@ private:
 
 	// Used by some controls to trigger certain rules updates
 	virtual void OnInternalUpdate(Control* const sender, EventArgs* const args) {};
-
-	static HBRUSH CreateGradientBrush(Color top, Color bottom, LPNMCUSTOMDRAW item);
+	static HBRUSH CreateGradientBrush(Color top, Color bottom, LPNMCUSTOMDRAW item) noexcept;
 
 protected:
 
@@ -58,6 +58,8 @@ protected:
 	Color m_BackgroundColor = Color::Default();
 	static MessageMapper Mapper;
 	HBRUSH m_Brush;
+	Padding Margin;
+	Padding Padding;
 
 	// Forces the implementation and call on individual childs because each WinApi control
 	// has it own creation method.
@@ -89,11 +91,11 @@ protected:
 
 public:
 
-	Control();
-	Control(Control* parent, const std::string& text);
-	Control(Control* parent, const std::string& text, int width, int height, int x, int y);
-	Control(const std::string& text);
-	Control(const std::string& text, int width, int height, int x, int y);
+	Control() noexcept;
+	Control(Control* parent, const std::string& text) noexcept;
+	Control(Control* parent, const std::string& text, int width, int height, int x, int y) noexcept;
+	Control(const std::string& text) noexcept;
+	Control(const std::string& text, int width, int height, int x, int y) noexcept;
 	Control(const Control&) = default;														// Copy constructor
 	Control(Control&&) = default;															// Move constructor
 	Control& operator=(const Control&) = default;											// Copy assignment constructor
@@ -125,7 +127,7 @@ public:
 	void SetForeColor(const Color& color) noexcept;
 	virtual void SetBackgroundColor(const Color& color) noexcept;
 	const std::string& GetText() const noexcept;
-	Window* GetWindow() const noexcept;
+	Window* GetWindow() noexcept;
 	bool IsMouseOver() const noexcept;
 	bool IsClicking() const noexcept;
 

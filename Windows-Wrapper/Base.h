@@ -13,7 +13,7 @@ private:
 
 public:
 
-	Base();
+	Base() noexcept;
 	Base(const Base&) = default;			// Copy constructor
 	Base(Base&&) = default;					// Move constructor
 	Base& operator=(const Base&) = default;	// Copy assignment constructor

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "IWinControl.h"
+#include "WinControl.h"
 #include "Color.h"
 #include "Keyboard.h"
 #include "Mouse.h"
@@ -21,7 +21,7 @@ class Window : public WinControl, public IHidable
 {
 	friend class Button;
 	friend class Menu;
-	friend class IWinControl;
+	friend class WinControl;
 
 private:
 

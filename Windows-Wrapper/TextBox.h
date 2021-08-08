@@ -1,9 +1,8 @@
 #pragma once
 
-#include "Control.h"
 #include "IActivable.h"
 #include "IHidable.h"
-#include "IWinControl.h"
+#include "WinControl.h"
 
 #define MAXINPUTBUF 256
 
@@ -58,10 +57,14 @@ private:
 
 public:
 
+	BorderStyle BorderStyle = BorderStyle::Fixed3D;
+
 	TextBox(Control* parent, int width, int height, int x, int y);
 	TextBox(Control* parent, const std::string& name, int width, int height, int x, int y);
 	virtual ~TextBox();
 
+	int GetSelectionLenght() const noexcept;
+	std::string GetSelectedText() const noexcept;
 	void Disable() noexcept override;
 	void Enable() noexcept override;
 	void Hide() override;

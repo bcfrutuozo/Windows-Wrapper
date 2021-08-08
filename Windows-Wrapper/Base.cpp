@@ -1,6 +1,6 @@
 #include "Base.h"
 
-Base::Base()
+Base::Base() noexcept
 	:
 	m_UUID(uuids::uuid_system_generator{}())
 {
