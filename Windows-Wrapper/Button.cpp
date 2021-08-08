@@ -46,7 +46,6 @@ void Button::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned in
 		m_TabClicking = true;
 		SetClickingState(true);
 		InvalidateRect(hwnd, nullptr, true);
-		RedrawWindow(hwnd, nullptr, nullptr, RDW_INVALIDATE | RDW_UPDATENOW);
 		break;
 	}
 	case VK_TAB:	// Allows the user to change controls by pressing Tab
@@ -86,7 +85,6 @@ void Button::OnKeyUp_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int 
 		m_TabClicking = false;
 		SetClickingState(false);
 		InvalidateRect(hwnd, nullptr, true);
-		RedrawWindow(hwnd, nullptr, nullptr, RDW_INVALIDATE | RDW_UPDATENOW);
 		break;
 	}
 	}
