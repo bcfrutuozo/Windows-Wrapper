@@ -114,12 +114,29 @@ void WinControl::OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept
 		If the CausesValidation property is set to false, the Validatingand Validated events are
 		suppressed.
 	/**************************************************************************************************/
+	InvalidateRect(hwnd, nullptr, true);
+
+#ifdef _DEBUG
+	std::ostringstream oss;
+	oss << "Text: " << Text.c_str() << "|" << " Tab: " << m_TabIndex << " | " << "Type: Enter" << std::endl << std::endl;
+	OutputDebugString(oss.str().c_str());
+	m_IsTabSelected = true;
+#endif
 
 	Dispatch("OnGotFocus", new EventArgs());
 }
 
 void WinControl::OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept
 {
+	InvalidateRect(hwnd, nullptr, true);
+
+#ifdef _DEBUG
+	std::ostringstream oss;
+	oss << "Text: " << Text.c_str() << "|" << " Tab: " << m_TabIndex << " | " << "Type: Leave" << std::endl << std::endl;
+	OutputDebugString(oss.str().c_str());
+	m_IsTabSelected = false;
+#endif
+
 	Dispatch("OnLostFocus", new EventArgs());
 }
 
@@ -130,6 +147,32 @@ int WinControl::OnGetDLGCode(HWND hwnd, LPMSG msg) noexcept
 
 void WinControl::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept
 {
+	switch (vk)
+	{
+	case VK_TAB:	// Allows the user to change controls by pressing Tab
+	{
+		const WinControl* newCtl;
+
+		// Previous Control
+		if (GetKeyState(VK_SHIFT) & 0x8000)
+		{
+			newCtl = GetPreviousControl();
+		}
+		else // Next control
+		{
+			newCtl = GetNextControl();
+
+		}
+
+		if (newCtl != nullptr)
+		{
+			SetFocus(static_cast<HWND>(newCtl->Handle.ToPointer()));
+		}
+
+		break;
+	}
+	}
+
 	Dispatch("OnKeyDown", new KeyEventArgs(static_cast<Keys>(vk)));
 }
 
@@ -194,6 +237,17 @@ void WinControl::OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags
 
 void WinControl::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
 {
+	// Trigger tabbing
+	if (Parent != nullptr)
+	{	
+		const WinControl* newCtl = dynamic_cast<WinControl*>(GetByHandle(hwnd));
+
+		if (newCtl != nullptr)
+		{
+			SetFocus(static_cast<HWND>(newCtl->Handle.ToPointer()));
+		}
+	}
+
 	SetMouseOverState(true);
 	SetClickingState(true);
 	InvalidateRect(hwnd, nullptr, TRUE);
@@ -334,7 +388,8 @@ WinControl* WinControl::GetByTabIndex(const unsigned int& index) noexcept
 WinControl::WinControl(Control* parent, const std::string& text, int width, int height, int x, int y) noexcept
 	:
 	Control(parent, text, width, height, x, y),
-	m_TabIndex(m_IncrementalTabIndex++)
+	m_TabIndex(m_IncrementalTabIndex++),
+	m_IsTabSelected(false)
 {
 
 }
@@ -527,7 +582,7 @@ WinControl* WinControl::GetPreviousControl() noexcept
 {
 	if (const auto& root = dynamic_cast<WinControl*>(GetWindow()))
 	{
-		int searchIndex = m_TabIndex == 0 ? m_IncrementalTabIndex : m_TabIndex - 1;
+		int searchIndex = m_TabIndex == 0 ? m_IncrementalTabIndex - 1 : m_TabIndex - 1;
 
 		for (int i = searchIndex; i >= 0; --i)
 		{
@@ -544,9 +599,9 @@ WinControl* WinControl::GetNextControl() noexcept
 {
 	if (const auto& root = dynamic_cast<WinControl*>(GetWindow()))
 	{
-		int searchIndex = m_TabIndex > m_IncrementalTabIndex ? 0 : m_TabIndex + 1;
+		int searchIndex = m_TabIndex >= m_IncrementalTabIndex - 1 ? 0 : m_TabIndex + 1;
 
-		for (int i = searchIndex; i <= m_IncrementalTabIndex; ++i)
+		for (int i = searchIndex; i < m_IncrementalTabIndex; ++i)
 		{
 			const auto& ret = root->GetByTabIndex(i);
 			if (ret != nullptr)

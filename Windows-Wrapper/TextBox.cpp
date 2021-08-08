@@ -204,13 +204,11 @@ void TextBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 			else // Next control
 			{
 				newCtl = GetNextControl();
-
 			}
 
 			if (newCtl != nullptr)
 			{
-				OnFocusLeave_Impl(hwnd, static_cast<HWND>(newCtl->Handle.ToPointer()));
-				HandleMessageForwarder(static_cast<HWND>(Parent->Handle.ToPointer()), WM_NEXTDLGCTL, (WPARAM)static_cast<HWND>(newCtl->Handle.ToPointer()), TRUE);
+				SetFocus(static_cast<HWND>(newCtl->Handle.ToPointer()));
 			}
 		}
 		//PostMessageW(GetParent(hwnd), WM_NEXTDLGCTL, GetKeyState(VK_SHIFT) & 0x8000, FALSE);
@@ -280,10 +278,10 @@ void TextBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 	}
 
 	// Forward input messages to the parent window
-	if (Parent != nullptr)
+	/*if (Parent != nullptr)
 	{
 		HandleMessageForwarder(static_cast<HWND>(Parent->Handle.ToPointer()), WM_KEYDOWN, vk, MAKELPARAM(cRepeat, flags));
-	}
+	}*/
 }
 
 void TextBox::OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat) noexcept
@@ -313,11 +311,6 @@ void TextBox::OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat) noexcept
 void TextBox::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
 {
 	SetFocus(hwnd);
-
-	/*if (Parent != nullptr)
-	{
-		HandleMessageForwarder(static_cast<HWND>(Parent->Handle.ToPointer()), WM_LBUTTONDOWN, (WPARAM)hwnd, TRUE);
-	}*/
 }
 
 void TextBox::OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept
@@ -329,6 +322,15 @@ void TextBox::OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept
 
 	ShowCaret(hwnd);
 	InputRedraw(hwnd);
+	InvalidateRect(hwnd, nullptr, TRUE);
+
+#ifdef _DEBUG
+	std::ostringstream oss;
+	oss << "Text: " << Text.c_str() << "|" << " Tab: " << m_TabIndex << " | " << "Type: Enter" << std::endl << std::endl;
+	OutputDebugString(oss.str().c_str());
+#endif
+
+	m_IsTabSelected = true;
 }
 
 void TextBox::OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept
@@ -336,6 +338,15 @@ void TextBox::OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept
 	SetFocus(hwndNewFocus);
 	HideCaret(hwnd);
 	DestroyCaret();
+	InvalidateRect(hwndNewFocus, nullptr, TRUE);
+
+#ifdef _DEBUG
+	std::ostringstream oss;
+	oss << "Text: " << Text.c_str() << "|" << " Tab: " << m_TabIndex << " | " << "Type: Leave" << std::endl << std::endl;
+	OutputDebugString(oss.str().c_str());
+#endif
+
+	m_IsTabSelected = false;
 }
 
 void TextBox::OnPaint_Impl(HWND hWnd) noexcept

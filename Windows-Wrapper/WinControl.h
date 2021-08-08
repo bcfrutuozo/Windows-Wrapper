@@ -56,6 +56,9 @@ private:
 
 protected:
 
+	// Variable to check if control is tab selected
+	bool m_IsTabSelected;
+
 	WinControl(Control* parent, const std::string& text, int width, int height, int x, int y) noexcept;
 	virtual ~WinControl() = default;
 

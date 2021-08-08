@@ -37,6 +37,61 @@ HINSTANCE Button::ButtonClass::GetInstance() noexcept
 	return m_ButtonClass.m_Instance;
 }
 
+void Button::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept
+{
+	switch (vk)
+	{
+	case VK_RETURN:
+	{
+		m_TabClicking = true;
+		SetClickingState(true);
+		InvalidateRect(hwnd, nullptr, true);
+		RedrawWindow(hwnd, nullptr, nullptr, RDW_INVALIDATE | RDW_UPDATENOW);
+		break;
+	}
+	case VK_TAB:	// Allows the user to change controls by pressing Tab
+	{
+		const WinControl* newCtl;
+
+		// Previous Control
+		if (GetKeyState(VK_SHIFT) & 0x8000)
+		{
+			newCtl = GetPreviousControl();
+		}
+		else // Next control
+		{
+			newCtl = GetNextControl();
+
+		}
+
+		if (newCtl != nullptr)
+		{
+			SetFocus(static_cast<HWND>(newCtl->Handle.ToPointer()));
+		}
+
+		break;
+	}
+	}
+
+	Dispatch("OnKeyDown", new KeyEventArgs(static_cast<Keys>(vk)));
+}
+
+void Button::OnKeyUp_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept
+{
+	switch (vk)
+	{
+	case VK_RETURN:
+	{
+		Dispatch("OnClick", new EventArgs());
+		m_TabClicking = false;
+		SetClickingState(false);
+		InvalidateRect(hwnd, nullptr, true);
+		RedrawWindow(hwnd, nullptr, nullptr, RDW_INVALIDATE | RDW_UPDATENOW);
+		break;
+	}
+	}
+}
+
 void Button::OnPaint_Impl(HWND hwnd) noexcept
 {
 	PAINTSTRUCT ps;
@@ -53,15 +108,24 @@ void Button::OnPaint_Impl(HWND hwnd) noexcept
 		pen = CreatePen(PS_INSIDEFRAME, FlatAppearance.BorderSize, RGB(FlatAppearance.BorderColor.GetR(), FlatAppearance.BorderColor.GetG(), FlatAppearance.BorderColor.GetB()));
 		m_Brush = CreateSolidBrush(RGB(FlatAppearance.MouseDownBackColor.GetR(), FlatAppearance.MouseDownBackColor.GetG(), FlatAppearance.MouseDownBackColor.GetB()));
 	}
-	else if (IsMouseOver())
+	else if (IsMouseOver() || m_TabClicking)
 	{
 		pen = CreatePen(PS_INSIDEFRAME, FlatAppearance.BorderSize, RGB(FlatAppearance.BorderColor.GetR(), FlatAppearance.BorderColor.GetG(), FlatAppearance.BorderColor.GetB()));
 		m_Brush = CreateSolidBrush(RGB(FlatAppearance.MouseOverBackColor.GetR(), FlatAppearance.MouseOverBackColor.GetG(), FlatAppearance.MouseOverBackColor.GetB()));
 	}
 	else
 	{
-		pen = CreatePen(PS_INSIDEFRAME, FlatAppearance.BorderSize, RGB(FlatAppearance.BorderColor.GetR(), FlatAppearance.BorderColor.GetG(), FlatAppearance.BorderColor.GetB()));
-		m_Brush = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+		if (m_IsTabSelected)
+		{
+			Color c = Color::Selection();
+			pen = CreatePen(PS_INSIDEFRAME, FlatAppearance.BorderSize, RGB(c.GetR(), c.GetG(), c.GetB()));
+			m_Brush = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+		}
+		else
+		{
+			pen = CreatePen(PS_INSIDEFRAME, FlatAppearance.BorderSize, RGB(FlatAppearance.BorderColor.GetR(), FlatAppearance.BorderColor.GetG(), FlatAppearance.BorderColor.GetB()));
+			m_Brush = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+		}
 	}
 
 	//Select our brush into hDC
@@ -93,7 +157,8 @@ void Button::OnPaint_Impl(HWND hwnd) noexcept
 
 Button::Button(Control* parent, const std::string& name, int width, int height, int x, int y)
 	:
-	WinControl(parent, name, width, height, x, y)
+	WinControl(parent, name, width, height, x, y),
+	m_TabClicking(false)
 {
 	Initialize();
 }
