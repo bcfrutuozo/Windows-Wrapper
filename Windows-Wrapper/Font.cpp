@@ -53,6 +53,7 @@ float Font::GetSize() const noexcept
 		strcpy_s(logFont.lfFaceName, m_Name.c_str());
 		logFont.lfHeight = -MulDiv(m_Size, deviceCaps, pointPerInch);
 		logFont.lfWidth = 0; // keep zero.
+		DeleteDC(hdc);
 		return logFont.lfHeight;
 	}
 	case GraphicsUnit::Inch: break;
