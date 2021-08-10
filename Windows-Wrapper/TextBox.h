@@ -28,7 +28,7 @@ private:
 	{
 		Backspace,
 		Delete,
-		Paste,
+		CutAndPaste,
 	};
 
 	// Singleton manages registration/cleanup of window class
@@ -60,6 +60,8 @@ private:
 	void OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept override;
 	void OnPaint_Impl(HWND hWnd) noexcept override;
 
+	void CopyToClipboard() const noexcept;
+	void PasteFromClipboard() noexcept;
 	void EnableCaret() noexcept;
 	void DisableCaret() noexcept;
 	void PrintDebug() const noexcept;
