@@ -300,12 +300,6 @@ void TextBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 		break;
 	}
 	}
-
-	// Forward input messages to the parent window
-	/*if (Parent != nullptr)
-	{
-		HandleMessageForwarder(static_cast<HWND>(Parent->Handle.ToPointer()), WM_KEYDOWN, vk, MAKELPARAM(cRepeat, flags));
-	}*/
 }
 
 void TextBox::OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat) noexcept
@@ -347,7 +341,7 @@ void TextBox::OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept
 	// Create a solid black caret. 
 	CreateCaret(hwnd, (HBITMAP)NULL, 2, Font.Size);
 
-	ShowCaret(hwnd);
+	EnableCaret();
 	InputRedraw(hwnd);
 	InvalidateRect(hwnd, nullptr, true);
 
@@ -362,8 +356,13 @@ void TextBox::OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept
 
 void TextBox::OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept
 {
+	// Remove selection on leave
+	m_CursorIndex = Text.length();
+	m_SelectIndex = m_CursorIndex;
+	InvalidateRect(hwnd, nullptr, true);
+
 	SetFocus(hwndNewFocus);
-	HideCaret(hwnd);
+	DisableCaret();
 	DestroyCaret();
 	InvalidateRect(hwndNewFocus, nullptr, true);
 
@@ -384,6 +383,24 @@ void TextBox::OnPaint_Impl(HWND hWnd) noexcept
 	dc = BeginPaint(hWnd, &paint);
 	InputDraw(hWnd, dc);
 	EndPaint(hWnd, &paint);
+}
+
+void TextBox::EnableCaret() noexcept
+{
+	if (!m_IsCaretVisible)
+	{
+		ShowCaret(static_cast<HWND>(Handle.ToPointer()));
+		m_IsCaretVisible = true;
+	}
+}
+
+void TextBox::DisableCaret() noexcept
+{
+	if (m_IsCaretVisible)
+	{
+		HideCaret(static_cast<HWND>(Handle.ToPointer()));
+		m_IsCaretVisible = false;
+	}
 }
 
 void TextBox::PrintDebug() const noexcept
@@ -490,13 +507,13 @@ void TextBox::InputRedraw(HWND hWnd) noexcept
 {
 	HDC hdc;
 
-	HideCaret(hWnd);
+	DisableCaret();
 
 	hdc = GetDC(hWnd);
 	InputDraw(hWnd, hdc);
 	ReleaseDC(hWnd, hdc);
 
-	ShowCaret(hWnd);
+	//EnableCaret();
 }
 
 void TextBox::InputDraw(HWND hWnd, HDC hdc) noexcept
@@ -586,22 +603,139 @@ void TextBox::InputDraw(HWND hWnd, HDC hdc) noexcept
 	cr.right -= Margin.Top;
 	cr.bottom -= Margin.Bottom;
 
-	SetBkMode(hdc, TRANSPARENT);
 	CopyRect(&r, &cr);
 	SelectObject(hdc, hFont);
-	DrawText(hdc, Text.c_str(), -1, &r, DT_LEFT | DT_TOP);
 
-	if (m_CursorIndex)
-		DrawText(hdc, Text.c_str(), m_CursorIndex, &r, DT_LEFT | DT_TOP | DT_CALCRECT);
+	if (m_CursorIndex > 0 || (m_CursorIndex == 0 && m_CursorIndex != m_SelectIndex))
+	{
+		if (m_CursorIndex == m_SelectIndex)
+		{
+			SetBkMode(hdc, TRANSPARENT);
+			SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
+			DrawText(hdc, Text.c_str(), -1, &r, DT_LEFT | DT_TOP);
+			DrawText(hdc, Text.c_str(), m_CursorIndex, &r, DT_LEFT | DT_TOP | DT_CALCRECT);
+		}
+		else
+		{
+			int currentX = 0;
+
+			if (m_CursorIndex > m_SelectIndex)
+			{
+				for (int i = 0; i < m_SelectIndex; ++i)
+				{
+					if (i != 0)
+					{
+						SIZE s;
+						GetTextExtentPoint32A(hdc, Text.substr(0, i).c_str(), i, &s);
+						currentX = s.cx;
+					}
+					SetBkMode(hdc, TRANSPARENT);
+					SetBkColor(hdc, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+					SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
+					TextOut(hdc, r.left + currentX, r.top, Text.substr(i, 1).c_str(), 1);
+				}
+
+				for (int i = m_SelectIndex; i < m_CursorIndex; ++i)
+				{
+					SIZE s;
+					GetTextExtentPoint32A(hdc, Text.substr(0, i).c_str(), i, &s);
+					currentX = s.cx;
+					r.right = currentX;
+					SetBkMode(hdc, OPAQUE);
+					Color c = Color::Selection();
+					SetBkColor(hdc, RGB(c.GetR(), c.GetG(), c.GetB()));
+					SetTextColor(hdc, RGB(255, 255, 255));
+					TextOut(hdc, r.left + currentX, r.top, Text.substr(i, 1).c_str(), 1);
+				}
+
+				for (int i = m_CursorIndex; i < Text.length(); ++i)
+				{
+					SIZE s;
+					GetTextExtentPoint32A(hdc, Text.substr(0, i).c_str(), i, &s);
+					currentX = s.cx;
+					SetBkMode(hdc, TRANSPARENT);
+					SetBkColor(hdc, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+					SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
+					TextOut(hdc, r.left + currentX, r.top, Text.substr(i, 1).c_str(), 1);
+				}
+			}
+			else
+			{
+				for (int i = 0; i < m_CursorIndex; ++i)
+				{
+					if (i != 0)
+					{
+						SIZE s;
+						GetTextExtentPoint32A(hdc, Text.substr(0, i).c_str(), i, &s);
+						currentX = s.cx;
+					}
+
+					SetBkMode(hdc, TRANSPARENT);
+					SetBkColor(hdc, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+					SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
+					TextOut(hdc, r.left + currentX, r.top, Text.substr(i, 1).c_str(), 1);
+				}
+
+				for (int i = m_CursorIndex; i < m_SelectIndex; ++i)
+				{
+					SIZE s;
+					GetTextExtentPoint32A(hdc, Text.substr(0, i).c_str(), i, &s);
+					currentX = s.cx;
+					SetBkMode(hdc, OPAQUE);
+					Color c = Color::Selection();
+					SetBkColor(hdc, RGB(c.GetR(), c.GetG(), c.GetB()));
+					SetTextColor(hdc, RGB(255, 255, 255));
+					TextOut(hdc, r.left + currentX, r.top, Text.substr(i, 1).c_str(), 1);
+				}
+
+				for (int i = m_SelectIndex; i < Text.length(); ++i)
+				{
+					SIZE s;
+					GetTextExtentPoint32A(hdc, Text.substr(0, i).c_str(), i, &s);
+					currentX = s.cx;
+					SetBkMode(hdc, TRANSPARENT);
+					SetBkColor(hdc, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+					SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
+					TextOut(hdc, r.left + currentX, r.top, Text.substr(i, 1).c_str(), 1);
+				}
+			}
+		}
+	}
 	else
+	{
+		SetBkMode(hdc, TRANSPARENT);
+		SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
+		DrawText(hdc, Text.c_str(), -1, &r, DT_LEFT | DT_TOP);
 		r.right = cr.left;
+	}
 
+
+	// Caret position for after
 	if (GetFocus() == hWnd)
 	{
-		if (r.right > cr.right)
-			SetCaretPos(cr.right, cr.top);
+		std::ostringstream oss;
+
+		if (m_CursorIndex == m_SelectIndex)
+		{
+			if (r.right > cr.right)
+			{
+				oss << "Caret X: " << cr.right << " | " << "Caret Y: " << cr.top << std::endl;
+				SetCaretPos(cr.right, cr.top);
+			}
+			else
+			{
+				oss << "Caret X: " << r.right << " | " << "Caret Y: " << cr.top << std::endl;
+				SetCaretPos(r.right, cr.top);
+			}
+
+			EnableCaret();
+		}
 		else
-			SetCaretPos(r.right, cr.top);
+		{
+			DisableCaret();
+		}
+
+		OutputDebugString(oss.str().c_str());
 	}
 
 	DeleteObject(hFont);
@@ -618,7 +752,8 @@ TextBox::TextBox(Control* parent, const std::string& name, int width, int height
 	:
 	WinControl(parent, name, width, height, x, y),
 	m_SelectIndex(Text.length()),
-	m_CursorIndex(Text.length())
+	m_CursorIndex(Text.length()),
+	m_IsCaretVisible(false)
 {
 	Initialize();
 }

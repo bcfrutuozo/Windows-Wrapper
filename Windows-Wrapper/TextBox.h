@@ -14,6 +14,16 @@ private:
 	size_t m_SelectIndex;
 	size_t m_CursorIndex;
 
+	/*
+	Documentation: https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-showcaret
+	Hiding is cumulative.
+	If your application calls HideCaret five times in a row, it must also call ShowCaret five times before the caret reappears.
+
+	That's why we need to have bool to check if Caret is visible. This kind of thing really motivates me to code. Even when my
+	code sucks, it might not suck as WinAPI. Geez...
+	*/
+	bool m_IsCaretVisible;
+
 	enum class DeleteInputType
 	{
 		Backspace,
@@ -50,6 +60,8 @@ private:
 	void OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept override;
 	void OnPaint_Impl(HWND hWnd) noexcept override;
 
+	void EnableCaret() noexcept;
+	void DisableCaret() noexcept;
 	void PrintDebug() const noexcept;
 	void InputDelete(HWND hWnd, DeleteInputType deleteType) noexcept;
 	void InputRedraw(HWND hWnd) noexcept;
