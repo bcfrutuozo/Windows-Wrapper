@@ -339,7 +339,7 @@ void TextBox::OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept
 	RECT r;
 	GetClientRect(hwnd, &r);
 	// Create a solid black caret. 
-	CreateCaret(hwnd, (HBITMAP)NULL, 2, Font.Size);
+	CreateCaret(hwnd, (HBITMAP)NULL, 2, Font.GetSize());
 
 	EnableCaret();
 	InputRedraw(hwnd);
@@ -523,9 +523,9 @@ void TextBox::InputDraw(HWND hWnd, HDC hdc) noexcept
 	HPEN pen;
 	RECT r, cr;
 
-	HFONT hFont = CreateFont(Font.Size, 0, 0, 0, Font.IsBold ? FW_BOLD : FW_NORMAL, Font.IsItalic, Font.IsUnderline, Font.IsStrikeout, ANSI_CHARSET,
+	HFONT hFont = CreateFont(Font.GetSize(), 0, 0, 0, Font.IsBold() ? FW_BOLD : FW_NORMAL, Font.IsItalic(), Font.IsUnderline(), Font.IsStrikeOut(), ANSI_CHARSET,
 		OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
-		DEFAULT_PITCH | FF_DONTCARE, Font.Name.c_str());
+		DEFAULT_PITCH | FF_DONTCARE, Font.GetName().c_str());
 
 	GetClientRect(hWnd, &cr);
 
@@ -787,6 +787,8 @@ void TextBox::Initialize() noexcept
 
 	// Set default TextBox margin to 3 pixels
 	Margin = 3;
+	m_BackgroundColor = Color::Window();
+	m_ForeColor = Color::WindowText();
 }
 
 int TextBox::GetSelectionLenght() const noexcept

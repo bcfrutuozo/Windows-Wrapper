@@ -80,5 +80,7 @@ struct Color : public IEquatable<Color>
 	static constexpr Color Border() { return Color(225, 225, 225, 255); }
 	static constexpr Color Control() { return Color(240, 240, 240, 255); }
 	static constexpr Color Default() { return Color(212, 208, 200, 255); }
-	static constexpr Color Selection() { return Color(0, 120, 215); }
+	static constexpr Color Selection() { return Color(0, 120, 215, 255); }
+	static constexpr Color Window() { return Color(255, 255, 255, 255); }
+	static constexpr Color WindowText() { return Color(0, 0, 0, 255); }
 };

@@ -63,51 +63,19 @@ void TestKeyPress(Control* const c, KeyEventArgs* e)
 		b.OnClickSet(&TesteBotaoClick);
 		b.OnMouseEnterSet(&TesteBotaoEnter);
 		b.OnMouseLeaveSet(&TesteBotaoLeave);
-		b.Font.Name = "Arial";
-		b.Font.Size = 24;
-		b.Font.IsBold = true;
+		b.Font.SetStyle(FontStyle::Bold);
 
 		Button& b2 = window->AddButton("XYZ", 100, 40, 200, 200);
 		b2.OnClickSet(&TesteBotaoClick);
-		b2.Font.Size = 24;
-		b2.Font.IsStrikeout = true;
+		b2.Font.SetStyle(FontStyle::Strikeout);
 
 		TextBox& t = window->AddTextBox("TextBox", 400, 30, 20, 400);
-		t.Font.IsBold = true;
-		t.Font.Size = 14;
-		t.Font.IsItalic = true;
+		t.Font.SetSize(10);
+		t.Font.SetStyle(FontStyle::Italic);
 
 		TextBox& t2 = window->AddTextBox("TextBox2", 400, 30, 20, 460);
-		t2.Font.IsBold = true;
-		t2.Font.Size = 18;
-		t2.Font.IsStrikeout = true;
-	}
-	if (e->KeyData == Keys::B)
-	{
-		auto window = dynamic_cast<Window*>(c);
-		if (window->Font.IsBold)
-		{
-			window->Font.IsBold = false;
-		}
-		else
-		{
-			window->Font.IsBold = true;
-		}
-	}
-	if (e->KeyData == Keys::I)
-	{
-		auto window = dynamic_cast<Window*>(c);
-		window->Font.IsBold |= window->Font.IsBold;
-	}
-	if (e->KeyData == Keys::U)
-	{
-		auto window = dynamic_cast<Window*>(c);
-		window->Font.IsUnderline |= window->Font.IsUnderline;
-	}
-	if (e->KeyData == Keys::U)
-	{
-		auto window = dynamic_cast<Window*>(c);
-		window->Font.IsStrikeout |= window->Font.IsStrikeout;
+		t2.Font.SetStyle(FontStyle::Underline);
+
 	}
 }
 
