@@ -59,7 +59,7 @@ public:
 
 	};
 
-	enum FlatStyle
+	enum class FlatStyle
 	{
 		//The control appears flat.
 		Flat = 0,
@@ -75,7 +75,7 @@ public:
 	};
 
 	FlatButtonAppearance FlatAppearance;
-	FlatStyle FlatStyle = FlatStyle::Standard;
+	FlatStyle FlatStyle;
 
 	Button(Control* parent, const std::string& name, int width, int height, int x, int y);
 	virtual ~Button();

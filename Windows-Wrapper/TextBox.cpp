@@ -329,8 +329,19 @@ void TextBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 
 void TextBox::OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat) noexcept
 {
-	if (c < VK_SPACE || c > VK_DIVIDE)
+	if (c == VK_TAB || c == VK_BACK)
+	{
 		return;
+	}
+
+	if (0x8000 & GetKeyState(VK_CONTROL))
+	{
+		// Doesn't type when CTRL+A, CTRL+C, CTRL+V or CTRL+X is pressed
+		if (c == 0x01 || c == 0x03 || c == 0x16 || c == 0x18)
+		{
+			return;
+		}
+	}
 
 	if (Text.length() + 1 < MAXINPUTBUF)
 	{
@@ -594,9 +605,10 @@ void TextBox::InputDraw(HWND hWnd, HDC hdc) noexcept
 
 	SetBkMode(hdc, OPAQUE);
 
-	HPEN pen;
+	HPEN pen = { 0 };
 	RECT r, cr;
-
+	HGDIOBJ old_pen = { 0 };
+	HGDIOBJ old_brush = { 0 };
 	HFONT hFont = CreateFont(Font.GetSize(), 0, 0, 0, Font.IsBold() ? FW_BOLD : FW_NORMAL, Font.IsItalic(), Font.IsUnderline(), Font.IsStrikeOut(), ANSI_CHARSET,
 		OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
 		DEFAULT_PITCH | FF_DONTCARE, Font.GetName().c_str());
@@ -609,48 +621,41 @@ void TextBox::InputDraw(HWND hWnd, HDC hdc) noexcept
 	case BorderStyle::None:
 	{
 		pen = CreatePen(PS_SOLID, 0, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-		//Select our brush into hDC
-		HGDIOBJ old_pen = SelectObject(hdc, pen);
-		HGDIOBJ old_brush;
-
+		old_pen = SelectObject(hdc, pen);
 		m_Brush = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
 		old_brush = SelectObject(hdc, m_Brush);
 
-		Rectangle(hdc, cr.left, cr.top, cr.right, cr.bottom);
-
-		//Clean up
-		SelectObject(hdc, old_pen);
-		DeleteObject(pen);
 		break;
 	}
 	case BorderStyle::FixedSingle:
 	{
 		pen = CreatePen(PS_INSIDEFRAME, 1, RGB(100, 100, 100));
-		//Select our brush into hDC
-		HGDIOBJ old_pen = SelectObject(hdc, pen);
-		HGDIOBJ old_brush;
-
+		old_pen = SelectObject(hdc, pen);
 		m_Brush = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
 		old_brush = SelectObject(hdc, m_Brush);
-		Rectangle(hdc, cr.left, cr.top, cr.right, cr.bottom);
 
-		//Clean up
-		SelectObject(hdc, old_pen);
-		SelectObject(hdc, old_brush);
-		DeleteObject(pen);
 		break;
 	}
 	case BorderStyle::Fixed3D:
 	{
-		pen = CreatePen(PS_INSIDEFRAME, 1, RGB(122, 122, 122));
-
-		HGDIOBJ old_pen = SelectObject(hdc, pen);
-		HGDIOBJ old_inner;
-
-		// Draw inner border
-		m_Brush = CreateSolidBrush(RGB(255, 255, 255));
-		old_inner = SelectObject(hdc, m_Brush);
-		Rectangle(hdc, cr.left, cr.top, cr.right, cr.bottom);
+		if (m_IsTabSelected)
+		{
+			Color c = Color::Selection();
+			pen = CreatePen(PS_INSIDEFRAME, 1, RGB(c.GetR(), c.GetG(), c.GetB()));
+			old_pen = SelectObject(hdc, pen);
+			m_Brush = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+			old_brush = SelectObject(hdc, m_Brush);
+			Rectangle(hdc, cr.left, cr.top, cr.right, cr.bottom);
+		}
+		else
+		{
+			pen = CreatePen(PS_INSIDEFRAME, 1, RGB(122, 122, 122));
+			old_pen = SelectObject(hdc, pen);
+			// Draw inner border
+			m_Brush = CreateSolidBrush(RGB(255, 255, 255));
+			old_brush = SelectObject(hdc, m_Brush);
+			Rectangle(hdc, cr.left, cr.top, cr.right, cr.bottom);
+		}
 
 		cr.left += 1;
 		cr.top += 1;
@@ -659,17 +664,18 @@ void TextBox::InputDraw(HWND hWnd, HDC hdc) noexcept
 
 		// Draw background
 		m_Brush = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-		old_inner = SelectObject(hdc, m_Brush);
-		Rectangle(hdc, cr.left, cr.top, cr.right, cr.bottom);
-
-		//Clean up
-		SelectObject(hdc, old_pen);
-		SelectObject(hdc, old_inner);
-		DeleteObject(pen);
+		old_brush = SelectObject(hdc, m_Brush);
 
 		break;
 	}
 	}
+
+	Rectangle(hdc, cr.left, cr.top, cr.right, cr.bottom);
+
+	//Clean up
+	SelectObject(hdc, old_pen);
+	SelectObject(hdc, old_brush);
+	DeleteObject(pen);
 
 	// Adjust text margin after border draw
 	cr.left += Margin.Left;

@@ -13,14 +13,12 @@
 
 void TesteBotaoEnter(Control* const c, EventArgs* const e)
 {
-	c->SetBackgroundColor(Color::Blue());
-	c->SetForeColor(Color::Red());
+
 }
 
 void TesteBotaoLeave(Control* const c, EventArgs* const e)
 {
-	c->SetBackgroundColor(Color::Default());
-	c->SetForeColor(Color::Black());
+
 }
 
 void TesteBotaoClick(Control* const c, EventArgs* const e)
@@ -57,13 +55,11 @@ void TestKeyPress(Control* const c, KeyEventArgs* e)
 		menu1.AddItem("Submenu-Item4");
 		menu1.AddItem("Submenu-Item5").OnMouseEnterSet(&TesteBotaoEnter);
 		window->UpdateMenuStrip();
-		window->SetBackgroundColor(Color(128, 128, 128));
 
 		Button& b = window->AddButton("Abc", 200, 80, 50, 100);
 		b.OnClickSet(&TesteBotaoClick);
 		b.OnMouseEnterSet(&TesteBotaoEnter);
 		b.OnMouseLeaveSet(&TesteBotaoLeave);
-		b.Font.SetStyle(FontStyle::Bold);
 
 		Button& b2 = window->AddButton("XYZ", 100, 40, 200, 200);
 		b2.OnClickSet(&TesteBotaoClick);
@@ -71,11 +67,13 @@ void TestKeyPress(Control* const c, KeyEventArgs* e)
 
 		TextBox& t = window->AddTextBox("TextBox", 400, 30, 20, 400);
 		t.Font.SetSize(10);
-		t.Font.SetStyle(FontStyle::Italic);
+		t.BorderStyle = BorderStyle::None;
 
 		TextBox& t2 = window->AddTextBox("TextBox2", 400, 30, 20, 460);
-		t2.Font.SetStyle(FontStyle::Underline);
+		t2.BorderStyle = BorderStyle::FixedSingle;
 
+		TextBox& t3 = window->AddTextBox("TextBox3", 400, 30, 20, 560);
+		t3.BorderStyle = BorderStyle::Fixed3D;
 	}
 }
 

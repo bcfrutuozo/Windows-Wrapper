@@ -54,8 +54,8 @@ protected:
 	Control* Parent;
 	std::vector<std::shared_ptr<Control>> Controls;
 	EventDispatcher Events;
-	Color m_ForeColor = Color::Black();
-	Color m_BackgroundColor = Color::Default();
+	Color m_ForeColor;
+	Color m_BackgroundColor;
 	static MessageMapper Mapper;
 	HBRUSH m_Brush;
 	Padding Margin;

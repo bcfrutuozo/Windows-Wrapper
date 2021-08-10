@@ -67,6 +67,8 @@ Control::Control(Control* parent, const std::string& text, int width, int height
 	Size(width, height),
 	Location(x, y),
 	m_Id(m_CurrentIndex++),
+	m_BackgroundColor(Color::Control()),
+	m_ForeColor(Color::Black()),
 	Padding(0),
 	Margin(0)
 {

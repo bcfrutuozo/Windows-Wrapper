@@ -143,6 +143,7 @@ void Window::Initialize() noexcept
 	//SetParent(static_cast<HWND>(Handle.ToPointer()), static_cast<HWND>(Parent->Handle.ToPointer()));
 
 	// Force window redraw to set Background color
+	m_BackgroundColor = Color::Control();
 	InvalidateRect(static_cast<HWND>(Handle.ToPointer()), nullptr, TRUE);
 }
 
