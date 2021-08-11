@@ -329,21 +329,25 @@ void TextBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 
 void TextBox::OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat) noexcept
 {
+	// Break processing if TextBox is multiline and ENTER is pressed
+	if (!m_IsMultiline && c == '\r')
+	{
+		return;
+	}
+
+	// Skip key input if TAB (Switch tabbing) or Backspace (Remove last character) is pressed
 	if (c == VK_TAB || c == VK_BACK)
 	{
 		return;
 	}
 
+	// Block key input if CTRL key is pressed. Only CTRL+A, CTRL+C, CTRL+V and CTRL+X is allowed 
 	if (0x8000 & GetKeyState(VK_CONTROL))
 	{
-		// Doesn't type when CTRL+A, CTRL+C, CTRL+V or CTRL+X is pressed
-		if (c == 0x01 || c == 0x03 || c == 0x16 || c == 0x18)
-		{
-			return;
-		}
+		return;
 	}
 
-	if (Text.length() + 1 < MAXINPUTBUF)
+	if (Text.length() < m_MaximumLenght)
 	{
 		if (m_CursorIndex == m_SelectIndex)
 		{
@@ -378,10 +382,10 @@ void TextBox::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlag
 void TextBox::OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept
 {
 	// Set the cursor at the end when entering the control
-	m_CursorIndex = Text.length();
+	//m_CursorIndex = Text.length();
 
 	// Create a solid black caret. 
-	CreateCaret(hwnd, (HBITMAP)NULL, 2, std::abs(Font.GetSize()));
+	CreateCaret(hwnd, (HBITMAP)NULL, 2, Font.GetSizeInPixels());
 	EnableCaret();
 	InputRedraw(hwnd);
 	InvalidateRect(hwnd, nullptr, true);
@@ -391,8 +395,8 @@ void TextBox::OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept
 void TextBox::OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept
 {
 	// Remove selection on leave
-	m_CursorIndex = Text.length();
-	m_SelectIndex = m_CursorIndex;
+	// m_CursorIndex = Text.length();
+	// m_SelectIndex = m_CursorIndex;
 	InvalidateRect(hwnd, nullptr, true);
 
 	SetFocus(hwndNewFocus);
@@ -609,9 +613,27 @@ void TextBox::InputDraw(HWND hWnd, HDC hdc) noexcept
 	RECT r, cr;
 	HGDIOBJ old_pen = { 0 };
 	HGDIOBJ old_brush = { 0 };
-	HFONT hFont = CreateFont(Font.GetSize(), 0, 0, 0, Font.IsBold() ? FW_BOLD : FW_NORMAL, Font.IsItalic(), Font.IsUnderline(), Font.IsStrikeOut(), ANSI_CHARSET,
+	HFONT hFont = CreateFont(Font.GetSizeInPixels(), 0, 0, 0, Font.IsBold() ? FW_BOLD : FW_NORMAL, Font.IsItalic(), Font.IsUnderline(), Font.IsStrikeOut(), ANSI_CHARSET,
 		OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
 		DEFAULT_PITCH | FF_DONTCARE, Font.GetName().c_str());
+
+	// Set the
+	int height = 5;
+	for (int i = 5, j = 0; i < Font.GetSizeInPixels(); ++i, ++j)
+	{
+		if (j == 2)
+		{
+			height += 2;
+			j = -1;
+		}
+		else
+		{
+			height += 1;
+		}
+	}
+	// Size is always the default plus the calculated area size
+	Size.Height = 9 + height;
+	SetWindowPos(hWnd, HWND_TOP, Location.X, Location.Y, Size.Width, Size.Height, 0);
 
 	GetClientRect(hWnd, &cr);
 
@@ -683,110 +705,128 @@ void TextBox::InputDraw(HWND hWnd, HDC hdc) noexcept
 	cr.right -= Margin.Top;
 	cr.bottom -= Margin.Bottom;
 
+	// Adjust text in center based on default TextBox size with font size as 1
+	int spacingForAlignment = cr.bottom - Font.GetSizeInPixels();
+	cr.top += (spacingForAlignment / 2) - 4;	// 4 Pixels extra for small TextBox and underline characteres
+	cr.bottom -= (spacingForAlignment / 2);
+
+	// BOTTOM ALIGNMENT
+	//cr.top += (cr.top + Font.GetSizeInPixels()) / 2;
+
 	CopyRect(&r, &cr);
 	SelectObject(hdc, hFont);
 
-	if (m_CursorIndex > 0 || (m_CursorIndex == 0 && m_CursorIndex != m_SelectIndex))
-	{
-		if (m_CursorIndex == m_SelectIndex)
-		{
-			SetBkMode(hdc, TRANSPARENT);
-			SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-			DrawText(hdc, Text.c_str(), -1, &r, DT_LEFT | DT_TOP);
-			DrawText(hdc, Text.c_str(), m_CursorIndex, &r, DT_LEFT | DT_TOP | DT_CALCRECT);
-		}
-		else
-		{
-			int currentX = 0;
-
-			if (m_CursorIndex > m_SelectIndex)
-			{
-				for (int i = 0; i < m_SelectIndex; ++i)
-				{
-					if (i != 0)
-					{
-						SIZE s;
-						GetTextExtentPoint32A(hdc, Text.substr(0, i).c_str(), i, &s);
-						currentX = s.cx;
-					}
-					SetBkMode(hdc, TRANSPARENT);
-					SetBkColor(hdc, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-					SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-					TextOut(hdc, r.left + currentX, r.top, Text.substr(i, 1).c_str(), 1);
-				}
-
-				for (int i = m_SelectIndex; i < m_CursorIndex; ++i)
-				{
-					SIZE s;
-					GetTextExtentPoint32A(hdc, Text.substr(0, i).c_str(), i, &s);
-					currentX = s.cx;
-					r.right = currentX;
-					SetBkMode(hdc, OPAQUE);
-					Color c = Color::Selection();
-					SetBkColor(hdc, RGB(c.GetR(), c.GetG(), c.GetB()));
-					SetTextColor(hdc, RGB(255, 255, 255));
-					TextOut(hdc, r.left + currentX, r.top, Text.substr(i, 1).c_str(), 1);
-				}
-
-				for (int i = m_CursorIndex; i < Text.length(); ++i)
-				{
-					SIZE s;
-					GetTextExtentPoint32A(hdc, Text.substr(0, i).c_str(), i, &s);
-					currentX = s.cx;
-					SetBkMode(hdc, TRANSPARENT);
-					SetBkColor(hdc, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-					SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-					TextOut(hdc, r.left + currentX, r.top, Text.substr(i, 1).c_str(), 1);
-				}
-			}
-			else
-			{
-				for (int i = 0; i < m_CursorIndex; ++i)
-				{
-					if (i != 0)
-					{
-						SIZE s;
-						GetTextExtentPoint32A(hdc, Text.substr(0, i).c_str(), i, &s);
-						currentX = s.cx;
-					}
-
-					SetBkMode(hdc, TRANSPARENT);
-					SetBkColor(hdc, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-					SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-					TextOut(hdc, r.left + currentX, r.top, Text.substr(i, 1).c_str(), 1);
-				}
-
-				for (int i = m_CursorIndex; i < m_SelectIndex; ++i)
-				{
-					SIZE s;
-					GetTextExtentPoint32A(hdc, Text.substr(0, i).c_str(), i, &s);
-					currentX = s.cx;
-					SetBkMode(hdc, OPAQUE);
-					Color c = Color::Selection();
-					SetBkColor(hdc, RGB(c.GetR(), c.GetG(), c.GetB()));
-					SetTextColor(hdc, RGB(255, 255, 255));
-					TextOut(hdc, r.left + currentX, r.top, Text.substr(i, 1).c_str(), 1);
-				}
-
-				for (int i = m_SelectIndex; i < Text.length(); ++i)
-				{
-					SIZE s;
-					GetTextExtentPoint32A(hdc, Text.substr(0, i).c_str(), i, &s);
-					currentX = s.cx;
-					SetBkMode(hdc, TRANSPARENT);
-					SetBkColor(hdc, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-					SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-					TextOut(hdc, r.left + currentX, r.top, Text.substr(i, 1).c_str(), 1);
-				}
-			}
-		}
-	}
-	else
+	if (!m_IsTabSelected)
 	{
 		SetBkMode(hdc, TRANSPARENT);
 		SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-		DrawText(hdc, Text.c_str(), -1, &r, DT_LEFT | DT_TOP);
-		r.right = cr.left;
+		DrawText(hdc, Text.c_str(), -1, &r, DT_LEFT | DT_VCENTER);
+		DrawText(hdc, Text.c_str(), m_CursorIndex, &r, DT_LEFT | DT_VCENTER | DT_CALCRECT);
+	}
+	else
+	{
+		if (m_CursorIndex > 0 || (m_CursorIndex == 0 && m_CursorIndex != m_SelectIndex))
+		{
+			if (m_CursorIndex == m_SelectIndex)
+			{
+				SetBkMode(hdc, TRANSPARENT);
+				SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
+				DrawText(hdc, Text.c_str(), -1, &r, DT_LEFT | DT_VCENTER);
+				DrawText(hdc, Text.c_str(), m_CursorIndex, &r, DT_LEFT | DT_VCENTER | DT_CALCRECT);
+			}
+			else
+			{
+				int currentX = 0;
+
+				if (m_CursorIndex > m_SelectIndex)
+				{
+					for (int i = 0; i < m_SelectIndex; ++i)
+					{
+						if (i != 0)
+						{
+							SIZE s;
+							GetTextExtentPoint32A(hdc, Text.substr(0, i).c_str(), i, &s);
+							currentX = s.cx;
+						}
+						SetBkMode(hdc, TRANSPARENT);
+						SetBkColor(hdc, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+						SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
+						TextOut(hdc, r.left + currentX, r.top, Text.substr(i, 1).c_str(), 1);
+					}
+
+					for (int i = m_SelectIndex; i < m_CursorIndex; ++i)
+					{
+						SIZE s;
+						GetTextExtentPoint32A(hdc, Text.substr(0, i).c_str(), i, &s);
+						currentX = s.cx;
+						r.right = currentX;
+						SetBkMode(hdc, OPAQUE);
+						Color c = Color::Selection();
+						SetBkColor(hdc, RGB(c.GetR(), c.GetG(), c.GetB()));
+						SetTextColor(hdc, RGB(255, 255, 255));
+						TextOut(hdc, r.left + currentX, r.top, Text.substr(i, 1).c_str(), 1);
+					}
+
+					for (int i = m_CursorIndex; i < Text.length(); ++i)
+					{
+						SIZE s;
+						GetTextExtentPoint32A(hdc, Text.substr(0, i).c_str(), i, &s);
+						currentX = s.cx;
+						SetBkMode(hdc, TRANSPARENT);
+						SetBkColor(hdc, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+						SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
+						TextOut(hdc, r.left + currentX, r.top, Text.substr(i, 1).c_str(), 1);
+					}
+				}
+				else
+				{
+					for (int i = 0; i < m_CursorIndex; ++i)
+					{
+						if (i != 0)
+						{
+							SIZE s;
+							GetTextExtentPoint32A(hdc, Text.substr(0, i).c_str(), i, &s);
+							currentX = s.cx;
+						}
+
+						SetBkMode(hdc, TRANSPARENT);
+						SetBkColor(hdc, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+						SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
+						TextOut(hdc, r.left + currentX, r.top, Text.substr(i, 1).c_str(), 1);
+					}
+
+					for (int i = m_CursorIndex; i < m_SelectIndex; ++i)
+					{
+						SIZE s;
+						GetTextExtentPoint32A(hdc, Text.substr(0, i).c_str(), i, &s);
+						currentX = s.cx;
+						SetBkMode(hdc, OPAQUE);
+						Color c = Color::Selection();
+						SetBkColor(hdc, RGB(c.GetR(), c.GetG(), c.GetB()));
+						SetTextColor(hdc, RGB(255, 255, 255));
+						TextOut(hdc, r.left + currentX, r.top, Text.substr(i, 1).c_str(), 1);
+					}
+
+					for (int i = m_SelectIndex; i < Text.length(); ++i)
+					{
+						SIZE s;
+						GetTextExtentPoint32A(hdc, Text.substr(0, i).c_str(), i, &s);
+						currentX = s.cx;
+						SetBkMode(hdc, TRANSPARENT);
+						SetBkColor(hdc, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+						SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
+						TextOut(hdc, r.left + currentX, r.top, Text.substr(i, 1).c_str(), 1);
+					}
+				}
+			}
+		}
+		else
+		{
+			SetBkMode(hdc, TRANSPARENT);
+			SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
+			DrawText(hdc, Text.c_str(), -1, &r, DT_LEFT | DT_VCENTER);
+			r.right = cr.left;
+		}
 	}
 
 	// Caret position for after
@@ -814,25 +854,29 @@ void TextBox::InputDraw(HWND hWnd, HDC hdc) noexcept
 			DisableCaret();
 		}
 
+#ifdef _DEBUG
 		OutputDebugString(oss.str().c_str());
+#endif
 	}
 
 	DeleteObject(hFont);
 }
 
-TextBox::TextBox(Control* parent, int width, int height, int x, int y)
+TextBox::TextBox(Control* parent, int width, int x, int y)
 	:
-	TextBox(parent, "", width, height, x, y)
+	TextBox(parent, "", width, x, y)			// Default control size without font is 9
 {
 
 }
 
-TextBox::TextBox(Control* parent, const std::string& name, int width, int height, int x, int y)
+TextBox::TextBox(Control* parent, const std::string& name, int width, int x, int y)
 	:
-	WinControl(parent, name, width, height, x, y),
+	WinControl(parent, name, width, 9, x, y),	// Default control size without font is 9
 	m_SelectIndex(Text.length()),
 	m_CursorIndex(Text.length()),
-	m_IsCaretVisible(false)
+	m_IsCaretVisible(false),
+	m_IsMultiline(false),
+	m_MaximumLenght(32767)
 {
 	Initialize();
 }
@@ -919,5 +963,19 @@ void TextBox::Show()
 	{
 		IsVisible = true;
 		ShowWindow(static_cast<HWND>(Handle.ToPointer()), SW_SHOWDEFAULT);
+	}
+}
+
+unsigned int TextBox::GetMaximumLength() const noexcept
+{
+	return m_MaximumLenght;
+}
+
+void TextBox::SetMaximumLength(unsigned int maximumLength) noexcept
+{
+	// If TextBox is single line, the height is controlled by the Font size
+	if (m_IsMultiline)
+	{
+		m_MaximumLenght = maximumLength;
 	}
 }

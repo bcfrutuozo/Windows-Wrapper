@@ -37,6 +37,17 @@ HINSTANCE Button::ButtonClass::GetInstance() noexcept
 	return m_ButtonClass.m_Instance;
 }
 
+Button::FlatButtonAppearance::FlatButtonAppearance()
+	:
+	BorderColor(Color::Border()),
+	BorderSize(1),
+	CheckedBackColor(Color::Default()),
+	MouseDownBackColor(Color(204, 228, 247, 255)),
+	MouseOverBackColor(Color(229, 241, 251, 255))
+{
+
+};
+
 int Button::OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept
 {
 	return 1;	// To avoid flickering
@@ -101,9 +112,6 @@ void Button::OnPaint_Impl(HWND hwnd) noexcept
 	RECT rc;
 	GetClientRect(hwnd, &rc);
 
-	//Create pen for button border
-	HPEN pen = { 0 };
-
 	// ONLY STANDARD BUTTON TYPE IS IMPLEMENTED
 	// NEED TO DRAW FLAT, POPUP AND SYSTEM STYLES
 	Color c;
@@ -117,136 +125,202 @@ void Button::OnPaint_Impl(HWND hwnd) noexcept
 	{
 		break;
 	}
-	case FlatStyle::Standard:
+	case FlatStyle::Standard:	// Standard button MouseOver and Clicking effects are pre-defineds. User can only change the background color
 	{
 		if (IsClicking())		// m_IsTabSelected ALWAYS true when Clicking
 		{
 			// Draw outer border
-			c = Color::Selection();
-			pen = CreatePen(PS_INSIDEFRAME, FlatAppearance.BorderSize, RGB(c.GetR(), c.GetG(), c.GetB()));
+			HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(0, 84, 153));
 			HGDIOBJ old_pen = SelectObject(hdc, pen);
 			Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
 
 			// Move inside rectangle for inner board
-			rc.left += FlatAppearance.BorderSize;
-			rc.top += FlatAppearance.BorderSize;
-			rc.right -= FlatAppearance.BorderSize;
-			rc.bottom -= FlatAppearance.BorderSize;
-
-			// Draw inner board
-			c = Color(229, 241, 251, 255);
-			pen = CreatePen(PS_INSIDEFRAME, 2, RGB(c.GetR(), c.GetG(), c.GetB()));
-			old_pen = SelectObject(hdc, pen);
-			Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+			rc.left += 1;
+			rc.top += 1;
+			rc.right -= 1;
+			rc.bottom -= 1;
 
 			// Draw dot for tabbed click and mouseover
-			pen = CreatePen(PS_DOT, 1, RGB(0, 0, 0));
+			SetBkMode(hdc, OPAQUE);
+			pen = CreatePen(PS_DOT, 0, RGB(0, 0, 0));
+			old_pen = SelectObject(hdc, pen);
+			SetBkColor(hdc, RGB(204, 228, 247));
+			Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+
+			rc.left += 1;
+			rc.top += 1;
+			rc.right -= 1;
+			rc.bottom -= 1;
+
+			//// Draw inner board
+			pen = CreatePen(PS_INSIDEFRAME, 2, RGB(204, 228, 247));
 			old_pen = SelectObject(hdc, pen);
 			Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
 
 			// Move even more for background
-			rc.left += 2;
-			rc.top += 2;
-			rc.right -= 2;
-			rc.bottom -= 2;
+			rc.left += 1;
+			rc.top += 1;
+			rc.right -= 1;
+			rc.bottom -= 1;
 
-			// Draw background inside
-			HBRUSH background = CreateSolidBrush(RGB(FlatAppearance.MouseDownBackColor.GetR(), FlatAppearance.MouseDownBackColor.GetG(), FlatAppearance.MouseDownBackColor.GetB()));
-			FillRect(hdc, &rc, background);
 			//Clean up
-			SelectObject(hdc, old_pen);
-			SelectObject(hdc, background);
+			DeleteObject(old_pen);
 			DeleteObject(pen);
 		}
 		else if (IsMouseOver())
 		{
-			m_Brush = CreateSolidBrush(RGB(FlatAppearance.MouseOverBackColor.GetR(), FlatAppearance.MouseOverBackColor.GetG(), FlatAppearance.MouseOverBackColor.GetB()));
 			if (m_IsTabSelected)
 			{
+				// Draw outer border
 				c = Color::Selection();
-				pen = CreatePen(PS_INSIDEFRAME, FlatAppearance.BorderSize, RGB(c.GetR(), c.GetG(), c.GetB()));
+				HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(c.GetR(), c.GetG(), c.GetB()));
 				HGDIOBJ old_pen = SelectObject(hdc, pen);
-				HGDIOBJ old_brush = SelectObject(hdc, m_Brush);
 				Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-				rc.left += FlatAppearance.BorderSize;
-				rc.top += FlatAppearance.BorderSize;
-				rc.right -= FlatAppearance.BorderSize;
-				rc.bottom -= FlatAppearance.BorderSize;
-				c = Color(229, 241, 251, 255);
-				pen = CreatePen(PS_INSIDEFRAME, 2, RGB(c.GetR(), c.GetG(), c.GetB()));
+
+				// Move inside rectangle for inner board
+				rc.left += 1;
+				rc.top += 1;
+				rc.right -= 1;
+				rc.bottom -= 1;
+
+				// Draw dot for tabbed click and mouseover
+				SetBkMode(hdc, OPAQUE);
+				pen = CreatePen(PS_DOT, 0, RGB(0, 0, 0));
+				old_pen = SelectObject(hdc, pen);
+				SetBkColor(hdc, RGB(229, 241, 251));
+				Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+
+				rc.left += 1;
+				rc.top += 1;
+				rc.right -= 1;
+				rc.bottom -= 1;
+
+				//// Draw inner board
+				pen = CreatePen(PS_INSIDEFRAME, 2, RGB(229, 241, 251));
 				old_pen = SelectObject(hdc, pen);
 				Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-				pen = CreatePen(PS_DOT, 1, RGB(0, 0, 0));
-				old_pen = SelectObject(hdc, pen);
-				Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+
+				// Move even more for background
+				rc.left += 1;
+				rc.top += 1;
+				rc.right -= 1;
+				rc.bottom -= 1;
+
 				//Clean up
-				SelectObject(hdc, old_pen);
-				SelectObject(hdc, old_brush);
+				DeleteObject(old_pen);
 				DeleteObject(pen);
 			}
 			else
 			{
-				pen = CreatePen(PS_INSIDEFRAME, FlatAppearance.BorderSize, RGB(FlatAppearance.BorderColor.GetR(), FlatAppearance.BorderColor.GetG(), FlatAppearance.BorderColor.GetB()));
+				// Draw outer border
+				c = Color::Selection();
+				HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(c.GetR(), c.GetG(), c.GetB()));
 				HGDIOBJ old_pen = SelectObject(hdc, pen);
-				HGDIOBJ old_brush = SelectObject(hdc, m_Brush);
 				Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-				rc.left += FlatAppearance.BorderSize;
-				rc.top += FlatAppearance.BorderSize;
-				rc.right -= FlatAppearance.BorderSize;
-				rc.bottom -= FlatAppearance.BorderSize;
+
+				// Move inside rectangle for inner board
+				rc.left += 1;
+				rc.top += 1;
+				rc.right -= 1;
+				rc.bottom -= 1;
+
+				// Draw inner board
 				c = Color(229, 241, 251, 255);
 				pen = CreatePen(PS_INSIDEFRAME, 2, RGB(c.GetR(), c.GetG(), c.GetB()));
 				old_pen = SelectObject(hdc, pen);
 				Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+
+				// Move even more for background
+				rc.left += 2;
+				rc.top += 2;
+				rc.right -= 2;
+				rc.bottom -= 2;
+
 				//Clean up
-				SelectObject(hdc, old_pen);
-				SelectObject(hdc, old_brush);
+				DeleteObject(old_pen);
 				DeleteObject(pen);
 			}
 		}
 		else
 		{
-			m_Brush = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
 			if (m_IsTabSelected)
 			{
-				c = Color::Selection();
-				pen = CreatePen(PS_INSIDEFRAME, FlatAppearance.BorderSize, RGB(c.GetR(), c.GetG(), c.GetB()));
+				// Draw outer border
+				HPEN pen = CreatePen(PS_INSIDEFRAME, 2, RGB(0, 120, 215));
 				HGDIOBJ old_pen = SelectObject(hdc, pen);
-				HGDIOBJ old_brush = SelectObject(hdc, m_Brush);
 				Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-				rc.left += FlatAppearance.BorderSize;
-				rc.top += FlatAppearance.BorderSize;
-				rc.right -= FlatAppearance.BorderSize;
-				rc.bottom -= FlatAppearance.BorderSize;
-				c = Color(229, 241, 251, 255);
-				pen = CreatePen(PS_INSIDEFRAME, 2, RGB(c.GetR(), c.GetG(), c.GetB()));
+
+				// Move inside rectangle for inner board
+				rc.left += 1;
+				rc.top += 1;
+				rc.right -= 1;
+				rc.bottom -= 1;
+
+				// Draw dot for tabbed click and mouseover
+				SetBkMode(hdc, OPAQUE);
+				pen = CreatePen(PS_DOT, 0, RGB(0, 0, 0));
+				old_pen = SelectObject(hdc, pen);
+				SetBkColor(hdc, RGB(0, 120, 215));
+				Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+
+				// Move inside rectangle for inner board
+				rc.left += 1;
+				rc.top += 1;
+				rc.right -= 1;
+				rc.bottom -= 1;
+
+				// Draw dot for tabbed click and mouseover
+				pen = CreatePen(PS_INSIDEFRAME, 0, RGB(225, 225, 225));
 				old_pen = SelectObject(hdc, pen);
 				Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+
+				// Move even more for background
+				rc.left += 1;
+				rc.top += 1;
+				rc.right -= 1;
+				rc.bottom -= 1;
+
 				//Clean up
-				SelectObject(hdc, old_pen);
-				SelectObject(hdc, old_brush);
+				DeleteObject(old_pen);
 				DeleteObject(pen);
 			}
 			else
 			{
-				pen = CreatePen(PS_INSIDEFRAME, FlatAppearance.BorderSize, RGB(FlatAppearance.BorderColor.GetR(), FlatAppearance.BorderColor.GetG(), FlatAppearance.BorderColor.GetB()));
-				HGDIOBJ old_pen = SelectObject(hdc, pen);
-				HGDIOBJ old_brush = SelectObject(hdc, m_Brush);
-				Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-				rc.left += FlatAppearance.BorderSize;
-				rc.top += FlatAppearance.BorderSize;
-				rc.right -= FlatAppearance.BorderSize;
-				rc.bottom -= FlatAppearance.BorderSize;
 				c = Color::Border();
+				// Draw outer border
+				HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(c.GetR(), c.GetG(), c.GetB()));
+				HGDIOBJ old_pen = SelectObject(hdc, pen);
+				Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+
+				// Move inside rectangle for inner board
+				rc.left += 1;
+				rc.top += 1;
+				rc.right -= 1;
+				rc.bottom -= 1;
+
+				// Draw inner board
+				c = Color(225, 225, 225, 255);
 				pen = CreatePen(PS_INSIDEFRAME, 2, RGB(c.GetR(), c.GetG(), c.GetB()));
 				old_pen = SelectObject(hdc, pen);
 				Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+
+				// Move even more for background
+				rc.left += 2;
+				rc.top += 2;
+				rc.right -= 2;
+				rc.bottom -= 2;
+
 				//Clean up
-				SelectObject(hdc, old_pen);
-				SelectObject(hdc, old_brush);
+				DeleteObject(old_pen);
 				DeleteObject(pen);
 			}
 		}
+
+		// Draw background inside
+		HBRUSH background = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+		FillRect(hdc, &rc, background);
+		DeleteObject(background);
+
 		break;
 	}
 	case FlatStyle::System:
@@ -271,23 +345,25 @@ void Button::OnPaint_Impl(HWND hwnd) noexcept
 
 	SetBkMode(hdc, TRANSPARENT);
 	SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-	HFONT hFont = CreateFont(Font.GetSize(), 0, 0, 0, Font.IsBold() ? FW_BOLD : FW_NORMAL, Font.IsItalic(), Font.IsUnderline(), Font.IsStrikeOut(), ANSI_CHARSET,
+	HFONT hFont = CreateFont(Font.GetSizeInPixels(), 0, 0, 0, Font.IsBold() ? FW_BOLD : FW_NORMAL, Font.IsItalic(), Font.IsUnderline(), Font.IsStrikeOut(), ANSI_CHARSET,
 		OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
 		DEFAULT_PITCH | FF_DONTCARE, Font.GetName().c_str());
 	SelectObject(hdc, hFont);
 	DrawText(hdc, GetText().c_str(), -1, &rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	DeleteObject(hFont);
 
-	EndPaint(hwnd, &ps);
 	// NEED TO IMPLEMENT A LARGE GRAPHICS CLASS TO HANDLE EVENTARGS TO THE USER.
 	// IT'S PROBABLY GOING TO BE ONE OF THE LAST STEPS
 	//Dispatch("OnPaint", new PaintEventArgs());
+
+	EndPaint(hwnd, &ps);
 }
 
 Button::Button(Control* parent, const std::string& name, int width, int height, int x, int y)
 	:
 	WinControl(parent, name, width, height, x, y),
-	FlatStyle(FlatStyle::Standard)
+	FlatStyle(FlatStyle::Standard),
+	FlatAppearance()
 {
 	Initialize();
 }

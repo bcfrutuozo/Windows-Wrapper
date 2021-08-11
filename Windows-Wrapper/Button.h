@@ -42,35 +42,22 @@ public:
 	public:
 
 		// Gets or sets the color of the border around the button.
-		Color BorderColor = Color::Border();
-			
-		//Gets or sets a value that specifies the size, in pixels, of the border around the button.
-		int BorderSize = 1;
-			
-		//Gets or sets the color of the client area of the button when the button is checked and the mouse pointer is outside the bounds of the control.
+		Color BorderColor;
+
+		// Gets or sets a value that specifies the size, in pixels, of the border around the button.
+		int BorderSize;
+
+		// Gets or sets the color of the client area of the button when the button is checked and the mouse pointer is outside the bounds of the control.
 		Color CheckedBackColor;
 
-		//Gets or sets the color of the client area of the button when the mouse is pressed within the bounds of the control.
-		Color MouseDownBackColor = Color(204, 228, 247, 255);
+		// Gets or sets the color of the client area of the button when the mouse is pressed within the bounds of the control.
+		Color MouseDownBackColor;
 
-		//Gets or sets the color of the client area of the button when the mouse pointer is within the bounds of the control.
-		Color MouseOverBackColor = Color(229, 241, 251, 255);
+		// Gets or sets the color of the client area of the button when the mouse pointer is within the bounds of the control.
+		Color MouseOverBackColor;
 
-	};
-
-	enum class FlatStyle
-	{
-		//The control appears flat.
-		Flat = 0,
-
-		//A control appears flat until the mouse pointer moves over it, at which point it appears three - dimensional.
-		Popup = 1,
-
-		//The control appears three - dimensional.
-		Standard = 2,
-
-		//The appearance of the control is determined by the user's operating system.
-		System = 3
+		FlatButtonAppearance();
+		virtual ~FlatButtonAppearance() = default;
 	};
 
 	FlatButtonAppearance FlatAppearance;

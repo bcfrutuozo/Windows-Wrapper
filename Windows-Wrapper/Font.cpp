@@ -1,5 +1,25 @@
 #include "Font.h"
 
+float Font::PixelToPoint(float sizeInPixels) const noexcept
+{
+	HDC hdc = CreateCompatibleDC(0);
+	float value = std::abs(static_cast<float>(MulDiv(sizeInPixels, 72, GetDeviceCaps(hdc, LOGPIXELSY))));
+	DeleteDC(hdc);
+	return value;
+}
+
+float Font::PointToPixel(float sizeInPoints) const noexcept
+{
+	HDC hdc = CreateCompatibleDC(0);
+	int pointPerInch = 72;
+	int deviceCaps = GetDeviceCaps(hdc, LOGPIXELSY);
+	LOGFONT logFont;
+	strcpy_s(logFont.lfFaceName, m_Name.c_str());
+	logFont.lfHeight = -MulDiv(m_Size, deviceCaps, pointPerInch);
+	DeleteDC(hdc);
+	return std::abs(logFont.lfHeight);
+}
+
 Font::Font(const std::string& name, const float& size, bool isBold, bool isItalic, bool isUnderline, bool isStrikeout, GraphicsUnit unit)
 	:
 	m_IsBold(isBold),
@@ -34,31 +54,41 @@ bool Font::IsStrikeOut() const noexcept
 
 float Font::GetSize() const noexcept
 {
+	return m_Size;
+}
+
+float Font::GetSizeInPixels() const noexcept
+{
 	switch (m_Unit)
 	{
-	case GraphicsUnit::World: break;
-	case GraphicsUnit::Display: break;
+	case GraphicsUnit::World:
+	{
+		break;
+	}
+	case GraphicsUnit::Display:
+	{
+		break;
+	}
 	case GraphicsUnit::Pixel:
 	{
 		return m_Size;
-		break;
 	}
 	case GraphicsUnit::Point:
 	{
-		HDC hdc = CreateCompatibleDC(0);
-		int pointPerInch = 72;
-		int deviceCaps = GetDeviceCaps(hdc, LOGPIXELSY);
-		// Generate a LOGFONT containing all the font properties.
-		LOGFONT logFont;
-		strcpy_s(logFont.lfFaceName, m_Name.c_str());
-		logFont.lfHeight = -MulDiv(m_Size, deviceCaps, pointPerInch);
-		logFont.lfWidth = 0; // keep zero.
-		DeleteDC(hdc);
-		return logFont.lfHeight;
+		return PointToPixel(m_Size);
 	}
-	case GraphicsUnit::Inch: break;
-	case GraphicsUnit::Document: break;
-	case GraphicsUnit::Millimeter:break;
+	case GraphicsUnit::Inch:
+	{
+		break;
+	}
+	case GraphicsUnit::Document:
+	{
+		break;
+	}
+	case GraphicsUnit::Millimeter:
+	{
+		break;
+	}
 	}
 }
 
@@ -75,6 +105,59 @@ std::string Font::GetName() const noexcept
 GraphicsUnit Font::GetUnit() const noexcept
 {
 	return m_Unit;
+}
+
+void Font::SetUnit(GraphicsUnit unit) noexcept
+{
+	switch (unit)
+	{
+	case GraphicsUnit::World:
+	{
+		break;
+	}
+	case GraphicsUnit::Display:
+	{
+		break;
+	}
+	case GraphicsUnit::Pixel:
+	{
+		switch (m_Unit)
+		{
+		case GraphicsUnit::Point:	// POINT TO PIXEL
+		{
+			m_Size = PointToPixel(m_Size);
+			break;
+		}
+		}
+		break;
+	}
+	case GraphicsUnit::Point:	
+	{
+		switch (m_Unit)
+		{
+		case GraphicsUnit::Pixel:	// PIXEL TO POINT
+		{
+			m_Size = PixelToPoint(m_Size);
+			break;
+		}
+		}
+		break;
+	}
+	case GraphicsUnit::Inch:
+	{
+		break;
+	}
+	case GraphicsUnit::Document:
+	{
+		break;
+	}
+	case GraphicsUnit::Millimeter:
+	{
+		break;
+	}
+	}
+
+	m_Unit = unit;
 }
 
 void Font::SetStyle(FontStyle style) noexcept

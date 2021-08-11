@@ -202,9 +202,9 @@ Button& Window::AddButton(const std::string& name, int width, int height, int x,
 	return Create<Button>(this, name, width, height, x, y);
 }
 
-TextBox& Window::AddTextBox(const std::string& name, int width, int height, int x, int y) noexcept
+TextBox& Window::AddTextBox(const std::string& name, int width, int x, int y) noexcept
 {
-	return Create<TextBox>(this, name, width, height, x, y);
+	return Create<TextBox>(this, name, width, x, y);
 }
 
 void Window::SetText(const std::string& title)

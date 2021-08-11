@@ -4,8 +4,6 @@
 #include "IHidable.h"
 #include "WinControl.h"
 
-#define MAXINPUTBUF 256
-
 class TextBox : public WinControl, public IHidable, public IActivable
 {
 private:
@@ -23,6 +21,8 @@ private:
 	code sucks, it might not suck as WinAPI. Geez...
 	*/
 	bool m_IsCaretVisible;
+	bool m_IsMultiline;
+	unsigned int m_MaximumLenght;
 
 	enum class DeleteInputType
 	{
@@ -73,8 +73,8 @@ public:
 
 	BorderStyle BorderStyle = BorderStyle::Fixed3D;
 
-	TextBox(Control* parent, int width, int height, int x, int y);
-	TextBox(Control* parent, const std::string& name, int width, int height, int x, int y);
+	TextBox(Control* parent, int width, int x, int y);
+	TextBox(Control* parent, const std::string& name, int width, int x, int y);
 	virtual ~TextBox();
 
 	int GetSelectionLenght() const noexcept;
@@ -84,4 +84,7 @@ public:
 	void Hide() override;
 	void Initialize() noexcept override;
 	void Show() override;
+
+	unsigned int GetMaximumLength() const noexcept;
+	void SetMaximumLength(unsigned int maximumLength) noexcept;
 };

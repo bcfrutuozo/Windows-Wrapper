@@ -85,7 +85,7 @@ public:
 
 	// Buttons
 	Button& AddButton(const std::string& name, int width, int height, int x, int y) noexcept;
-	TextBox& AddTextBox(const std::string& name, int width, int height, int x, int y) noexcept;
+	TextBox& AddTextBox(const std::string& name, int width, int x, int y) noexcept;
 
 	void SetText(const std::string& text);
 	void EnableCursor() noexcept;

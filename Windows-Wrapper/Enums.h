@@ -89,3 +89,18 @@ enum class GraphicsUnit
     // Specifies the millimeter as the unit of measure.
     Millimeter = 6
 };
+
+enum class FlatStyle
+{
+    //The control appears flat.
+    Flat = 0,
+
+    //A control appears flat until the mouse pointer moves over it, at which point it appears three - dimensional.
+    Popup = 1,
+
+    //The control appears three - dimensional.
+    Standard = 2,
+
+    //The appearance of the control is determined by the user's operating system.
+    System = 3
+};
