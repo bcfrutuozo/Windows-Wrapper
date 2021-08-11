@@ -219,6 +219,8 @@ void WinControl::OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags
 
 	if (!IsMouseOver())
 	{
+		// Mouseover Redraw should happen on MouseEnter trigger, not on MouseMove
+		InvalidateRect(hwnd, nullptr, TRUE);
 		Dispatch("OnMouseEnter", new EventArgs());
 	}
 
@@ -229,7 +231,6 @@ void WinControl::OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags
 	if (::_TrackMouseEvent(&tme))
 	{
 		SetMouseOverState(true);
-		InvalidateRect(hwnd, nullptr, TRUE);
 	}
 
 	Dispatch("OnMouseMove", new MouseEventArgs(MouseButtons::None, 0, 0, x, y));

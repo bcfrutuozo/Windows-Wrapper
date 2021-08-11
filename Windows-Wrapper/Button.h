@@ -10,8 +10,6 @@ class Button : public WinControl, public IHidable, public IActivable
 
 private:
 
-	bool m_TabClicking;
-
 	// Singleton manages registration/cleanup of window class
 	class ButtonClass
 	{
@@ -32,6 +30,7 @@ private:
 		static HINSTANCE GetInstance() noexcept;
 	};
 
+	int OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept override;
 	void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept override;
 	void OnKeyUp_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept override;
 	void OnPaint_Impl(HWND hwnd) noexcept override;
