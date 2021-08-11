@@ -617,7 +617,7 @@ void TextBox::InputDraw(HWND hWnd, HDC hdc) noexcept
 		OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
 		DEFAULT_PITCH | FF_DONTCARE, Font.GetName().c_str());
 
-	// Set the
+	// Set the control size in relation to the font size
 	int height = 5;
 	for (int i = 5, j = 0; i < Font.GetSizeInPixels(); ++i, ++j)
 	{
@@ -702,7 +702,7 @@ void TextBox::InputDraw(HWND hWnd, HDC hdc) noexcept
 	// Adjust text margin after border draw
 	cr.left += Margin.Left;
 	cr.top += Margin.Top;
-	cr.right -= Margin.Top;
+	cr.right -= Margin.Right;
 	cr.bottom -= Margin.Bottom;
 
 	// Adjust text in center based on default TextBox size with font size as 1
