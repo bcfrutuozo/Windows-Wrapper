@@ -66,19 +66,13 @@ void TestKeyPress(Control* const c, KeyEventArgs* e)
 		b2.Font.SetStyle(FontStyle::Strikeout);
 
 		TextBox& t = window->AddTextBox("TextBox", 400, 20, 400);
-		t.Font.SetSize(10);
 		t.BorderStyle = BorderStyle::None;
-		t.Font.SetUnit(GraphicsUnit::Point);
-		t.Font.SetSize(4);
 
 		TextBox& t2 = window->AddTextBox("TextBox2", 400, 20, 460);
 		t2.BorderStyle = BorderStyle::FixedSingle;
 
 		TextBox& t3 = window->AddTextBox("TextBox3", 400, 20, 560);
 		t3.BorderStyle = BorderStyle::Fixed3D;
-		t3.Font.SetUnit(GraphicsUnit::Pixel);
-		t3.Font.SetSize(100);
-		t3.Font.SetUnit(GraphicsUnit::Point);
 	}
 }
 

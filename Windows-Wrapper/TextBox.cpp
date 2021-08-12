@@ -14,12 +14,7 @@ TextBox::TextBoxClass::TextBoxClass() noexcept
 	wc.cbSize = sizeof(wc);
 	wc.style = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;
 	wc.lpfnWndProc = HandleMessageSetup;
-	wc.cbClsExtra = 0;
-	wc.cbWndExtra = 0;
 	wc.hInstance = GetInstance();
-	wc.hCursor = nullptr;
-	wc.hbrBackground = nullptr;
-	wc.lpszMenuName = nullptr;
 	wc.lpszClassName = GetName();
 	RegisterClassEx(&wc);
 }
@@ -330,7 +325,7 @@ void TextBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 void TextBox::OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat) noexcept
 {
 	// Break processing if TextBox is multiline and ENTER is pressed
-	if (!m_IsMultiline && c == '\r')
+	if (!m_IsMultiline && (c == '\r' || c == '\n'))
 	{
 		return;
 	}
@@ -343,6 +338,14 @@ void TextBox::OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat) noexcept
 
 	// Block key input if CTRL key is pressed. Only CTRL+A, CTRL+C, CTRL+V and CTRL+X is allowed 
 	if (0x8000 & GetKeyState(VK_CONTROL))
+	{
+		return;
+	}
+
+	// Don't process input in case the dispatched event is canceled by the user
+	KeyPressEventArgs e(c);
+	Dispatch("OnKeyPress", &e);
+	if (e.Handled == true)
 	{
 		return;
 	}
@@ -601,7 +604,7 @@ void TextBox::InputRedraw(HWND hWnd) noexcept
 	ReleaseDC(hWnd, hdc);
 }
 
-void TextBox::InputDraw(HWND hWnd, HDC hdc) noexcept
+void TextBox::InputDraw(HWND hWnd, HDC& hdc) noexcept
 {
 #ifdef _DEBUG
 	PrintDebug(); // Show string, cursor and selection indices on Output Window
@@ -609,10 +612,7 @@ void TextBox::InputDraw(HWND hWnd, HDC hdc) noexcept
 
 	SetBkMode(hdc, OPAQUE);
 
-	HPEN pen = { 0 };
 	RECT r, cr;
-	HGDIOBJ old_pen = { 0 };
-	HGDIOBJ old_brush = { 0 };
 	HFONT hFont = CreateFont(Font.GetSizeInPixels(), 0, 0, 0, Font.IsBold() ? FW_BOLD : FW_NORMAL, Font.IsItalic(), Font.IsUnderline(), Font.IsStrikeOut(), ANSI_CHARSET,
 		OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
 		DEFAULT_PITCH | FF_DONTCARE, Font.GetName().c_str());
@@ -637,67 +637,95 @@ void TextBox::InputDraw(HWND hWnd, HDC hdc) noexcept
 
 	GetClientRect(hWnd, &cr);
 
-	//Create pen for button border
+	// Create TextBox border
 	switch (BorderStyle)
 	{
 	case BorderStyle::None:
 	{
-		pen = CreatePen(PS_SOLID, 0, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-		old_pen = SelectObject(hdc, pen);
-		m_Brush = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-		old_brush = SelectObject(hdc, m_Brush);
-
+		// No border is drawn
 		break;
 	}
 	case BorderStyle::FixedSingle:
 	{
+		HPEN pen;
+		HGDIOBJ old_pen;
+
 		pen = CreatePen(PS_INSIDEFRAME, 1, RGB(100, 100, 100));
 		old_pen = SelectObject(hdc, pen);
-		m_Brush = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-		old_brush = SelectObject(hdc, m_Brush);
+		Rectangle(hdc, cr.left, cr.top, cr.right, cr.bottom);
 
-		break;
-	}
-	case BorderStyle::Fixed3D:
-	{
-		if (m_IsTabSelected)
-		{
-			Color c = Color::Selection();
-			pen = CreatePen(PS_INSIDEFRAME, 1, RGB(c.GetR(), c.GetG(), c.GetB()));
-			old_pen = SelectObject(hdc, pen);
-			m_Brush = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-			old_brush = SelectObject(hdc, m_Brush);
-			Rectangle(hdc, cr.left, cr.top, cr.right, cr.bottom);
-		}
-		else
-		{
-			pen = CreatePen(PS_INSIDEFRAME, 1, RGB(122, 122, 122));
-			old_pen = SelectObject(hdc, pen);
-			// Draw inner border
-			m_Brush = CreateSolidBrush(RGB(255, 255, 255));
-			old_brush = SelectObject(hdc, m_Brush);
-			Rectangle(hdc, cr.left, cr.top, cr.right, cr.bottom);
-		}
-
+		// Adjust padding for text
 		cr.left += 1;
 		cr.top += 1;
 		cr.right -= 1;
 		cr.bottom -= 1;
 
-		// Draw background
-		m_Brush = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-		old_brush = SelectObject(hdc, m_Brush);
+		//Clean up
+		DeleteObject(old_pen);
+		DeleteObject(pen);
 
+		break;
+	}
+	case BorderStyle::Fixed3D:
+	{
+		HPEN pen;
+		HGDIOBJ old_pen;
+
+		if (m_IsTabSelected)
+		{
+			// Draw outer border
+			Color c = Color::Selection();
+			pen = CreatePen(PS_INSIDEFRAME, 1, RGB(c.GetR(), c.GetG(), c.GetB()));
+			old_pen = SelectObject(hdc, pen);
+			Rectangle(hdc, cr.left, cr.top, cr.right, cr.bottom);
+
+			// Adjust padding for next border
+			cr.left += 1;
+			cr.top += 1;
+			cr.right -= 1;
+			cr.bottom -= 1;
+
+			// Draw inner border
+			pen = CreatePen(PS_INSIDEFRAME, 1, RGB(255, 255, 255));
+			old_pen = SelectObject(hdc, pen);
+			Rectangle(hdc, cr.left, cr.top, cr.right, cr.bottom);
+		}
+		else
+		{
+			// Draw outer border
+			pen = CreatePen(PS_INSIDEFRAME, 1, RGB(122, 122, 122));
+			old_pen = SelectObject(hdc, pen);
+			Rectangle(hdc, cr.left, cr.top, cr.right, cr.bottom);
+
+			// Adjust padding for next border
+			cr.left += 1;
+			cr.top += 1;
+			cr.right -= 1;
+			cr.bottom -= 1;
+
+			// Draw inner border
+			pen = CreatePen(PS_INSIDEFRAME, 1, RGB(255, 255, 255));
+			old_pen = SelectObject(hdc, pen);
+			Rectangle(hdc, cr.left, cr.top, cr.right, cr.bottom);
+		}
+
+		//Clean up
+		DeleteObject(old_pen);
+		DeleteObject(pen);
+
+		// Adjust padding for text
+		cr.left += 1;
+		cr.top += 1;
+		cr.right -= 1;
+		cr.bottom -= 1;
 		break;
 	}
 	}
 
-	Rectangle(hdc, cr.left, cr.top, cr.right, cr.bottom);
-
-	//Clean up
-	SelectObject(hdc, old_pen);
-	SelectObject(hdc, old_brush);
-	DeleteObject(pen);
+	// Draw background
+	HBRUSH brush = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+	FillRect(hdc, &cr, brush);
+	DeleteObject(brush);
 
 	// Adjust text margin after border draw
 	cr.left += Margin.Left;
@@ -708,7 +736,6 @@ void TextBox::InputDraw(HWND hWnd, HDC hdc) noexcept
 	// Adjust text in center based on default TextBox size with font size as 1
 	int spacingForAlignment = cr.bottom - Font.GetSizeInPixels();
 	cr.top += (spacingForAlignment / 2) - 4;	// 4 Pixels extra for small TextBox and underline characteres
-	cr.bottom -= (spacingForAlignment / 2);
 
 	// BOTTOM ALIGNMENT
 	//cr.top += (cr.top + Font.GetSizeInPixels()) / 2;
@@ -716,117 +743,23 @@ void TextBox::InputDraw(HWND hWnd, HDC hdc) noexcept
 	CopyRect(&r, &cr);
 	SelectObject(hdc, hFont);
 
-	if (!m_IsTabSelected)
+	// Draw for when control is selected and cursor index is the same as select index
+	if (!m_IsTabSelected || m_CursorIndex == m_SelectIndex)
 	{
 		SetBkMode(hdc, TRANSPARENT);
 		SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
 		DrawText(hdc, Text.c_str(), -1, &r, DT_LEFT | DT_VCENTER);
 		DrawText(hdc, Text.c_str(), m_CursorIndex, &r, DT_LEFT | DT_VCENTER | DT_CALCRECT);
+
+		if (m_CursorIndex == 0)
+		{
+			r.right = cr.left;
+		}
 	}
 	else
 	{
-		if (m_CursorIndex > 0 || (m_CursorIndex == 0 && m_CursorIndex != m_SelectIndex))
-		{
-			if (m_CursorIndex == m_SelectIndex)
-			{
-				SetBkMode(hdc, TRANSPARENT);
-				SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-				DrawText(hdc, Text.c_str(), -1, &r, DT_LEFT | DT_VCENTER);
-				DrawText(hdc, Text.c_str(), m_CursorIndex, &r, DT_LEFT | DT_VCENTER | DT_CALCRECT);
-			}
-			else
-			{
-				int currentX = 0;
-
-				if (m_CursorIndex > m_SelectIndex)
-				{
-					for (int i = 0; i < m_SelectIndex; ++i)
-					{
-						if (i != 0)
-						{
-							SIZE s;
-							GetTextExtentPoint32A(hdc, Text.substr(0, i).c_str(), i, &s);
-							currentX = s.cx;
-						}
-						SetBkMode(hdc, TRANSPARENT);
-						SetBkColor(hdc, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-						SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-						TextOut(hdc, r.left + currentX, r.top, Text.substr(i, 1).c_str(), 1);
-					}
-
-					for (int i = m_SelectIndex; i < m_CursorIndex; ++i)
-					{
-						SIZE s;
-						GetTextExtentPoint32A(hdc, Text.substr(0, i).c_str(), i, &s);
-						currentX = s.cx;
-						r.right = currentX;
-						SetBkMode(hdc, OPAQUE);
-						Color c = Color::Selection();
-						SetBkColor(hdc, RGB(c.GetR(), c.GetG(), c.GetB()));
-						SetTextColor(hdc, RGB(255, 255, 255));
-						TextOut(hdc, r.left + currentX, r.top, Text.substr(i, 1).c_str(), 1);
-					}
-
-					for (int i = m_CursorIndex; i < Text.length(); ++i)
-					{
-						SIZE s;
-						GetTextExtentPoint32A(hdc, Text.substr(0, i).c_str(), i, &s);
-						currentX = s.cx;
-						SetBkMode(hdc, TRANSPARENT);
-						SetBkColor(hdc, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-						SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-						TextOut(hdc, r.left + currentX, r.top, Text.substr(i, 1).c_str(), 1);
-					}
-				}
-				else
-				{
-					for (int i = 0; i < m_CursorIndex; ++i)
-					{
-						if (i != 0)
-						{
-							SIZE s;
-							GetTextExtentPoint32A(hdc, Text.substr(0, i).c_str(), i, &s);
-							currentX = s.cx;
-						}
-
-						SetBkMode(hdc, TRANSPARENT);
-						SetBkColor(hdc, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-						SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-						TextOut(hdc, r.left + currentX, r.top, Text.substr(i, 1).c_str(), 1);
-					}
-
-					for (int i = m_CursorIndex; i < m_SelectIndex; ++i)
-					{
-						SIZE s;
-						GetTextExtentPoint32A(hdc, Text.substr(0, i).c_str(), i, &s);
-						currentX = s.cx;
-						SetBkMode(hdc, OPAQUE);
-						Color c = Color::Selection();
-						SetBkColor(hdc, RGB(c.GetR(), c.GetG(), c.GetB()));
-						SetTextColor(hdc, RGB(255, 255, 255));
-						TextOut(hdc, r.left + currentX, r.top, Text.substr(i, 1).c_str(), 1);
-					}
-
-					for (int i = m_SelectIndex; i < Text.length(); ++i)
-					{
-						SIZE s;
-						GetTextExtentPoint32A(hdc, Text.substr(0, i).c_str(), i, &s);
-						currentX = s.cx;
-						SetBkMode(hdc, TRANSPARENT);
-						SetBkColor(hdc, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-						SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-						TextOut(hdc, r.left + currentX, r.top, Text.substr(i, 1).c_str(), 1);
-					}
-				}
-			}
-		}
-		else
-		{
-			SetBkMode(hdc, TRANSPARENT);
-			SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-			DrawText(hdc, Text.c_str(), -1, &r, DT_LEFT | DT_VCENTER);
-			r.right = cr.left;
-		}
+		// Such beauty with a different function for draw
+		PaintSelection(hdc, r, (std::min)(m_CursorIndex, m_SelectIndex), (std::max)(m_CursorIndex, m_SelectIndex));
 	}
 
 	// Caret position for after
@@ -860,6 +793,97 @@ void TextBox::InputDraw(HWND hWnd, HDC hdc) noexcept
 	}
 
 	DeleteObject(hFont);
+}
+
+void TextBox::PaintSelection(HDC& hdc, RECT& r, size_t start, size_t end) const noexcept
+{
+	/**************************************************************************************************/
+	/* Paint selection section by section
+	The logic is working flawlessly with just small pixel flaws on the first letter :D
+	However, it'll be very hard to implement autoscroll with Caret and Text redraw because the redraw
+	process is executed after the key press, meaning that the key would be draw one time, check it's
+	position and then redraw again in the right region... GEEZZZ
+
+	I'll try to find a proper way to implement this in a better to handle the scrolling for two reasons:
+		1 - AS A DECENT TEXTBOX, IT MUST HAVE THE FEATURE;
+		2 - Multiline TextBox in the future (Try no to cry, cry a lot)		:'(
+
+	As everything is working fine except the scrolling, I'll delay this feature to the future.
+	/**************************************************************************************************/
+	int currentX = 0;
+
+	// Draw text prior to selection
+	SIZE s;
+
+	if (start != 0)
+	{
+		GetTextExtentPoint32(hdc, Text.substr(0, start).c_str(), start, &s);
+		SetBkMode(hdc, TRANSPARENT);
+		SetBkColor(hdc, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+		SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
+		TextOut(hdc, r.left, r.top, Text.substr(0, start).c_str(), start);
+		currentX += s.cx;
+	}
+
+	GetTextExtentPoint32(hdc, Text.substr(start, end - start).c_str(), end - start, &s);
+	SetBkMode(hdc, OPAQUE);
+	Color c = Color::Selection();
+	SetBkColor(hdc, RGB(c.GetR(), c.GetG(), c.GetB()));
+	SetTextColor(hdc, RGB(255, 255, 255));
+	TextOut(hdc, r.left + currentX, r.top, Text.substr(start, end - start).c_str(), end - start);
+	currentX += s.cx;
+	r.right = currentX;
+
+	if (end != Text.length())
+	{
+		GetTextExtentPoint32(hdc, Text.substr(end, Text.length() - end).c_str(), Text.length() - end, &s);
+		SetBkMode(hdc, TRANSPARENT);
+		SetBkColor(hdc, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+		SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
+		TextOut(hdc, r.left + currentX, r.top, Text.substr(end, Text.length() - end).c_str(), Text.length() - end);
+	}
+
+	/**************************************************************************************************/
+	/* Paint selection char by char - OBSOLETE and slow code. It was working properly but with a lot
+	* more instructions per second.
+	/**************************************************************************************************/ 
+	/*for (int i = 0; i < start; ++i)
+	{
+		if (i != 0)
+		{
+			SIZE s;
+			GetTextExtentPoint32A(hdc, Text.substr(0, i).c_str(), i, &s);
+			currentX = s.cx;
+		}
+		SetBkMode(hdc, TRANSPARENT);
+		SetBkColor(hdc, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+		SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
+		TextOut(hdc, r.left + currentX, r.top, Text.substr(i, 1).c_str(), 1);
+	}
+
+	for (int i = start; i < end; ++i)
+	{
+		SIZE s;
+		GetTextExtentPoint32A(hdc, Text.substr(0, i).c_str(), i, &s);
+		currentX = s.cx;
+		r.right = currentX;
+		SetBkMode(hdc, OPAQUE);
+		Color c = Color::Selection();
+		SetBkColor(hdc, RGB(c.GetR(), c.GetG(), c.GetB()));
+		SetTextColor(hdc, RGB(255, 255, 255));
+		TextOut(hdc, r.left + currentX, r.top, Text.substr(i, 1).c_str(), 1);
+	}
+
+	for (int i = end; i < Text.length(); ++i)
+	{
+		SIZE s;
+		GetTextExtentPoint32A(hdc, Text.substr(0, i).c_str(), i, &s);
+		currentX = s.cx;
+		SetBkMode(hdc, TRANSPARENT);
+		SetBkColor(hdc, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+		SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
+		TextOut(hdc, r.left + currentX, r.top, Text.substr(i, 1).c_str(), 1);
+	}*/
 }
 
 TextBox::TextBox(Control* parent, int width, int x, int y)

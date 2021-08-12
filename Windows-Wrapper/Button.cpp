@@ -12,12 +12,7 @@ Button::ButtonClass::ButtonClass() noexcept
 	wc.cbSize = sizeof(wc);
 	wc.style = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;
 	wc.lpfnWndProc = HandleMessageSetup;
-	wc.cbClsExtra = 0;
-	wc.cbWndExtra = 0;
 	wc.hInstance = GetInstance();
-	wc.hCursor = nullptr;
-	wc.hbrBackground = nullptr;
-	wc.lpszMenuName = nullptr;
 	wc.lpszClassName = GetName();
 	RegisterClassEx(&wc);
 }

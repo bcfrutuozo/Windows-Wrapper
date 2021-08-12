@@ -44,7 +44,6 @@ private:
 
 	// Used by some controls to trigger certain rules updates
 	virtual void OnInternalUpdate(Control* const sender, EventArgs* const args) {};
-	static HBRUSH CreateGradientBrush(Color top, Color bottom, LPNMCUSTOMDRAW item) noexcept;
 
 protected:
 
@@ -57,7 +56,6 @@ protected:
 	Color m_ForeColor;
 	Color m_BackgroundColor;
 	static MessageMapper Mapper;
-	HBRUSH m_Brush;
 	Padding Margin;
 	Padding Padding;
 

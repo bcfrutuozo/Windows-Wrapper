@@ -67,7 +67,8 @@ private:
 	void PrintDebug() const noexcept;
 	void InputDelete(HWND hWnd, DeleteInputType deleteType) noexcept;
 	void InputRedraw(HWND hWnd) noexcept;
-	void InputDraw(HWND hWnd, HDC hdc) noexcept;
+	void InputDraw(HWND hWnd, HDC& hdc) noexcept;
+	void PaintSelection(HDC& hdc, RECT& r, size_t start, size_t end) const noexcept;
 
 public:
 

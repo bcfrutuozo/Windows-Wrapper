@@ -17,12 +17,8 @@ Window::WindowClass::WindowClass() noexcept
 	wc.cbSize = sizeof(wc);
 	wc.style = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;
 	wc.lpfnWndProc = HandleMessageSetup;
-	wc.cbClsExtra = 0;
-	wc.cbWndExtra = 0;
 	wc.hInstance = GetInstance();
-	wc.hCursor = nullptr;
-	wc.hbrBackground = nullptr;
-	wc.lpszMenuName = nullptr;
+	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.lpszClassName = GetName();
 	RegisterClassEx(&wc);
 }
@@ -165,7 +161,7 @@ void Window::ClearMenuStrip() noexcept
 			Controls.erase(it);
 
 			// Break processing to avoid exception.
-			// We are removing an element inside a for loop which will break the for iterator.
+			// We are removing an element inside a for loop which will cause the compiler to reference a null iterator.
 			// And as we have just one MenuStrip per Window. It's a valid assumption.
 			break;
 		}
