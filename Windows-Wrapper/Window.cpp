@@ -203,6 +203,16 @@ TextBox& Window::AddTextBox(const std::string& name, int width, int x, int y) no
 	return Create<TextBox>(this, name, width, x, y);
 }
 
+ProgressBar& Window::AddProgressBar(int width, int height, int x, int y) noexcept
+{
+	return Create<ProgressBar>(this, width, height, x, y);
+}
+
+ProgressBar& Window::AddProgressBar(const std::string& text, int width, int height, int x, int y) noexcept
+{
+	return Create<ProgressBar>(this, text, width, height, x, y);
+}
+
 void Window::SetText(const std::string& title)
 {
 	if (IsShown())

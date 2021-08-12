@@ -2,10 +2,10 @@
 
 #include <algorithm>
 
-// Singleton WndClass
+// Singleton TextBoxClass
 TextBox::TextBoxClass TextBox::TextBoxClass::m_TextBoxClass;
 
-// Window class declarations
+// TextBox class declarations
 TextBox::TextBoxClass::TextBoxClass() noexcept
 	:
 	m_Instance(GetModuleHandle(nullptr))

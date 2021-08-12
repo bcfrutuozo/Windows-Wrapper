@@ -35,8 +35,8 @@ class Control : public IHandle, public Base
 
 private:
 
-	bool m_IsMouseOver = false;
-	bool m_IsClicking = false;
+	bool m_IsMouseOver;
+	bool m_IsClicking;
 
 	// Fields for callback bindings to WinAPI
 	unsigned int m_Id;

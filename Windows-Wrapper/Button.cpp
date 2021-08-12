@@ -1,9 +1,9 @@
 #include "Button.h"
 
-// Singleton WndClass
+// Singleton ButtonClass
 Button::ButtonClass Button::ButtonClass::m_ButtonClass;
 
-// Window class declarations
+// ProgressBar class declarations
 Button::ButtonClass::ButtonClass() noexcept
 	:
 	m_Instance(GetModuleHandle(nullptr))

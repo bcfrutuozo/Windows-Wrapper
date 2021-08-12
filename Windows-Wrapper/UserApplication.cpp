@@ -11,6 +11,8 @@
 #include <iomanip>
 #include <functional>
 
+ProgressBar* teste = nullptr;
+
 void TesteBotaoEnter(Control* const c, EventArgs* const e)
 {
 
@@ -73,6 +75,32 @@ void TestKeyPress(Control* const c, KeyEventArgs* e)
 
 		TextBox& t3 = window->AddTextBox("TextBox3", 400, 20, 560);
 		t3.BorderStyle = BorderStyle::Fixed3D;
+
+		ProgressBar& pb = window->AddProgressBar("abc", 300, 50, 400, 20);
+		teste = &pb;
+	}
+	if (e->KeyData == Keys::A)
+	{
+		if (teste != nullptr)
+		{
+			teste->SetValue(teste->GetValue() + 1);
+		}
+	}
+
+	if (e->KeyData == Keys::D)
+	{
+		if (teste != nullptr)
+		{
+			teste->DecrementStep();
+		}
+	}
+
+	if (e->KeyData == Keys::I)
+	{
+		if (teste != nullptr)
+		{
+			teste->IncrementStep();
+		}
 	}
 }
 

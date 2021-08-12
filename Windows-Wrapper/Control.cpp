@@ -34,7 +34,9 @@ Control::Control(Control* parent, const std::string& text, int width, int height
 	m_BackgroundColor(Color::Control()),
 	m_ForeColor(Color::Black()),
 	Padding(0),
-	Margin(0)
+	Margin(0),
+	m_IsMouseOver(false),
+	m_IsClicking(false)
 {
 
 }

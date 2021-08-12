@@ -7,6 +7,7 @@
 #include "MenuStrip.h"
 #include "Button.h"
 #include "TextBox.h"
+#include "ProgressBar.h"
 #include "OnClosedEventArgs.h"
 #include "OnClosingEventArgs.h"
 
@@ -19,7 +20,6 @@ class Menu;
 
 class Window : public WinControl, public IHidable
 {
-	friend class Button;
 	friend class Menu;
 	friend class WinControl;
 
@@ -86,6 +86,8 @@ public:
 	// Buttons
 	Button& AddButton(const std::string& name, int width, int height, int x, int y) noexcept;
 	TextBox& AddTextBox(const std::string& name, int width, int x, int y) noexcept;
+	ProgressBar& AddProgressBar(int width, int height, int x, int y) noexcept;
+	ProgressBar& AddProgressBar(const std::string& text, int width, int height, int x, int y) noexcept;
 
 	void SetText(const std::string& text);
 	void EnableCursor() noexcept;

@@ -59,6 +59,7 @@
     <ClCompile Include="WinControl.cpp" />
     <ClCompile Include="Padding.cpp" />
     <ClCompile Include="Font.cpp" />
+    <ClCompile Include="ProgressBar.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RealTimeApplication.h" />
@@ -178,6 +179,7 @@
     <ClInclude Include="MouseButtons.h" />
     <ClInclude Include="Padding.h" />
     <ClInclude Include="Font.h" />
+    <ClInclude Include="ProgressBar.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interfaces">
