@@ -79,27 +79,60 @@ void TestKeyPress(Control* const c, KeyEventArgs* e)
 		ProgressBar& pb = window->AddProgressBar("abc", 300, 50, 400, 20);
 		teste = &pb;
 	}
+	if (e->KeyData == Keys::W)
+	{
+		if (teste != nullptr)
+		{
+			if (teste->GetAnimationType() == ProgressBarAnimation::Marquee)
+			{
+				teste->SetAnimation(ProgressBarAnimation::Blocks);
+			}
+			else
+			{
+				teste->SetAnimation(ProgressBarAnimation::Marquee);
+			}
+		}
+	}
 	if (e->KeyData == Keys::A)
+	{
+		if (teste != nullptr)
+		{
+			teste->Start();
+		}
+	}
+	if (e->KeyData == Keys::S)
+	{
+		if (teste != nullptr)
+		{
+			teste->Stop();
+		}
+	}
+	if (e->KeyData == Keys::U)
 	{
 		if (teste != nullptr)
 		{
 			teste->SetValue(teste->GetValue() + 1);
 		}
 	}
-
-	if (e->KeyData == Keys::D)
-	{
-		if (teste != nullptr)
-		{
-			teste->DecrementStep();
-		}
-	}
-
 	if (e->KeyData == Keys::I)
 	{
 		if (teste != nullptr)
 		{
+			teste->SetValue(teste->GetValue() - 1);
+		}
+	}
+	if (e->KeyData == Keys::O)
+	{
+		if (teste != nullptr)
+		{
 			teste->IncrementStep();
+		}
+	}
+	if (e->KeyData == Keys::P)
+	{
+		if (teste != nullptr)
+		{
+			teste->DecrementStep();
 		}
 	}
 }

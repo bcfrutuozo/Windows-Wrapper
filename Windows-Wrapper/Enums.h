@@ -104,3 +104,9 @@ enum class FlatStyle
     //The appearance of the control is determined by the user's operating system.
     System = 3
 };
+
+enum class ProgressBarAnimation
+{
+    Blocks  = 0,
+    Marquee = 1,
+};
