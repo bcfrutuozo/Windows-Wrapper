@@ -379,7 +379,26 @@ void TextBox::OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat) noexcept
 
 void TextBox::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
 {
-	SetFocus(hwnd);
+	if (m_IsTabSelected)
+	{
+		if (Text.length() == 0)
+		{
+			return;
+		}
+
+		int start = 0;
+		int end = 0;
+		POINT p;
+		GetCaretPos(&p);
+
+
+		// TODO: CHECK CARET POS FOR EACH CHAR
+		InputRedraw(hwnd);
+	}
+	else
+	{
+		SetFocus(hwnd);
+	}
 }
 
 void TextBox::OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept
@@ -417,6 +436,28 @@ void TextBox::OnPaint_Impl(HWND hWnd) noexcept
 	dc = BeginPaint(hWnd, &paint);
 	InputDraw(hWnd, dc);
 	EndPaint(hWnd, &paint);
+}
+
+void TextBox::CalculateCaret(HWND hwnd) noexcept
+{
+	if (Text.length() == 0)
+	{
+		return;
+	}
+
+	HDC hdc = GetDC(hwnd);
+
+	if (m_CaretPosition.size() < Text.length())
+	{
+		m_CaretPosition.resize(Text.length());
+	}
+
+	for (int i = 1; i < Text.length(); ++i)
+	{
+		GetTextExtentPoint32(hdc, Text.substr(0, i).c_str(), i, &m_CaretPosition[i]);
+	}
+
+	ReleaseDC(hwnd, hdc);
 }
 
 void TextBox::CopyToClipboard() const noexcept
@@ -742,6 +783,9 @@ void TextBox::InputDraw(HWND hWnd, HDC& hdc) noexcept
 
 	CopyRect(&r, &cr);
 	SelectObject(hdc, hFont);
+
+	// Recalculate Caret position for each character
+	CalculateCaret(hWnd);
 
 	// Draw for when control is selected and cursor index is the same as select index
 	if (!m_IsTabSelected || m_CursorIndex == m_SelectIndex)

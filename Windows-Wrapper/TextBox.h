@@ -23,6 +23,7 @@ private:
 	bool m_IsCaretVisible;
 	bool m_IsMultiline;
 	unsigned int m_MaximumLenght;
+	std::vector<SIZE> m_CaretPosition;
 
 	enum class DeleteInputType
 	{
@@ -60,6 +61,7 @@ private:
 	void OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept override;
 	void OnPaint_Impl(HWND hWnd) noexcept override;
 
+	void CalculateCaret(HWND hwnd) noexcept;
 	void CopyToClipboard() const noexcept;
 	void PasteFromClipboard() noexcept;
 	void EnableCaret() noexcept;
