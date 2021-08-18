@@ -484,11 +484,10 @@ void TextBox::OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept
 
 void TextBox::OnPaint_Impl(HWND hWnd) noexcept
 {
-	HDC dc;
 	PAINTSTRUCT paint;
 
-	dc = BeginPaint(hWnd, &paint);
-	InputDraw(hWnd, dc);
+	BeginPaint(hWnd, &paint);
+	InputDraw(hWnd, paint.hdc);
 	EndPaint(hWnd, &paint);
 }
 
@@ -715,13 +714,6 @@ void TextBox::InputDraw(HWND hWnd, HDC& hdc) noexcept
 	PrintDebug(); // Show string, cursor and selection indices on Output Window
 #endif
 
-	SetBkMode(hdc, OPAQUE);
-
-	RECT r, cr;
-	HFONT hFont = CreateFont(Font.GetSizeInPixels(), 0, 0, 0, Font.IsBold() ? FW_BOLD : FW_NORMAL, Font.IsItalic(), Font.IsUnderline(), Font.IsStrikeOut(), ANSI_CHARSET,
-		OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
-		DEFAULT_PITCH | FF_DONTCARE, Font.GetName().c_str());
-
 	// Set the control size in relation to the font size
 	int height = 5;
 	for (int i = 5, j = 0; i < Font.GetSizeInPixels(); ++i, ++j)
@@ -740,6 +732,15 @@ void TextBox::InputDraw(HWND hWnd, HDC& hdc) noexcept
 	Size.Height = 9 + height;
 	SetWindowPos(hWnd, HWND_TOP, Location.X, Location.Y, Size.Width, Size.Height, 0);
 
+	HDC hdcMem = CreateCompatibleDC(hdc);
+	HBITMAP hbmMem = CreateCompatibleBitmap(hdc, Size.Width, Size.Height);
+	HBITMAP hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
+
+	HFONT hFont = CreateFont(Font.GetSizeInPixels(), 0, 0, 0, Font.IsBold() ? FW_BOLD : FW_NORMAL, Font.IsItalic(), Font.IsUnderline(), Font.IsStrikeOut(), ANSI_CHARSET,
+		OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+		DEFAULT_PITCH | FF_DONTCARE, Font.GetName().c_str());
+
+	RECT r, cr;
 	GetClientRect(hWnd, &cr);
 
 	// Create TextBox border
@@ -756,8 +757,8 @@ void TextBox::InputDraw(HWND hWnd, HDC& hdc) noexcept
 		HGDIOBJ old_pen;
 
 		pen = CreatePen(PS_INSIDEFRAME, 1, RGB(100, 100, 100));
-		old_pen = SelectObject(hdc, pen);
-		Rectangle(hdc, cr.left, cr.top, cr.right, cr.bottom);
+		old_pen = SelectObject(hdcMem, pen);
+		Rectangle(hdcMem, cr.left, cr.top, cr.right, cr.bottom);
 
 		// Adjust padding for text
 		cr.left += 1;
@@ -766,7 +767,9 @@ void TextBox::InputDraw(HWND hWnd, HDC& hdc) noexcept
 		cr.bottom -= 1;
 
 		//Clean up
+		SelectObject(hdcMem, old_pen);
 		DeleteObject(old_pen);
+		SelectObject(hdcMem, pen);
 		DeleteObject(pen);
 
 		break;
@@ -781,8 +784,8 @@ void TextBox::InputDraw(HWND hWnd, HDC& hdc) noexcept
 			// Draw outer border
 			Color c = Color::Selection();
 			pen = CreatePen(PS_INSIDEFRAME, 1, RGB(c.GetR(), c.GetG(), c.GetB()));
-			old_pen = SelectObject(hdc, pen);
-			Rectangle(hdc, cr.left, cr.top, cr.right, cr.bottom);
+			old_pen = SelectObject(hdcMem, pen);
+			Rectangle(hdcMem, cr.left, cr.top, cr.right, cr.bottom);
 
 			// Adjust padding for next border
 			cr.left += 1;
@@ -792,15 +795,15 @@ void TextBox::InputDraw(HWND hWnd, HDC& hdc) noexcept
 
 			// Draw inner border
 			pen = CreatePen(PS_INSIDEFRAME, 1, RGB(255, 255, 255));
-			old_pen = SelectObject(hdc, pen);
-			Rectangle(hdc, cr.left, cr.top, cr.right, cr.bottom);
+			old_pen = SelectObject(hdcMem, pen);
+			Rectangle(hdcMem, cr.left, cr.top, cr.right, cr.bottom);
 		}
 		else
 		{
 			// Draw outer border
 			pen = CreatePen(PS_INSIDEFRAME, 1, RGB(122, 122, 122));
-			old_pen = SelectObject(hdc, pen);
-			Rectangle(hdc, cr.left, cr.top, cr.right, cr.bottom);
+			old_pen = SelectObject(hdcMem, pen);
+			Rectangle(hdcMem, cr.left, cr.top, cr.right, cr.bottom);
 
 			// Adjust padding for next border
 			cr.left += 1;
@@ -810,12 +813,14 @@ void TextBox::InputDraw(HWND hWnd, HDC& hdc) noexcept
 
 			// Draw inner border
 			pen = CreatePen(PS_INSIDEFRAME, 1, RGB(255, 255, 255));
-			old_pen = SelectObject(hdc, pen);
-			Rectangle(hdc, cr.left, cr.top, cr.right, cr.bottom);
+			old_pen = SelectObject(hdcMem, pen);
+			Rectangle(hdcMem, cr.left, cr.top, cr.right, cr.bottom);
 		}
 
 		//Clean up
+		SelectObject(hdcMem, old_pen);
 		DeleteObject(old_pen);
+		SelectObject(hdcMem, pen);
 		DeleteObject(pen);
 
 		// Adjust padding for text
@@ -829,7 +834,8 @@ void TextBox::InputDraw(HWND hWnd, HDC& hdc) noexcept
 
 	// Draw background
 	HBRUSH brush = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-	FillRect(hdc, &cr, brush);
+	FillRect(hdcMem, &cr, brush);
+	SelectObject(hdcMem, brush);
 	DeleteObject(brush);
 
 	// Adjust text margin after border draw
@@ -846,18 +852,18 @@ void TextBox::InputDraw(HWND hWnd, HDC& hdc) noexcept
 	//cr.top += (cr.top + Font.GetSizeInPixels()) / 2;
 
 	CopyRect(&r, &cr);
-	SelectObject(hdc, hFont);
+	SelectObject(hdcMem, hFont);
 
 	// Recalculate Caret position for each character
-	CalculateCaret(hWnd, hdc);
+	CalculateCaret(hWnd, hdcMem);
 
 	// Draw for when control is selected and cursor index is the same as select index
 	if (!m_IsTabSelected || m_CursorIndex == m_SelectIndex)
 	{
-		SetBkMode(hdc, TRANSPARENT);
-		SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-		DrawText(hdc, Text.c_str(), -1, &r, DT_LEFT | DT_VCENTER);
-		DrawText(hdc, Text.c_str(), m_CursorIndex, &r, DT_LEFT | DT_VCENTER | DT_CALCRECT);
+		SetBkMode(hdcMem, TRANSPARENT);
+		SetTextColor(hdcMem, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
+		DrawText(hdcMem, Text.c_str(), -1, &r, DT_LEFT | DT_VCENTER);
+		DrawText(hdcMem, Text.c_str(), m_CursorIndex, &r, DT_LEFT | DT_VCENTER | DT_CALCRECT);
 
 		if (m_CursorIndex == 0)
 		{
@@ -867,7 +873,7 @@ void TextBox::InputDraw(HWND hWnd, HDC& hdc) noexcept
 	else
 	{
 		// Such beauty with a different function for draw
-		PaintSelection(hdc, r, (std::min)(m_CursorIndex, m_SelectIndex), (std::max)(m_CursorIndex, m_SelectIndex));
+		PaintSelection(hdcMem, r, (std::min)(m_CursorIndex, m_SelectIndex), (std::max)(m_CursorIndex, m_SelectIndex));
 	}
 
 	// Caret position for after
@@ -900,7 +906,19 @@ void TextBox::InputDraw(HWND hWnd, HDC& hdc) noexcept
 #endif
 	}
 
+	//
+	// Blt the changes to the screen DC.
+	//
+	BitBlt(hdc, 0, 0, Size.Width, Size.Height, hdcMem, 0, 0, SRCCOPY);
+
+	SelectObject(hdcMem, hbmOld);
+	DeleteObject(hbmOld);
+	SelectObject(hdcMem, hbmOld);
+	DeleteObject(hbmMem);
+	SelectObject(hdcMem, hFont);
 	DeleteObject(hFont);
+	ReleaseDC(hWnd, hdcMem);
+	DeleteDC(hdcMem);
 }
 
 void TextBox::PaintSelection(HDC& hdc, RECT& r, size_t start, size_t end) const noexcept
