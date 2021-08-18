@@ -379,25 +379,79 @@ void TextBox::OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat) noexcept
 
 void TextBox::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
 {
+	SetClickingState(true);
+
+	if (Text.length() == 0)
+	{	
+		return;
+	}
+
+	if (x > m_CaretPosition.back().cx)
+	{
+		m_CursorIndex = Text.length();
+	}
+	else if (x < m_CaretPosition.front().cx)
+	{
+		m_CursorIndex = 0;
+	}
+	else
+	{
+		for (int i = 0; i < Text.length(); ++i)
+		{
+			if (x >= m_CaretPosition[i].cx - 2 && x <= m_CaretPosition[i].cx + 2)
+			{
+				m_CursorIndex = i;
+				break;
+			}
+		}
+	}
+
+	m_SelectIndex = m_CursorIndex;
+
 	if (m_IsTabSelected)
 	{
-		if (Text.length() == 0)
-		{
-			return;
-		}
-
-		int start = 0;
-		int end = 0;
-		POINT p;
-		GetCaretPos(&p);
-
-
-		// TODO: CHECK CARET POS FOR EACH CHAR
-		InputRedraw(hwnd);
+		InvalidateRect(hwnd, nullptr, true);
 	}
 	else
 	{
 		SetFocus(hwnd);
+	}
+}
+
+void TextBox::OnMouseLeftUp_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
+{
+	SetClickingState(false);
+}
+
+void TextBox::OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
+{
+	if (IsClicking())
+	{
+		if (keyFlags & MK_LBUTTON)
+		{
+			if (x > m_CaretPosition.back().cx)
+			{
+				m_SelectIndex = Text.length();
+			}
+			else if (x < m_CaretPosition.front().cx)
+			{
+				m_SelectIndex = 0;
+			}
+			else
+			{
+				for (int i = 0; i < Text.length(); ++i)
+				{
+					if (x >= m_CaretPosition[i].cx - 2 && x <= m_CaretPosition[i].cx + 2)
+					{
+						m_SelectIndex = i;
+						break;
+					}
+				}
+			}
+		}
+
+		InvalidateRect(hwnd, nullptr, true);
+		InputRedraw(hwnd);
 	}
 }
 
@@ -438,26 +492,36 @@ void TextBox::OnPaint_Impl(HWND hWnd) noexcept
 	EndPaint(hWnd, &paint);
 }
 
-void TextBox::CalculateCaret(HWND hwnd) noexcept
+void TextBox::CalculateCaret(HWND hwnd, const HDC& hdc) noexcept
 {
 	if (Text.length() == 0)
 	{
 		return;
 	}
 
-	HDC hdc = GetDC(hwnd);
+	// Not the best solution for now.
+	// At least it calculates using the right values
+	m_CaretPosition.clear();
 
-	if (m_CaretPosition.size() < Text.length())
+	if (m_CaretPosition.size() < Text.length() + 1)
 	{
-		m_CaretPosition.resize(Text.length());
+		m_CaretPosition.resize(Text.length() + 1, { 0, 0 });
 	}
 
-	for (int i = 1; i < Text.length(); ++i)
+	for (int i = 0; i <= Text.length(); ++i)
 	{
-		GetTextExtentPoint32(hdc, Text.substr(0, i).c_str(), i, &m_CaretPosition[i]);
-	}
+		if (i > 0)
+		{
+			GetTextExtentPoint32(hdc, Text.substr(0, i).c_str(), i, &m_CaretPosition[i]);
+		}
 
-	ReleaseDC(hwnd, hdc);
+		switch (BorderStyle)
+		{
+		case BorderStyle::None: m_CaretPosition[i].cx += Margin.Left; break;
+		case BorderStyle::FixedSingle: m_CaretPosition[i].cx += Margin.Left + 1; break;
+		case BorderStyle::Fixed3D: m_CaretPosition[i].cx += Margin.Left + 2; break;
+		}
+	}
 }
 
 void TextBox::CopyToClipboard() const noexcept
@@ -785,7 +849,7 @@ void TextBox::InputDraw(HWND hWnd, HDC& hdc) noexcept
 	SelectObject(hdc, hFont);
 
 	// Recalculate Caret position for each character
-	CalculateCaret(hWnd);
+	CalculateCaret(hWnd, hdc);
 
 	// Draw for when control is selected and cursor index is the same as select index
 	if (!m_IsTabSelected || m_CursorIndex == m_SelectIndex)
@@ -886,48 +950,6 @@ void TextBox::PaintSelection(HDC& hdc, RECT& r, size_t start, size_t end) const 
 		SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
 		TextOut(hdc, r.left + currentX, r.top, Text.substr(end, Text.length() - end).c_str(), Text.length() - end);
 	}
-
-	/**************************************************************************************************/
-	/* Paint selection char by char - OBSOLETE and slow code. It was working properly but with a lot
-	* more instructions per second.
-	/**************************************************************************************************/ 
-	/*for (int i = 0; i < start; ++i)
-	{
-		if (i != 0)
-		{
-			SIZE s;
-			GetTextExtentPoint32A(hdc, Text.substr(0, i).c_str(), i, &s);
-			currentX = s.cx;
-		}
-		SetBkMode(hdc, TRANSPARENT);
-		SetBkColor(hdc, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-		SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-		TextOut(hdc, r.left + currentX, r.top, Text.substr(i, 1).c_str(), 1);
-	}
-
-	for (int i = start; i < end; ++i)
-	{
-		SIZE s;
-		GetTextExtentPoint32A(hdc, Text.substr(0, i).c_str(), i, &s);
-		currentX = s.cx;
-		r.right = currentX;
-		SetBkMode(hdc, OPAQUE);
-		Color c = Color::Selection();
-		SetBkColor(hdc, RGB(c.GetR(), c.GetG(), c.GetB()));
-		SetTextColor(hdc, RGB(255, 255, 255));
-		TextOut(hdc, r.left + currentX, r.top, Text.substr(i, 1).c_str(), 1);
-	}
-
-	for (int i = end; i < Text.length(); ++i)
-	{
-		SIZE s;
-		GetTextExtentPoint32A(hdc, Text.substr(0, i).c_str(), i, &s);
-		currentX = s.cx;
-		SetBkMode(hdc, TRANSPARENT);
-		SetBkColor(hdc, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-		SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-		TextOut(hdc, r.left + currentX, r.top, Text.substr(i, 1).c_str(), 1);
-	}*/
 }
 
 TextBox::TextBox(Control* parent, int width, int x, int y)

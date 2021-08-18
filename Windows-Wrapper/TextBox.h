@@ -57,11 +57,13 @@ private:
 	void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept override;
 	void OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat) noexcept override;
 	void OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept override;
+	void OnMouseLeftUp_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept override;
+	void OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept override;
 	void OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept override;
 	void OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept override;
 	void OnPaint_Impl(HWND hWnd) noexcept override;
 
-	void CalculateCaret(HWND hwnd) noexcept;
+	void CalculateCaret(HWND hwnd, const HDC& hdc) noexcept;
 	void CopyToClipboard() const noexcept;
 	void PasteFromClipboard() noexcept;
 	void EnableCaret() noexcept;
