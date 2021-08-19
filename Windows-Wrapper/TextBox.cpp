@@ -386,24 +386,26 @@ void TextBox::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlag
 		return;
 	}
 
-	if (x > m_CaretPosition.back().cx)
+	if (x > m_CaretPosition.back())
 	{
 		m_CursorIndex = Text.length();
 	}
-	else if (x < m_CaretPosition.front().cx)
+	else if (x < m_CaretPosition.front())
 	{
 		m_CursorIndex = 0;
 	}
 	else
 	{
-		for (int i = 0; i < Text.length(); ++i)
+		const auto idx = std::lower_bound(m_CaretPosition.begin(), m_CaretPosition.end(), x);
+		m_CursorIndex = idx - m_CaretPosition.begin();
+		/*for (int i = 0; i < Text.length(); ++i)
 		{
-			if (x >= m_CaretPosition[i].cx - 2 && x <= m_CaretPosition[i].cx + 2)
+			if (x >= m_CaretPosition[i].cx - Font.GetSizeInPixels() && x <= m_CaretPosition[i].cx + Font.GetSizeInPixels())
 			{
 				m_CursorIndex = i;
 				break;
 			}
-		}
+		}*/
 	}
 
 	m_SelectIndex = m_CursorIndex;
@@ -429,24 +431,18 @@ void TextBox::OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) n
 	{
 		if (keyFlags & MK_LBUTTON)
 		{
-			if (x > m_CaretPosition.back().cx)
+			if (x > m_CaretPosition.back())
 			{
 				m_SelectIndex = Text.length();
 			}
-			else if (x < m_CaretPosition.front().cx)
+			else if (x < m_CaretPosition.front())
 			{
 				m_SelectIndex = 0;
 			}
 			else
 			{
-				for (int i = 0; i < Text.length(); ++i)
-				{
-					if (x >= m_CaretPosition[i].cx - 2 && x <= m_CaretPosition[i].cx + 2)
-					{
-						m_SelectIndex = i;
-						break;
-					}
-				}
+				const auto idx = std::lower_bound(m_CaretPosition.begin(), m_CaretPosition.end(), x);
+				m_SelectIndex = idx - m_CaretPosition.begin();
 			}
 		}
 
@@ -504,21 +500,23 @@ void TextBox::CalculateCaret(HWND hwnd, const HDC& hdc) noexcept
 
 	if (m_CaretPosition.size() < Text.length() + 1)
 	{
-		m_CaretPosition.resize(Text.length() + 1, { 0, 0 });
+		m_CaretPosition.resize(Text.length() + 1, 0ul);
 	}
 
 	for (int i = 0; i <= Text.length(); ++i)
 	{
 		if (i > 0)
 		{
-			GetTextExtentPoint32(hdc, Text.substr(0, i).c_str(), i, &m_CaretPosition[i]);
+			SIZE s;
+			GetTextExtentPoint32(hdc, Text.substr(0, i).c_str(), i, &s);
+			m_CaretPosition[i] = s.cx;
 		}
 
 		switch (BorderStyle)
 		{
-		case BorderStyle::None: m_CaretPosition[i].cx += Margin.Left; break;
-		case BorderStyle::FixedSingle: m_CaretPosition[i].cx += Margin.Left + 1; break;
-		case BorderStyle::Fixed3D: m_CaretPosition[i].cx += Margin.Left + 2; break;
+		case BorderStyle::None: m_CaretPosition[i] += Margin.Left; break;
+		case BorderStyle::FixedSingle: m_CaretPosition[i] += Margin.Left + 1; break;
+		case BorderStyle::Fixed3D: m_CaretPosition[i] += Margin.Left + 2; break;
 		}
 	}
 }
