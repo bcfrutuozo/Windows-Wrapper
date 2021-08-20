@@ -46,6 +46,7 @@ void ProgressBar::OnPaint_Impl(HWND hwnd) noexcept
 		RECT rt;
 		GetClientRect(hwnd, &rt);
 		HDC hdc = GetDC(hwnd);
+
 		if (hdc == nullptr)
 		{
 			break;
@@ -120,7 +121,7 @@ void ProgressBar::OnPaint_Impl(HWND hwnd) noexcept
 			rt.right -= 1;
 			rt.bottom -= 1;
 
-			FillRect(hdc, &rt, CreateSolidBrush(RGB(240, 240, 240)));
+			FillRect(hdc, &rt, CreateSolidBrush(RGB(230, 230, 230)));
 			DeleteObject(draw);
 			DeleteObject(pen);
 			ReleaseDC(hwnd, hdc);
@@ -133,22 +134,23 @@ void ProgressBar::OnPaint_Impl(HWND hwnd) noexcept
 void ProgressBar::OnPaintMarquee_Thread(HWND hwnd) noexcept
 {
 	HDC hdc = GetDC(hwnd);
+	SetBkColor(hdc, RGB(230, 230, 230));
+	SetBkMode(hdc, TRANSPARENT);
+	HDC hdcMem = CreateCompatibleDC(hdc);
+	HBITMAP hbmMem = CreateCompatibleBitmap(hdc, Size.Width, Size.Height);
+	HBITMAP hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
+
 	while (m_IsRunning)
 	{
 		RECT rt;
 		GetClientRect(hwnd, &rt);
 
-		// Get the HDC object without forcing it everytime
-		if (hdc == nullptr)
-		{
-			break;
-		}
-
 		HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(188, 188, 188));
-		HGDIOBJ draw = SelectObject(hdc, pen);
-		Rectangle(hdc, rt.left, rt.top, rt.right, rt.bottom);
-		DeleteObject(draw);
+		HGDIOBJ draw = SelectObject(hdcMem, pen);
+		Rectangle(hdcMem, rt.left, rt.top, rt.right, rt.bottom);
 		DeleteObject(pen);
+		SelectObject(hdcMem, draw);
+		DeleteObject(draw);
 
 		// Enter rectangle ignoring border
 		rt.left += 1;
@@ -156,73 +158,81 @@ void ProgressBar::OnPaintMarquee_Thread(HWND hwnd) noexcept
 		rt.right -= 1;
 		rt.bottom -= 1;
 
-		// Draw first portion if Marquee effect is in middle of the bar
-		if (Maximum - Minimum < 1)
-		{
-			rt.right = Minimum;
-			FillRect(hdc, &rt, CreateSolidBrush(RGB(240, 240, 240)));
-		}
-
-		// Draw inner bar for Marquee effect
-		if (Maximum > 1)
-		{
-			if (Minimum < 1)
-			{
-				rt.left = 1;
-			}
-			else
-			{
-				rt.left = Minimum;
-			}
-
-			if (Maximum > Size.Width - 1)
-			{
-				rt.right = Size.Width - 1;
-			}
-			else
-			{
-				rt.right = Maximum - 1;
-			}
-
-			FillRect(hdc, &rt, CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB())));
-		}
-
-		// Draw the end of the bar if Marquee effect is in middle
-		if (Maximum < Size.Width - 1)
-		{
-			rt.left = rt.right;
-			rt.right = Size.Width - 1;
-
-			FillRect(hdc, &rt, CreateSolidBrush(RGB(240, 240, 240)));
-		}
-
-		// Redraw back part of the bar
-		if (Minimum > 1)
-		{
-			RECT o;
-			CopyRect(&o, &rt);
-			o.left = 2;
-			o.right = Minimum - 1;
-			FillRect(hdc, &o, CreateSolidBrush(RGB(240, 240, 240)));
-		}
-
-		// Increment Marquee effect 1 pixel for each draw
-		Minimum += 1;
-		Maximum += 1;
-
 		// Reset Marquee effect when inner bar leaves the main bar window
 		if (Minimum >= Size.Width)
 		{
 			Minimum = -125;
 			Maximum = 0;
+			FillRect(hdcMem, &rt, CreateSolidBrush(RGB(230, 230, 230)));
+		}
+		else
+		{
+			// Draw first portion if Marquee effect is in middle of the bar
+			if (Maximum - Minimum < 1)
+			{
+				rt.right = Minimum;
+				FillRect(hdcMem, &rt, CreateSolidBrush(RGB(230, 230, 230)));
+			}
+
+			// Draw inner bar for Marquee effect
+			if (Maximum > 1)
+			{
+				if (Minimum < 1)
+				{
+					rt.left = 1;
+				}
+				else
+				{
+					rt.left = Minimum - 1;
+				}
+
+				if (Maximum > Size.Width - 1)
+				{
+					rt.right = Size.Width - 1;
+				}
+				else
+				{
+					rt.right = Maximum + 1;
+				}
+
+				FillRect(hdcMem, &rt, CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB())));
+			}
+
+			// Draw the end of the bar if Marquee effect is in middle
+			if (Maximum < Size.Width - 1)
+			{
+				rt.left = Maximum + 1;
+				rt.right = Size.Width - 1;
+
+				FillRect(hdcMem, &rt, CreateSolidBrush(RGB(230, 230, 230)));
+			}
+
+			// Redraw back part of the bar
+			if (Minimum > 1)
+			{
+				rt.left = 1;
+				rt.right = Minimum - 1;
+				FillRect(hdcMem, &rt, CreateSolidBrush(RGB(230, 230, 230)));
+			}
+
+			// Increment Marquee effect 1 pixel for each draw
+			Minimum += 1;
+			Maximum += 1;
 		}
 
-		Sleep(1);
+		// Perform the bit-block transfer between the memory Device Context which has the next bitmap
+		// with the current image to avoid flickering
+		BitBlt(hdc, 0, 0, Size.Width, Size.Height, hdcMem, 0, 0, SRCCOPY);
+
+		std::this_thread::sleep_for(std::chrono::microseconds(250));
 	}
 
 	if (hdc != nullptr)
 	{
 		ReleaseDC(hwnd, hdc);
+		DeleteDC(hdc);
+		ReleaseDC(hwnd, hdc);
+		DeleteDC(hdcMem);
 	}
 }
 
@@ -299,20 +309,20 @@ void ProgressBar::SetValue(int value) noexcept
 		m_Value = value;
 
 		// Force progress bar redraw
-		InvalidateRect(static_cast<HWND>(Handle.ToPointer()), nullptr, true);
+		Update();
 	}
 	else
 	{
 		if (value > Maximum && m_Value < Maximum)
 		{
 			m_Value = Maximum;
-			InvalidateRect(static_cast<HWND>(Handle.ToPointer()), nullptr, true);
+			Update();
 		}
 
 		if (value < Minimum && m_Value > Minimum)
 		{
 			m_Value = Minimum;
-			InvalidateRect(static_cast<HWND>(Handle.ToPointer()), nullptr, true);
+			Update();
 		}
 	}
 }
@@ -390,7 +400,7 @@ void ProgressBar::SetAnimation(ProgressBarAnimation animation) noexcept
 	}
 
 	m_Animation = animation;
-	InvalidateRect(static_cast<HWND>(Handle.ToPointer()), nullptr, true);
+	Update();
 }
 
 void ProgressBar::Start() noexcept
@@ -417,7 +427,7 @@ void ProgressBar::Stop() noexcept
 			Maximum = 0;
 			Step = 1;
 			m_Value = -125;
-			InvalidateRect(static_cast<HWND>(Handle.ToPointer()), nullptr, true);
+			Update();
 		}
 	}
 }
