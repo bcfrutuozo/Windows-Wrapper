@@ -131,7 +131,7 @@ void Window::Initialize() noexcept
 	rid.usUsage = 0x02; // Mouse page
 	rid.dwFlags = 0;
 	rid.hwndTarget = nullptr;
-	if (RegisterRawInputDevices(&rid, 1, sizeof(rid)) == FALSE)
+	if (RegisterRawInputDevices(&rid, 1, sizeof(rid)) == false)
 	{
 		throw CTL_LAST_EXCEPT();
 	}
@@ -140,7 +140,7 @@ void Window::Initialize() noexcept
 
 	// Force window redraw to set Background color
 	m_BackgroundColor = Color::Control();
-	InvalidateRect(static_cast<HWND>(Handle.ToPointer()), nullptr, TRUE);
+	InvalidateRect(static_cast<HWND>(Handle.ToPointer()), nullptr, true);
 }
 
 Window::~Window()
@@ -175,6 +175,7 @@ void Window::UpdateMenuStrip() noexcept
 		if (c->GetType() == typeid(MenuStrip))
 		{
 			SetMenu(static_cast<HWND>(Handle.ToPointer()), static_cast<HMENU>(c->Handle.ToPointer()));
+			c->Update();
 			m_IsMenuStripEnabled = true;
 		}
 	}
@@ -279,7 +280,7 @@ void Window::OnCommand_Impl(HWND hwnd, int id, HWND hwndCtl, unsigned int codeNo
 		c->Dispatch("OnMouseClick", new MouseEventArgs(MouseButtons::Left, 1, 0, 0, 0));
 
 		// Force the update of the controls
-		c->Dispatch("OnInternalUpdate", new EventArgs());
+		c->Update();
 	}
 }
 

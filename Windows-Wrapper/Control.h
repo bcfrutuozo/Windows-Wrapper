@@ -42,9 +42,6 @@ private:
 	unsigned int m_Id;
 	static unsigned int m_CurrentIndex;
 
-	// Used by some controls to trigger certain rules updates
-	virtual void OnInternalUpdate(Control* const sender, EventArgs* const args) {};
-
 protected:
 
 	std::string Text;
@@ -62,7 +59,7 @@ protected:
 	// Forces the implementation and call on individual childs because each WinApi control
 	// has it own creation method.
 	// ALL DERIVED CLASSES MUST CALL THIS METHOD ON ITS CONSTRUCTOR
-	virtual void Initialize() noexcept = 0;
+	virtual void Initialize() = 0;
 
 	template<typename T, typename... Args>
 	T& Create(Args... a)
@@ -128,6 +125,9 @@ public:
 	Window* GetWindow() noexcept;
 	bool IsMouseOver() const noexcept;
 	bool IsClicking() const noexcept;
+
+	// Used by some controls to trigger certain rules updates
+	virtual void Update() = 0;
 
 	// Control Exception
 	class ControlException : public Exception

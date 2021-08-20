@@ -6,7 +6,7 @@ class MenuEntryItem : public MenuItem
 {
 protected:
 
-	void Initialize() noexcept override;
+	void Initialize() override;
 
 public:
 

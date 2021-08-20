@@ -13,9 +13,25 @@ class WinControl : public Control
 
 private:
 
+	bool m_Enabled;
+
 	// Tabulation fields
 	unsigned int m_TabIndex;
 	static unsigned int m_IncrementalTabIndex;
+
+	// Event fields
+	EventArgs ArgsDefault;
+	OnClosingEventArgs ArgsOnClosing;
+	OnClosedEventArgs ArgsOnClosed;
+	KeyEventArgs ArgsOnKeyDown;
+	KeyPressEventArgs ArgsOnKeyPressed;
+	KeyEventArgs ArgsOnKeyUp;
+	MouseEventArgs ArgsOnMouseMove;
+	MouseEventArgs ArgsOnMouseDown;
+	MouseEventArgs ArgsOnMouseClick;
+	MouseEventArgs ArgsOnMouseUp;
+	MouseEventArgs ArgsOnMouseDoubleClick;
+	MouseEventArgs ArgsOnMouseWheel;
 
 	/* Global events declaration
 	All are virtual to be overritten on the derived classes. Not all should be, but events like OnPaint(), OnMouseOver(),
@@ -35,7 +51,6 @@ private:
 	virtual void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept;
 	virtual void OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat) noexcept;
 	virtual void OnKeyUp_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept;
-	virtual void OnMove_Impl(HWND hwnd, int x, int y) noexcept;
 	virtual void OnMouseLeave_Impl(HWND hwnd) noexcept;
 	virtual void OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept;
 	virtual void OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept;
@@ -80,6 +95,10 @@ public:
 
 	Font Font;
 
+	bool IsEnabled() const noexcept;
+	void Enable() noexcept;
+	void Disable() noexcept;
 	int GetTabIndex() const noexcept;
 	void SetTabIndex(const unsigned int& index) noexcept;
+	void Update() override;
 };

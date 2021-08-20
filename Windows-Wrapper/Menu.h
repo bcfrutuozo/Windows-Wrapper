@@ -23,5 +23,9 @@ protected:
 	Menu(Control* parent, const std::string& text, unsigned int subitemIndex, int section);		// Base constructor for other menu types (CreatePopupMenu())
 	virtual ~Menu();
 
-	virtual void Initialize() noexcept override = 0;
+	virtual void Initialize() override = 0;
+
+public:
+
+	void Update() override;
 };

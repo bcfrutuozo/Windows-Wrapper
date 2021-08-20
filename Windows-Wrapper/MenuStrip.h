@@ -9,6 +9,10 @@ class MenuStrip : public MenuRoot, public IHidable
 {
 	friend class Window;
 
+protected:
+
+	void Initialize() override;
+
 public:
 
 	MenuStrip(Control* parent);

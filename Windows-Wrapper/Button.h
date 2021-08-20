@@ -4,7 +4,7 @@
 #include "IHidable.h"
 #include "WinControl.h"
 
-class Button : public WinControl, public IHidable, public IActivable
+class Button final: public WinControl, public IHidable
 {
 	friend class WinControl;
 
@@ -66,10 +66,8 @@ public:
 	Button(Control* parent, const std::string& name, int width, int height, int x, int y);
 	virtual ~Button();
 
-	void Disable() noexcept override;
-	void Enable() noexcept override;
 	void Hide() override;
-	void Initialize() noexcept override;
+	void Initialize() override;
 	void Show() override;
 };
 

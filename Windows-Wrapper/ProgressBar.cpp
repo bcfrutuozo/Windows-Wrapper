@@ -251,7 +251,7 @@ ProgressBar::~ProgressBar()
 
 }
 
-void ProgressBar::Initialize() noexcept
+void ProgressBar::Initialize()
 {
 	// Create window and get its handle
 	Handle = CreateWindow(

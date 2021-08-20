@@ -11,7 +11,7 @@ private:
 
 protected:
 
-	void Initialize() noexcept override;
+	void Initialize() override;
 
 public:
 

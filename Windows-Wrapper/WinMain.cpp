@@ -1,5 +1,5 @@
-#include "RealTimeApplication.h"
-#include "UserApplication.h"
+#include "TestApplication.h"
+#include "Control.h"
 
 #ifdef _DEBUG
 #define _CRTDBG_MAP_ALLOC
@@ -26,27 +26,21 @@ int CALLBACK WinMain(
 	_CrtMemDumpStatistics(&StartupMemState);
 #endif
 
+	int ret = 0;
+
 	try
 	{
 		SetProcessDPIAware();
-		int ret = UserApplication().Start();
-
-#ifdef _DEBUG
-		_CrtMemState ShutdownMemState;
-		_CrtMemCheckpoint(&ShutdownMemState);
-		_CrtMemDumpStatistics(&ShutdownMemState);
-		OutputDebugString("=============\n");
-		_CrtMemDumpAllObjectsSince(&StartupMemState);
-#endif
-
-		return ret;
+		ret = TestApplication().Start();
 	}
 	catch (const std::exception& e)
 	{
+		ret = -1;
 		MessageBox(nullptr, e.what(), "Standard Exception", MB_OK | MB_ICONEXCLAMATION);
 	}
 	catch (...)
 	{
+		ret = -1;
 		MessageBox(nullptr, "No details available", "Unknown Exception", MB_OK | MB_ICONEXCLAMATION);
 	}
 
@@ -58,5 +52,5 @@ int CALLBACK WinMain(
 	_CrtMemDumpAllObjectsSince(&StartupMemState);
 #endif
 
-	return -1;
+	return ret;
 }

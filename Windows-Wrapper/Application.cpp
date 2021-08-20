@@ -11,3 +11,8 @@ Application::~Application()
 {
 
 }
+
+Window* const Application::GetWindow() const noexcept
+{
+	return m_Window.get();
+}

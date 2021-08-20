@@ -1,14 +1,6 @@
 #include "MenuRadioItem.h"
 #include "EventHandler.h"
 
-// Triggered after all event dispatch
-void MenuRadioItem::OnInternalUpdate(Control* const sender, EventArgs* const args)
-{
-	IsChecked = !IsChecked;
-	auto idx = InvalidateSection(m_Section);
-	CheckMenuRadioItem(static_cast<HMENU>(Parent->Handle.ToPointer()), std::get<0>(idx), std::get<1>(idx), m_SubItemIndex, MF_BYPOSITION);
-}
-
 std::tuple<int, int> MenuRadioItem::InvalidateSection(int section)
 {
 	int begin = 0;
@@ -61,13 +53,9 @@ MenuRadioItem::MenuRadioItem(Menu* parent, const std::string& text, unsigned int
 	IsChecked(isChecked)
 {
 	Initialize();
-
-	// The OnInternalUpdate() event could be registered in Control class. However, it's registered on each child class who implement
-	// the function to avoid unnecessary calls for the other classes
-	Events.Register(std::make_unique<EventHandler>("OnInternalUpdate", std::function<void(Control* c, EventArgs* e)>([this](Control* c, EventArgs* e) { OnInternalUpdate(c, e); })));
 }
 
-void MenuRadioItem::Initialize() noexcept
+void MenuRadioItem::Initialize()
 {
 	MENUITEMINFO mi = { 0 };
 	mi.cbSize = sizeof(MENUITEMINFO);
@@ -76,12 +64,18 @@ void MenuRadioItem::Initialize() noexcept
 	mi.fType = MFT_RADIOCHECK;
 	mi.wID = m_Id;
 	mi.dwTypeData = const_cast<char*>(Text.c_str());
-	InsertMenuItem(static_cast<HMENU>(Parent->Handle.ToPointer()), m_SubItemIndex, true, &mi);
-
-	// Remove selection of other radio buttons on same submenu if any of them were create with IsSelected = TRUE
-	if (IsChecked)
+	if (InsertMenuItem(static_cast<HMENU>(Parent->Handle.ToPointer()), m_SubItemIndex, true, &mi) == 0)
 	{
-		auto idx = InvalidateSection(m_Section);
-		CheckMenuRadioItem(static_cast<HMENU>(Parent->Handle.ToPointer()), std::get<0>(idx), std::get<1>(idx), m_SubItemIndex, MF_BYPOSITION);
+		throw CTL_LAST_EXCEPT();
+	}
+}
+
+void MenuRadioItem::Update()
+{
+	IsChecked = !IsChecked;
+	auto idx = InvalidateSection(m_Section);
+	if (CheckMenuRadioItem(static_cast<HMENU>(Parent->Handle.ToPointer()), std::get<0>(idx), std::get<1>(idx), m_SubItemIndex, MF_BYPOSITION) == 0)
+	{
+		throw CTL_LAST_EXCEPT();
 	}
 }

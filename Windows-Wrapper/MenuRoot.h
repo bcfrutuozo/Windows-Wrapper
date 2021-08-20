@@ -13,7 +13,7 @@ protected:
 	MenuRoot(Control* parent, const std::string& text, unsigned int subitemIndex, int section);
 	virtual ~MenuRoot() = default;
 
-	virtual void Initialize() noexcept override;
+	virtual void Initialize() override;
 
 public:
 

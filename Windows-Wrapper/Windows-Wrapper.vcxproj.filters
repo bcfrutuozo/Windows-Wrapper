@@ -60,6 +60,7 @@
     <ClCompile Include="Padding.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="ProgressBar.cpp" />
+    <ClCompile Include="TestApplication.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RealTimeApplication.h" />
@@ -180,6 +181,7 @@
     <ClInclude Include="Padding.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="ProgressBar.h" />
+    <ClInclude Include="TestApplication.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interfaces">

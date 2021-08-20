@@ -16,15 +16,24 @@ MenuRoot::MenuRoot(Control* parent, const std::string& text, unsigned int subite
 	Initialize();
 }
 
-void MenuRoot::Initialize() noexcept
+void MenuRoot::Initialize()
 {
+	// If the parent is a Window type, don't call InsertMenuItem to avoid errors
+	if (dynamic_cast<Menu*>(Parent) == nullptr)
+	{
+		return;
+	}
+
 	MENUITEMINFO mi = { 0 };
 	mi.cbSize = sizeof(MENUITEMINFO);
 	mi.fMask = MIIM_STRING | MIIM_ID | MIIM_SUBMENU;
 	mi.wID = GetId();
-	mi.hSubMenu = (HMENU)Handle.ToPointer();
+	mi.hSubMenu = static_cast<HMENU>(Handle.ToPointer());
 	mi.dwTypeData = const_cast<char*>(Text.c_str());
-	InsertMenuItem(static_cast<HMENU>(Parent->Handle.ToPointer()), m_SubItemIndex, true, &mi);
+	if (InsertMenuItem(static_cast<HMENU>(Parent->Handle.ToPointer()), m_SubItemIndex, true, &mi) == 0)
+	{
+		throw CTL_LAST_EXCEPT();
+	}
 }
 
 MenuLeaf& MenuRoot::AddMenu(const std::string& text)

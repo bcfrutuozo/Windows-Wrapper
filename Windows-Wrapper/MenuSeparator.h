@@ -6,7 +6,7 @@ class MenuSeparator : public Menu
 {
 protected:
 
-	void Initialize() noexcept override;
+	void Initialize() override;
 
 public:
 

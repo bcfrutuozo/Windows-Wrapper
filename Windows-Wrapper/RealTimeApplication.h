@@ -7,12 +7,12 @@ constexpr auto SPEEDFACTOR = 1.0f;
 
 class RealTimeApplication : public Application
 {
-
 private:
+
+	Timer Timer;
+
 	void Run(float dt);
 	void HandleInput(float dt);
-
-	Timer m_Timer;
 
 public:
 

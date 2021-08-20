@@ -48,7 +48,7 @@ public:
 	ProgressBar(Control* parent, const std::string& name, int width, int height, int x, int y);
 	virtual ~ProgressBar();
 
-	void Initialize() noexcept override;
+	void Initialize() override;
 	int GetValue() const noexcept;
 	void SetValue(int value) noexcept;
 	void IncrementStep() noexcept;

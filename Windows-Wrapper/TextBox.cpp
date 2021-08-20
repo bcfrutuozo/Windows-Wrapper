@@ -248,30 +248,6 @@ void TextBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 		InputRedraw(hwnd);
 		break;
 	}
-	case VK_TAB:	// Allows the user to change controls by pressing Tab
-	{
-		// Forward input messages to the parent window
-		if (Parent != nullptr)
-		{
-			const WinControl* newCtl;
-
-			// Previous Control
-			if (GetKeyState(VK_SHIFT) & 0x8000)
-			{
-				newCtl = GetPreviousControl();
-			}
-			else // Next control
-			{
-				newCtl = GetNextControl();
-			}
-
-			if (newCtl != nullptr)
-			{
-				SetFocus(static_cast<HWND>(newCtl->Handle.ToPointer()));
-			}
-		}
-		break;
-	}
 	case VK_HOME:	// Allows the user to go to the beginning of the TextBox by pressing Home
 	{
 		if ((GetKeyState(VK_SHIFT) & 0x8000))
@@ -320,6 +296,8 @@ void TextBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 		break;
 	}
 	}
+
+	WinControl::OnKeyDown_Impl(hwnd, vk, cRepeat, flags);
 }
 
 void TextBox::OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat) noexcept
@@ -342,10 +320,10 @@ void TextBox::OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat) noexcept
 		return;
 	}
 
-	// Don't process input in case the dispatched event is canceled by the user
-	KeyPressEventArgs e(c);
-	Dispatch("OnKeyPress", &e);
-	if (e.Handled == true)
+	WinControl::OnKeyPressed_Impl(hwnd, c, cRepeat);
+
+	// Avoid key input if event is canceled
+	if (ArgsOnKeyPressed.Handled)
 	{
 		return;
 	}
@@ -379,10 +357,8 @@ void TextBox::OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat) noexcept
 
 void TextBox::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
 {
-	SetClickingState(true);
-
 	if (Text.length() == 0)
-	{	
+	{
 		return;
 	}
 
@@ -398,31 +374,11 @@ void TextBox::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlag
 	{
 		const auto idx = std::lower_bound(m_CaretPosition.begin(), m_CaretPosition.end(), x);
 		m_CursorIndex = idx - m_CaretPosition.begin();
-		/*for (int i = 0; i < Text.length(); ++i)
-		{
-			if (x >= m_CaretPosition[i].cx - Font.GetSizeInPixels() && x <= m_CaretPosition[i].cx + Font.GetSizeInPixels())
-			{
-				m_CursorIndex = i;
-				break;
-			}
-		}*/
 	}
 
 	m_SelectIndex = m_CursorIndex;
 
-	if (m_IsTabSelected)
-	{
-		InvalidateRect(hwnd, nullptr, true);
-	}
-	else
-	{
-		SetFocus(hwnd);
-	}
-}
-
-void TextBox::OnMouseLeftUp_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
-{
-	SetClickingState(false);
+	WinControl::OnMouseLeftDown_Impl(hwnd, x, y, keyFlags);
 }
 
 void TextBox::OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
@@ -446,36 +402,30 @@ void TextBox::OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) n
 			}
 		}
 
-		InvalidateRect(hwnd, nullptr, true);
+		Update();
 		InputRedraw(hwnd);
 	}
+
+	WinControl::OnMouseMove_Impl(hwnd, x, y, keyFlags);
 }
 
 void TextBox::OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept
 {
-	// Set the cursor at the end when entering the control
-	//m_CursorIndex = Text.length();
-
 	// Create a solid black caret. 
 	CreateCaret(hwnd, (HBITMAP)NULL, 2, Font.GetSizeInPixels());
 	EnableCaret();
 	InputRedraw(hwnd);
-	InvalidateRect(hwnd, nullptr, true);
-	m_IsTabSelected = true;
+
+	WinControl::OnFocusEnter_Impl(hwnd, hwndOldFocus);
 }
 
 void TextBox::OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept
 {
-	// Remove selection on leave
-	// m_CursorIndex = Text.length();
-	// m_SelectIndex = m_CursorIndex;
-	InvalidateRect(hwnd, nullptr, true);
-
 	SetFocus(hwndNewFocus);
 	DisableCaret();
 	DestroyCaret();
-	InvalidateRect(hwndNewFocus, nullptr, true);
-	m_IsTabSelected = false;
+
+	WinControl::OnFocusLeave_Impl(hwnd, hwndNewFocus);
 }
 
 void TextBox::OnPaint_Impl(HWND hWnd) noexcept
@@ -700,7 +650,7 @@ void TextBox::InputDelete(HWND hWnd, DeleteInputType deleteType) noexcept
 
 void TextBox::InputRedraw(HWND hWnd) noexcept
 {
-	DisableCaret();
+	//DisableCaret();
 	HDC hdc = GetDC(hWnd);
 	InputDraw(hWnd, hdc);
 	ReleaseDC(hWnd, hdc);
@@ -899,9 +849,9 @@ void TextBox::InputDraw(HWND hWnd, HDC& hdc) noexcept
 			DisableCaret();
 		}
 
-#ifdef _DEBUG
-		OutputDebugString(oss.str().c_str());
-#endif
+		//#ifdef _DEBUG
+		//		OutputDebugString(oss.str().c_str());
+		//#endif
 	}
 
 	//
@@ -992,7 +942,7 @@ TextBox::~TextBox()
 
 }
 
-void TextBox::Initialize() noexcept
+void TextBox::Initialize()
 {
 	// Create window and get its handle
 	Handle = CreateWindow(
@@ -1042,16 +992,6 @@ std::string TextBox::GetSelectedText() const noexcept
 	{
 		return Text.substr(m_SelectIndex, GetSelectionLenght());
 	}
-}
-
-void TextBox::Disable() noexcept
-{
-
-}
-
-void TextBox::Enable() noexcept
-{
-
 }
 
 void TextBox::Hide()

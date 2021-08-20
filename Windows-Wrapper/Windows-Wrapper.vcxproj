@@ -177,6 +177,7 @@
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="Point.cpp" />
     <ClCompile Include="Size.cpp" />
+    <ClCompile Include="TestApplication.cpp" />
     <ClCompile Include="TextBox.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Type.cpp" />
@@ -214,6 +215,7 @@
     <ClInclude Include="IHandle.h" />
     <ClInclude Include="IHidable.h" />
     <ClInclude Include="IntPtr.h" />
+    <ClInclude Include="TestApplication.h" />
     <ClInclude Include="WinControl.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="KeyEventArgs.h" />

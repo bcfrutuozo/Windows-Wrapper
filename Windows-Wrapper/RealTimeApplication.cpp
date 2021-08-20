@@ -13,8 +13,9 @@
 
 RealTimeApplication::RealTimeApplication()
 {
-	m_Window->GetMouse().DisableRaw();
-	m_Window->GetKeyboard().EnableAutorepeat();
+	auto window = GetWindow();
+	window->GetMouse().DisableRaw();
+	window->GetKeyboard().EnableAutorepeat();
 }
 
 RealTimeApplication::~RealTimeApplication()
@@ -39,7 +40,7 @@ const int RealTimeApplication::Start()
 			DispatchMessage(&msg);
 		}
 
-		const auto dt = m_Timer.Peek() * SPEEDFACTOR;
+		const auto dt = Timer.Peek() * SPEEDFACTOR;
 
 		// AS NO GRAPHICS IS STILL IMPLEMENTED, SLEEP(1) IS NEEDED BECAUSE THE Window::ProcessMessages() IS USING PeekMessage() instead of GetMessage()
 		// PeekMessage ALLOW THE PROGRAM FLOW TO CONTINUES WHILE GetMessage() WAITS FOR THE MESSAGE QUEUE
@@ -53,35 +54,37 @@ const int RealTimeApplication::Start()
 
 void RealTimeApplication::HandleInput(float dt)
 {
-	while (const auto& e = m_Window->GetKeyboard().ReadKey())
+	auto window = GetWindow();
+
+	while (const auto& e = window->GetKeyboard().ReadKey())
 	{
 		if (!e->IsPress())
 		{
 			switch (e->GetCode())
 			{
 			case VK_ESCAPE:
-				if (m_Window->IsCursorEnabled())
+				if (window->IsCursorEnabled())
 				{
-					m_Window->DisableCursor();
-					m_Window->GetMouse().EnableRaw();
+					window->DisableCursor();
+					window->GetMouse().EnableRaw();
 				}
 				else
 				{
-					m_Window->EnableCursor();
-					m_Window->GetMouse().DisableRaw();
+					window->EnableCursor();
+					window->GetMouse().DisableRaw();
 				}
 				break;
 			}
 		}
 	}
 
-	if (!m_Window->IsCursorEnabled())
+	if (!window->IsCursorEnabled())
 	{
-		if (m_Window->GetKeyboard().IsKeyPressed('Y'))
+		if (window->GetKeyboard().IsKeyPressed('Y'))
 		{
-			m_Window->AddButton("Teste", 200, 80, 50, 100);
+			window->AddButton("Teste", 200, 80, 50, 100);
 
-			auto& mb = m_Window->GetMenuStrip();
+			auto& mb = window->GetMenuStrip();
 			auto& item1 = mb.AddItem("Arquivo");
 			auto& item2 = mb.AddItem("Arquivo2");
 			auto& menu1 = mb.AddMenu("Submenu");
@@ -103,25 +106,25 @@ void RealTimeApplication::HandleInput(float dt)
 			menu2.AddRadioItem("Radio2", true);
 			menu1.AddItem("Submenu-Item4");
 			menu1.AddItem("Submenu-Item5");
-			m_Window->UpdateMenuStrip();
+			window->UpdateMenuStrip();
 		}
 
-		if (m_Window->GetKeyboard().IsKeyPressed('R'))
+		if (window->GetKeyboard().IsKeyPressed('R'))
 		{
-			m_Window->ClearMenuStrip();
+			window->ClearMenuStrip();
 		}
 
-		if (m_Window->GetKeyboard().IsKeyPressed('O'))
+		if (window->GetKeyboard().IsKeyPressed('O'))
 		{
-			m_Window->GetMenuStrip().Show();
+			window->GetMenuStrip().Show();
 		}
 
-		if (m_Window->GetKeyboard().IsKeyPressed('P'))
+		if (window->GetKeyboard().IsKeyPressed('P'))
 		{
-			m_Window->GetMenuStrip().Hide();
+			window->GetMenuStrip().Hide();
 		}
 
-		if (m_Window->GetKeyboard().IsKeyPressed('Q'))
+		if (window->GetKeyboard().IsKeyPressed('Q'))
 		{
 			/*Color x = m_Window->();
 			x.SetR(x.GetR() - 1);
@@ -129,7 +132,7 @@ void RealTimeApplication::HandleInput(float dt)
 			if (x.GetR() >= 0) m_Window->SetForeColor(x);*/
 			//cameras->Translate({ 0.0f, 0.0f, dt });
 		}
-		if (m_Window->GetKeyboard().IsKeyPressed('A'))
+		if (window->GetKeyboard().IsKeyPressed('A'))
 		{
 			/*Color x = m_Window->GetForeColor();
 			x.SetG(x.GetG() - 1);
@@ -137,7 +140,7 @@ void RealTimeApplication::HandleInput(float dt)
 			if (x.GetG() >= 0) m_Window->SetForeColor(x);*/
 			//cameras->Translate({ -dt, 0.0f, 0.0f });
 		}
-		if (m_Window->GetKeyboard().IsKeyPressed('Z'))
+		if (window->GetKeyboard().IsKeyPressed('Z'))
 		{
 			/*Color x = m_Window->GetForeColor();
 			x.SetB(x.GetB() - 1);
@@ -145,7 +148,7 @@ void RealTimeApplication::HandleInput(float dt)
 			if (x.GetB() >= 0) m_Window->SetForeColor(x);*/
 			//cameras->Translate({ 0.0f, 0.0f, -dt });
 		}
-		if (m_Window->GetKeyboard().IsKeyPressed('W'))
+		if (window->GetKeyboard().IsKeyPressed('W'))
 		{
 			/*Color x = m_Window->GetForeColor();
 			x.SetR(x.GetR() + 1);
@@ -154,7 +157,7 @@ void RealTimeApplication::HandleInput(float dt)
 
 			//cameras->Translate({ dt, 0.0f, 0.0f });
 		}
-		if (m_Window->GetKeyboard().IsKeyPressed('S'))
+		if (window->GetKeyboard().IsKeyPressed('S'))
 		{
 			/*Color x = m_Window->GetForeColor();
 			x.SetG(x.GetG() + 1);
@@ -163,7 +166,7 @@ void RealTimeApplication::HandleInput(float dt)
 
 			//cameras->Translate({ 0.0f, dt, 0.0f });
 		}
-		if (m_Window->GetKeyboard().IsKeyPressed('X'))
+		if (window->GetKeyboard().IsKeyPressed('X'))
 		{
 			/*Color x = m_Window->GetForeColor();
 			x.SetB(x.GetB() + 1);
@@ -175,9 +178,9 @@ void RealTimeApplication::HandleInput(float dt)
 	}
 
 
-	while (const auto& delta = m_Window->GetMouse().ReadRawDelta())
+	while (const auto& delta = window->GetMouse().ReadRawDelta())
 	{
-		if (!m_Window->IsCursorEnabled())
+		if (!window->IsCursorEnabled())
 		{
 			//cameras->Rotate(static_cast<float>(delta->x), static_cast<float>(delta->y));
 		}
@@ -186,11 +189,13 @@ void RealTimeApplication::HandleInput(float dt)
 
 void RealTimeApplication::Run(float dt)
 {
+	auto window = GetWindow();
+
 	// Time elapse on window title
 	//const float t = m_Timer.Peek();
 	std::ostringstream oss;
 	oss << "Timer elapsed: " << std::setprecision(1) << std::fixed << dt << "s";
-	m_Window->SetText(oss.str().c_str());
+	window->SetText(oss.str().c_str());
 
 	// renderGraph.Execute(window.Gfx());
 

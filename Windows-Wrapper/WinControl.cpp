@@ -30,11 +30,11 @@ void WinControl::OnActivate_Impl(HWND hwnd, unsigned int state, HWND hwndActDeac
 
 	if (state == 1 || state == 2)
 	{
-		Dispatch("OnActivate", new EventArgs());
+		Dispatch("OnActivate", &ArgsDefault);
 	}
 	else
 	{
-		Dispatch("OnDeactivate", new EventArgs());
+		Dispatch("OnDeactivate", &ArgsDefault);
 	}
 }
 
@@ -45,12 +45,11 @@ void WinControl::OnCommand_Impl(HWND hwnd, int id, HWND hwndCtl, unsigned int co
 
 int WinControl::OnClosing_Impl(HWND hwnd) noexcept
 {
-	bool cancel = false;
-	Dispatch("OnClosing", new OnClosingEventArgs(CloseReason::UserClosing, cancel));
+	Dispatch("OnClosing", &ArgsOnClosing);
 
 	// If cancel is false and doesn't have Parent Control, means that it's the main window
 	// and application must post quit
-	if (!cancel && Parent == nullptr)
+	if (!ArgsOnClosing.Cancel && Parent == nullptr)
 	{
 		PostQuitMessage(0);
 	}
@@ -60,7 +59,7 @@ int WinControl::OnClosing_Impl(HWND hwnd) noexcept
 
 void WinControl::OnClosed_Impl(HWND hwnd) noexcept
 {
-	Dispatch("OnClosed", new OnClosedEventArgs(CloseReason::UserClosing));
+	Dispatch("OnClosed", &ArgsOnClosed);
 }
 
 HBRUSH WinControl::OnColorControl_Impl(HWND hwnd, HDC hdc, HWND hwndChild, int type)
@@ -70,7 +69,7 @@ HBRUSH WinControl::OnColorControl_Impl(HWND hwnd, HDC hdc, HWND hwndChild, int t
 
 void WinControl::OnCreate_Impl(HWND hwnd, LPCREATESTRUCT lpCreateStruct) noexcept
 {
-	Dispatch("OnCreate", new EventArgs());
+	Dispatch("OnCreate", &ArgsDefault);
 }
 
 void WinControl::OnEnable_Impl(HWND hwnd, bool fEnable)
@@ -81,7 +80,7 @@ void WinControl::OnEnable_Impl(HWND hwnd, bool fEnable)
 int WinControl::OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept
 {
 	// 0 always redraw
-	// Some controls like textbox have 1 to avoid flickering on input
+	// Some controls like have 1 to avoid flickering on input
 
 	return 0;
 }
@@ -111,33 +110,19 @@ void WinControl::OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept
 			Validating
 			Validated
 
-		If the CausesValidation property is set to false, the Validatingand Validated events are
+		If the CausesValidation property is set to false, the Validating and Validated events are
 		suppressed.
 	/**************************************************************************************************/
-	InvalidateRect(hwnd, nullptr, true);
-
-#ifdef _DEBUG
-	std::ostringstream oss;
-	oss << "Text: " << Text.c_str() << "|" << " Tab: " << m_TabIndex << " | " << "Type: Enter" << std::endl << std::endl;
-	OutputDebugString(oss.str().c_str());
 	m_IsTabSelected = true;
-#endif
-
-	Dispatch("OnGotFocus", new EventArgs());
+	Update();
+	Dispatch("OnGotFocus", &ArgsDefault);
 }
 
 void WinControl::OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept
 {
-	InvalidateRect(hwnd, nullptr, true);
-
-#ifdef _DEBUG
-	std::ostringstream oss;
-	oss << "Text: " << Text.c_str() << "|" << " Tab: " << m_TabIndex << " | " << "Type: Leave" << std::endl << std::endl;
-	OutputDebugString(oss.str().c_str());
 	m_IsTabSelected = false;
-#endif
-
-	Dispatch("OnLostFocus", new EventArgs());
+	Update();
+	Dispatch("OnLostFocus", &ArgsDefault);
 }
 
 int WinControl::OnGetDLGCode(HWND hwnd, LPMSG msg) noexcept
@@ -173,30 +158,29 @@ void WinControl::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigne
 	}
 	}
 
-	Dispatch("OnKeyDown", new KeyEventArgs(static_cast<Keys>(vk)));
+	ArgsOnKeyDown = KeyEventArgs(static_cast<Keys>(vk));
+	Dispatch("OnKeyDown", &ArgsOnKeyDown);
 }
 
 void WinControl::OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat) noexcept
 {
-	Dispatch("OnKeyPress", new KeyPressEventArgs(c));
+	ArgsOnKeyPressed = KeyPressEventArgs(c);
+	Dispatch("OnKeyPress", &ArgsOnKeyPressed);
 }
 
 void WinControl::OnKeyUp_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept
 {
-	Dispatch("OnKeyUp", new KeyEventArgs(static_cast<Keys>(vk)));
+	ArgsOnKeyUp = KeyEventArgs(static_cast<Keys>(vk));
+	Dispatch("OnKeyUp", &ArgsOnKeyUp);
 }
 
-void WinControl::OnMove_Impl(HWND hwnd, int x, int y) noexcept
-{
-
-}
 
 void WinControl::OnMouseLeave_Impl(HWND hwnd) noexcept
 {
 	SetClickingState(false);
 	SetMouseOverState(false);
-	InvalidateRect(hwnd, nullptr, TRUE);
-	Dispatch("OnMouseLeave", new EventArgs());
+	Update();
+	Dispatch("OnMouseLeave", &ArgsDefault);
 }
 
 void WinControl::OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
@@ -220,8 +204,8 @@ void WinControl::OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags
 	if (!IsMouseOver())
 	{
 		// Mouseover Redraw should happen on MouseEnter trigger, not on MouseMove
-		InvalidateRect(hwnd, nullptr, TRUE);
-		Dispatch("OnMouseEnter", new EventArgs());
+		Update();
+		Dispatch("OnMouseEnter", &ArgsDefault);
 	}
 
 	TRACKMOUSEEVENT tme;
@@ -233,70 +217,83 @@ void WinControl::OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags
 		SetMouseOverState(true);
 	}
 
-	Dispatch("OnMouseMove", new MouseEventArgs(MouseButtons::None, 0, 0, x, y));
+	ArgsOnMouseMove = MouseEventArgs(MouseButtons::None, 0, 0, x, y);
+	Dispatch("OnMouseMove", &ArgsOnMouseMove);
 }
 
 void WinControl::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
 {
 	// Trigger tabbing
-	if (Parent != nullptr)
-	{	
+	if (Parent != nullptr && GetFocus() != hwnd)
+	{
 		const WinControl* newCtl = dynamic_cast<WinControl*>(GetByHandle(hwnd));
 
-		if (newCtl != nullptr)
+		if (newCtl != nullptr && newCtl->IsEnabled())
 		{
 			SetFocus(static_cast<HWND>(newCtl->Handle.ToPointer()));
 		}
 	}
+	else
+	{
+		Update();
+	}
 
 	SetMouseOverState(true);
 	SetClickingState(true);
-	InvalidateRect(hwnd, nullptr, TRUE);
-	Dispatch("OnMouseDown", new MouseEventArgs(MouseButtons::Left, 1, 0, x, y));
+	ArgsOnMouseDown = MouseEventArgs(MouseButtons::Left, 1, 0, x, y);
+	Dispatch("OnMouseDown", &ArgsOnMouseDown);
 }
 
 void WinControl::OnMouseLeftUp_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
 {
 	SetClickingState(false);
 	SetMouseOverState(true);
-	InvalidateRect(hwnd, nullptr, TRUE);
-	Dispatch("OnClick", new EventArgs());
-	Dispatch("OnMouseClick", new MouseEventArgs(MouseButtons::Left, 1, 0, x, y));
-	Dispatch("OnMouseUp", new MouseEventArgs(MouseButtons::Left, 1, 0, x, y));
+	Update();
+	ArgsOnMouseClick = MouseEventArgs(MouseButtons::Left, 1, 0, x, y);
+	ArgsOnMouseUp = MouseEventArgs(MouseButtons::Left, 1, 0, x, y);
+	Dispatch("OnClick", &ArgsDefault);
+	Dispatch("OnMouseClick", &ArgsOnMouseClick);
+	Dispatch("OnMouseUp", &ArgsOnMouseUp);
 }
 
 void WinControl::OnMouseRightDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
 {
-	Dispatch("OnMouseDown", new MouseEventArgs(MouseButtons::Right, 1, 0, x, y));
+	ArgsOnMouseDown = MouseEventArgs(MouseButtons::Right, 1, 0, x, y);
+	Dispatch("OnMouseDown", &ArgsOnMouseDown);
 }
 
 void WinControl::OnMouseRightUp_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
 {
-	Dispatch("OnMouseUp", new MouseEventArgs(MouseButtons::Right, 1, 0, x, y));
+	ArgsOnMouseUp = MouseEventArgs(MouseButtons::Right, 1, 0, x, y);
+	Dispatch("OnMouseUp", &ArgsOnMouseUp);
 }
 
 void WinControl::OnMouseLeftDoubleClick_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
 {
-	Dispatch("OnDoubleClick", new EventArgs());
-	Dispatch("OnMouseDoubleClick", new MouseEventArgs(MouseButtons::Left, 2, 0, x, y));
+	ArgsOnMouseDoubleClick = MouseEventArgs(MouseButtons::Left, 2, 0, x, y);
+	Dispatch("OnDoubleClick", &ArgsDefault);
+	Dispatch("OnMouseDoubleClick", &ArgsOnMouseDoubleClick);
 }
 
 void WinControl::OnMouseRightDoubleClick_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
 {
-	Dispatch("OnMouseDoubleClick", new MouseEventArgs(MouseButtons::Right, 2, 0, x, y));
+	ArgsOnMouseDoubleClick = MouseEventArgs(MouseButtons::Right, 2, 0, x, y);
+	Dispatch("OnMouseDoubleClick", &ArgsOnMouseDoubleClick);
 }
 
 void WinControl::OnMouseWheel_Impl(HWND hwnd, int x, int y, int delta, unsigned int fwKeys) noexcept
 {
 	switch (fwKeys)
 	{
-	case MK_LBUTTON: Dispatch("OnMouseWheel", new MouseEventArgs(MouseButtons::Left, 0, delta, x, y)); break;
-	case MK_MBUTTON: Dispatch("OnMouseWheel", new MouseEventArgs(MouseButtons::Middle, 0, delta, x, y)); break;
-	case MK_RBUTTON: Dispatch("OnMouseWheel", new MouseEventArgs(MouseButtons::Right, 0, delta, x, y));  break;
-	case MK_XBUTTON1: Dispatch("OnMouseWheel", new MouseEventArgs(MouseButtons::XButton1, 0, delta, x, y)); break;
-	case MK_XBUTTON2: Dispatch("OnMouseWheel", new MouseEventArgs(MouseButtons::XButton2, 0, delta, x, y)); break;
-	default: Dispatch("OnMouseWheel", new MouseEventArgs(MouseButtons::None, 0, delta, x, y)); break;
+	case MK_LBUTTON: ArgsOnMouseWheel = MouseEventArgs(MouseButtons::Left, 0, delta, x, y); break;
+	case MK_MBUTTON: ArgsOnMouseWheel = MouseEventArgs(MouseButtons::Middle, 0, delta, x, y); break;
+	case MK_RBUTTON: ArgsOnMouseWheel = MouseEventArgs(MouseButtons::Right, 0, delta, x, y);  break;
+	case MK_XBUTTON1: ArgsOnMouseWheel = MouseEventArgs(MouseButtons::XButton1, 0, delta, x, y); break;
+	case MK_XBUTTON2: ArgsOnMouseWheel = MouseEventArgs(MouseButtons::XButton2, 0, delta, x, y); break;
+	default: ArgsOnMouseWheel = MouseEventArgs(MouseButtons::None, 0, delta, x, y); break;
 	}
+
+	Dispatch("OnMouseWheel", &ArgsOnMouseWheel);
 }
 
 void WinControl::OnNextDialogControl_Impl(HWND hwnd, HWND hwndSetFocus, bool fNext) noexcept
@@ -330,10 +327,10 @@ void WinControl::OnPaint_Impl(HWND hwnd) noexcept
 	// to let the user customize the control.
 	//Dispatch("OnPaint", new PaintEventArgs());
 
-	HFONT hFont = CreateFont(Font.GetSizeInPixels(), 0, 0, 0, Font.IsBold() ? FW_BOLD: FW_NORMAL, Font.IsItalic(), Font.IsUnderline(), Font.IsStrikeOut(), ANSI_CHARSET,
+	HFONT hFont = CreateFont(Font.GetSizeInPixels(), 0, 0, 0, Font.IsBold() ? FW_BOLD : FW_NORMAL, Font.IsItalic(), Font.IsUnderline(), Font.IsStrikeOut(), ANSI_CHARSET,
 		OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
 		DEFAULT_PITCH | FF_DONTCARE, Font.GetName().c_str());
-	
+
 	SendMessage(hwnd, WM_SETFONT, (WPARAM)hFont, TRUE);
 
 	FillRect(hdc, &ps.rcPaint, CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB())));
@@ -359,14 +356,14 @@ void WinControl::OnShowWindow_Impl(HWND hwnd, bool fShow, unsigned int status) n
 {
 	if (fShow)
 	{
-		Dispatch("OnShown");
+		Dispatch("OnShown", &ArgsDefault);
 	}
 	else
 	{
-		Dispatch("OnHide");
+		Dispatch("OnHide", &ArgsDefault);
 	}
 
-	Dispatch("OnVisibleChanged", new EventArgs());
+	Dispatch("OnVisibleChanged", &ArgsDefault);
 }
 
 WinControl* WinControl::GetByTabIndex(const unsigned int& index) noexcept
@@ -381,7 +378,7 @@ WinControl* WinControl::GetByTabIndex(const unsigned int& index) noexcept
 		if (const auto& winc = dynamic_cast<WinControl*>(c.get()))
 		{
 			WinControl* ret = winc->GetByTabIndex(index);
-			if (ret != nullptr)
+			if (ret != nullptr && ret->IsEnabled())
 			{
 				return ret;
 			}
@@ -397,7 +394,19 @@ WinControl::WinControl(Control* parent, const std::string& text, int width, int 
 	Control(parent, text, width, height, x, y),
 	m_TabIndex(m_IncrementalTabIndex++),
 	m_IsTabSelected(false),
-	Font("Segoe", 9.0f, false, false, false, false, GraphicsUnit::Point)		// Default application font for controls
+	Font("Segoe", 9.0f, false, false, false, false, GraphicsUnit::Point),		// Default application font for controls
+	ArgsOnClosing(CloseReason::None, false),
+	ArgsOnClosed(CloseReason::None),
+	ArgsOnKeyDown(Keys::None),
+	ArgsOnKeyPressed('\0'),
+	ArgsOnKeyUp(Keys::None),
+	ArgsOnMouseMove(MouseButtons::None, 0, 0, 0, 0),
+	ArgsOnMouseDown(MouseButtons::None, 0, 0, 0, 0),
+	ArgsOnMouseClick(MouseButtons::None, 0, 0, 0, 0),
+	ArgsOnMouseUp(MouseButtons::None, 0, 0, 0, 0),
+	ArgsOnMouseDoubleClick(MouseButtons::None, 0, 0, 0, 0),
+	ArgsOnMouseWheel(MouseButtons::None, 0, 0, 0, 0),
+	m_Enabled(true)
 {
 
 }
@@ -595,7 +604,7 @@ WinControl* WinControl::GetPreviousControl() noexcept
 		for (int i = searchIndex; i >= 0; --i)
 		{
 			const auto& ret = root->GetByTabIndex(i);
-			if (ret != nullptr)
+			if (ret != nullptr && ret->IsEnabled())
 			{
 				return ret;
 			}
@@ -612,7 +621,7 @@ WinControl* WinControl::GetNextControl() noexcept
 		for (int i = searchIndex; i < m_IncrementalTabIndex; ++i)
 		{
 			const auto& ret = root->GetByTabIndex(i);
-			if (ret != nullptr)
+			if (ret != nullptr && ret->IsEnabled())
 			{
 				return ret;
 			}
@@ -621,6 +630,36 @@ WinControl* WinControl::GetNextControl() noexcept
 
 	// Returning nullptr is extremely important, otherwise it will be a trash pointer and will launch an exception trying to process it
 	return nullptr;
+}
+
+bool WinControl::IsEnabled() const noexcept
+{
+	if (!m_Enabled)
+	{
+		return false;
+	}
+
+	if (const auto& p = dynamic_cast<WinControl*>(Parent))
+	{
+		if (!p->IsEnabled())
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+void WinControl::Enable() noexcept
+{
+	m_Enabled = true;
+	EnableWindow(static_cast<HWND>(Handle.ToPointer()), true);
+}
+
+void WinControl::Disable() noexcept
+{
+	m_Enabled = false;
+	EnableWindow(static_cast<HWND>(Handle.ToPointer()), false);
 }
 
 int WinControl::GetTabIndex() const noexcept
@@ -639,4 +678,9 @@ void WinControl::SetTabIndex(const unsigned int& index) noexcept
 	{
 		m_TabIndex = index;
 	}
+}
+
+void WinControl::Update()
+{
+	InvalidateRect(static_cast<HWND>(Handle.ToPointer()), nullptr, true);
 }

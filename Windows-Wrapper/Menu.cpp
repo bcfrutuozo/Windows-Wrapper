@@ -27,3 +27,14 @@ Menu::~Menu()
 {
 	DestroyMenu(static_cast<HMENU>(Handle.ToPointer()));
 }
+
+void Menu::Update()
+{
+	for (const auto& c : Controls)
+	{
+		if (const auto& menu = dynamic_cast<Menu*>(c.get()))
+		{
+			menu->Update();
+		}
+	}
+}

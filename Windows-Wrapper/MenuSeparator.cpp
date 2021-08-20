@@ -7,11 +7,14 @@ MenuSeparator::MenuSeparator(Menu* parent, unsigned int subitemIndex)
 	Initialize();
 }
 
-void MenuSeparator::Initialize() noexcept
+void MenuSeparator::Initialize()
 {
 	MENUITEMINFO mi = { 0 };
 	mi.cbSize = sizeof(MENUITEMINFO);
 	mi.fMask = MIIM_FTYPE;
 	mi.fType = MFT_SEPARATOR;
-	InsertMenuItem(static_cast<HMENU>(Parent->Handle.ToPointer()), Handle.ToInt32(), FALSE, &mi);
+	if (InsertMenuItem(static_cast<HMENU>(Parent->Handle.ToPointer()), Handle.ToInt32(), FALSE, &mi) == 0)
+	{
+		throw CTL_LAST_EXCEPT();
+	}
 }

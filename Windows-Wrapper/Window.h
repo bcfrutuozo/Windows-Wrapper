@@ -18,7 +18,7 @@
 
 class Menu;
 
-class Window : public WinControl, public IHidable
+class Window final : public WinControl, public IHidable
 {
 	friend class Menu;
 	friend class WinControl;

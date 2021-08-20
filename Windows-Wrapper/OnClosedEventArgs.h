@@ -9,8 +9,8 @@ public:
 
 	OnClosedEventArgs(const CloseReason& closeReason)
 		:
-		m_CloseReason(closeReason)
+		CloseReason(closeReason)
 	{}
 
-	CloseReason m_CloseReason;
+	CloseReason CloseReason;
 };

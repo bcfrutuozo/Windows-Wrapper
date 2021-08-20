@@ -7,12 +7,15 @@ MenuEntryItem::MenuEntryItem(Menu* parent, const std::string& text, unsigned int
 	Initialize();
 }
 
-void MenuEntryItem::Initialize() noexcept
+void MenuEntryItem::Initialize()
 {
 	MENUITEMINFO mi = { 0 };
 	mi.cbSize = sizeof(MENUITEMINFO);
 	mi.fMask = MIIM_STRING | MIIM_ID;
 	mi.wID = GetId();
 	mi.dwTypeData = const_cast<char*>(Text.c_str());
-	InsertMenuItem(static_cast<HMENU>(Parent->Handle.ToPointer()), m_SubItemIndex, true, &mi);
+	if (InsertMenuItem(static_cast<HMENU>(Parent->Handle.ToPointer()), m_SubItemIndex, true, &mi) == 0)
+	{
+		throw CTL_LAST_EXCEPT();
+	}
 }

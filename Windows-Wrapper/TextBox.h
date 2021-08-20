@@ -4,7 +4,7 @@
 #include "IHidable.h"
 #include "WinControl.h"
 
-class TextBox : public WinControl, public IHidable, public IActivable
+class TextBox final: public WinControl, public IHidable
 {
 private:
 
@@ -57,7 +57,6 @@ private:
 	void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept override;
 	void OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat) noexcept override;
 	void OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept override;
-	void OnMouseLeftUp_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept override;
 	void OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept override;
 	void OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept override;
 	void OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept override;
@@ -84,10 +83,8 @@ public:
 
 	int GetSelectionLenght() const noexcept;
 	std::string GetSelectedText() const noexcept;
-	void Disable() noexcept override;
-	void Enable() noexcept override;
 	void Hide() override;
-	void Initialize() noexcept override;
+	void Initialize() override;
 	void Show() override;
 
 	unsigned int GetMaximumLength() const noexcept;

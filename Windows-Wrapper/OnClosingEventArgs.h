@@ -7,12 +7,12 @@ class OnClosingEventArgs : public EventArgs
 {
 public:
 
-	OnClosingEventArgs(const CloseReason& closeReason, bool& cancel)
+	OnClosingEventArgs(const CloseReason closeReason, bool cancel)
 		:
-		m_CloseReason(closeReason),
-        m_Cancel(cancel)
+		CloseReason(closeReason),
+        Cancel(cancel)
 	{}
 
-	CloseReason m_CloseReason;
-    bool m_Cancel;
+	CloseReason CloseReason;
+    bool Cancel;
 };

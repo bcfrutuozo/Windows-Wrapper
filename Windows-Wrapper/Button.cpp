@@ -55,34 +55,12 @@ void Button::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned in
 	case VK_RETURN:
 	{
 		SetClickingState(true);
-		InvalidateRect(hwnd, nullptr, true);
-		break;
-	}
-	case VK_TAB:	// Allows the user to change controls by pressing Tab
-	{
-		const WinControl* newCtl;
-
-		// Previous Control
-		if (GetKeyState(VK_SHIFT) & 0x8000)
-		{
-			newCtl = GetPreviousControl();
-		}
-		else // Next control
-		{
-			newCtl = GetNextControl();
-
-		}
-
-		if (newCtl != nullptr)
-		{
-			SetFocus(static_cast<HWND>(newCtl->Handle.ToPointer()));
-		}
-
+		Update();
 		break;
 	}
 	}
 
-	Dispatch("OnKeyDown", new KeyEventArgs(static_cast<Keys>(vk)));
+	WinControl::OnKeyDown_Impl(hwnd, vk, cRepeat, flags);
 }
 
 void Button::OnKeyUp_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept
@@ -93,10 +71,12 @@ void Button::OnKeyUp_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int 
 	{
 		Dispatch("OnClick", new EventArgs());
 		SetClickingState(false);
-		InvalidateRect(hwnd, nullptr, true);
+		Update();
 		break;
 	}
 	}
+
+	WinControl::OnKeyUp_Impl(hwnd, vk, cRepeat, flags);
 }
 
 void Button::OnPaint_Impl(HWND hwnd) noexcept
@@ -159,7 +139,9 @@ void Button::OnPaint_Impl(HWND hwnd) noexcept
 			rc.bottom -= 1;
 
 			//Clean up
+			SelectObject(hdc, old_pen);
 			DeleteObject(old_pen);
+			SelectObject(hdc, pen);
 			DeleteObject(pen);
 		}
 		else if (IsMouseOver())
@@ -202,7 +184,9 @@ void Button::OnPaint_Impl(HWND hwnd) noexcept
 				rc.bottom -= 1;
 
 				//Clean up
+				SelectObject(hdc, old_pen);
 				DeleteObject(old_pen);
+				SelectObject(hdc, pen);
 				DeleteObject(pen);
 			}
 			else
@@ -232,7 +216,9 @@ void Button::OnPaint_Impl(HWND hwnd) noexcept
 				rc.bottom -= 2;
 
 				//Clean up
+				SelectObject(hdc, old_pen);
 				DeleteObject(old_pen);
+				SelectObject(hdc, pen);
 				DeleteObject(pen);
 			}
 		}
@@ -276,7 +262,9 @@ void Button::OnPaint_Impl(HWND hwnd) noexcept
 				rc.bottom -= 1;
 
 				//Clean up
+				SelectObject(hdc, old_pen);
 				DeleteObject(old_pen);
+				SelectObject(hdc, pen);
 				DeleteObject(pen);
 			}
 			else
@@ -306,7 +294,9 @@ void Button::OnPaint_Impl(HWND hwnd) noexcept
 				rc.bottom -= 2;
 
 				//Clean up
+				SelectObject(hdc, old_pen);
 				DeleteObject(old_pen);
+				SelectObject(hdc, pen);
 				DeleteObject(pen);
 			}
 		}
@@ -314,6 +304,7 @@ void Button::OnPaint_Impl(HWND hwnd) noexcept
 		// Draw background inside
 		HBRUSH background = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
 		FillRect(hdc, &rc, background);
+		SelectObject(hdc, background);
 		DeleteObject(background);
 
 		break;
@@ -368,7 +359,7 @@ Button::~Button()
 
 }
 
-void Button::Initialize() noexcept
+void Button::Initialize()
 {
 	// Create window and get its handle
 	Handle = CreateWindow(
@@ -389,16 +380,6 @@ void Button::Initialize() noexcept
 	{
 		throw CTL_LAST_EXCEPT();
 	}
-}
-
-void Button::Disable() noexcept
-{
-
-}
-
-void Button::Enable() noexcept
-{
-
 }
 
 void Button::Hide()

@@ -4,10 +4,11 @@
 
 class UserApplication : public Application
 {
+
 public:
 
 	UserApplication();
-	~UserApplication();
+	virtual ~UserApplication();
 	UserApplication(const UserApplication&) = delete;				// Copy constructor
 	UserApplication(UserApplication&&) = delete;					// Move constructor
 	UserApplication& operator=(const UserApplication&) = delete;	// Copy assignment constructor

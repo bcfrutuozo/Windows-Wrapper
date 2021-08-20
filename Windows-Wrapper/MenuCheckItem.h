@@ -4,13 +4,9 @@
 
 class MenuCheckItem : public MenuItem
 {
-private:
-
-	virtual void OnInternalUpdate(Control* const sender, EventArgs* const args) override;
-
 protected:
 
-	void Initialize() noexcept override;
+	void Initialize() override;
 
 public:
 
@@ -18,4 +14,6 @@ public:
 
 	MenuCheckItem(Menu* parent, const std::string& text, unsigned int subitemIndex, int section, bool isChecked);
 	virtual ~MenuCheckItem() = default;
+
+	void Update() override;
 };
