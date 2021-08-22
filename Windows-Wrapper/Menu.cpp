@@ -25,7 +25,16 @@ Menu::Menu(Control* parent, const std::string& text, unsigned int subitemIndex, 
 
 Menu::~Menu()
 {
-	DestroyMenu(static_cast<HMENU>(Handle.ToPointer()));
+	// If Menu entry is a submenu, it cannot be destroyed.
+	if (Controls.size() > 0)
+	{
+		return;
+	}
+
+	if (DestroyMenu(static_cast<HMENU>(Handle.ToPointer())) == 0)
+	{
+		throw CTL_LAST_EXCEPT();
+	}
 }
 
 void Menu::Update()

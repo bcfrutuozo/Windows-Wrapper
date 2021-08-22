@@ -80,7 +80,7 @@ void Window::OnShownSet(const std::function<void(Control* const c, EventArgs* co
 void Window::SetBackgroundColor(const Color& color) noexcept
 {
 	m_BackgroundColor = color;
-	InvalidateRect(static_cast<HWND>(Handle.ToPointer()), nullptr, TRUE);
+	Update();
 }
 
 void Window::OnClosedSet(const std::function<void(Control* const c, OnClosedEventArgs* const e)>& callback) noexcept
@@ -103,17 +103,17 @@ void Window::Initialize() noexcept
 
 	// Create window and get its handle
 	Handle = CreateWindow(
-		WindowClass::GetName(),																// Class name
-		Text.c_str(),																		// Window title
+		WindowClass::GetName(),																							// Class name
+		Text.c_str(),																									// Window title
 		WS_OVERLAPPEDWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU | WS_CLIPCHILDREN | WS_VISIBLE,	// Style values
-		CW_USEDEFAULT,																		// X position
-		CW_USEDEFAULT,																		// Y position
-		(r.right - r.left),																	// Width
-		(r.bottom - r.top),																	// Height
-		nullptr,																			// Parent handle
-		nullptr,																			// Menu handle
-		WindowClass::GetInstance(),															// Module instance handle
-		this																				// Pointer to the window instance to work along with HandleMessageSetup function.
+		CW_USEDEFAULT,																									// X position
+		CW_USEDEFAULT,																									// Y position
+		(r.right - r.left),																								// Width
+		(r.bottom - r.top),																								// Height
+		nullptr,																										// Parent handle
+		nullptr,																										// Menu handle
+		WindowClass::GetInstance(),																						// Module instance handle
+		this																											// Pointer to the window instance to work along with HandleMessageSetup function.
 	);
 
 	if (Handle.IsNull())
@@ -140,7 +140,7 @@ void Window::Initialize() noexcept
 
 	// Force window redraw to set Background color
 	m_BackgroundColor = Color::Control();
-	InvalidateRect(static_cast<HWND>(Handle.ToPointer()), nullptr, true);
+	Update();
 }
 
 Window::~Window()
