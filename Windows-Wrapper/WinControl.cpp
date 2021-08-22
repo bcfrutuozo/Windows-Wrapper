@@ -62,11 +62,6 @@ void WinControl::OnClosed_Impl(HWND hwnd) noexcept
 	Dispatch("OnClosed", &ArgsOnClosed);
 }
 
-HBRUSH WinControl::OnColorControl_Impl(HWND hwnd, HDC hdc, HWND hwndChild, int type)
-{
-	return CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-}
-
 void WinControl::OnCreate_Impl(HWND hwnd, LPCREATESTRUCT lpCreateStruct) noexcept
 {
 	Dispatch("OnCreate", &ArgsDefault);
@@ -321,7 +316,7 @@ int WinControl::OnNotify_Impl(HWND hwnd, int xPos, int yPos, int zDelta, unsigne
 void WinControl::OnPaint_Impl(HWND hwnd) noexcept
 {
 	PAINTSTRUCT ps;
-	HDC hdc = BeginPaint(hwnd, &ps);
+	BeginPaint(hwnd, &ps);
 
 	// TODO: OnPaint MUST receive a Graphics object which abstracts the PAINTSTRUCT and DeviceContext handle 
 	// to let the user customize the control.
@@ -333,7 +328,11 @@ void WinControl::OnPaint_Impl(HWND hwnd) noexcept
 
 	SendMessage(hwnd, WM_SETFONT, (WPARAM)hFont, TRUE);
 
-	FillRect(hdc, &ps.rcPaint, CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB())));
+	HBRUSH bgColor = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+	FillRect(ps.hdc, &ps.rcPaint, bgColor);
+	SelectObject(ps.hdc, bgColor);
+	DeleteObject(bgColor);
+
 	EndPaint(hwnd, &ps);
 }
 

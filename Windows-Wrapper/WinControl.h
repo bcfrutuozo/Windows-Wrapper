@@ -41,7 +41,6 @@ private:
 	virtual void OnCommand_Impl(HWND hwnd, int id, HWND hwndCtl, unsigned int codeNotify) noexcept;
 	virtual int OnClosing_Impl(HWND hwnd) noexcept;
 	virtual void OnClosed_Impl(HWND hwnd) noexcept;
-	virtual HBRUSH OnColorControl_Impl(HWND hwnd, HDC hdc, HWND hwndChild, int type);
 	virtual void OnCreate_Impl(HWND hwnd, LPCREATESTRUCT lpCreateStruct) noexcept;
 	virtual void OnEnable_Impl(HWND hwnd, bool fEnable);
 	virtual int OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept;

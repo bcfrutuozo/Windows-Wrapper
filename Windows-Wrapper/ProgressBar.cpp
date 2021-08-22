@@ -270,7 +270,12 @@ ProgressBar::ProgressBar(Control* parent, const std::string& name, int width, in
 
 ProgressBar::~ProgressBar()
 {
-
+	// Waits to update thread to finish in order to close the application without code 3
+	if (m_IsRunning)
+	{
+		m_IsRunning = false;
+		m_UpdateThread.join();
+	}
 }
 
 void ProgressBar::Initialize()
