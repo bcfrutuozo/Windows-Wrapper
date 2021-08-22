@@ -650,10 +650,10 @@ void TextBox::InputDelete(HWND hWnd, DeleteInputType deleteType) noexcept
 
 void TextBox::InputRedraw(HWND hWnd) noexcept
 {
-	//DisableCaret();
 	HDC hdc = GetDC(hWnd);
 	InputDraw(hWnd, hdc);
 	ReleaseDC(hWnd, hdc);
+	DeleteDC(hdc);
 }
 
 void TextBox::InputDraw(HWND hWnd, HDC& hdc) noexcept
@@ -730,8 +730,7 @@ void TextBox::InputDraw(HWND hWnd, HDC& hdc) noexcept
 		if (m_IsTabSelected)
 		{
 			// Draw outer border
-			Color c = Color::Selection();
-			pen = CreatePen(PS_INSIDEFRAME, 1, RGB(c.GetR(), c.GetG(), c.GetB()));
+			pen = CreatePen(PS_INSIDEFRAME, 1, RGB(0, 120, 215));
 			old_pen = SelectObject(hdcMem, pen);
 			Rectangle(hdcMem, cr.left, cr.top, cr.right, cr.bottom);
 
@@ -848,15 +847,10 @@ void TextBox::InputDraw(HWND hWnd, HDC& hdc) noexcept
 		{
 			DisableCaret();
 		}
-
-		//#ifdef _DEBUG
-		//		OutputDebugString(oss.str().c_str());
-		//#endif
 	}
 
-	//
-	// Blt the changes to the screen DC.
-	//
+	// Perform the bit-block transfer between the memory Device Context which has the next bitmap
+	// with the current image to avoid flickering
 	BitBlt(hdc, 0, 0, Size.Width, Size.Height, hdcMem, 0, 0, SRCCOPY);
 
 	SelectObject(hdcMem, hbmOld);
@@ -901,8 +895,7 @@ void TextBox::PaintSelection(HDC& hdc, RECT& r, size_t start, size_t end) const 
 
 	GetTextExtentPoint32(hdc, Text.substr(start, end - start).c_str(), end - start, &s);
 	SetBkMode(hdc, OPAQUE);
-	Color c = Color::Selection();
-	SetBkColor(hdc, RGB(c.GetR(), c.GetG(), c.GetB()));
+	SetBkColor(hdc, RGB(0, 120, 215));
 	SetTextColor(hdc, RGB(255, 255, 255));
 	TextOut(hdc, r.left + currentX, r.top, Text.substr(start, end - start).c_str(), end - start);
 	currentX += s.cx;

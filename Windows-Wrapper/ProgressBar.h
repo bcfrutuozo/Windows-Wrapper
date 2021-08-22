@@ -2,6 +2,7 @@
 
 #include "WinControl.h"
 #include "Enums.h"
+#include "Timer.h"
 
 #include <thread>
 
@@ -15,6 +16,7 @@ private:
 	volatile int Minimum;
 	volatile int Maximum;
 	std::thread m_UpdateThread;
+	volatile int m_Speed;
 
 	// Singleton manages registration/cleanup of window class
 	class ProgressBarClass
@@ -55,6 +57,7 @@ public:
 	void DecrementStep() noexcept;
 	void SetMinimum(int value) noexcept;
 	void SetMaximum(int value) noexcept;
+	void SetSpeed(int value) noexcept;
 	ProgressBarAnimation GetAnimationType() const noexcept;
 	void SetAnimation(ProgressBarAnimation animation) noexcept;
 	void Start() noexcept;

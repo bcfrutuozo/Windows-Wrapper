@@ -76,7 +76,7 @@ protected:
 	bool m_IsTabSelected;
 
 	WinControl(Control* parent, const std::string& text, int width, int height, int x, int y) noexcept;
-	virtual ~WinControl() = default;
+	virtual ~WinControl();
 
 	// Static function which handle WinAPI messages to corresponding member function of the control
 	static LRESULT WINAPI HandleMessageSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;

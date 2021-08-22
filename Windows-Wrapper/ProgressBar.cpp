@@ -39,23 +39,29 @@ int ProgressBar::OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept
 
 void ProgressBar::OnPaint_Impl(HWND hwnd) noexcept
 {
+	// Process default paint only when thread is not running
+	if (m_IsRunning)
+	{
+		return;
+	}
+
+	PAINTSTRUCT ps;
+	RECT rt;
+	GetClientRect(hwnd, &rt);
+	BeginPaint(hwnd, &ps);
+	HDC hdcMem = CreateCompatibleDC(ps.hdc);
+	HBITMAP hbmMem = CreateCompatibleBitmap(ps.hdc, Size.Width, Size.Height);
+	HBITMAP hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
+
 	switch (m_Animation)
 	{
 	case ProgressBarAnimation::Blocks:
 	{
-		RECT rt;
-		GetClientRect(hwnd, &rt);
-		HDC hdc = GetDC(hwnd);
-
-		if (hdc == nullptr)
-		{
-			break;
-		}
-
 		HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(188, 188, 188));
-		HGDIOBJ draw = SelectObject(hdc, pen);
-		Rectangle(hdc, rt.left, rt.top, rt.right, rt.bottom);
+		HGDIOBJ draw = SelectObject(hdcMem, pen);
+		Rectangle(hdcMem, rt.left, rt.top, rt.right, rt.bottom);
 		DeleteObject(draw);
+		SelectObject(hdcMem, pen);
 		DeleteObject(pen);
 
 		// Enter rectangle ignoring border
@@ -67,7 +73,7 @@ void ProgressBar::OnPaint_Impl(HWND hwnd) noexcept
 		char buff[100];
 		wsprintf(buff, "%d%% Finished", m_Value);
 		SIZE size;
-		GetTextExtentPoint32(hdc, buff, ::lstrlen(buff), &size);
+		GetTextExtentPoint32(hdcMem, buff, ::lstrlen(buff), &size);
 
 		// Draw the value amount region
 		LONG right = rt.right;
@@ -81,67 +87,69 @@ void ProgressBar::OnPaint_Impl(HWND hwnd) noexcept
 				++rt.right;
 			}
 
-			SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-			SetBkColor(hdc, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-			ExtTextOut(hdc, (right - size.cx) / 2, (rt.bottom - size.cy) / 2, ETO_CLIPPED | ETO_OPAQUE, &rt, buff, lstrlen(buff), NULL);
+			SetTextColor(hdcMem, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
+			SetBkColor(hdcMem, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+			ExtTextOut(hdcMem, (right - size.cx) / 2, (rt.bottom - size.cy) / 2, ETO_CLIPPED | ETO_OPAQUE, &rt, buff, lstrlen(buff), NULL);
 		}
 
 		// Draw the remaining amount region
 		if (m_Value < Maximum)
 		{
-			SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-			SetBkColor(hdc, RGB(230, 230, 230));
+			SetTextColor(hdcMem, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
+			SetBkColor(hdcMem, RGB(230, 230, 230));
 			rt.left = rt.right;
 			rt.right = right;
-			ExtTextOut(hdc, (right - size.cx) / 2, (rt.bottom - size.cy) / 2, ETO_CLIPPED | ETO_OPAQUE, &rt, buff, lstrlen(buff), NULL);
+			ExtTextOut(hdcMem, (right - size.cx) / 2, (rt.bottom - size.cy) / 2, ETO_CLIPPED | ETO_OPAQUE, &rt, buff, lstrlen(buff), NULL);
 		}
-
-		ReleaseDC(hwnd, hdc);
 
 		break;
 	}
 	case ProgressBarAnimation::Marquee:	// Marquee ProgressBar is painted on another thread
 	{
-		// Draw Marquee effect ProgressBar when it's not running
-		if (!m_IsRunning)
-		{
-			RECT rt;
-			GetClientRect(hwnd, &rt);
-			HDC hdc = GetDC(hwnd);
-			if (hdc == nullptr)
-			{
-				break;
-			}
 
-			HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(188, 188, 188));
-			HGDIOBJ draw = SelectObject(hdc, pen);
-			Rectangle(hdc, rt.left, rt.top, rt.right, rt.bottom);
-			rt.left += 1;
-			rt.top += 1;
-			rt.right -= 1;
-			rt.bottom -= 1;
+		HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(188, 188, 188));
+		HGDIOBJ draw = SelectObject(hdcMem, pen);
+		Rectangle(hdcMem, rt.left, rt.top, rt.right, rt.bottom);
+		rt.left += 1;
+		rt.top += 1;
+		rt.right -= 1;
+		rt.bottom -= 1;
 
-			FillRect(hdc, &rt, CreateSolidBrush(RGB(230, 230, 230)));
-			DeleteObject(draw);
-			DeleteObject(pen);
-			ReleaseDC(hwnd, hdc);
-		}
+		HBRUSH bgColor = CreateSolidBrush(RGB(230, 230, 230));
+		FillRect(hdcMem, &rt, bgColor);
+		DeleteObject(draw);
+		SelectObject(hdcMem, bgColor);
+		DeleteObject(bgColor);
+		SelectObject(hdcMem, pen);
+		DeleteObject(pen);
 		break;
 	}
 	}
+
+	// Perform the bit-block transfer between the memory Device Context which has the next bitmap
+	// with the current image to avoid flickering
+	BitBlt(ps.hdc, 0, 0, Size.Width, Size.Height, hdcMem, 0, 0, SRCCOPY);
+
+	ReleaseDC(hwnd, hdcMem);
+	DeleteDC(hdcMem);
+	EndPaint(hwnd, &ps);
 }
 
 void ProgressBar::OnPaintMarquee_Thread(HWND hwnd) noexcept
 {
 	HDC hdc = GetDC(hwnd);
-	SetBkColor(hdc, RGB(230, 230, 230));
-	SetBkMode(hdc, TRANSPARENT);
 	HDC hdcMem = CreateCompatibleDC(hdc);
-	HBITMAP hbmMem = CreateCompatibleBitmap(hdc, Size.Width, Size.Height);
-	HBITMAP hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
+	HBRUSH defaultControlColor = CreateSolidBrush(RGB(230, 230, 230));
+	HBRUSH bgColor = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
 
 	while (m_IsRunning)
 	{
+		HBITMAP hbmMem = CreateCompatibleBitmap(hdc, Size.Width, Size.Height);
+		HBITMAP hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
+
+		long long time = (m_Speed * 2.0f) * m_Speed;
+		std::this_thread::sleep_for(std::chrono::microseconds(time));
+
 		RECT rt;
 		GetClientRect(hwnd, &rt);
 
@@ -163,7 +171,7 @@ void ProgressBar::OnPaintMarquee_Thread(HWND hwnd) noexcept
 		{
 			Minimum = -125;
 			Maximum = 0;
-			FillRect(hdcMem, &rt, CreateSolidBrush(RGB(230, 230, 230)));
+			FillRect(hdcMem, &rt, defaultControlColor);
 		}
 		else
 		{
@@ -171,7 +179,7 @@ void ProgressBar::OnPaintMarquee_Thread(HWND hwnd) noexcept
 			if (Maximum - Minimum < 1)
 			{
 				rt.right = Minimum;
-				FillRect(hdcMem, &rt, CreateSolidBrush(RGB(230, 230, 230)));
+				FillRect(hdcMem, &rt, defaultControlColor);
 			}
 
 			// Draw inner bar for Marquee effect
@@ -195,7 +203,7 @@ void ProgressBar::OnPaintMarquee_Thread(HWND hwnd) noexcept
 					rt.right = Maximum + 1;
 				}
 
-				FillRect(hdcMem, &rt, CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB())));
+				FillRect(hdcMem, &rt, bgColor);
 			}
 
 			// Draw the end of the bar if Marquee effect is in middle
@@ -204,7 +212,7 @@ void ProgressBar::OnPaintMarquee_Thread(HWND hwnd) noexcept
 				rt.left = Maximum + 1;
 				rt.right = Size.Width - 1;
 
-				FillRect(hdcMem, &rt, CreateSolidBrush(RGB(230, 230, 230)));
+				FillRect(hdcMem, &rt, defaultControlColor);
 			}
 
 			// Redraw back part of the bar
@@ -212,7 +220,7 @@ void ProgressBar::OnPaintMarquee_Thread(HWND hwnd) noexcept
 			{
 				rt.left = 1;
 				rt.right = Minimum - 1;
-				FillRect(hdcMem, &rt, CreateSolidBrush(RGB(230, 230, 230)));
+				FillRect(hdcMem, &rt, defaultControlColor);
 			}
 
 			// Increment Marquee effect 1 pixel for each draw
@@ -224,16 +232,20 @@ void ProgressBar::OnPaintMarquee_Thread(HWND hwnd) noexcept
 		// with the current image to avoid flickering
 		BitBlt(hdc, 0, 0, Size.Width, Size.Height, hdcMem, 0, 0, SRCCOPY);
 
-		std::this_thread::sleep_for(std::chrono::microseconds(250));
+		SelectObject(hdc, hbmMem);
+		DeleteObject(hbmMem);
+		SelectObject(hdcMem, hbmOld);
+		DeleteObject(hbmOld);
 	}
 
-	if (hdc != nullptr)
-	{
-		ReleaseDC(hwnd, hdc);
-		DeleteDC(hdc);
-		ReleaseDC(hwnd, hdc);
-		DeleteDC(hdcMem);
-	}
+	SelectObject(hdc, defaultControlColor);
+	DeleteObject(defaultControlColor);
+	SelectObject(hdc, bgColor);
+	DeleteObject(bgColor);
+	ReleaseDC(hwnd, hdcMem);
+	DeleteDC(hdcMem);
+	ReleaseDC(hwnd, hdc);
+	DeleteDC(hdc);
 }
 
 ProgressBar::ProgressBar(Control* parent, int width, int height, int x, int y)
@@ -359,6 +371,27 @@ void ProgressBar::SetMaximum(int value) noexcept
 	}
 }
 
+void ProgressBar::SetSpeed(int value) noexcept
+{
+	if (m_Animation != ProgressBarAnimation::Marquee)
+	{
+		return;
+	}
+
+	if (m_Speed > 100)
+	{
+		m_Speed = 100;
+	}
+	else if (m_Speed < 1)
+	{
+		m_Speed = 1;
+	}
+	else
+	{
+		m_Speed = value;
+	}
+}
+
 ProgressBarAnimation ProgressBar::GetAnimationType() const noexcept
 {
 	return m_Animation;
@@ -385,6 +418,7 @@ void ProgressBar::SetAnimation(ProgressBarAnimation animation) noexcept
 		Maximum = 100;
 		Step = 10;
 		m_Value = 0;
+		m_Speed = 0;
 		break;
 	}
 	case ProgressBarAnimation::Marquee:
@@ -395,6 +429,7 @@ void ProgressBar::SetAnimation(ProgressBarAnimation animation) noexcept
 		Maximum = 0;
 		Step = 1;
 		m_Value = -125;
+		m_Speed = 50;
 		break;
 	}
 	}

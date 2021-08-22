@@ -45,7 +45,6 @@ void TestKeyPress(Control* c, KeyEventArgs* e)
 	if (e->KeyData == Keys::I)
 	{
 		teste->SetValue(teste->GetValue() - 1);
-
 	}
 	if (e->KeyData == Keys::O)
 	{
@@ -54,6 +53,14 @@ void TestKeyPress(Control* c, KeyEventArgs* e)
 	if (e->KeyData == Keys::P)
 	{
 		teste->DecrementStep();
+	}
+	if (e->KeyData == Keys::K)
+	{
+		teste->SetSpeed(100);
+	}
+	if (e->KeyData == Keys::L)
+	{
+		teste->SetSpeed(1);
 	}
 }
 

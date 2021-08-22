@@ -411,6 +411,11 @@ WinControl::WinControl(Control* parent, const std::string& text, int width, int 
 
 }
 
+WinControl::~WinControl()
+{
+	DestroyWindow(static_cast<HWND>(Handle.ToPointer()));
+}
+
 // Static function which handle WinAPI messages to corresponding member function of the control
 LRESULT WINAPI WinControl::HandleMessageSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {

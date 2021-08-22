@@ -1,5 +1,4 @@
 #include "TestApplication.h"
-#include "Control.h"
 
 #ifdef _DEBUG
 #define _CRTDBG_MAP_ALLOC
