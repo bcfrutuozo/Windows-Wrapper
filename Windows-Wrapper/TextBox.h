@@ -1,10 +1,9 @@
 #pragma once
 
-#include "IActivable.h"
 #include "IHidable.h"
-#include "WinControl.h"
+#include "Control.h"
 
-class TextBox final: public WinControl, public IHidable
+class TextBox final: public Control, public IHidable
 {
 private:
 

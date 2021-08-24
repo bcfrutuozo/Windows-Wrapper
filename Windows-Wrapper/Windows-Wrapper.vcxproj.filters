@@ -39,7 +39,7 @@
     <ClCompile Include="MenuSeparator.cpp">
       <Filter>Menu</Filter>
     </ClCompile>
-    <ClCompile Include="MenuStrip.cpp">
+    <ClCompile Include="MenuBar.cpp">
       <Filter>Menu</Filter>
     </ClCompile>
     <ClCompile Include="Event.cpp">
@@ -61,6 +61,8 @@
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="ProgressBar.cpp" />
     <ClCompile Include="TestApplication.cpp" />
+    <ClCompile Include="ToolStrip.cpp" />
+    <ClCompile Include="Label.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RealTimeApplication.h" />
@@ -109,7 +111,7 @@
     <ClInclude Include="MenuSeparator.h">
       <Filter>Menu</Filter>
     </ClInclude>
-    <ClInclude Include="MenuStrip.h">
+    <ClInclude Include="MenuBar.h">
       <Filter>Menu</Filter>
     </ClInclude>
     <ClInclude Include="Event.h">
@@ -182,6 +184,8 @@
     <ClInclude Include="Font.h" />
     <ClInclude Include="ProgressBar.h" />
     <ClInclude Include="TestApplication.h" />
+    <ClInclude Include="ToolStrip.h" />
+    <ClInclude Include="Label.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interfaces">

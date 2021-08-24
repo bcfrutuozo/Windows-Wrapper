@@ -1,18 +1,15 @@
 #pragma once
 
-#include "Base.h"
-#include "Color.h"
 #include "Common.h"
+#include "WinControl.h"
 #include "Exception.h"
-#include "IHandle.h"
+#include "Color.h"
 #include "Size.h"
 #include "Padding.h"
-#include "Event.h"
 #include "EventHandler.h"
 #include "KeyEventArgs.h"
 #include "MouseEventArgs.h"
 #include "KeyPressEventArgs.h"
-#include "MessageMapper.h"
 #include "CancelEventArgs.h"
 #include "OnClosedEventArgs.h"
 #include "OnClosingEventArgs.h"
@@ -24,37 +21,37 @@
 #define CTL_EXCEPT( hr ) Control::HRException( __LINE__,__FILE__,(hr) )
 #define CTL_LAST_EXCEPT() Control::HRException( __LINE__,__FILE__,GetLastError() )
 
-class Window;
-
-class Control : public IHandle, public Base
+class Control : public WinControl
 {
 	friend class Window;
-	friend class Menu;
-	friend class MenuRadioItem;
 	friend class Button;
+	friend class ToolStrip;
+	friend class TextBox;
 
 private:
 
-	bool m_IsMouseOver;
-	bool m_IsClicking;
+	// Tabulation fields
+	unsigned int m_TabIndex;
+	static unsigned int m_IncrementalTabIndex;
 
-	// Fields for callback bindings to WinAPI
-	unsigned int m_Id;
-	static unsigned int m_CurrentIndex;
+	// Variable to check if control is tab selected
+	bool m_IsTabSelected;
+
+	void OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept override;
+	void OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept override;
+	void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept override;
+	void OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept override;
+	void OnNextDialogControl_Impl(HWND hwnd, HWND hwndSetFocus, bool fNext) noexcept override;
 
 protected:
 
-	std::string Text;
-	Size Size;
 	Point Location;
-	Control* Parent;
 	std::vector<std::shared_ptr<Control>> Controls;
-	EventDispatcher Events;
 	Color m_ForeColor;
 	Color m_BackgroundColor;
-	static MessageMapper Mapper;
-	Padding Margin;
-	Padding Padding;
+	Padding m_Margin;
+	Padding m_Padding;
+	unsigned int m_MinSize;
 
 	// Forces the implementation and call on individual childs because each WinApi control
 	// has it own creation method.
@@ -67,22 +64,6 @@ protected:
 		Controls.push_back(std::move(std::make_shared<T>(a...)));
 		return dynamic_cast<T&>(*Controls.back());
 	}
-
-	// Going to think a proper way to handle events
-	// Afterall, only EventArgs type are allowed instead of multiple types
-	template<typename ...Args>
-	void Dispatch(const std::string& event, Args... args)
-	{
-		// Pass the event name, the control which will compose the "sender" parameter in the event
-		// and the arguments which will be an EventArgs type
-		Events.Dispatch(event, this, args...);
-	}
-
-	Control* GetById(unsigned int id) noexcept;
-	Control* GetByHandle(const IntPtr p) noexcept;
-	const unsigned int GetId() const noexcept;
-	void SetMouseOverState(bool state) noexcept;
-	void SetClickingState(bool state) noexcept;
 
 public:
 
@@ -119,15 +100,18 @@ public:
 	void OnMouseWheelSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept;
 	void OnVisibleChangedSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
 
+	Size GetSize() const noexcept;
+	Padding GetMargin() const noexcept;
+	Control* GetByTabIndex(const unsigned int& index) noexcept;
 	void SetForeColor(const Color& color) noexcept;
-	virtual void SetBackgroundColor(const Color& color) noexcept;
+	void SetBackgroundColor(const Color& color) noexcept;
 	const std::string& GetText() const noexcept;
-	Window* GetWindow() noexcept;
-	bool IsMouseOver() const noexcept;
-	bool IsClicking() const noexcept;
-
-	// Used by some controls to trigger certain rules updates
-	virtual void Update() = 0;
+	Control* GetPreviousControl() noexcept;
+	Control* GetNextControl() noexcept;
+	Control* GetById(unsigned int id) noexcept;
+	Control* GetByHandle(const IntPtr p) noexcept;
+	int GetTabIndex() const noexcept;
+	void SetTabIndex(const unsigned int& index) noexcept;
 
 	// Control Exception
 	class ControlException : public Exception

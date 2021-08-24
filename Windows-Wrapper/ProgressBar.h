@@ -1,12 +1,11 @@
 #pragma once
 
-#include "WinControl.h"
+#include "Control.h"
 #include "Enums.h"
-#include "Timer.h"
 
 #include <thread>
 
-class ProgressBar : public WinControl
+class ProgressBar : public Control
 {
 private:
 
@@ -38,7 +37,7 @@ private:
 		static HINSTANCE GetInstance() noexcept;
 	};
 
-	int OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept;
+	int OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept override;
 	void OnPaint_Impl(HWND hwnd) noexcept override;
 	void OnPaintMarquee_Thread(HWND hwnd) noexcept;
 

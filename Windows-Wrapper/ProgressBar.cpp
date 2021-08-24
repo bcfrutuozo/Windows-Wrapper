@@ -50,7 +50,7 @@ void ProgressBar::OnPaint_Impl(HWND hwnd) noexcept
 	GetClientRect(hwnd, &rt);
 	BeginPaint(hwnd, &ps);
 	HDC hdcMem = CreateCompatibleDC(ps.hdc);
-	HBITMAP hbmMem = CreateCompatibleBitmap(ps.hdc, Size.Width, Size.Height);
+	HBITMAP hbmMem = CreateCompatibleBitmap(ps.hdc, m_Size.Width, m_Size.Height);
 	HBITMAP hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
 
 	switch (m_Animation)
@@ -128,7 +128,7 @@ void ProgressBar::OnPaint_Impl(HWND hwnd) noexcept
 
 	// Perform the bit-block transfer between the memory Device Context which has the next bitmap
 	// with the current image to avoid flickering
-	BitBlt(ps.hdc, 0, 0, Size.Width, Size.Height, hdcMem, 0, 0, SRCCOPY);
+	BitBlt(ps.hdc, 0, 0, m_Size.Width, m_Size.Height, hdcMem, 0, 0, SRCCOPY);
 
 	ReleaseDC(hwnd, hdcMem);
 	DeleteDC(hdcMem);
@@ -144,7 +144,7 @@ void ProgressBar::OnPaintMarquee_Thread(HWND hwnd) noexcept
 
 	while (m_IsRunning)
 	{
-		HBITMAP hbmMem = CreateCompatibleBitmap(hdc, Size.Width, Size.Height);
+		HBITMAP hbmMem = CreateCompatibleBitmap(hdc, m_Size.Width, m_Size.Height);
 		HBITMAP hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
 
 		long long time = (m_Speed * 2.0f) * m_Speed;
@@ -167,7 +167,7 @@ void ProgressBar::OnPaintMarquee_Thread(HWND hwnd) noexcept
 		rt.bottom -= 1;
 
 		// Reset Marquee effect when inner bar leaves the main bar window
-		if (Minimum >= Size.Width)
+		if (Minimum >= m_Size.Width)
 		{
 			Minimum = -125;
 			Maximum = 0;
@@ -194,9 +194,9 @@ void ProgressBar::OnPaintMarquee_Thread(HWND hwnd) noexcept
 					rt.left = Minimum - 1;
 				}
 
-				if (Maximum > Size.Width - 1)
+				if (Maximum > m_Size.Width - 1)
 				{
-					rt.right = Size.Width - 1;
+					rt.right = m_Size.Width - 1;
 				}
 				else
 				{
@@ -207,10 +207,10 @@ void ProgressBar::OnPaintMarquee_Thread(HWND hwnd) noexcept
 			}
 
 			// Draw the end of the bar if Marquee effect is in middle
-			if (Maximum < Size.Width - 1)
+			if (Maximum < m_Size.Width - 1)
 			{
 				rt.left = Maximum + 1;
-				rt.right = Size.Width - 1;
+				rt.right = m_Size.Width - 1;
 
 				FillRect(hdcMem, &rt, defaultControlColor);
 			}
@@ -230,7 +230,7 @@ void ProgressBar::OnPaintMarquee_Thread(HWND hwnd) noexcept
 
 		// Perform the bit-block transfer between the memory Device Context which has the next bitmap
 		// with the current image to avoid flickering
-		BitBlt(hdc, 0, 0, Size.Width, Size.Height, hdcMem, 0, 0, SRCCOPY);
+		BitBlt(hdc, 0, 0, m_Size.Width, m_Size.Height, hdcMem, 0, 0, SRCCOPY);
 
 		SelectObject(hdc, hbmMem);
 		DeleteObject(hbmMem);
@@ -257,7 +257,7 @@ ProgressBar::ProgressBar(Control* parent, int width, int height, int x, int y)
 
 ProgressBar::ProgressBar(Control* parent, const std::string& name, int width, int height, int x, int y)
 	:
-	WinControl(parent, name, width, height, x, y),
+	Control(parent, name, width, height, x, y),
 	m_Value(0),
 	Step(10),
 	Minimum(0),
@@ -287,8 +287,8 @@ void ProgressBar::Initialize()
 		WS_CHILD | WS_VISIBLE,							// Style values
 		Location.X,										// X position
 		Location.Y,										// Y position
-		Size.Width,										// Width
-		Size.Height,									// Height
+		m_Size.Width,										// Width
+		m_Size.Height,									// Height
 		static_cast<HWND>(Parent->Handle.ToPointer()),	// Parent handle
 		NULL,						                	// Menu handle
 		ProgressBarClass::GetInstance(),				// Module instance handle

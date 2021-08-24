@@ -3,7 +3,7 @@
 #include "WinControl.h"
 #include "Window.h"
 
-unsigned int WinControl::m_IncrementalTabIndex = 0;
+unsigned int WinControl::m_CurrentIndex = 1;
 
 void WinControl::OnActivate_Impl(HWND hwnd, unsigned int state, HWND hwndActDeact, bool minimized) noexcept
 {
@@ -108,14 +108,12 @@ void WinControl::OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept
 		If the CausesValidation property is set to false, the Validating and Validated events are
 		suppressed.
 	/**************************************************************************************************/
-	m_IsTabSelected = true;
 	Update();
 	Dispatch("OnGotFocus", &ArgsDefault);
 }
 
 void WinControl::OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept
 {
-	m_IsTabSelected = false;
 	Update();
 	Dispatch("OnLostFocus", &ArgsDefault);
 }
@@ -125,34 +123,18 @@ int WinControl::OnGetDLGCode(HWND hwnd, LPMSG msg) noexcept
 	return 0;
 }
 
+void WinControl::OnInitMenu_Impl(HWND hwnd, HMENU hMenu) noexcept
+{
+
+}
+
+void WinControl::OnInitMenuPopup_Impl(HWND hwnd, HMENU hMenu, unsigned int item, bool fSystemMenu) noexcept
+{
+
+}
+
 void WinControl::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept
 {
-	switch (vk)
-	{
-	case VK_TAB:	// Allows the user to change controls by pressing Tab
-	{
-		const WinControl* newCtl;
-
-		// Previous Control
-		if (GetKeyState(VK_SHIFT) & 0x8000)
-		{
-			newCtl = GetPreviousControl();
-		}
-		else // Next control
-		{
-			newCtl = GetNextControl();
-
-		}
-
-		if (newCtl != nullptr)
-		{
-			SetFocus(static_cast<HWND>(newCtl->Handle.ToPointer()));
-		}
-
-		break;
-	}
-	}
-
 	ArgsOnKeyDown = KeyEventArgs(static_cast<Keys>(vk));
 	Dispatch("OnKeyDown", &ArgsOnKeyDown);
 }
@@ -169,6 +151,25 @@ void WinControl::OnKeyUp_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned 
 	Dispatch("OnKeyUp", &ArgsOnKeyUp);
 }
 
+int WinControl::OnMenuChar_Impl(HWND hwnd, unsigned int ch, unsigned int flags, HMENU hmenu) noexcept
+{
+	/*
+		MNC_CLOSE 1
+		Informs the system that it should close the active menu.
+		MNC_EXECUTE 2
+		Informs the system that it should choose the item specified in the low - order word of the return value.The owner window receives a WM_COMMAND message.
+		MNC_IGNORE 	0
+		Informs the system that it should discard the character the user pressed and create a short beep on the system speaker.
+		MNC_SELECT 	3
+		Informs the system that it should select the item specified in the low - order word of the return value.
+	*/
+	return 0;
+}
+
+void WinControl::OnMenuSelect_Impl(HWND hwnd, HMENU hmenu, int item, HMENU hmenuPopup, unsigned int flags) noexcept
+{
+
+}
 
 void WinControl::OnMouseLeave_Impl(HWND hwnd) noexcept
 {
@@ -218,21 +219,6 @@ void WinControl::OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags
 
 void WinControl::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
 {
-	// Trigger tabbing
-	if (Parent != nullptr && GetFocus() != hwnd)
-	{
-		const WinControl* newCtl = dynamic_cast<WinControl*>(GetByHandle(hwnd));
-
-		if (newCtl != nullptr && newCtl->IsEnabled())
-		{
-			SetFocus(static_cast<HWND>(newCtl->Handle.ToPointer()));
-		}
-	}
-	else
-	{
-		Update();
-	}
-
 	SetMouseOverState(true);
 	SetClickingState(true);
 	ArgsOnMouseDown = MouseEventArgs(MouseButtons::Left, 1, 0, x, y);
@@ -293,47 +279,12 @@ void WinControl::OnMouseWheel_Impl(HWND hwnd, int x, int y, int delta, unsigned 
 
 void WinControl::OnNextDialogControl_Impl(HWND hwnd, HWND hwndSetFocus, bool fNext) noexcept
 {
-	if (fNext)
-	{
-		HandleMessageForwarder(hwndSetFocus, WM_SETFOCUS, (WPARAM)hwnd, 0);
-	}
-	else
-	{
-		if (const auto& ctl = dynamic_cast<WinControl*>(GetByHandle(hwndSetFocus)))
-		{
-			auto next = GetByTabIndex(ctl->m_TabIndex + 1);
-			HandleMessageForwarder(hwnd, WM_KILLFOCUS, (WPARAM)static_cast<HWND>(next->Handle.ToPointer()), 0);
-			HandleMessageForwarder(static_cast<HWND>(next->Handle.ToPointer()), WM_SETFOCUS, (WPARAM)hwnd, 0);
-		}
-	}
+
 }
 
 int WinControl::OnNotify_Impl(HWND hwnd, int xPos, int yPos, int zDelta, unsigned int fwKeys) noexcept
 {
 	return 1;
-}
-
-void WinControl::OnPaint_Impl(HWND hwnd) noexcept
-{
-	PAINTSTRUCT ps;
-	BeginPaint(hwnd, &ps);
-
-	// TODO: OnPaint MUST receive a Graphics object which abstracts the PAINTSTRUCT and DeviceContext handle 
-	// to let the user customize the control.
-	//Dispatch("OnPaint", new PaintEventArgs());
-
-	HFONT hFont = CreateFont(Font.GetSizeInPixels(), 0, 0, 0, Font.IsBold() ? FW_BOLD : FW_NORMAL, Font.IsItalic(), Font.IsUnderline(), Font.IsStrikeOut(), ANSI_CHARSET,
-		OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
-		DEFAULT_PITCH | FF_DONTCARE, Font.GetName().c_str());
-
-	SendMessage(hwnd, WM_SETFONT, (WPARAM)hFont, TRUE);
-
-	HBRUSH bgColor = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-	FillRect(ps.hdc, &ps.rcPaint, bgColor);
-	SelectObject(ps.hdc, bgColor);
-	DeleteObject(bgColor);
-
-	EndPaint(hwnd, &ps);
 }
 
 void WinControl::OnRawInput_Impl(HWND hWnd, unsigned int inputCode, HRAWINPUT hRawInput) noexcept
@@ -365,34 +316,10 @@ void WinControl::OnShowWindow_Impl(HWND hwnd, bool fShow, unsigned int status) n
 	Dispatch("OnVisibleChanged", &ArgsDefault);
 }
 
-WinControl* WinControl::GetByTabIndex(const unsigned int& index) noexcept
-{
-	if (m_TabIndex == index)
-	{
-		return this;
-	}
-
-	for (const auto& c : Controls)
-	{
-		if (const auto& winc = dynamic_cast<WinControl*>(c.get()))
-		{
-			WinControl* ret = winc->GetByTabIndex(index);
-			if (ret != nullptr && ret->IsEnabled())
-			{
-				return ret;
-			}
-		}
-	}
-
-	// Returning nullptr is extremely important, otherwise it will be a trash pointer and will launch an exception trying to process it
-	return nullptr;
-}
-
-WinControl::WinControl(Control* parent, const std::string& text, int width, int height, int x, int y) noexcept
+WinControl::WinControl(WinControl* parent, const std::string& text, int width, int height) noexcept
 	:
-	Control(parent, text, width, height, x, y),
-	m_TabIndex(m_IncrementalTabIndex++),
-	m_IsTabSelected(false),
+	Parent(parent),
+	Text(text),
 	Font("Segoe", 9.0f, false, false, false, false, GraphicsUnit::Point),		// Default application font for controls
 	ArgsOnClosing(CloseReason::None, false),
 	ArgsOnClosed(CloseReason::None),
@@ -405,9 +332,16 @@ WinControl::WinControl(Control* parent, const std::string& text, int width, int 
 	ArgsOnMouseUp(MouseButtons::None, 0, 0, 0, 0),
 	ArgsOnMouseDoubleClick(MouseButtons::None, 0, 0, 0, 0),
 	ArgsOnMouseWheel(MouseButtons::None, 0, 0, 0, 0),
-	m_Enabled(true)
+	m_Enabled(true),
+	m_Id(m_CurrentIndex++),
+	m_IsMouseOver(false),
+	m_IsClicking(false),
+	m_Size(width, height)
 {
-
+	if (m_Size.Height == 0 || m_Size.Width == 0)
+	{
+		m_Size = CalculateSizeByFont();
+	}
 }
 
 WinControl::~WinControl()
@@ -498,6 +432,32 @@ LRESULT WINAPI WinControl::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPA
 		OnActivate_Impl(hWnd, static_cast<unsigned int>(LOWORD(wParam)), (HWND)(lParam), static_cast<bool> (HIWORD(wParam)));
 		break;
 	}
+	/********************** MENU MESSAGES ***********************/
+	case WM_INITMENU:
+	{
+		OnInitMenu_Impl(hWnd, (HMENU)wParam);
+		break;
+	}
+	case WM_INITMENUPOPUP:
+	{
+		OnInitMenuPopup_Impl(hWnd, (HMENU)wParam, (UINT)LOWORD(lParam), (BOOL)HIWORD(lParam));
+		break;
+	}
+	case WM_MENUSELECT:
+	{
+		OnMenuSelect_Impl(hWnd,
+			(HMENU)lParam,
+			(HIWORD(wParam) & MF_POPUP) ? 0L : (int)(LOWORD(wParam)),
+			(HIWORD(wParam) & MF_POPUP) ? GetSubMenu((HMENU)lParam, LOWORD(wParam)) : 0L,
+			(unsigned int)((short)HIWORD(wParam) == -1) ? 0xFFFFFFFF : HIWORD(wParam));
+		break;
+	}
+	case WM_MENUCHAR:
+	{
+		OnMenuChar_Impl(hWnd, (unsigned int)LOWORD(wParam), (unsigned int)HIWORD(wParam), (HMENU)lParam);
+		break;
+	}
+	/********************* END MENU MESSAGES ********************/
 
 	/******************** KEYBOARD MESSAGES *********************/
 	case WM_KEYDOWN:
@@ -599,41 +559,61 @@ LRESULT WINAPI WinControl::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPA
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
-WinControl* WinControl::GetPreviousControl() noexcept
+unsigned int WinControl::GetId() const noexcept
 {
-	if (const auto& root = dynamic_cast<WinControl*>(GetWindow()))
-	{
-		int searchIndex = m_TabIndex == 0 ? m_IncrementalTabIndex - 1 : m_TabIndex - 1;
-
-		for (int i = searchIndex; i >= 0; --i)
-		{
-			const auto& ret = root->GetByTabIndex(i);
-			if (ret != nullptr && ret->IsEnabled())
-			{
-				return ret;
-			}
-		}
-	}
+	return m_Id;
 }
 
-WinControl* WinControl::GetNextControl() noexcept
+void WinControl::SetMouseOverState(bool state) noexcept
 {
-	if (const auto& root = dynamic_cast<WinControl*>(GetWindow()))
-	{
-		int searchIndex = m_TabIndex >= m_IncrementalTabIndex - 1 ? 0 : m_TabIndex + 1;
+	m_IsMouseOver = state;
+}
 
-		for (int i = searchIndex; i < m_IncrementalTabIndex; ++i)
+void WinControl::SetClickingState(bool state) noexcept
+{
+	m_IsClicking = state;
+}
+
+Size WinControl::CalculateSizeByFont() noexcept
+{
+	Size r(m_Size);
+
+	if (m_Size.Height == 0)
+	{
+		int height = 5;
+		for (int i = 5, j = 0; i < Font.GetSizeInPixels(); ++i, ++j)
 		{
-			const auto& ret = root->GetByTabIndex(i);
-			if (ret != nullptr && ret->IsEnabled())
+			if (j == 2)
 			{
-				return ret;
+				height += 2;
+				j = -1;
+			}
+			else
+			{
+				height += 1;
 			}
 		}
+
+		// Size is always the default plus the calculated area size
+		r.Height = GetControlDefaultHeight() + height;
 	}
 
-	// Returning nullptr is extremely important, otherwise it will be a trash pointer and will launch an exception trying to process it
-	return nullptr;
+	if (m_Size.Width == 0)
+	{
+		SIZE s;
+		HDC hdc = GetDC(static_cast<HWND>(GetWindow()->Handle.ToPointer()));
+		GetTextExtentPoint32(hdc, Text.c_str(), Text.length(), &s);
+		ReleaseDC(static_cast<HWND>(GetWindow()->Handle.ToPointer()), hdc);
+		DeleteDC(hdc);
+		r.Width = s.cx;
+	}
+
+	return r;
+}
+
+inline unsigned int WinControl::GetControlDefaultHeight() const noexcept
+{
+	return 9; // Default size is 9 for 1 pixel font
 }
 
 bool WinControl::IsEnabled() const noexcept
@@ -654,6 +634,34 @@ bool WinControl::IsEnabled() const noexcept
 	return true;
 }
 
+Window* WinControl::GetWindow() noexcept
+{
+	if (GetType() == typeid(Window))
+		return dynamic_cast<Window*>(this);
+
+	if (Parent != nullptr)
+	{
+		if (Parent->GetType() == typeid(Window))
+		{
+			return dynamic_cast<Window*>(Parent);
+		}
+
+		return Parent->GetWindow();
+	}
+
+	return nullptr;
+}
+
+bool WinControl::IsMouseOver() const noexcept
+{
+	return m_IsMouseOver;
+}
+
+bool WinControl::IsClicking() const noexcept
+{
+	return m_IsClicking;
+}
+
 void WinControl::Enable() noexcept
 {
 	m_Enabled = true;
@@ -664,24 +672,6 @@ void WinControl::Disable() noexcept
 {
 	m_Enabled = false;
 	EnableWindow(static_cast<HWND>(Handle.ToPointer()), false);
-}
-
-int WinControl::GetTabIndex() const noexcept
-{
-	return m_TabIndex;
-}
-
-void WinControl::SetTabIndex(const unsigned int& index) noexcept
-{
-	// Don't let the user use a higher Tab Index than the number of current controls
-	if (index > m_IncrementalTabIndex)
-	{
-		m_TabIndex = m_IncrementalTabIndex;
-	}
-	else
-	{
-		m_TabIndex = index;
-	}
 }
 
 void WinControl::Update()

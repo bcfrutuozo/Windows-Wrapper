@@ -1,5 +1,4 @@
 #include "Window.h"
-#include "Event.h"
 #include "OnClosedEventHandler.h"
 #include "OnClosingEventHandler.h"
 
@@ -40,7 +39,7 @@ HINSTANCE Window::WindowClass::GetInstance() noexcept
 
 Window::Window(const std::string& name, int width, int height)
 	:
-	WinControl(nullptr, name, width, height, 0, 0),
+	Control(nullptr, name, width, height, 0, 0),
 	m_IsCursorEnabled(true),
 	m_Keyboard(std::make_unique<Keyboard>()),
 	m_Mouse(std::make_unique<Mouse>()),
@@ -77,12 +76,6 @@ void Window::OnShownSet(const std::function<void(Control* const c, EventArgs* co
 	Events.Register(std::make_unique<EventHandler>("OnShown", callback));
 }
 
-void Window::SetBackgroundColor(const Color& color) noexcept
-{
-	m_BackgroundColor = color;
-	Update();
-}
-
 void Window::OnClosedSet(const std::function<void(Control* const c, OnClosedEventArgs* const e)>& callback) noexcept
 {
 	Events.Register(std::make_unique<OnClosedEventHandler>("OnClosing", callback));
@@ -93,9 +86,9 @@ void Window::Initialize() noexcept
 	// Calculate window size based on desired client region
 	RECT r;
 	r.left = 100;
-	r.right = Size.Width + r.left;
+	r.right = m_Size.Width + r.left;
 	r.top = 100;
-	r.bottom = Size.Height + r.top;
+	r.bottom = m_Size.Height + r.top;
 	if (AdjustWindowRect(&r, WS_OVERLAPPEDWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU | WS_CLIPCHILDREN | WS_VISIBLE, FALSE) == 0)
 	{
 		throw CTL_LAST_EXCEPT();
@@ -150,49 +143,49 @@ Window::~Window()
 
 void Window::ClearMenuStrip() noexcept
 {
-	SetMenu(static_cast<HWND>(Handle.ToPointer()), NULL);
+	//SetMenu(static_cast<HWND>(Handle.ToPointer()), NULL);
 
-	for (auto& c : Controls)
-	{
-		if (c->GetType() == typeid(MenuStrip))
-		{
-			c->Delete();
-			const auto it = std::find(Controls.begin(), Controls.end(), c);
-			Controls.erase(it);
+	//for (auto& c : Controls)
+	//{
+	//	if (c->GetType() == typeid(MenuBar))
+	//	{
+	//		c->Delete();
+	//		const auto it = std::find(Controls.begin(), Controls.end(), c);
+	//		Controls.erase(it);
 
-			// Break processing to avoid exception.
-			// We are removing an element inside a for loop which will cause the compiler to reference a null iterator.
-			// And as we have just one MenuStrip per Window. It's a valid assumption.
-			break;
-		}
-	}
+	//		// Break processing to avoid exception.
+	//		// We are removing an element inside a for loop which will cause the compiler to reference a null iterator.
+	//		// And as we have just one MenuStrip per Window. It's a valid assumption.
+	//		break;
+	//	}
+	//}
 }
 
 void Window::UpdateMenuStrip() noexcept
 {
-	for (auto& c : Controls)
+	/*for (auto& c : Controls)
 	{
-		if (c->GetType() == typeid(MenuStrip))
+		if (c->GetType() == typeid(MenuBar))
 		{
 			SetMenu(static_cast<HWND>(Handle.ToPointer()), static_cast<HMENU>(c->Handle.ToPointer()));
 			c->Update();
 			m_IsMenuStripEnabled = true;
 		}
-	}
+	}*/
 }
 
-MenuStrip& Window::GetMenuStrip() noexcept
-{
-	for (auto& c : Controls)
-	{
-		if (c->GetType() == typeid(MenuStrip))
-		{
-			return dynamic_cast<MenuStrip&>(*c);
-		}
-	}
-
-	return Create<MenuStrip>(this);
-}
+//MenuBar& Window::GetMenuStrip() noexcept
+//{
+//	for (auto& c : Controls)
+//	{
+//		if (c->GetType() == typeid(MenuBar))
+//		{
+//			return dynamic_cast<MenuBar&>(*c);
+//		}
+//	}
+//
+//	return Create<MenuBar>(this);
+//}
 
 Button& Window::AddButton(const std::string& name, int width, int height, int x, int y) noexcept
 {
@@ -212,6 +205,18 @@ ProgressBar& Window::AddProgressBar(int width, int height, int x, int y) noexcep
 ProgressBar& Window::AddProgressBar(const std::string& text, int width, int height, int x, int y) noexcept
 {
 	return Create<ProgressBar>(this, text, width, height, x, y);
+}
+
+ToolStrip& Window::AddToolStrip() noexcept
+{
+	ToolStrip& t = Create<ToolStrip>(this);
+	m_MinSize += t.GetSize().Height; // Invalidate the window header size
+	return t;
+}
+
+Label& Window::AddLabel(const std::string& text, int x, int y) noexcept
+{
+	return Create<Label>(this, text, x, y);
 }
 
 void Window::SetText(const std::string& title)
@@ -273,15 +278,38 @@ void Window::ShowCursor() noexcept
 
 void Window::OnCommand_Impl(HWND hwnd, int id, HWND hwndCtl, unsigned int codeNotify) noexcept
 {
-	if (const auto& c = GetById(id))
-	{
-		// Dispatch both OnClick for common task and OnMouseClick which receives the cursor information
-		c->Dispatch("OnClick", new EventArgs());
-		c->Dispatch("OnMouseClick", new MouseEventArgs(MouseButtons::Left, 1, 0, 0, 0));
+	//if (const auto& c = GetById(id))
+	//{
+	//	// Dispatch both OnClick for common task and OnMouseClick which receives the cursor information
+	//	c->Dispatch("OnClick", new EventArgs());
+	//	c->Dispatch("OnMouseClick", new MouseEventArgs(MouseButtons::Left, 1, 0, 0, 0));
 
-		// Force the update of the controls
-		c->Update();
-	}
+	//	// Force the update of the controls
+	//	c->Update();
+	//}
+}
+
+void Window::OnPaint_Impl(HWND hwnd) noexcept
+{
+	PAINTSTRUCT ps;
+	BeginPaint(hwnd, &ps);
+
+	// TODO: OnPaint MUST receive a Graphics object which abstracts the PAINTSTRUCT and DeviceContext handle 
+	// to let the user customize the control.
+	//Dispatch("OnPaint", new PaintEventArgs());
+
+	HFONT hFont = CreateFont(Font.GetSizeInPixels(), 0, 0, 0, Font.IsBold() ? FW_BOLD : FW_NORMAL, Font.IsItalic(), Font.IsUnderline(), Font.IsStrikeOut(), ANSI_CHARSET,
+		OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+		DEFAULT_PITCH | FF_DONTCARE, Font.GetName().c_str());
+
+	SendMessage(hwnd, WM_SETFONT, (WPARAM)hFont, TRUE);
+
+	HBRUSH bgColor = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+	FillRect(ps.hdc, &ps.rcPaint, bgColor);
+	SelectObject(ps.hdc, bgColor);
+	DeleteObject(bgColor);
+
+	EndPaint(hwnd, &ps);
 }
 
 bool Window::IsCursorEnabled() const noexcept

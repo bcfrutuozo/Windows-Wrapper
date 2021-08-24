@@ -148,6 +148,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Font.cpp" />
+    <ClCompile Include="Label.cpp" />
+    <ClCompile Include="ToolStrip.cpp" />
     <ClCompile Include="MessageMapper.cpp" />
     <ClCompile Include="Padding.cpp" />
     <ClCompile Include="ProgressBar.cpp" />
@@ -169,7 +171,7 @@
     <ClCompile Include="MenuEntryItem.cpp" />
     <ClCompile Include="MenuLeaf.cpp" />
     <ClCompile Include="MenuRoot.cpp" />
-    <ClCompile Include="MenuStrip.cpp" />
+    <ClCompile Include="MenuBar.cpp" />
     <ClCompile Include="MenuCheckItem.cpp" />
     <ClCompile Include="MenuItem.cpp" />
     <ClCompile Include="MenuRadioItem.cpp" />
@@ -191,6 +193,8 @@
     <ClInclude Include="CancelEventHandler.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="Keys.h" />
+    <ClInclude Include="Label.h" />
+    <ClInclude Include="ToolStrip.h" />
     <ClInclude Include="MessageMapper.h" />
     <ClInclude Include="MouseButtons.h" />
     <ClInclude Include="Padding.h" />
@@ -228,7 +232,7 @@
     <ClInclude Include="MenuEntryItem.h" />
     <ClInclude Include="MenuLeaf.h" />
     <ClInclude Include="MenuRoot.h" />
-    <ClInclude Include="MenuStrip.h" />
+    <ClInclude Include="MenuBar.h" />
     <ClInclude Include="MenuCheckItem.h" />
     <ClInclude Include="MenuItem.h" />
     <ClInclude Include="MenuRadioItem.h" />

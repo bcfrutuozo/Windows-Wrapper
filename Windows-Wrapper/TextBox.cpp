@@ -297,7 +297,7 @@ void TextBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 	}
 	}
 
-	WinControl::OnKeyDown_Impl(hwnd, vk, cRepeat, flags);
+	Control::OnKeyDown_Impl(hwnd, vk, cRepeat, flags);
 }
 
 void TextBox::OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat) noexcept
@@ -320,7 +320,7 @@ void TextBox::OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat) noexcept
 		return;
 	}
 
-	WinControl::OnKeyPressed_Impl(hwnd, c, cRepeat);
+	Control::OnKeyPressed_Impl(hwnd, c, cRepeat);
 
 	// Avoid key input if event is canceled
 	if (ArgsOnKeyPressed.Handled)
@@ -378,7 +378,7 @@ void TextBox::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlag
 
 	m_SelectIndex = m_CursorIndex;
 
-	WinControl::OnMouseLeftDown_Impl(hwnd, x, y, keyFlags);
+	Control::OnMouseLeftDown_Impl(hwnd, x, y, keyFlags);
 }
 
 void TextBox::OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
@@ -406,7 +406,7 @@ void TextBox::OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) n
 		InputRedraw(hwnd);
 	}
 
-	WinControl::OnMouseMove_Impl(hwnd, x, y, keyFlags);
+	Control::OnMouseMove_Impl(hwnd, x, y, keyFlags);
 }
 
 void TextBox::OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept
@@ -416,7 +416,7 @@ void TextBox::OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept
 	EnableCaret();
 	InputRedraw(hwnd);
 
-	WinControl::OnFocusEnter_Impl(hwnd, hwndOldFocus);
+	Control::OnFocusEnter_Impl(hwnd, hwndOldFocus);
 }
 
 void TextBox::OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept
@@ -425,7 +425,7 @@ void TextBox::OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept
 	DisableCaret();
 	DestroyCaret();
 
-	WinControl::OnFocusLeave_Impl(hwnd, hwndNewFocus);
+	Control::OnFocusLeave_Impl(hwnd, hwndNewFocus);
 }
 
 void TextBox::OnPaint_Impl(HWND hWnd) noexcept
@@ -464,9 +464,9 @@ void TextBox::CalculateCaret(HWND hwnd, const HDC& hdc) noexcept
 
 		switch (BorderStyle)
 		{
-		case BorderStyle::None: m_CaretPosition[i] += Margin.Left; break;
-		case BorderStyle::FixedSingle: m_CaretPosition[i] += Margin.Left + 1; break;
-		case BorderStyle::Fixed3D: m_CaretPosition[i] += Margin.Left + 2; break;
+		case BorderStyle::None: m_CaretPosition[i] += m_Margin.Left; break;
+		case BorderStyle::FixedSingle: m_CaretPosition[i] += m_Margin.Left + 1; break;
+		case BorderStyle::Fixed3D: m_CaretPosition[i] += m_Margin.Left + 2; break;
 		}
 	}
 }
@@ -662,26 +662,11 @@ void TextBox::InputDraw(HWND hWnd, HDC& hdc) noexcept
 	PrintDebug(); // Show string, cursor and selection indices on Output Window
 #endif
 
-	// Set the control size in relation to the font size
-	int height = 5;
-	for (int i = 5, j = 0; i < Font.GetSizeInPixels(); ++i, ++j)
-	{
-		if (j == 2)
-		{
-			height += 2;
-			j = -1;
-		}
-		else
-		{
-			height += 1;
-		}
-	}
-	// Size is always the default plus the calculated area size
-	Size.Height = 9 + height;
-	SetWindowPos(hWnd, HWND_TOP, Location.X, Location.Y, Size.Width, Size.Height, 0);
+	m_Size = CalculateSizeByFont();
+	SetWindowPos(hWnd, HWND_TOP, Location.X, Location.Y, m_Size.Width, m_Size.Height, 0);
 
 	HDC hdcMem = CreateCompatibleDC(hdc);
-	HBITMAP hbmMem = CreateCompatibleBitmap(hdc, Size.Width, Size.Height);
+	HBITMAP hbmMem = CreateCompatibleBitmap(hdc, m_Size.Width, m_Size.Height);
 	HBITMAP hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
 
 	HFONT hFont = CreateFont(Font.GetSizeInPixels(), 0, 0, 0, Font.IsBold() ? FW_BOLD : FW_NORMAL, Font.IsItalic(), Font.IsUnderline(), Font.IsStrikeOut(), ANSI_CHARSET,
@@ -786,10 +771,10 @@ void TextBox::InputDraw(HWND hWnd, HDC& hdc) noexcept
 	DeleteObject(brush);
 
 	// Adjust text margin after border draw
-	cr.left += Margin.Left;
-	cr.top += Margin.Top;
-	cr.right -= Margin.Right;
-	cr.bottom -= Margin.Bottom;
+	cr.left += m_Margin.Left;
+	cr.top += m_Margin.Top;
+	cr.right -= m_Margin.Right;
+	cr.bottom -= m_Margin.Bottom;
 
 	// Adjust text in center based on default TextBox size with font size as 1
 	int spacingForAlignment = cr.bottom - Font.GetSizeInPixels();
@@ -851,7 +836,7 @@ void TextBox::InputDraw(HWND hWnd, HDC& hdc) noexcept
 
 	// Perform the bit-block transfer between the memory Device Context which has the next bitmap
 	// with the current image to avoid flickering
-	BitBlt(hdc, 0, 0, Size.Width, Size.Height, hdcMem, 0, 0, SRCCOPY);
+	BitBlt(hdc, 0, 0, m_Size.Width, m_Size.Height, hdcMem, 0, 0, SRCCOPY);
 
 	SelectObject(hdcMem, hbmOld);
 	DeleteObject(hbmOld);
@@ -920,7 +905,7 @@ TextBox::TextBox(Control* parent, int width, int x, int y)
 
 TextBox::TextBox(Control* parent, const std::string& name, int width, int x, int y)
 	:
-	WinControl(parent, name, width, 9, x, y),	// Default control size without font is 9
+	Control(parent, name, width, 0, x, y),	// Default control size without font is 9
 	m_SelectIndex(Text.length()),
 	m_CursorIndex(Text.length()),
 	m_IsCaretVisible(false),
@@ -944,8 +929,8 @@ void TextBox::Initialize()
 		WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPSIBLINGS | SS_LEFT,										// Style values
 		Location.X,																							// X position
 		Location.Y,																							// Y position
-		Size.Width,																							// Width
-		Size.Height,																						// Height
+		m_Size.Width,																							// Width
+		m_Size.Height,																						// Height
 		static_cast<HWND>(Parent->Handle.ToPointer()),														// Parent handle
 		(HMENU)GetId(),						                												// Menu handle
 		TextBoxClass::GetInstance(),																		// Module instance handle
@@ -958,9 +943,10 @@ void TextBox::Initialize()
 	}
 
 	// Set default TextBox margin to 3 pixels
-	Margin = 3;
+	m_Margin = 3;
 	m_BackgroundColor = Color::Window();
 	m_ForeColor = Color::WindowText();
+	m_Size = CalculateSizeByFont();
 }
 
 int TextBox::GetSelectionLenght() const noexcept

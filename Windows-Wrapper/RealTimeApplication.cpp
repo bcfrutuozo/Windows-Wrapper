@@ -2,7 +2,7 @@
 #include "Event.h"
 #include "Timer.h"
 #include "Menu.h"
-#include "MenuStrip.h"
+#include "MenuBar.h"
 #include "MenuSeparator.h"
 #include "MenuItem.h"
 #include "MenuLeaf.h"
@@ -82,46 +82,21 @@ void RealTimeApplication::HandleInput(float dt)
 	{
 		if (window->GetKeyboard().IsKeyPressed('Y'))
 		{
-			window->AddButton("Teste", 200, 80, 50, 100);
-
-			auto& mb = window->GetMenuStrip();
-			auto& item1 = mb.AddItem("Arquivo");
-			auto& item2 = mb.AddItem("Arquivo2");
-			auto& menu1 = mb.AddMenu("Submenu");
-			menu1.AddItem("Submenu-Item1");
-			menu1.AddCheckItem("Check-test01", true);
-			menu1.AddCheckItem("Check-test02", false);
-			menu1.AddSeparator();
-			menu1.AddItemWithIcon("Submenu-Item2", "images\\1.bmp");
-			menu1.AddSeparator();
-			auto& menu2 = menu1.AddMenu("Submenu-Item3");
-			menu2.AddItemWithIcon("Submenu2-Item1", "images\\2.bmp");
-			menu2.AddSeparator();
-			menu2.AddRadioItem("Radio1", true).Disable();
-			menu2.AddRadioItem("Radio2", true);
-			menu2.AddRadioItem("Radio3", false);
-			menu2.AddRadioItem("Radio4", true);
-			menu2.AddSeparator();
-			menu2.AddRadioItem("Radio1", false);
-			menu2.AddRadioItem("Radio2", true);
-			menu1.AddItem("Submenu-Item4");
-			menu1.AddItem("Submenu-Item5");
-			window->UpdateMenuStrip();
+			
 		}
 
 		if (window->GetKeyboard().IsKeyPressed('R'))
 		{
-			window->ClearMenuStrip();
+
 		}
 
 		if (window->GetKeyboard().IsKeyPressed('O'))
 		{
-			window->GetMenuStrip().Show();
+
 		}
 
 		if (window->GetKeyboard().IsKeyPressed('P'))
 		{
-			window->GetMenuStrip().Hide();
 		}
 
 		if (window->GetKeyboard().IsKeyPressed('Q'))

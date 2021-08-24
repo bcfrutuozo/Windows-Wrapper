@@ -12,9 +12,6 @@ private:
 	TextBox* txtBox1;
 	TextBox* txtBox2;
 	TextBox* txtBox3;
-	Menu* m1;
-	Menu* m2;
-	Menu* m3;
 
 public:
 

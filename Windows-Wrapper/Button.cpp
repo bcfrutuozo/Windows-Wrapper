@@ -60,7 +60,7 @@ void Button::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned in
 	}
 	}
 
-	WinControl::OnKeyDown_Impl(hwnd, vk, cRepeat, flags);
+	Control::OnKeyDown_Impl(hwnd, vk, cRepeat, flags);
 }
 
 void Button::OnKeyUp_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept
@@ -76,7 +76,7 @@ void Button::OnKeyUp_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int 
 	}
 	}
 
-	WinControl::OnKeyUp_Impl(hwnd, vk, cRepeat, flags);
+	Control::OnKeyUp_Impl(hwnd, vk, cRepeat, flags);
 }
 
 void Button::OnPaint_Impl(HWND hwnd) noexcept
@@ -88,7 +88,7 @@ void Button::OnPaint_Impl(HWND hwnd) noexcept
 	GetClientRect(hwnd, &rc);
 
 	HDC hdcMem = CreateCompatibleDC(ps.hdc);
-	HBITMAP hbmMem = CreateCompatibleBitmap(ps.hdc, Size.Width, Size.Height);
+	HBITMAP hbmMem = CreateCompatibleBitmap(ps.hdc, m_Size.Width, m_Size.Height);
 	HBITMAP hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
 
 	// ONLY STANDARD BUTTON TYPE IS IMPLEMENTED
@@ -338,7 +338,7 @@ void Button::OnPaint_Impl(HWND hwnd) noexcept
 
 	// Perform the bit-block transfer between the memory Device Context which has the next bitmap
 	// with the current image to avoid flickering
-	BitBlt(ps.hdc, 0, 0, Size.Width, Size.Height, hdcMem, 0, 0, SRCCOPY);
+	BitBlt(ps.hdc, 0, 0, m_Size.Width, m_Size.Height, hdcMem, 0, 0, SRCCOPY);
 
 	// NEED TO IMPLEMENT A LARGE GRAPHICS CLASS TO HANDLE EVENTARGS TO THE USER.
 	// IT'S PROBABLY GOING TO BE ONE OF THE LAST STEPS
@@ -355,7 +355,7 @@ void Button::OnPaint_Impl(HWND hwnd) noexcept
 
 Button::Button(Control* parent, const std::string& name, int width, int height, int x, int y)
 	:
-	WinControl(parent, name, width, height, x, y),
+	Control(parent, name, width, height, x, y),
 	FlatStyle(FlatStyle::Standard),
 	FlatAppearance()
 {
@@ -376,8 +376,8 @@ void Button::Initialize()
 		WS_CHILD | WS_VISIBLE | WS_TABSTOP,				// Style values
 		Location.X,										// X position
 		Location.Y,										// Y position
-		Size.Width,										// Width
-		Size.Height,									// Height
+		m_Size.Width,										// Width
+		m_Size.Height,									// Height
 		static_cast<HWND>(Parent->Handle.ToPointer()),	// Parent handle
 		NULL,						                	// Menu handle
 		ButtonClass::GetInstance(),						// Module instance handle

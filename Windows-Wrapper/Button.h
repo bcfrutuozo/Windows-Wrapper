@@ -1,10 +1,9 @@
 #pragma once
 
-#include "IActivable.h"
 #include "IHidable.h"
-#include "WinControl.h"
+#include "Control.h"
 
-class Button final: public WinControl, public IHidable
+class Button final: public Control, public IHidable
 {
 	friend class WinControl;
 

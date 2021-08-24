@@ -1,24 +1,23 @@
 #pragma once
 
-#include "WinControl.h"
+#include "Control.h"
 #include "Color.h"
 #include "Keyboard.h"
 #include "Mouse.h"
-#include "MenuStrip.h"
+#include "MenuBar.h"
 #include "Button.h"
 #include "TextBox.h"
 #include "ProgressBar.h"
 #include "OnClosedEventArgs.h"
 #include "OnClosingEventArgs.h"
+#include "ToolStrip.h"
 
 #include <memory>
 #include <vector>
 #include <optional>
 #include <string>
 
-class Menu;
-
-class Window final : public WinControl, public IHidable
+class Window final : public Control, public IHidable
 {
 	friend class Menu;
 	friend class WinControl;
@@ -58,6 +57,7 @@ private:
 
 	// Events implementations
 	void OnCommand_Impl(HWND hwnd, int id, HWND hwndCtl, unsigned int codeNotify) noexcept override;
+	void OnPaint_Impl(HWND hwnd) noexcept override;
 
 protected:
 
@@ -72,7 +72,6 @@ public:
 
 	void Hide() override;
 	void Show() override;
-	void SetBackgroundColor(const Color& color) noexcept override;
 
 	void OnClosedSet(const std::function<void(Control* const c, OnClosedEventArgs* const e)>& callback) noexcept;
 	void OnClosingSet(const std::function<void(Control* const c, OnClosingEventArgs* const e)>& callback) noexcept;
@@ -81,13 +80,15 @@ public:
 	// MenuStrip functions
 	void ClearMenuStrip() noexcept;
 	void UpdateMenuStrip() noexcept;
-	MenuStrip& GetMenuStrip() noexcept;
+	//MenuBar& GetMenuStrip() noexcept;
 
 	// Buttons
 	Button& AddButton(const std::string& name, int width, int height, int x, int y) noexcept;
 	TextBox& AddTextBox(const std::string& name, int width, int x, int y) noexcept;
 	ProgressBar& AddProgressBar(int width, int height, int x, int y) noexcept;
 	ProgressBar& AddProgressBar(const std::string& text, int width, int height, int x, int y) noexcept;
+	ToolStrip& AddToolStrip() noexcept;
+	Label& AddLabel(const std::string& text, int x, int y) noexcept;
 
 	void SetText(const std::string& text);
 	void EnableCursor() noexcept;

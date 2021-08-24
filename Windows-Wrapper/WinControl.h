@@ -1,23 +1,41 @@
 #pragma once
 
-#include "Control.h"
+#include "Base.h"
+#include "IHandle.h"
+#include "Event.h"
 #include "Font.h"
+#include "Size.h"
+#include "OnClosingEventArgs.h"
+#include "OnClosedEventArgs.h"
+#include "MouseEventArgs.h"
+#include "KeyEventArgs.h"
+#include "KeyPressEventArgs.h"
 
-#include <functional>
+class Window;
 
-class WinControl : public Control
+class WinControl : public IHandle, public Base
 {
-	friend class Window;
+	/*
+	* Friend classes to allow access between children.
+	* It will be useful to implement hidden methods from the final user and at the same time,
+	* improve the Interops between WinAPI controls
+	*/
+	friend class Control;
 	friend class Button;
 	friend class TextBox;
+	friend class Window;
+	friend class ProgressBar;
+	friend class Label;
+	friend class ToolStrip;
 
 private:
 
+	// Fields for callback bindings to WinAPI
+	unsigned int m_Id;
+	static unsigned int m_CurrentIndex;
+	bool m_IsMouseOver;
+	bool m_IsClicking;
 	bool m_Enabled;
-
-	// Tabulation fields
-	unsigned int m_TabIndex;
-	static unsigned int m_IncrementalTabIndex;
 
 	// Event fields
 	EventArgs ArgsDefault;
@@ -33,10 +51,13 @@ private:
 	MouseEventArgs ArgsOnMouseDoubleClick;
 	MouseEventArgs ArgsOnMouseWheel;
 
-	/* Global events declaration
-	All are virtual to be overritten on the derived classes. Not all should be, but events like OnPaint(), OnMouseOver(),
-	OnKeyPressed() have different behaviors on each type of Control. So they are all virtual to decouple each kind of 
+	EventDispatcher Events;
+
+	/***** Global events declaration *****/
+	/* All are virtual to be overritten on the derived classes. Not all should be, but events like OnPaint(), OnMouseOver(),
+	OnKeyPressed() have different behaviors on each type of Control. So they are all virtual to decouple each kind of
 	functionality. */
+
 	virtual void OnActivate_Impl(HWND hwnd, unsigned int state, HWND hwndActDeact, bool minimized) noexcept;
 	virtual void OnCommand_Impl(HWND hwnd, int id, HWND hwndCtl, unsigned int codeNotify) noexcept;
 	virtual int OnClosing_Impl(HWND hwnd) noexcept;
@@ -47,9 +68,24 @@ private:
 	virtual void OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept;
 	virtual void OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept;
 	virtual int OnGetDLGCode(HWND hwnd, LPMSG msg) noexcept;
+
+	/* Sent when a menu is about to become active. It occurs when the user clicks an item on the menu bar or presses
+	a menu key. This allows the application to modify the menu before it is displayed. */
+	virtual void OnInitMenu_Impl(HWND hwnd, HMENU hMenu) noexcept;
+
+	/* Sent when a drop-down menu or submenu is about to become active. This allows an application to modify the menu
+	before it is displayed, without changing the entire menu. */
+	virtual void OnInitMenuPopup_Impl(HWND hwnd, HMENU hMenu, unsigned int item, bool fSystemMenu) noexcept;
 	virtual void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept;
 	virtual void OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat) noexcept;
 	virtual void OnKeyUp_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept;
+
+	/* Sent when a menu is active and the user presses a key that does not correspond to any mnemonic or accelerator
+	key. This message is sent to the window that owns the menu. */
+	virtual int OnMenuChar_Impl(HWND hwnd, unsigned int ch, unsigned int flags, HMENU hmenu) noexcept;
+
+	/* Sent to a menu's owner window when the user selects a menu item. */
+	virtual void OnMenuSelect_Impl(HWND hwnd, HMENU hmenu, int item, HMENU hmenuPopup, unsigned int flags) noexcept;
 	virtual void OnMouseLeave_Impl(HWND hwnd) noexcept;
 	virtual void OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept;
 	virtual void OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept;
@@ -59,22 +95,31 @@ private:
 	virtual void OnMouseLeftDoubleClick_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept;
 	virtual void OnMouseRightDoubleClick_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept;
 	virtual void OnMouseWheel_Impl(HWND hwnd, int x, int y, int delta, unsigned int fwKeys) noexcept;
-	virtual void OnNextDialogControl_Impl(HWND hwnd, HWND hwndSetFocus, bool fNext) noexcept;
+	virtual void OnNextDialogControl_Impl(HWND hwnd, HWND hwndSetFocus, bool fNext) noexcept = 0;
 	virtual int OnNotify_Impl(HWND hwnd, int xPos, int yPos, int zDelta, unsigned int fwKeys) noexcept;
-	virtual void OnPaint_Impl(HWND hwnd) noexcept;
+	virtual void OnPaint_Impl(HWND hwnd) noexcept = 0;
 	virtual void OnRawInput_Impl(HWND hWnd, unsigned int inputCode, HRAWINPUT hRawInput) noexcept;
 	virtual int OnSetCursor_Impl(HWND hwnd, HWND hwndCursor, unsigned int codeHitTest, unsigned int msg) noexcept;
 	virtual void OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy) noexcept;
 	virtual void OnShowWindow_Impl(HWND hwnd, bool fShow, unsigned int status) noexcept;
 
-	WinControl* GetByTabIndex(const unsigned int& index) noexcept;
+	// Going to think a proper way to handle events
+	// Afterall, only EventArgs type are allowed instead of multiple types
+	template<typename ...Args>
+	void Dispatch(const std::string& event, Args... args)
+	{
+		// Pass the event name, the control which will compose the "sender" parameter in the event
+		// and the arguments which will be an EventArgs type
+		Events.Dispatch(event, this, args...);
+	}
 
 protected:
 
-	// Variable to check if control is tab selected
-	bool m_IsTabSelected;
+	std::string Text;
+	WinControl* Parent;
+	Size m_Size;
 
-	WinControl(Control* parent, const std::string& text, int width, int height, int x, int y) noexcept;
+	WinControl(WinControl* parent, const std::string& text, int width, int height) noexcept;
 	virtual ~WinControl();
 
 	// Static function which handle WinAPI messages to corresponding member function of the control
@@ -87,17 +132,22 @@ protected:
 	// Member function responsible to handle the messages of each different type of control 
 	LRESULT WINAPI HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 
-	WinControl* GetPreviousControl() noexcept;
-	WinControl* GetNextControl() noexcept;
+	Size CalculateSizeByFont() noexcept;
+	inline unsigned int GetControlDefaultHeight() const noexcept;
+	unsigned int GetId() const noexcept;
+	void SetMouseOverState(bool state) noexcept;
+	void SetClickingState(bool state) noexcept;
 
 public:
 
 	Font Font;
+	
 
+	Window* GetWindow() noexcept;
+	bool IsMouseOver() const noexcept;
+	bool IsClicking() const noexcept;
 	bool IsEnabled() const noexcept;
 	void Enable() noexcept;
 	void Disable() noexcept;
-	int GetTabIndex() const noexcept;
-	void SetTabIndex(const unsigned int& index) noexcept;
-	void Update() override;
+	virtual void Update();
 };
