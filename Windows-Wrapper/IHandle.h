@@ -6,5 +6,5 @@ class IHandle
 {
 public:
 
-	IntPtr Handle = 0;
+	IntPtr Handle = nullptr;
 };

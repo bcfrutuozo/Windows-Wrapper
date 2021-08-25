@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Common.h"
-#include "WinControl.h"
+#include "WinAPI.h"
 #include "Exception.h"
 #include "Color.h"
 #include "Size.h"
@@ -21,7 +21,7 @@
 #define CTL_EXCEPT( hr ) Control::HRException( __LINE__,__FILE__,(hr) )
 #define CTL_LAST_EXCEPT() Control::HRException( __LINE__,__FILE__,GetLastError() )
 
-class Control : public WinControl
+class Control : public WinAPI
 {
 	friend class Window;
 	friend class Button;

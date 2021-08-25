@@ -5,7 +5,7 @@
 
 class Button final: public Control, public IHidable
 {
-	friend class WinControl;
+	friend class WinAPI;
 
 private:
 

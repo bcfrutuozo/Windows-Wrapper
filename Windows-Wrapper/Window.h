@@ -20,7 +20,7 @@
 class Window final : public Control, public IHidable
 {
 	friend class Menu;
-	friend class WinControl;
+	friend class WinAPI;
 
 private:
 

@@ -37,13 +37,13 @@ void Control::OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept
 		suppressed.
 	/**************************************************************************************************/
 	m_IsTabSelected = true;
-	WinControl::OnFocusEnter_Impl(hwnd, hwndOldFocus);
+	WinAPI::OnFocusEnter_Impl(hwnd, hwndOldFocus);
 }
 
 void Control::OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept
 {
 	m_IsTabSelected = false;
-	WinControl::OnFocusLeave_Impl(hwnd, hwndNewFocus);
+	WinAPI::OnFocusLeave_Impl(hwnd, hwndNewFocus);
 }
 
 void Control::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept
@@ -52,7 +52,7 @@ void Control::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 	{
 	case VK_TAB:	// Allows the user to change controls by pressing Tab
 	{
-		const WinControl* newCtl;
+		const WinAPI* newCtl;
 
 		// Previous Control
 		if (GetKeyState(VK_SHIFT) & 0x8000)
@@ -74,7 +74,7 @@ void Control::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 	}
 	}
 
-	WinControl::OnKeyDown_Impl(hwnd, vk, cRepeat, flags);
+	WinAPI::OnKeyDown_Impl(hwnd, vk, cRepeat, flags);
 }
 
 void Control::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
@@ -82,7 +82,7 @@ void Control::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlag
 	// Trigger tabbing
 	if (Parent != nullptr && GetFocus() != hwnd)
 	{
-		const WinControl* newCtl = dynamic_cast<WinControl*>(GetByHandle(hwnd));
+		const WinAPI* newCtl = dynamic_cast<WinAPI*>(GetByHandle(hwnd));
 
 		if (newCtl != nullptr && newCtl->IsEnabled())
 		{
@@ -94,7 +94,7 @@ void Control::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlag
 		Update();
 	}
 
-	WinControl::OnMouseLeftDown_Impl(hwnd, x, y, keyFlags);
+	WinAPI::OnMouseLeftDown_Impl(hwnd, x, y, keyFlags);
 }
 
 void Control::OnNextDialogControl_Impl(HWND hwnd, HWND hwndSetFocus, bool fNext) noexcept
@@ -130,7 +130,7 @@ Control::Control(Control* parent, const std::string& text) noexcept
 
 Control::Control(Control* parent, const std::string& text, int width, int height, int x, int y) noexcept
 	:
-	WinControl(parent, text, width, height),
+	WinAPI(parent, text, width, height),
 	Location(x, y),
 	m_BackgroundColor(Color::Control()),
 	m_ForeColor(Color::Black()),
@@ -156,7 +156,7 @@ Control::Control(const std::string& text, int width, int height, int x, int y) n
 
 }
 
-Control::~Control() noexcept
+Control::~Control()
 {
 
 }

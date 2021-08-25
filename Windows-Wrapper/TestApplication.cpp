@@ -8,17 +8,17 @@
 
 void TestClick(Control* c, EventArgs* e)
 {
-
+	c->Dispose();
 }
 
 void TestApplication::Initialize()
 {
 	auto window = GetWindow();
 
-	ToolStrip& p = window->AddToolStrip();
-	ToolStrip& j = window->AddToolStrip();
-	p.SetBackgroundColor(Color::Black());
-	j.SetBackgroundColor(Color::Blue());
+	//ToolStrip& p = window->AddToolStrip();
+	//ToolStrip& j = window->AddToolStrip();
+	//p.SetBackgroundColor(Color::Black());
+	//j.SetBackgroundColor(Color::Blue());
 	window->AddLabel("abcdef", 50, 100);
 
 	
@@ -55,11 +55,7 @@ void TestApplication::Initialize()
 	//menu2.OnClickSet(&TestClick);
 
 	button1 = &window->AddButton("Abc", 200, 80, 50, 100);
-	button1->OnClickSet([](Control* c, EventArgs* e)
-		{
-			OutputDebugString("Teste Click Button1");
-		}
-	);
+	button1->OnClickSet(&TestClick);
 	button1->OnMouseEnterSet([](Control* c, EventArgs* e)
 		{
 			OutputDebugString("Teste Mouseenter Button1");
@@ -74,7 +70,7 @@ void TestApplication::Initialize()
 	button2 = &window->AddButton("XYZ", 100, 40, 200, 200);
 	button2->OnClickSet([](Control* c, EventArgs* e)
 		{
-			OutputDebugString("Teste Click Button2");
+			c->Dispose();
 		}
 	);
 	button2->Font.SetStyle(FontStyle::Strikeout);

@@ -56,13 +56,17 @@
     <ClCompile Include="UserApplication.cpp" />
     <ClCompile Include="MessageMapper.cpp" />
     <ClCompile Include="TextBox.cpp" />
-    <ClCompile Include="WinControl.cpp" />
+    <ClCompile Include="WinAPI.cpp" />
     <ClCompile Include="Padding.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="ProgressBar.cpp" />
     <ClCompile Include="TestApplication.cpp" />
     <ClCompile Include="ToolStrip.cpp" />
     <ClCompile Include="Label.cpp" />
+    <ClCompile Include="Component.cpp" />
+    <ClCompile Include="Container.cpp" />
+    <ClCompile Include="Utilities.cpp" />
+    <ClCompile Include="Site.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RealTimeApplication.h" />
@@ -142,7 +146,7 @@
       <Filter>Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="Button.h" />
-    <ClInclude Include="WinControl.h" />
+    <ClInclude Include="WinAPI.h" />
     <ClInclude Include="KeyEventHandler.h">
       <Filter>Events</Filter>
     </ClInclude>
@@ -186,6 +190,22 @@
     <ClInclude Include="TestApplication.h" />
     <ClInclude Include="ToolStrip.h" />
     <ClInclude Include="Label.h" />
+    <ClInclude Include="IDisposable.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IComponent.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="ISite.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IContainer.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.h" />
+    <ClInclude Include="Container.h" />
+    <ClInclude Include="Utilities.h" />
+    <ClInclude Include="Site.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interfaces">

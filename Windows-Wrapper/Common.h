@@ -48,6 +48,9 @@
 // Globalize Enums inclusion
 #include "Enums.h"
 
+// Utility functions inclusion
+#include "Utilities.h"
+
 #pragma warning(disable:4265)
 #include <wrl.h>
 #pragma warning(default:4265)

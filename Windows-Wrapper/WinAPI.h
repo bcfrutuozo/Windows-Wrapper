@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Base.h"
+#include "Component.h"
 #include "IHandle.h"
 #include "Event.h"
 #include "Font.h"
@@ -13,7 +13,7 @@
 
 class Window;
 
-class WinControl : public IHandle, public Base
+class WinAPI : public Component, public IHandle
 {
 	/*
 	* Friend classes to allow access between children.
@@ -50,8 +50,6 @@ private:
 	MouseEventArgs ArgsOnMouseUp;
 	MouseEventArgs ArgsOnMouseDoubleClick;
 	MouseEventArgs ArgsOnMouseWheel;
-
-	EventDispatcher Events;
 
 	/***** Global events declaration *****/
 	/* All are virtual to be overritten on the derived classes. Not all should be, but events like OnPaint(), OnMouseOver(),
@@ -103,24 +101,14 @@ private:
 	virtual void OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy) noexcept;
 	virtual void OnShowWindow_Impl(HWND hwnd, bool fShow, unsigned int status) noexcept;
 
-	// Going to think a proper way to handle events
-	// Afterall, only EventArgs type are allowed instead of multiple types
-	template<typename ...Args>
-	void Dispatch(const std::string& event, Args... args)
-	{
-		// Pass the event name, the control which will compose the "sender" parameter in the event
-		// and the arguments which will be an EventArgs type
-		Events.Dispatch(event, this, args...);
-	}
-
 protected:
 
 	std::string Text;
-	WinControl* Parent;
+	WinAPI* Parent;
 	Size m_Size;
 
-	WinControl(WinControl* parent, const std::string& text, int width, int height) noexcept;
-	virtual ~WinControl();
+	WinAPI(WinAPI* parent, const std::string& text, int width, int height) noexcept;
+	virtual ~WinAPI();
 
 	// Static function which handle WinAPI messages to corresponding member function of the control
 	static LRESULT WINAPI HandleMessageSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
@@ -142,7 +130,6 @@ public:
 
 	Font Font;
 	
-
 	Window* GetWindow() noexcept;
 	bool IsMouseOver() const noexcept;
 	bool IsClicking() const noexcept;
