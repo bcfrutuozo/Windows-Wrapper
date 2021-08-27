@@ -17,6 +17,7 @@ public:
 	Size(int width, int height);
 	Size(Point p);
 
+	inline bool operator==(const Size& s) const noexcept override;
 	inline bool Equals(const Size& s) const noexcept override;
 
 	const bool IsEmpty() const noexcept;
@@ -28,7 +29,6 @@ public:
 	inline Size operator+(Size rhs) noexcept;
 	inline Size operator/(int i);
 	inline Size operator/(float f);
-	inline bool operator==(Size s) noexcept;
 	inline Size operator*(int i) noexcept;
 	inline SizeF operator*(float f) noexcept;
 	inline Size operator*(Size s) noexcept;
@@ -46,6 +46,7 @@ public:
 	SizeF(float width, float height);
 	SizeF(PointF p);
 
+	inline bool operator==(const SizeF& s) const noexcept override;
 	inline bool Equals(const SizeF& s) const noexcept override;
 
 	const bool IsEmpty() const noexcept;
@@ -55,7 +56,6 @@ public:
 	inline Size ToSize() noexcept;
 	inline SizeF operator+(SizeF rhs) noexcept;
 	inline SizeF operator/(float f) noexcept;
-	inline bool operator==(SizeF s) noexcept;
 	inline SizeF operator*(float f) noexcept;
 	inline SizeF operator*(SizeF f) noexcept;
 	inline SizeF operator-(SizeF s) noexcept;

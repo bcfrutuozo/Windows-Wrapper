@@ -13,6 +13,7 @@
 #include "CancelEventArgs.h"
 #include "OnClosedEventArgs.h"
 #include "OnClosingEventArgs.h"
+#include "Collection.h"
 
 #include <memory>
 #include <functional>
@@ -33,6 +34,7 @@ private:
 	// Tabulation fields
 	unsigned int m_TabIndex;
 	static unsigned int m_IncrementalTabIndex;
+	std::string Name;
 
 	// Variable to check if control is tab selected
 	bool m_IsTabSelected;
@@ -46,7 +48,9 @@ private:
 protected:
 
 	Point Location;
-	std::vector<std::shared_ptr<Control>> Controls;
+	Control* Parent;
+	std::string Text;
+	Size m_Size;
 	Color m_ForeColor;
 	Color m_BackgroundColor;
 	Padding m_Margin;
@@ -61,11 +65,26 @@ protected:
 	template<typename T, typename... Args>
 	T& Create(Args... a)
 	{
-		Controls.push_back(std::move(std::make_shared<T>(a...)));
-		return dynamic_cast<T&>(*Controls.back());
+		T* item = new T(a...);
+		Controls.Add(item);
+		return dynamic_cast<T&>(*item);
 	}
 
 public:
+
+	Font Font;
+
+	class ControlCollection : public Collection<Control>
+	{
+	public:
+
+		ControlCollection(Control* owner);
+
+		void RemoveByKey(const std::string& key) noexcept;
+		bool ContainsKey(const std::string& key) const noexcept;
+	};
+
+	ControlCollection Controls;
 
 	Control() noexcept;
 	Control(Control* parent, const std::string& text) noexcept;
@@ -78,28 +97,32 @@ public:
 	Control& operator=(Control&&) = default;												// Move assignment constructor
 	virtual ~Control();																		// Destructor
 
-	void Delete();
+	void Dispose() override;
 
-	void OnActivateSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
-	void OnClickSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
-	void OnDeactivateSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
-	void OnGotFocusSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
-	void OnLostFocusSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
-	void OnKeyDownSet(const std::function<void(Control* const c, KeyEventArgs* const e) >& callback) noexcept;
-	void OnKeyPressSet(const std::function<void(Control* const c, KeyPressEventArgs* const e) >& callback) noexcept;
-	void OnKeyUpSet(const std::function<void(Control* const c, KeyEventArgs* const e) >& callback) noexcept;
-	void OnMouseClickSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept;
-	void OnMouseDownSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept;
-	void OnMouseEnterSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
-	void OnMouseHoverSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
-	void OnMouseLeaveSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
-	void OnMouseLeftDoubleClickSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept;
-	void OnMouseMoveSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept;
-	void OnMouseRightDoubleClickSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept;
-	void OnMouseUpSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept;
-	void OnMouseWheelSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept;
-	void OnVisibleChangedSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
+	void OnActivateSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept;
+	void OnClickSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept;
+	void OnDeactivateSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept;
+	void OnGotFocusSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept;
+	void OnLostFocusSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept;
+	void OnKeyDownSet(const std::function<void(Object*, KeyEventArgs*) >& callback) noexcept;
+	void OnKeyPressSet(const std::function<void(Object*, KeyPressEventArgs*) >& callback) noexcept;
+	void OnKeyUpSet(const std::function<void(Object*, KeyEventArgs*) >& callback) noexcept;
+	void OnMouseClickSet(const std::function<void(Object*, MouseEventArgs*)>& callback) noexcept;
+	void OnMouseDownSet(const std::function<void(Object*, MouseEventArgs*)>& callback) noexcept;
+	void OnMouseEnterSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept;
+	void OnMouseHoverSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept;
+	void OnMouseLeaveSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept;
+	void OnMouseLeftDoubleClickSet(const std::function<void(Object*, MouseEventArgs*)>& callback) noexcept;
+	void OnMouseMoveSet(const std::function<void(Object*, MouseEventArgs*)>& callback) noexcept;
+	void OnMouseRightDoubleClickSet(const std::function<void(Object*, MouseEventArgs*)>& callback) noexcept;
+	void OnMouseUpSet(const std::function<void(Object*, MouseEventArgs*)>& callback) noexcept;
+	void OnMouseWheelSet(const std::function<void(Object*, MouseEventArgs*)>& callback) noexcept;
+	void OnVisibleChangedSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept;
 
+	bool HasChildren() const noexcept;
+	Size CalculateSizeByFont() noexcept;
+	bool IsEnabled() const noexcept;
+	Window* GetWindow() noexcept;
 	Size GetSize() const noexcept;
 	Padding GetMargin() const noexcept;
 	Control* GetByTabIndex(const unsigned int& index) noexcept;

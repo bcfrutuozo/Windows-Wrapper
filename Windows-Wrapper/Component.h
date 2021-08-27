@@ -1,11 +1,12 @@
 #pragma once
 
-#include "Base.h"
+#include "Object.h"
 #include "IComponent.h"
-#include "Event.h"
+#include "EventDispatcher.h"
 
-class Component : public Base, public IComponent
+class Component : public Object, public IComponent
 {
+	friend class WinAPI;
 	friend class Control;
 	friend class Window;
 	friend class ToolStrip;
@@ -16,30 +17,20 @@ class Component : public Base, public IComponent
 private:
 
 	EventDispatcher Events;
+	bool Disposed;
 
 protected:
 
 	inline bool CanRaiseEvents();
 	void Dispose(bool disposing) noexcept;
-	
-	// Going to think a proper way to handle events
-	// Afterall, only EventArgs type are allowed instead of multiple types
-	template<typename ...Args>
-	void Dispatch(const std::string& event, Args... args)
-	{
-		// Pass the event name, the control which will compose the "sender" parameter in the event
-		// and the arguments which will be an EventArgs type
-		if (!IsDisposed)
-		{
-			Events.Dispatch(event, dynamic_cast<Control*>(this), args...);
-		}
-	}
+	void Dispatch(const std::string& name, EventArgs* e) noexcept;
 
 public:
 
 	Component();
 	~Component();
 
+	bool IsDisposed() const noexcept;
 	bool IsDesignMode();
 	virtual ISite* GetSite();
 	virtual void SetSite(ISite* const site);

@@ -7,7 +7,7 @@
 
 class Type : public IEquatable<Type>
 {
-	friend class Base;
+	friend class Object;
 
 private:
 
@@ -17,8 +17,8 @@ private:
 
 public:
 
-	bool Equals(const Type& t) const noexcept;
-	bool operator==(Type t) const noexcept;
+	bool operator==(const Type& t) const noexcept override;
+	bool Equals(const Type& t) const noexcept override;
 	bool operator==(const type_info& t) const noexcept;
 	virtual const std::string ToString() const noexcept;
 };

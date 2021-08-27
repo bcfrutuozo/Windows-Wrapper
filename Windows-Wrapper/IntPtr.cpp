@@ -26,6 +26,11 @@ IntPtr::~IntPtr()
 
 }
 
+bool IntPtr::operator==(const IntPtr& p) const noexcept
+{
+	return m_Ptr == p.m_Ptr;
+}
+
 bool IntPtr::Equals(const IntPtr& p) const noexcept
 {
 	return m_Ptr == p.m_Ptr;
@@ -102,9 +107,4 @@ bool IntPtr::operator==(long p) const noexcept
 bool IntPtr::operator==(void* p) const noexcept
 {
 	return m_Ptr == p;
-}
-
-bool IntPtr::operator==(IntPtr p) const noexcept
-{
-	return m_Ptr == p.m_Ptr;
 }

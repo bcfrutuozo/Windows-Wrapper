@@ -66,19 +66,19 @@ void Window::Show()
 	}
 }
 
-void Window::OnClosingSet(const std::function<void(Control* const c, OnClosingEventArgs* const e)>& callback) noexcept
+void Window::OnClosingSet(const std::function<void(Object*, OnClosingEventArgs*)>& callback) noexcept
 {
-	Events.Register(std::make_unique<OnClosingEventHandler>("OnClosing", callback));
+	Events.Register(new OnClosingEventHandler("OnClosing", callback));
 }
 
-void Window::OnShownSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept
+void Window::OnShownSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept
 {
-	Events.Register(std::make_unique<EventHandler>("OnShown", callback));
+	Events.Register(new EventHandler("OnShown", callback));
 }
 
-void Window::OnClosedSet(const std::function<void(Control* const c, OnClosedEventArgs* const e)>& callback) noexcept
+void Window::OnClosedSet(const std::function<void(Object*, OnClosedEventArgs*)>& callback) noexcept
 {
-	Events.Register(std::make_unique<OnClosedEventHandler>("OnClosing", callback));
+	Events.Register(new OnClosedEventHandler("OnClosing", callback));
 }
 
 void Window::Initialize() noexcept

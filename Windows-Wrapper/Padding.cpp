@@ -20,6 +20,16 @@ Padding::Padding(int left, int top, int right, int bottom) noexcept
 
 }
 
+bool Padding::operator==(const Padding& p) const noexcept
+{
+	return Left == p.Left && Top == p.Top && Right == p.Right && Bottom == p.Bottom;
+}
+
+bool Padding::Equals(const Padding& p) const noexcept
+{
+	return Left == p.Left && Top == p.Top && Right == p.Right && Bottom == p.Bottom;
+}
+
 Padding Padding::operator+(const Padding& p) noexcept
 {
 	return Padding(Left + Left, Top + p.Top, Right + p.Right, Bottom + p.Bottom);
@@ -28,11 +38,6 @@ Padding Padding::operator+(const Padding& p) noexcept
 Padding Padding::operator-(const Padding& p) noexcept
 {
 	return Padding(Left - p.Left, Top - p.Top, Right - p.Right, Bottom - p.Bottom);
-}
-
-bool Padding::operator==(const Padding& p) const noexcept
-{
-	return Left == p.Left && Top == p.Top && Right == p.Right && Bottom == p.Bottom;
 }
 
 Padding Padding::Add(Padding& p1, Padding& p2) noexcept

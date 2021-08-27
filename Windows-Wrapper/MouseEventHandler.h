@@ -3,13 +3,11 @@
 #include "Event.h"
 #include "MouseEventArgs.h"
 
-class Control;
-
-class MouseEventHandler : public Event<Control*, MouseEventArgs*>
+class MouseEventHandler : public Event<MouseEventArgs*>
 {
 public:
 
-	MouseEventHandler(const std::string& name, const std::function<void(Control*, MouseEventArgs*)>& callback)
+	MouseEventHandler(const std::string& name, const std::function<void(Object*, MouseEventArgs*)>& callback)
 		:
 		Event(name, callback)
 	{

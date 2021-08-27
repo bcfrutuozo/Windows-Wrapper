@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Base.h"
+#include "Object.h"
 #include "IEquatable.h"
 #include "Size.h"
 
-struct Padding : public Base
+struct Padding : public Object, public IEquatable<Padding>
 {
 public:
 
@@ -16,11 +16,13 @@ public:
 	Padding(int padding) noexcept;
 	Padding(int left, int top, int right, int bottom) noexcept;
 
-	Padding operator+(const Padding& p) noexcept;
-	Padding operator-(const Padding& p) noexcept;
-	bool operator==(const Padding& p) const noexcept;
-	static Padding Add(Padding& p1, Padding& p2) noexcept;
-	static Padding Subtract(Padding& p1, Padding& p2) noexcept;
+	bool operator==(const Padding& p) const noexcept override;
+	bool Equals(const Padding& p) const noexcept override;
+
+	inline Padding operator+(const Padding& p) noexcept;
+	inline Padding operator-(const Padding& p) noexcept;
+	inline static Padding Add(Padding& p1, Padding& p2) noexcept;
+	inline static Padding Subtract(Padding& p1, Padding& p2) noexcept;
 	void SetAll(int padding) noexcept;
 	int GetHorizontal() const noexcept;
 	int GetVertical() const noexcept;

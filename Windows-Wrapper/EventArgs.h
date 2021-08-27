@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Base.h"
+#include "Object.h"
 
-class EventArgs : public Base
+class EventArgs : public Object
 {
 public:
 

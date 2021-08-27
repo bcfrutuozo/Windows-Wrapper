@@ -16,7 +16,9 @@ public:
 	IntPtr(void*);
 	virtual ~IntPtr();
 
-	inline bool Equals(const IntPtr& p) const noexcept override;
+	bool operator==(const IntPtr& p) const noexcept override;
+	bool Equals(const IntPtr& p) const noexcept override;
+
 	int ToInt32() const noexcept;
 	long ToInt64() const noexcept;
 	void* ToPointer() const noexcept;
@@ -29,7 +31,6 @@ public:
 	bool operator==(int p) const noexcept;
 	bool operator==(long p) const noexcept;
 	bool operator==(void* p) const noexcept;
-	bool operator==(IntPtr p) const noexcept;
 
 	static IntPtr Zero() { return IntPtr(0); }
 	static IntPtr MaxValue() { return IntPtr(0x7fffffff); }

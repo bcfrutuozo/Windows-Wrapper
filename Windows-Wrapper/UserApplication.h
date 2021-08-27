@@ -4,7 +4,6 @@
 
 class UserApplication : public Application
 {
-
 public:
 
 	UserApplication();
@@ -14,5 +13,5 @@ public:
 	UserApplication& operator=(const UserApplication&) = delete;	// Copy assignment constructor
 	UserApplication& operator=(UserApplication&&) = delete;			// Move assignment constructor
 
-	const int Start() override;
+	const int Run() override;
 };

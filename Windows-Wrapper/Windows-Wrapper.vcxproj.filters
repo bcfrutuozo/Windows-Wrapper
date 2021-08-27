@@ -2,7 +2,7 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="RealTimeApplication.cpp" />
-    <ClCompile Include="Base.cpp" />
+    <ClCompile Include="Object.cpp" />
     <ClCompile Include="Control.cpp" />
     <ClCompile Include="dxerr.cpp" />
     <ClCompile Include="DXGIInfoManager.cpp" />
@@ -67,10 +67,14 @@
     <ClCompile Include="Container.cpp" />
     <ClCompile Include="Utilities.cpp" />
     <ClCompile Include="Site.cpp" />
+    <ClCompile Include="EventDispatcher.cpp">
+      <Filter>Events</Filter>
+    </ClCompile>
+    <ClCompile Include="Enumerator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RealTimeApplication.h" />
-    <ClInclude Include="Base.h" />
+    <ClInclude Include="Object.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="Control.h" />
@@ -206,6 +210,23 @@
     <ClInclude Include="Container.h" />
     <ClInclude Include="Utilities.h" />
     <ClInclude Include="Site.h" />
+    <ClInclude Include="IEvent.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="EventDispatcher.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Collection.h" />
+    <ClInclude Include="IEnumerator.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="ICollection.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IEnumerable.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Enumerator.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interfaces">

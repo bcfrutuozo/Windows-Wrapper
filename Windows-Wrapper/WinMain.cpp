@@ -1,10 +1,13 @@
 #include "TestApplication.h"
+#include "Window.h"
 
 #ifdef _DEBUG
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
 #endif
+
+Application* App;
 
 int CALLBACK WinMain(
 	_In_ HINSTANCE hInstance,
@@ -30,7 +33,8 @@ int CALLBACK WinMain(
 	try
 	{
 		SetProcessDPIAware();
-		ret = TestApplication().Start();
+		App = new TestApplication();
+		ret = App->Run();
 	}
 	catch (const std::exception& e)
 	{
@@ -41,6 +45,13 @@ int CALLBACK WinMain(
 	{
 		ret = -1;
 		MessageBox(nullptr, "No details available", "Unknown Exception", MB_OK | MB_ICONEXCLAMATION);
+	}
+
+	
+	if (App != nullptr)
+	{
+		delete App;
+		App = nullptr;
 	}
 
 #ifdef _DEBUG

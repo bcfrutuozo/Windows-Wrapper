@@ -69,7 +69,7 @@ void Button::OnKeyUp_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int 
 	{
 	case VK_RETURN:
 	{
-		Dispatch("OnClick", new EventArgs());
+		Dispatch("OnClick", &ArgsDefault);
 		SetClickingState(false);
 		Update();
 		break;

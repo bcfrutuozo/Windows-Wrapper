@@ -3,13 +3,11 @@
 #include "Event.h"
 #include "KeyEventArgs.h"
 
-class Control;
-
-class KeyEventHandler : public Event<Control*, KeyEventArgs*>
+class KeyEventHandler : public Event<KeyEventArgs*>
 {
 public:
 
-	KeyEventHandler(const std::string& name, const std::function<void(Control*, KeyEventArgs*)>& callback)
+	KeyEventHandler(const std::string& name, const std::function<void(Object*, KeyEventArgs*)>& callback)
 		:
 		Event(name, callback)
 	{

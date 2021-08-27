@@ -13,15 +13,15 @@
 
 RealTimeApplication::RealTimeApplication()
 {
-	auto window = GetWindow();
-	window->GetMouse().DisableRaw();
-	window->GetKeyboard().EnableAutorepeat();
+	//auto window = GetWindow();
+	//window->GetMouse().DisableRaw();
+	//window->GetKeyboard().EnableAutorepeat();
 }
 
 RealTimeApplication::~RealTimeApplication()
 { }
 
-const int RealTimeApplication::Start()
+const int RealTimeApplication::Run()
 {
 	while (true)
 	{
@@ -48,129 +48,127 @@ const int RealTimeApplication::Start()
 		// I STILL DON'T KNOW, BUT IT'S BETTER TO START WITH THE HARD PART :D
 		Sleep(1);
 		HandleInput(dt);
-		Run(dt);
+		Process(dt);
 	}
 }
 
 void RealTimeApplication::HandleInput(float dt)
 {
-	auto window = GetWindow();
+	//auto window = GetWindow();
 
-	while (const auto& e = window->GetKeyboard().ReadKey())
-	{
-		if (!e->IsPress())
-		{
-			switch (e->GetCode())
-			{
-			case VK_ESCAPE:
-				if (window->IsCursorEnabled())
-				{
-					window->DisableCursor();
-					window->GetMouse().EnableRaw();
-				}
-				else
-				{
-					window->EnableCursor();
-					window->GetMouse().DisableRaw();
-				}
-				break;
-			}
-		}
-	}
+	//while (const auto& e = window->GetKeyboard().ReadKey())
+	//{
+	//	if (!e->IsPress())
+	//	{
+	//		switch (e->GetCode())
+	//		{
+	//		case VK_ESCAPE:
+	//			if (window->IsCursorEnabled())
+	//			{
+	//				window->DisableCursor();
+	//				window->GetMouse().EnableRaw();
+	//			}
+	//			else
+	//			{
+	//				window->EnableCursor();
+	//				window->GetMouse().DisableRaw();
+	//			}
+	//			break;
+	//		}
+	//	}
+	//}
 
-	if (!window->IsCursorEnabled())
-	{
-		if (window->GetKeyboard().IsKeyPressed('Y'))
-		{
-			
-		}
+	//if (!window->IsCursorEnabled())
+	//{
+	//	if (window->GetKeyboard().IsKeyPressed('Y'))
+	//	{
+	//		
+	//	}
 
-		if (window->GetKeyboard().IsKeyPressed('R'))
-		{
+	//	if (window->GetKeyboard().IsKeyPressed('R'))
+	//	{
 
-		}
+	//	}
 
-		if (window->GetKeyboard().IsKeyPressed('O'))
-		{
+	//	if (window->GetKeyboard().IsKeyPressed('O'))
+	//	{
 
-		}
+	//	}
 
-		if (window->GetKeyboard().IsKeyPressed('P'))
-		{
-		}
+	//	if (window->GetKeyboard().IsKeyPressed('P'))
+	//	{
+	//	}
 
-		if (window->GetKeyboard().IsKeyPressed('Q'))
-		{
-			/*Color x = m_Window->();
-			x.SetR(x.GetR() - 1);
+	//	if (window->GetKeyboard().IsKeyPressed('Q'))
+	//	{
+	//		/*Color x = m_Window->();
+	//		x.SetR(x.GetR() - 1);
 
-			if (x.GetR() >= 0) m_Window->SetForeColor(x);*/
-			//cameras->Translate({ 0.0f, 0.0f, dt });
-		}
-		if (window->GetKeyboard().IsKeyPressed('A'))
-		{
-			/*Color x = m_Window->GetForeColor();
-			x.SetG(x.GetG() - 1);
+	//		if (x.GetR() >= 0) m_Window->SetForeColor(x);*/
+	//		//cameras->Translate({ 0.0f, 0.0f, dt });
+	//	}
+	//	if (window->GetKeyboard().IsKeyPressed('A'))
+	//	{
+	//		/*Color x = m_Window->GetForeColor();
+	//		x.SetG(x.GetG() - 1);
 
-			if (x.GetG() >= 0) m_Window->SetForeColor(x);*/
-			//cameras->Translate({ -dt, 0.0f, 0.0f });
-		}
-		if (window->GetKeyboard().IsKeyPressed('Z'))
-		{
-			/*Color x = m_Window->GetForeColor();
-			x.SetB(x.GetB() - 1);
+	//		if (x.GetG() >= 0) m_Window->SetForeColor(x);*/
+	//		//cameras->Translate({ -dt, 0.0f, 0.0f });
+	//	}
+	//	if (window->GetKeyboard().IsKeyPressed('Z'))
+	//	{
+	//		/*Color x = m_Window->GetForeColor();
+	//		x.SetB(x.GetB() - 1);
 
-			if (x.GetB() >= 0) m_Window->SetForeColor(x);*/
-			//cameras->Translate({ 0.0f, 0.0f, -dt });
-		}
-		if (window->GetKeyboard().IsKeyPressed('W'))
-		{
-			/*Color x = m_Window->GetForeColor();
-			x.SetR(x.GetR() + 1);
+	//		if (x.GetB() >= 0) m_Window->SetForeColor(x);*/
+	//		//cameras->Translate({ 0.0f, 0.0f, -dt });
+	//	}
+	//	if (window->GetKeyboard().IsKeyPressed('W'))
+	//	{
+	//		/*Color x = m_Window->GetForeColor();
+	//		x.SetR(x.GetR() + 1);
 
-			if (x.GetR() < 256) m_Window->SetForeColor(x);*/
+	//		if (x.GetR() < 256) m_Window->SetForeColor(x);*/
 
-			//cameras->Translate({ dt, 0.0f, 0.0f });
-		}
-		if (window->GetKeyboard().IsKeyPressed('S'))
-		{
-			/*Color x = m_Window->GetForeColor();
-			x.SetG(x.GetG() + 1);
+	//		//cameras->Translate({ dt, 0.0f, 0.0f });
+	//	}
+	//	if (window->GetKeyboard().IsKeyPressed('S'))
+	//	{
+	//		/*Color x = m_Window->GetForeColor();
+	//		x.SetG(x.GetG() + 1);
 
-			if (x.GetG() < 256) m_Window->SetForeColor(x);*/
+	//		if (x.GetG() < 256) m_Window->SetForeColor(x);*/
 
-			//cameras->Translate({ 0.0f, dt, 0.0f });
-		}
-		if (window->GetKeyboard().IsKeyPressed('X'))
-		{
-			/*Color x = m_Window->GetForeColor();
-			x.SetB(x.GetB() + 1);
+	//		//cameras->Translate({ 0.0f, dt, 0.0f });
+	//	}
+	//	if (window->GetKeyboard().IsKeyPressed('X'))
+	//	{
+	//		/*Color x = m_Window->GetForeColor();
+	//		x.SetB(x.GetB() + 1);
 
-			if (x.GetB() < 256) m_Window->SetForeColor(x);*/
+	//		if (x.GetB() < 256) m_Window->SetForeColor(x);*/
 
-			//cameras->Translate({ 0.0f, -dt, 0.0f });
-		}
-	}
+	//		//cameras->Translate({ 0.0f, -dt, 0.0f });
+	//	}
+	//}
 
 
-	while (const auto& delta = window->GetMouse().ReadRawDelta())
-	{
-		if (!window->IsCursorEnabled())
-		{
-			//cameras->Rotate(static_cast<float>(delta->x), static_cast<float>(delta->y));
-		}
-	}
+	//while (const auto& delta = window->GetMouse().ReadRawDelta())
+	//{
+	//	if (!window->IsCursorEnabled())
+	//	{
+	//		//cameras->Rotate(static_cast<float>(delta->x), static_cast<float>(delta->y));
+	//	}
+	//}
 }
 
-void RealTimeApplication::Run(float dt)
+void RealTimeApplication::Process(float dt)
 {
-	auto window = GetWindow();
-
 	// Time elapse on window title
 	//const float t = m_Timer.Peek();
 	std::ostringstream oss;
 	oss << "Timer elapsed: " << std::setprecision(1) << std::fixed << dt << "s";
-	window->SetText(oss.str().c_str());
+	//window->SetText(oss.str().c_str());
 
 	// renderGraph.Execute(window.Gfx());
 

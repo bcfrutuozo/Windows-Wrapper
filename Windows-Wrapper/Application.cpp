@@ -1,8 +1,6 @@
 #include "Application.h"
 
 Application::Application()
-	:
-	m_Window(std::make_unique<Window>("Application", 1024, 1000))
 {
 
 }
@@ -12,7 +10,14 @@ Application::~Application()
 
 }
 
-Window* const Application::GetWindow() const noexcept
+void Application::AddWindow(Window* window)
 {
-	return m_Window.get();
+	Windows.Add(window);
+}
+
+Window& Application::AddWindow(const std::string& name, int width, int height)
+{
+	auto w = new Window(name, width, height);
+	Windows.Add(w);
+	return *w;
 }

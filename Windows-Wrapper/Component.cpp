@@ -15,13 +15,24 @@ void Component::Dispose(bool disposing) noexcept
 			m_Site->GetContainer()->Remove(this);
 		}
 
-		Events.Dispatch("OnDispose", &ArgsDisposed);
+		Dispatch("OnDispose", &ArgsDisposed);
+	}
+
+	Disposed = true;
+}
+
+void Component::Dispatch(const std::string& name, EventArgs* e) noexcept
+{
+	if (CanRaiseEvents() && !IsDisposed())
+	{
+		Events.Dispatch(name, this, e);
 	}
 }
 
 Component::Component()
 	:
-	IsDisposed(false)
+	Disposed(false),
+	Events(this)
 {
 
 }
@@ -30,6 +41,11 @@ Component::~Component()
 {
 	Dispose(false);
 	// GarbageCollector?? Too much to dream for now
+}
+
+bool Component::IsDisposed() const noexcept
+{
+	return Disposed;
 }
 
 bool Component::IsDesignMode()
@@ -46,7 +62,7 @@ void Component::SetSite(ISite* const site)
 {
 	if (site == nullptr)
 	{
-		return ;
+		return;
 	}
 
 	m_Site = site;

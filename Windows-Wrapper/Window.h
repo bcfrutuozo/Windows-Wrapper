@@ -66,16 +66,16 @@ protected:
 public:
 
 	Window(const std::string& name, int width, int height);
+	Window(const Window&) = default;
+	Window& operator=(const Window&) = default;
 	virtual ~Window();
-	Window(const Window&) = delete;
-	Window& operator=(const Window&) = delete;
 
 	void Hide() override;
 	void Show() override;
 
-	void OnClosedSet(const std::function<void(Control* const c, OnClosedEventArgs* const e)>& callback) noexcept;
-	void OnClosingSet(const std::function<void(Control* const c, OnClosingEventArgs* const e)>& callback) noexcept;
-	void OnShownSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept;
+	void OnClosedSet(const std::function<void(Object*, OnClosedEventArgs*)>& callback) noexcept;
+	void OnClosingSet(const std::function<void(Object*, OnClosingEventArgs*)>& callback) noexcept;
+	void OnShownSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept;
 
 	// MenuStrip functions
 	void ClearMenuStrip() noexcept;

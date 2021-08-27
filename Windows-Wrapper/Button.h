@@ -36,7 +36,7 @@ private:
 
 public:
 
-	class FlatButtonAppearance : public Base
+	class FlatButtonAppearance : public Object
 	{
 	public:
 

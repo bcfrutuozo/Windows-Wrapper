@@ -19,6 +19,7 @@ public:
 	Point(int x, int y);
 	Point(Size size);
 
+	inline bool operator==(const Point& p) const noexcept override;
 	inline bool Equals(const Point& p) const noexcept override;
 
 	const bool IsEmpty() const noexcept;
@@ -30,7 +31,6 @@ public:
 	inline static Point Subtract(Point p, Size s) noexcept;
 	inline static Point Truncate(PointF p) noexcept;
 	inline Point operator+(Size s) noexcept;
-	inline bool operator==(Point p) noexcept;
 	inline Point operator-(Size s) noexcept;
 };
 
@@ -43,6 +43,7 @@ public:
 
 	PointF(float x, float y);
 
+	inline bool operator==(const PointF& p) const noexcept override;
 	inline bool Equals(const PointF& p) const noexcept override;
 
 	const bool IsEmpty() const noexcept;
@@ -52,7 +53,6 @@ public:
 	inline static PointF Subtract(PointF p, SizeF s) noexcept;
 	inline PointF operator+(Size s) noexcept;
 	inline PointF operator+(SizeF s) noexcept;
-	inline bool operator==(PointF p) noexcept;
 	inline PointF operator-(Size s) noexcept;
 	inline PointF operator-(SizeF s) noexcept;
 };

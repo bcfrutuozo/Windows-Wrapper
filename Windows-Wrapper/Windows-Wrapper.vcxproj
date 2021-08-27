@@ -149,6 +149,8 @@
   <ItemGroup>
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="Container.cpp" />
+    <ClCompile Include="Enumerator.cpp" />
+    <ClCompile Include="EventDispatcher.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="Label.cpp" />
     <ClCompile Include="Site.cpp" />
@@ -158,7 +160,7 @@
     <ClCompile Include="ProgressBar.cpp" />
     <ClCompile Include="RealTimeApplication.cpp" />
     <ClCompile Include="Application.cpp" />
-    <ClCompile Include="Base.cpp" />
+    <ClCompile Include="Object.cpp" />
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="Control.cpp" />
     <ClCompile Include="dxerr.cpp" />
@@ -195,12 +197,19 @@
   <ItemGroup>
     <ClInclude Include="CancelEventArgs.h" />
     <ClInclude Include="CancelEventHandler.h" />
+    <ClInclude Include="Collection.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Container.h" />
+    <ClInclude Include="Enumerator.h" />
+    <ClInclude Include="EventDispatcher.h" />
     <ClInclude Include="Font.h" />
+    <ClInclude Include="ICollection.h" />
     <ClInclude Include="IComponent.h" />
     <ClInclude Include="IContainer.h" />
     <ClInclude Include="IDisposable.h" />
+    <ClInclude Include="IEnumerable.h" />
+    <ClInclude Include="IEnumerator.h" />
+    <ClInclude Include="IEvent.h" />
     <ClInclude Include="ISite.h" />
     <ClInclude Include="Keys.h" />
     <ClInclude Include="Label.h" />
@@ -211,7 +220,7 @@
     <ClInclude Include="Padding.h" />
     <ClInclude Include="ProgressBar.h" />
     <ClInclude Include="RealTimeApplication.h" />
-    <ClInclude Include="Base.h" />
+    <ClInclude Include="Object.h" />
     <ClInclude Include="Button.h" />
     <ClInclude Include="Enums.h" />
     <ClInclude Include="Color.h" />

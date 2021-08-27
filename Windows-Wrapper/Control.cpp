@@ -5,6 +5,7 @@
 #include "MouseEventHandler.h"
 #include "KeyPressEventHandler.h"
 #include "CancelEventHandler.h"
+#include "Window.h"
 
 unsigned int Control::m_IncrementalTabIndex = 0;
 
@@ -52,7 +53,7 @@ void Control::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 	{
 	case VK_TAB:	// Allows the user to change controls by pressing Tab
 	{
-		const WinAPI* newCtl;
+		const Control* newCtl;
 
 		// Previous Control
 		if (GetKeyState(VK_SHIFT) & 0x8000)
@@ -82,9 +83,9 @@ void Control::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlag
 	// Trigger tabbing
 	if (Parent != nullptr && GetFocus() != hwnd)
 	{
-		const WinAPI* newCtl = dynamic_cast<WinAPI*>(GetByHandle(hwnd));
+		const auto& newCtl = GetByHandle(hwnd);
 
-		if (newCtl != nullptr && newCtl->IsEnabled())
+		if (newCtl->IsEnabled())
 		{
 			SetFocus(static_cast<HWND>(newCtl->Handle.ToPointer()));
 		}
@@ -114,6 +115,26 @@ void Control::OnNextDialogControl_Impl(HWND hwnd, HWND hwndSetFocus, bool fNext)
 	}
 }
 
+void Control::Dispose()
+{
+	Component::Dispose();
+
+	if (Controls.GetCount() > 0)
+	{
+		for (const auto& c : Controls)
+		{
+			c->Dispose();
+		}
+	}
+
+	if (Parent != nullptr)
+	{
+		Parent->Controls.Remove(this);
+	}
+
+	delete this;
+}
+
 Control::Control() noexcept
 	:
 	Control(nullptr, "")
@@ -130,16 +151,24 @@ Control::Control(Control* parent, const std::string& text) noexcept
 
 Control::Control(Control* parent, const std::string& text, int width, int height, int x, int y) noexcept
 	:
-	WinAPI(parent, text, width, height),
+	Font("Segoe", 9.0f, false, false, false, false, GraphicsUnit::Point),		// Default application font for controls
+	Parent(parent),
+	Text(text),
+	m_Size(width, height),
 	Location(x, y),
 	m_BackgroundColor(Color::Control()),
 	m_ForeColor(Color::Black()),
 	m_Padding(0),
 	m_Margin(0),
 	m_TabIndex(m_IncrementalTabIndex++),
-	m_IsTabSelected(false)
+	m_IsTabSelected(false),
+	m_MinSize(0u),
+	Controls(this)
 {
-
+	if (m_Size.Height == 0 || m_Size.Width == 0)
+	{
+		m_Size = CalculateSizeByFont();
+	}
 }
 
 Control::Control(const std::string& text) noexcept
@@ -158,117 +187,102 @@ Control::Control(const std::string& text, int width, int height, int x, int y) n
 
 Control::~Control()
 {
-
+	
 }
 
-void Control::Delete()
+void Control::OnActivateSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept
 {
-	// Recursive delete is necessary to avoid a parent destruction prior to children
-	// This could cause some WinAPI errors during some controls deletion
-	for (const auto& c : Controls)
-	{
-		c->Delete();
-	}
-
-	Parent = nullptr;
-	Controls.clear();
-	Events.Clear();
-	Controls.shrink_to_fit();
+	Events.Register(new EventHandler("OnActivate", callback));
 }
 
-void Control::OnActivateSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept
+void Control::OnClickSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept
 {
-	Events.Register(std::make_unique<EventHandler>("OnActivate", callback));
+	Events.Register(new EventHandler("OnClick", callback));
 }
 
-void Control::OnClickSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept
+void Control::OnDeactivateSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept
 {
-	Events.Register(std::make_unique<EventHandler>("OnClick", callback));
+	Events.Register(new EventHandler("OnDeactivate", callback));
 }
 
-void Control::OnDeactivateSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept
+void Control::OnGotFocusSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept
 {
-	Events.Register(std::make_unique<EventHandler>("OnDeactivate", callback));
+	Events.Register(new EventHandler("OnGotFocus", callback));
 }
 
-void Control::OnGotFocusSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept
+void Control::OnLostFocusSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept
 {
-	Events.Register(std::make_unique<EventHandler>("OnGotFocus", callback));
+	Events.Register(new EventHandler("OnLostFocus", callback));
 }
 
-void Control::OnLostFocusSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept
+void Control::OnKeyDownSet(const std::function<void(Object*, KeyEventArgs*)>& callback) noexcept
 {
-	Events.Register(std::make_unique<EventHandler>("OnLostFocus", callback));
+	Events.Register(new KeyEventHandler("OnKeyDown", callback));
 }
 
-void Control::OnKeyDownSet(const std::function<void(Control* const c, KeyEventArgs* const e)>& callback) noexcept
+void Control::OnKeyPressSet(const std::function<void(Object*, KeyPressEventArgs*)>& callback) noexcept
 {
-	Events.Register(std::make_unique<KeyEventHandler>("OnKeyDown", callback));
+	Events.Register(new KeyPressEventHandler("OnKeyPress", callback));
 }
 
-void Control::OnKeyPressSet(const std::function<void(Control* const c, KeyPressEventArgs* const e)>& callback) noexcept
+void Control::OnKeyUpSet(const std::function<void(Object*, KeyEventArgs*)>& callback) noexcept
 {
-	Events.Register(std::make_unique<KeyPressEventHandler>("OnKeyPress", callback));
+	Events.Register(new KeyEventHandler("OnKeyUp", callback));
 }
 
-void Control::OnKeyUpSet(const std::function<void(Control* const c, KeyEventArgs* const e)>& callback) noexcept
+void Control::OnMouseClickSet(const std::function<void(Object*, MouseEventArgs*)>& callback) noexcept
 {
-	Events.Register(std::make_unique<KeyEventHandler>("OnKeyUp", callback));
+	Events.Register(new MouseEventHandler("OnMouseClick", callback));
 }
 
-void Control::OnMouseClickSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept
+void Control::OnMouseDownSet(const std::function<void(Object*, MouseEventArgs*)>& callback) noexcept
 {
-	Events.Register(std::make_unique<MouseEventHandler>("OnMouseClick", callback));
+	Events.Register(new MouseEventHandler("OnMouseDown", callback));
 }
 
-void Control::OnMouseDownSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept
+void Control::OnMouseEnterSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept
 {
-	Events.Register(std::make_unique<MouseEventHandler>("OnMouseDown", callback));
+	Events.Register(new EventHandler("OnMouseEnter", callback));
 }
 
-void Control::OnMouseEnterSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept
+void Control::OnMouseHoverSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept
 {
-	Events.Register(std::make_unique<EventHandler>("OnMouseEnter", callback));
+	Events.Register(new EventHandler("OnMouseHover", callback));
 }
 
-void Control::OnMouseHoverSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept
+void Control::OnMouseLeaveSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept
 {
-	Events.Register(std::make_unique<EventHandler>("OnMouseHover", callback));
+	Events.Register(new EventHandler("OnMouseLeave", callback));
 }
 
-void Control::OnMouseLeaveSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept
+void Control::OnMouseLeftDoubleClickSet(const std::function<void(Object*, MouseEventArgs*)>& callback) noexcept
 {
-	Events.Register(std::make_unique<EventHandler>("OnMouseLeave", callback));
+	Events.Register(new MouseEventHandler("OnMouseLeftDoubleClick", callback));
 }
 
-void Control::OnMouseLeftDoubleClickSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept
+void Control::OnMouseMoveSet(const std::function<void(Object*, MouseEventArgs*)>& callback) noexcept
 {
-	Events.Register(std::make_unique<MouseEventHandler>("OnMouseLeftDoubleClick", callback));
+	Events.Register(new MouseEventHandler("OnMouseMove", callback));
 }
 
-void Control::OnMouseMoveSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept
+void Control::OnMouseRightDoubleClickSet(const std::function<void(Object*, MouseEventArgs*)>& callback) noexcept
 {
-	Events.Register(std::make_unique<MouseEventHandler>("OnMouseMove", callback));
+	Events.Register(new MouseEventHandler("OnMouseRightDoubleClick", callback));
 }
 
-void Control::OnMouseRightDoubleClickSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept
+void Control::OnMouseUpSet(const std::function<void(Object*, MouseEventArgs*)>& callback) noexcept
 {
-	Events.Register(std::make_unique<MouseEventHandler>("OnMouseRightDoubleClick", callback));
+	Events.Register(new MouseEventHandler("OnMouseUp", callback));
 }
 
-void Control::OnMouseUpSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept
+void Control::OnMouseWheelSet(const std::function<void(Object*, MouseEventArgs*)>& callback) noexcept
 {
-	Events.Register(std::make_unique<MouseEventHandler>("OnMouseUp", callback));
+	Events.Register(new MouseEventHandler("OnMouseWheel", callback));
 }
 
-void Control::OnMouseWheelSet(const std::function<void(Control* const c, MouseEventArgs* const e)>& callback) noexcept
+void Control::OnVisibleChangedSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept
 {
-	Events.Register(std::make_unique<MouseEventHandler>("OnMouseWheel", callback));
-}
-
-void Control::OnVisibleChangedSet(const std::function<void(Control* const c, EventArgs* const e)>& callback) noexcept
-{
-	Events.Register(std::make_unique<EventHandler>("OnVisibledChanged", callback));
+	Events.Register(new EventHandler("OnVisibledChanged", callback));
 }
 
 Size Control::GetSize() const noexcept
@@ -335,6 +349,11 @@ Control* Control::GetPreviousControl() noexcept
 	}
 }
 
+bool Control::HasChildren() const noexcept
+{
+	return Controls.GetCount() > 0;
+}
+
 Control* Control::GetNextControl() noexcept
 {
 	if (const auto& root = dynamic_cast<Control*>(GetWindow()))
@@ -354,6 +373,43 @@ Control* Control::GetNextControl() noexcept
 	// Returning nullptr is extremely important, otherwise it will be a trash pointer and will launch an exception trying to process it
 	return nullptr;
 }
+
+// ControlCollection
+Control::ControlCollection::ControlCollection(Control* owner)
+	:
+	Collection(owner)
+{}
+//
+//void Control::ControlCollection::RemoveByKey(const std::string& key) noexcept
+//{
+//	auto temp = pNext;
+//
+//	while (temp != nullptr)
+//	{
+//		if (temp->GetCurrent()->Name == key)
+//		{
+//			Remove(pNext->GetCurrent());
+//			break;
+//		}
+//
+//		temp = temp->Prior;
+//	}
+//}
+//
+//bool Control::ControlCollection::ContainsKey(const std::string& key) const noexcept
+//{
+//	auto temp = pNext;
+//
+//	while(pNext != nullptr)
+//	{
+//		if (pNext->GetCurrent()->Name == key)
+//		{
+//			return true;
+//		}
+//	}
+//
+//	return false;
+//}
 
 Control* Control::GetByHandle(const IntPtr p) noexcept
 {
@@ -411,6 +467,76 @@ void Control::SetTabIndex(const unsigned int& index) noexcept
 	{
 		m_TabIndex = index;
 	}
+}
+
+Size Control::CalculateSizeByFont() noexcept
+{
+	Size r(m_Size);
+
+	if (m_Size.Height == 0)
+	{
+		int height = 5;
+		for (int i = 5, j = 0; i < Font.GetSizeInPixels(); ++i, ++j)
+		{
+			if (j == 2)
+			{
+				height += 2;
+				j = -1;
+			}
+			else
+			{
+				height += 1;
+			}
+		}
+
+		// Size is always the default plus the calculated area size
+		r.Height = Font::DefaultHeight() + height;
+	}
+
+	if (m_Size.Width == 0)
+	{
+		SIZE s;
+		HDC hdc = GetDC(static_cast<HWND>(GetWindow()->Handle.ToPointer()));
+		GetTextExtentPoint32(hdc, Text.c_str(), Text.length(), &s);
+		ReleaseDC(static_cast<HWND>(GetWindow()->Handle.ToPointer()), hdc);
+		DeleteDC(hdc);
+		r.Width = s.cx;
+	}
+
+	return r;
+}
+
+bool Control::IsEnabled() const noexcept
+{
+	if (!m_Enabled)
+	{
+		return false;
+	}
+
+	if (Parent != nullptr && !Parent->IsEnabled())
+	{
+		return false;
+	}
+
+	return true;
+}
+
+Window* Control::GetWindow() noexcept
+{
+	if (GetType() == typeid(Window))
+		return dynamic_cast<Window*>(this);
+
+	if (Parent != nullptr)
+	{
+		if (Parent->GetType() == typeid(Window))
+		{
+			return dynamic_cast<Window*>(Parent);
+		}
+
+		return Parent->GetWindow();
+	}
+
+	return nullptr;
 }
 
 // Exceptions

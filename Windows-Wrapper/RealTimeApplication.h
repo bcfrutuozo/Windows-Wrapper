@@ -11,7 +11,7 @@ private:
 
 	Timer Timer;
 
-	void Run(float dt);
+	void Process(float dt);
 	void HandleInput(float dt);
 
 public:
@@ -23,5 +23,5 @@ public:
 	RealTimeApplication& operator=(const Application&) = delete;		// Copy assignment constructor
 	RealTimeApplication& operator=(RealTimeApplication&&) = delete;		// Move assignment constructor
 
-	const int Start() override;
+	const int Run() override;
 };

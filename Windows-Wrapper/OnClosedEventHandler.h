@@ -3,13 +3,11 @@
 #include "Event.h"
 #include "OnClosedEventArgs.h"
 
-class Control;
-
-class OnClosedEventHandler : public Event<Control*, OnClosedEventArgs*>
+class OnClosedEventHandler : public Event<OnClosedEventArgs*>
 {
 public:
 
-	OnClosedEventHandler(const std::string& name, const std::function<void(Control*, OnClosedEventArgs*)>& callback)
+	OnClosedEventHandler(const std::string& name, const std::function<void(Object*, OnClosedEventArgs*)>& callback)
 		:
 		Event(name, callback)
 	{

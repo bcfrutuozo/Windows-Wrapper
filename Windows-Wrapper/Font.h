@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Base.h"
+#include "Object.h"
 #include "Enums.h"
 
-class Font : public Base
+class Font : public Object
 {
 private:
 
@@ -19,6 +19,8 @@ private:
 	float PointToPixel(float sizeInPoints) const noexcept;
 
 public:
+
+	static constexpr unsigned int DefaultHeight() { return 9; }
 
 	Font(const std::string& name, const float& size, bool isBold, bool isItalic, bool isUnderline, bool isStrikeout, GraphicsUnit unit);
 	virtual ~Font() = default;

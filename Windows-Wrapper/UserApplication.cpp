@@ -8,7 +8,7 @@ UserApplication::UserApplication()
 UserApplication::~UserApplication()
 { }
 
-const int UserApplication::Start()
+const int UserApplication::Run()
 {
 	MSG msg;
 

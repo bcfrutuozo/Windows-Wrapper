@@ -103,11 +103,8 @@ private:
 
 protected:
 
-	std::string Text;
-	WinAPI* Parent;
-	Size m_Size;
 
-	WinAPI(WinAPI* parent, const std::string& text, int width, int height) noexcept;
+	WinAPI() noexcept;
 	virtual ~WinAPI();
 
 	// Static function which handle WinAPI messages to corresponding member function of the control
@@ -120,20 +117,14 @@ protected:
 	// Member function responsible to handle the messages of each different type of control 
 	LRESULT WINAPI HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 
-	Size CalculateSizeByFont() noexcept;
-	inline unsigned int GetControlDefaultHeight() const noexcept;
 	unsigned int GetId() const noexcept;
 	void SetMouseOverState(bool state) noexcept;
 	void SetClickingState(bool state) noexcept;
 
 public:
-
-	Font Font;
 	
-	Window* GetWindow() noexcept;
 	bool IsMouseOver() const noexcept;
 	bool IsClicking() const noexcept;
-	bool IsEnabled() const noexcept;
 	void Enable() noexcept;
 	void Disable() noexcept;
 	virtual void Update();

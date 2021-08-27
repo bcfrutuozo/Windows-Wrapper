@@ -3,13 +3,11 @@
 #include "Event.h"
 #include "KeyPressEventArgs.h"
 
-class Control;
-
-class KeyPressEventHandler : public Event<Control*, KeyPressEventArgs*>
+class KeyPressEventHandler : public Event<KeyPressEventArgs*>
 {
 public:
 
-	KeyPressEventHandler(const std::string& name, const std::function<void(Control*, KeyPressEventArgs*)>& callback)
+	KeyPressEventHandler(const std::string& name, const std::function<void(Object*, KeyPressEventArgs*)>& callback)
 		:
 		Event(name, callback)
 	{

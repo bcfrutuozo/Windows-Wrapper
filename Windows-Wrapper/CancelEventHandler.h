@@ -5,11 +5,11 @@
 
 class Control;
 
-class CancelEventHandler : public Event<Control*, CancelEventArgs*>
+class CancelEventHandler : public Event<CancelEventArgs*>
 {
 public:
 
-	CancelEventHandler(const std::string& name, const std::function<void(Control*, CancelEventArgs*)>& callback)
+	CancelEventHandler(const std::string& name, const std::function<void(Object*, CancelEventArgs*)>& callback)
 		:
 		Event(name, callback)
 	{

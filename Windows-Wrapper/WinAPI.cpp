@@ -1,7 +1,6 @@
 #pragma once
 
 #include "WinAPI.h"
-#include "Window.h"
 
 unsigned int WinAPI::m_CurrentIndex = 1;
 
@@ -49,7 +48,7 @@ int WinAPI::OnClosing_Impl(HWND hwnd) noexcept
 
 	// If cancel is false and doesn't have Parent Control, means that it's the main window
 	// and application must post quit
-	if (!ArgsOnClosing.Cancel && Parent == nullptr)
+	if (!ArgsOnClosing.Cancel)
 	{
 		PostQuitMessage(0);
 	}
@@ -136,7 +135,7 @@ void WinAPI::OnInitMenuPopup_Impl(HWND hwnd, HMENU hMenu, unsigned int item, boo
 void WinAPI::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept
 {
 	ArgsOnKeyDown = KeyEventArgs(static_cast<Keys>(vk));
-	Dispatch("OnKeyDown", &ArgsOnKeyDown);
+	Dispatch("OnKeyDown",  &ArgsOnKeyDown);
 }
 
 void WinAPI::OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat) noexcept
@@ -316,11 +315,8 @@ void WinAPI::OnShowWindow_Impl(HWND hwnd, bool fShow, unsigned int status) noexc
 	Dispatch("OnVisibleChanged", &ArgsDefault);
 }
 
-WinAPI::WinAPI(WinAPI* parent, const std::string& text, int width, int height) noexcept
+WinAPI::WinAPI() noexcept
 	:
-	Parent(parent),
-	Text(text),
-	Font("Segoe", 9.0f, false, false, false, false, GraphicsUnit::Point),		// Default application font for controls
 	ArgsOnClosing(CloseReason::None, false),
 	ArgsOnClosed(CloseReason::None),
 	ArgsOnKeyDown(Keys::None),
@@ -335,13 +331,9 @@ WinAPI::WinAPI(WinAPI* parent, const std::string& text, int width, int height) n
 	m_Enabled(true),
 	m_Id(m_CurrentIndex++),
 	m_IsMouseOver(false),
-	m_IsClicking(false),
-	m_Size(width, height)
+	m_IsClicking(false)
 {
-	if (m_Size.Height == 0 || m_Size.Width == 0)
-	{
-		m_Size = CalculateSizeByFont();
-	}
+	
 }
 
 WinAPI::~WinAPI()
@@ -572,84 +564,6 @@ void WinAPI::SetMouseOverState(bool state) noexcept
 void WinAPI::SetClickingState(bool state) noexcept
 {
 	m_IsClicking = state;
-}
-
-Size WinAPI::CalculateSizeByFont() noexcept
-{
-	Size r(m_Size);
-
-	if (m_Size.Height == 0)
-	{
-		int height = 5;
-		for (int i = 5, j = 0; i < Font.GetSizeInPixels(); ++i, ++j)
-		{
-			if (j == 2)
-			{
-				height += 2;
-				j = -1;
-			}
-			else
-			{
-				height += 1;
-			}
-		}
-
-		// Size is always the default plus the calculated area size
-		r.Height = GetControlDefaultHeight() + height;
-	}
-
-	if (m_Size.Width == 0)
-	{
-		SIZE s;
-		HDC hdc = GetDC(static_cast<HWND>(GetWindow()->Handle.ToPointer()));
-		GetTextExtentPoint32(hdc, Text.c_str(), Text.length(), &s);
-		ReleaseDC(static_cast<HWND>(GetWindow()->Handle.ToPointer()), hdc);
-		DeleteDC(hdc);
-		r.Width = s.cx;
-	}
-
-	return r;
-}
-
-inline unsigned int WinAPI::GetControlDefaultHeight() const noexcept
-{
-	return 9; // Default size is 9 for 1 pixel font
-}
-
-bool WinAPI::IsEnabled() const noexcept
-{
-	if (!m_Enabled)
-	{
-		return false;
-	}
-
-	if (const auto& p = dynamic_cast<WinAPI*>(Parent))
-	{
-		if (!p->IsEnabled())
-		{
-			return false;
-		}
-	}
-
-	return true;
-}
-
-Window* WinAPI::GetWindow() noexcept
-{
-	if (GetType() == typeid(Window))
-		return dynamic_cast<Window*>(this);
-
-	if (Parent != nullptr)
-	{
-		if (Parent->GetType() == typeid(Window))
-		{
-			return dynamic_cast<Window*>(Parent);
-		}
-
-		return Parent->GetWindow();
-	}
-
-	return nullptr;
 }
 
 bool WinAPI::IsMouseOver() const noexcept
