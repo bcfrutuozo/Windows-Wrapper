@@ -7,6 +7,9 @@
 #include "Size.h"
 #include "Padding.h"
 #include "EventHandler.h"
+#include "KeyEventHandler.h"
+#include "KeyPressEventHandler.h"
+#include "MouseEventHandler.h"
 #include "KeyEventArgs.h"
 #include "MouseEventArgs.h"
 #include "KeyPressEventArgs.h"
@@ -45,6 +48,26 @@ private:
 	void OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept override;
 	void OnNextDialogControl_Impl(HWND hwnd, HWND hwndSetFocus, bool fNext) noexcept override;
 
+	EventHandler* OnActivate;
+	EventHandler* OnClick;
+	EventHandler* OnDeactivate;
+	EventHandler* OnGotFocus;
+	EventHandler* OnLostFocus;
+	KeyEventHandler* OnKeyDown;
+	KeyPressEventHandler* OnKeyPress;
+	KeyEventHandler* OnKeyUp;
+	MouseEventHandler* OnMouseClick;
+	MouseEventHandler* OnMouseDown;
+	EventHandler* OnMouseEnter;
+	EventHandler* OnMouseHover;
+	EventHandler* OnMouseLeave;
+	MouseEventHandler* OnMouseLeftDoubleClick;
+	MouseEventHandler* OnMouseMove;
+	MouseEventHandler* OnMouseRightDoubleClick;
+	MouseEventHandler* OnMouseUp;
+	MouseEventHandler* OnMouseWheel;
+	EventHandler* OnVisibleChanged;
+
 protected:
 
 	Point Location;
@@ -79,9 +102,6 @@ public:
 	public:
 
 		ControlCollection(Control* owner);
-
-		void RemoveByKey(const std::string& key) noexcept;
-		bool ContainsKey(const std::string& key) const noexcept;
 	};
 
 	ControlCollection Controls;

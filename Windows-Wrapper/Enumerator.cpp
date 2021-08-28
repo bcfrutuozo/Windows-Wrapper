@@ -36,9 +36,19 @@ Enumerator::Enumerator(const Enumerator& src)
 
 Enumerator::~Enumerator()
 {
-	Begin = nullptr;
-	Prior = nullptr;
-	Next = nullptr;
+	if (Begin != nullptr)
+	{
+		Begin = nullptr;
+	}
+
+	if (Prior != nullptr)
+	{
+		Prior = nullptr;
+	}
+	if (Next != nullptr)
+	{
+		Next = nullptr;
+	}
 }
 
 //Enumerator& operator=(const Enumerator& obj) = delete;

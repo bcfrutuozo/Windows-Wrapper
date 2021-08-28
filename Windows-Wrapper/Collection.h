@@ -13,6 +13,57 @@ private:
 
 	T* Owner;
 
+	void ResetIndices(Enumerator* begin) noexcept
+	{
+		auto start = begin;
+		while (start != nullptr)
+		{
+			start->Begin = begin;
+			start = start->Next;
+		}
+	}
+
+	bool Remove(Enumerator* e) noexcept
+	{
+		Enumerator* temp = e;
+		Enumerator* next = e->Next;
+		Enumerator* prior = e->Prior;
+
+		if (this->Count > 1)
+		{
+			if (next == nullptr)
+			{
+				temp->Prior->Next = nullptr;
+				pNext = prior;	// Change the end of the Collection to the new last element
+			}
+			else
+			{
+				next->Prior = prior;
+			}
+			if (prior == nullptr)
+			{
+				temp->Next->Prior = nullptr;
+			}
+			else
+			{
+				prior->Next = next;
+			}
+		}
+
+		--this->Count;
+
+		delete dynamic_cast<T*>(temp->GetCurrent());
+
+		if (temp == temp->Begin)
+		{
+			ResetIndices(temp->Next);
+		}
+
+		delete temp;
+
+		return true;
+	}
+
 protected:
 
 	Enumerator* pNext;
@@ -62,12 +113,12 @@ public:
 	{
 		assert(i < this->Count);
 
+		auto e = pNext->Begin;
 		if (i == 0)
 		{
-			return dynamic_cast<T*>(pNext->GetCurrent());
+			return dynamic_cast<T*>(e->GetCurrent());
 		}
 
-		auto e = pNext->Begin;
 		for (size_t p = 0; p < i; ++p, e = e->Next)
 		{
 			if (p == i)
@@ -79,11 +130,12 @@ public:
 
 	virtual ~Collection()
 	{
-		if (pNext != nullptr)
+		if (Owner != nullptr)
 		{
-			delete pNext;
-			pNext = nullptr;
+			Owner = nullptr;
 		}
+
+		Clear();
 	}
 
 	void Add(T* const item) noexcept override
@@ -110,37 +162,7 @@ public:
 		{
 			if (search->GetCurrent() == item)
 			{
-				Enumerator* temp = search;
-				Enumerator* next = search->Next;
-				Enumerator* prior = search->Prior;
-
-				if (this->Count > 1)
-				{
-					if (next == nullptr)
-					{
-						temp->Prior->Next = nullptr;
-						pNext = prior;	// Change the end of the Collection to the new last element
-					}
-					else
-					{
-						next->Prior = prior;
-					}
-					if (prior == nullptr)
-					{
-						temp->Next->Prior = nullptr;
-					}
-					else
-					{
-						prior->Next = next;
-					}
-				}
-
-				--this->Count;
-
-				T* c = dynamic_cast<T*>(temp->GetCurrent());
-				delete temp;
-
-				return true;
+				return Remove(search);
 			}
 			else
 			{
@@ -158,23 +180,17 @@ public:
 			return;
 		}
 
-		Enumerator* search = pNext;
-
-		while (search != nullptr)
+		while (pNext != nullptr)
 		{
-			Enumerator* prior = search->Prior;
-			if (prior != nullptr)
+			Enumerator* temp = nullptr;
+			if (pNext->Prior != nullptr)
 			{
-				pNext = prior;
-				pNext->Next = nullptr;
+				temp = pNext->Prior;
 			}
 
-			delete search;
-			search = pNext;
-			--this->Count;
+			Remove(pNext);
+			pNext = temp;
 		}
-
-		search = nullptr;
 	}
 
 	bool Contains(T* const item) const noexcept override
@@ -203,7 +219,7 @@ public:
 		Iterator() = default;
 		Iterator(Enumerator* pElement)
 			:
-			pElement(pElement == nullptr ? nullptr : pElement->Begin)
+			pElement(pElement)
 		{
 
 		}
@@ -244,7 +260,7 @@ public:
 		ConstIterator() = default;
 		ConstIterator(const Enumerator* pElement)
 			:
-			pElement(pElement == nullptr ? nullptr : pElement->Begin)
+			pElement(pElement)
 		{
 
 		}
@@ -274,8 +290,8 @@ public:
 		}
 	};
 
-	Iterator begin() { return{ pNext }; }
+	Iterator begin() { return{ this->Count == 0 ? nullptr : pNext->Begin }; }
 	Iterator end() { return{}; }
-	ConstIterator begin() const { return{ pNext }; }
+	ConstIterator begin() const { return{ this->Count == 0 ? nullptr : pNext->Begin }; }
 	ConstIterator end() const { return{}; }
 };

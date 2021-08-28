@@ -9,10 +9,7 @@ EventDispatcher::EventDispatcher(Component* parent)
 
 EventDispatcher::~EventDispatcher()
 {
-	for (auto el : m_List)
-	{
-		delete el.second;
-	}
+	
 }
 
 void EventDispatcher::Register(IEvent* event) noexcept
@@ -35,7 +32,7 @@ void EventDispatcher::Unregister(const std::string& name) noexcept
 	if (entry != m_List.end())
 	{
 		m_List.erase(entry);
-		delete entry->second;
+		// DO NOT DELETE Event pointer. It is handled inside the Control class destructor
 	}
 }
 

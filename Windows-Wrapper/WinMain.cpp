@@ -1,13 +1,11 @@
 #include "TestApplication.h"
-#include "Window.h"
 
 #ifdef _DEBUG
-#define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
+#define _CRTDBG_MAP_ALLOC  
+#include <stdlib.h>  
+#include <crtdbg.h>  
+#include <conio.h>
 #endif
-
-Application* App;
 
 int CALLBACK WinMain(
 	_In_ HINSTANCE hInstance,
@@ -16,16 +14,13 @@ int CALLBACK WinMain(
 	_In_ int nCmdShow)
 {
 #ifdef _DEBUG
+	AllocConsole();
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
 	_CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDERR);
 	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_FILE);
 	_CrtSetReportFile(_CRT_ERROR, _CRTDBG_FILE_STDERR);
 	_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
 	_CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);
-
-	_CrtMemState StartupMemState;
-	_CrtMemCheckpoint(&StartupMemState);
-	_CrtMemDumpStatistics(&StartupMemState);
 #endif
 
 	int ret = 0;
@@ -47,11 +42,8 @@ int CALLBACK WinMain(
 	}
 
 #ifdef _DEBUG
-	_CrtMemState ShutdownMemState;
-	_CrtMemCheckpoint(&ShutdownMemState);
-	_CrtMemDumpStatistics(&ShutdownMemState);
-	OutputDebugString("=============\n");
-	_CrtMemDumpAllObjectsSince(&StartupMemState);
+	_CrtDumpMemoryLeaks();
+	while (!_kbhit());
 #endif
 
 	return ret;

@@ -119,20 +119,11 @@ void Control::Dispose()
 {
 	Component::Dispose();
 
-	if (Controls.GetCount() > 0)
-	{
-		for (const auto& c : Controls)
-		{
-			c->Dispose();
-		}
-	}
-
+	Controls.Clear();
 	if (Parent != nullptr)
 	{
 		Parent->Controls.Remove(this);
 	}
-
-	delete this;
 }
 
 Control::Control() noexcept
@@ -163,7 +154,27 @@ Control::Control(Control* parent, const std::string& text, int width, int height
 	m_TabIndex(m_IncrementalTabIndex++),
 	m_IsTabSelected(false),
 	m_MinSize(0u),
-	Controls(this)
+	Controls(this),
+	OnActivate(nullptr),
+	OnClick(nullptr),
+	OnDeactivate(nullptr),
+	OnGotFocus(nullptr),
+	OnLostFocus(nullptr),
+	OnKeyDown(nullptr),
+	OnKeyPress(nullptr),
+	OnKeyUp(nullptr),
+	OnMouseClick(nullptr),
+	OnMouseDown(nullptr),
+	OnMouseEnter(nullptr),
+	OnMouseHover(nullptr),
+	OnMouseLeave(nullptr),
+	OnMouseLeftDoubleClick(nullptr),
+	OnMouseMove(nullptr),
+	OnMouseRightDoubleClick(nullptr),
+	OnMouseUp(nullptr),
+	OnMouseWheel(nullptr),
+	OnVisibleChanged(nullptr)
+
 {
 	if (m_Size.Height == 0 || m_Size.Width == 0)
 	{
@@ -187,102 +198,139 @@ Control::Control(const std::string& text, int width, int height, int x, int y) n
 
 Control::~Control()
 {
-	
+	if (OnActivate != nullptr) { delete OnActivate; OnActivate = nullptr; }
+	if (OnClick != nullptr) { delete OnClick; OnClick = nullptr; }
+	if (OnDeactivate != nullptr) { delete OnDeactivate; OnDeactivate = nullptr; }
+	if (OnGotFocus != nullptr) { delete OnGotFocus; OnGotFocus = nullptr; }
+	if (OnLostFocus != nullptr) { delete OnLostFocus; OnLostFocus = nullptr; }
+	if (OnKeyDown != nullptr) { delete OnKeyDown; OnKeyDown = nullptr; }
+	if (OnKeyPress != nullptr) { delete OnKeyPress; OnKeyPress = nullptr; }
+	if (OnKeyUp != nullptr) { delete OnKeyUp; OnKeyUp = nullptr; }
+	if (OnMouseClick != nullptr) { delete OnMouseClick; OnMouseClick = nullptr; }
+	if (OnMouseDown != nullptr) { delete OnMouseDown; OnMouseDown = nullptr; }
+	if (OnMouseEnter != nullptr) { delete OnMouseEnter; OnMouseEnter = nullptr; }
+	if (OnMouseHover != nullptr) { delete OnMouseHover; OnMouseHover = nullptr; }
+	if (OnMouseLeave != nullptr) { delete OnMouseLeave; OnMouseLeave = nullptr; }
+	if (OnMouseLeftDoubleClick != nullptr) { delete OnMouseLeftDoubleClick; OnMouseLeftDoubleClick = nullptr; }
+	if (OnMouseMove != nullptr) { delete OnMouseMove; OnMouseMove = nullptr; }
+	if (OnMouseRightDoubleClick != nullptr) { delete OnMouseRightDoubleClick; OnMouseRightDoubleClick = nullptr; }
+	if (OnMouseUp != nullptr) { delete OnMouseUp; OnMouseUp = nullptr; }
+	if (OnMouseWheel != nullptr) { delete OnMouseWheel; OnMouseWheel = nullptr; }
+	if (OnVisibleChanged != nullptr) { delete OnVisibleChanged; OnVisibleChanged = nullptr; }
 }
 
 void Control::OnActivateSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept
 {
-	Events.Register(new EventHandler("OnActivate", callback));
+	OnActivate = new EventHandler("OnActivate", callback);
+	Events.Register(OnActivate);
 }
 
 void Control::OnClickSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept
 {
-	Events.Register(new EventHandler("OnClick", callback));
+	OnClick = new EventHandler("OnClick", callback);
+	Events.Register(OnClick);
 }
 
 void Control::OnDeactivateSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept
 {
-	Events.Register(new EventHandler("OnDeactivate", callback));
+	OnDeactivate = new EventHandler("OnDeactivate", callback);
+	Events.Register(OnDeactivate);
 }
 
 void Control::OnGotFocusSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept
 {
-	Events.Register(new EventHandler("OnGotFocus", callback));
+	OnGotFocus = new EventHandler("OnGotFocus", callback);
+	Events.Register(OnGotFocus);
 }
 
 void Control::OnLostFocusSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept
 {
-	Events.Register(new EventHandler("OnLostFocus", callback));
+	OnLostFocus = new EventHandler("OnLostFocus", callback);
+	Events.Register(OnLostFocus);
 }
 
 void Control::OnKeyDownSet(const std::function<void(Object*, KeyEventArgs*)>& callback) noexcept
 {
-	Events.Register(new KeyEventHandler("OnKeyDown", callback));
+	OnKeyDown = new KeyEventHandler("OnKeyDown", callback);
+	Events.Register(OnKeyDown);
 }
 
 void Control::OnKeyPressSet(const std::function<void(Object*, KeyPressEventArgs*)>& callback) noexcept
 {
-	Events.Register(new KeyPressEventHandler("OnKeyPress", callback));
+	OnKeyPress = new KeyPressEventHandler("OnKeyPress", callback);
+	Events.Register(OnKeyPress);
 }
 
 void Control::OnKeyUpSet(const std::function<void(Object*, KeyEventArgs*)>& callback) noexcept
 {
-	Events.Register(new KeyEventHandler("OnKeyUp", callback));
+	OnKeyUp = new KeyEventHandler("OnKeyUp", callback);
+	Events.Register(OnKeyUp);
 }
 
 void Control::OnMouseClickSet(const std::function<void(Object*, MouseEventArgs*)>& callback) noexcept
 {
-	Events.Register(new MouseEventHandler("OnMouseClick", callback));
+	OnMouseClick = new MouseEventHandler("OnMouseClick", callback);
+	Events.Register(OnMouseClick);
 }
 
 void Control::OnMouseDownSet(const std::function<void(Object*, MouseEventArgs*)>& callback) noexcept
 {
-	Events.Register(new MouseEventHandler("OnMouseDown", callback));
+	OnMouseDown = new MouseEventHandler("OnMouseDown", callback);
+	Events.Register(OnMouseDown);
 }
 
 void Control::OnMouseEnterSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept
 {
-	Events.Register(new EventHandler("OnMouseEnter", callback));
+	OnMouseEnter = new EventHandler("OnMouseEnter", callback);
+	Events.Register(OnMouseEnter);
 }
 
 void Control::OnMouseHoverSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept
 {
-	Events.Register(new EventHandler("OnMouseHover", callback));
+	OnMouseHover = new EventHandler("OnMouseHover", callback);
+	Events.Register(OnMouseHover);
 }
 
 void Control::OnMouseLeaveSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept
 {
-	Events.Register(new EventHandler("OnMouseLeave", callback));
+	OnMouseLeave = new EventHandler("OnMouseLeave", callback);
+	Events.Register(OnMouseLeave);
 }
 
 void Control::OnMouseLeftDoubleClickSet(const std::function<void(Object*, MouseEventArgs*)>& callback) noexcept
 {
-	Events.Register(new MouseEventHandler("OnMouseLeftDoubleClick", callback));
+	OnMouseLeftDoubleClick = new MouseEventHandler("OnMouseLeftDoubleClick", callback);
+	Events.Register(OnMouseLeftDoubleClick);
 }
 
 void Control::OnMouseMoveSet(const std::function<void(Object*, MouseEventArgs*)>& callback) noexcept
 {
-	Events.Register(new MouseEventHandler("OnMouseMove", callback));
+	OnMouseMove = new MouseEventHandler("OnMouseMove", callback);
+	Events.Register(OnMouseMove);
 }
 
 void Control::OnMouseRightDoubleClickSet(const std::function<void(Object*, MouseEventArgs*)>& callback) noexcept
 {
-	Events.Register(new MouseEventHandler("OnMouseRightDoubleClick", callback));
+	OnMouseRightDoubleClick = new MouseEventHandler("OnMouseRightDoubleClick", callback);
+	Events.Register(OnMouseRightDoubleClick);
 }
 
 void Control::OnMouseUpSet(const std::function<void(Object*, MouseEventArgs*)>& callback) noexcept
 {
-	Events.Register(new MouseEventHandler("OnMouseUp", callback));
+	OnMouseUp = new MouseEventHandler("OnMouseUp", callback);
+	Events.Register(OnMouseUp);
 }
 
 void Control::OnMouseWheelSet(const std::function<void(Object*, MouseEventArgs*)>& callback) noexcept
 {
-	Events.Register(new MouseEventHandler("OnMouseWheel", callback));
+	OnMouseWheel = new MouseEventHandler("OnMouseWheel", callback);
+	Events.Register(OnMouseWheel);
 }
 
 void Control::OnVisibleChangedSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept
 {
-	Events.Register(new EventHandler("OnVisibledChanged", callback));
+	OnVisibleChanged = new EventHandler("OnVisibleChanged", callback);
+	Events.Register(OnVisibleChanged);
 }
 
 Size Control::GetSize() const noexcept
@@ -379,37 +427,6 @@ Control::ControlCollection::ControlCollection(Control* owner)
 	:
 	Collection(owner)
 {}
-//
-//void Control::ControlCollection::RemoveByKey(const std::string& key) noexcept
-//{
-//	auto temp = pNext;
-//
-//	while (temp != nullptr)
-//	{
-//		if (temp->GetCurrent()->Name == key)
-//		{
-//			Remove(pNext->GetCurrent());
-//			break;
-//		}
-//
-//		temp = temp->Prior;
-//	}
-//}
-//
-//bool Control::ControlCollection::ContainsKey(const std::string& key) const noexcept
-//{
-//	auto temp = pNext;
-//
-//	while(pNext != nullptr)
-//	{
-//		if (pNext->GetCurrent()->Name == key)
-//		{
-//			return true;
-//		}
-//	}
-//
-//	return false;
-//}
 
 Control* Control::GetByHandle(const IntPtr p) noexcept
 {

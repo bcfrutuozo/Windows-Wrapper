@@ -54,6 +54,10 @@ int WinAPI::OnClosing_Impl(HWND hwnd) noexcept
 		if (GetType() == typeid(Window))
 		{
 			Dispose();
+			if (IsDisposing())
+			{
+				Application::ValidateWindows();
+			}
 		}
 
 		Application::TryCloseApplication();
@@ -65,11 +69,6 @@ int WinAPI::OnClosing_Impl(HWND hwnd) noexcept
 
 void WinAPI::OnClosed_Impl(HWND hwnd) noexcept
 {
-	if (GetType() == typeid(Window) && IsDisposing())
-	{
-		Application::ValidateWindows();
-	}
-
 	Dispatch("OnClosed", &ArgsOnClosed);
 }
 
