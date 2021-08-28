@@ -1,6 +1,7 @@
 #pragma once
 
 #include "WinAPI.h"
+#include "Application.h"
 
 unsigned int WinAPI::m_CurrentIndex = 1;
 
@@ -50,14 +51,25 @@ int WinAPI::OnClosing_Impl(HWND hwnd) noexcept
 	// and application must post quit
 	if (!ArgsOnClosing.Cancel)
 	{
-		PostQuitMessage(0);
+		if (GetType() == typeid(Window))
+		{
+			Dispose();
+		}
+
+		Application::TryCloseApplication();
+		return 0;
 	}
 
-	return 0;
+	return 1;
 }
 
 void WinAPI::OnClosed_Impl(HWND hwnd) noexcept
 {
+	if (GetType() == typeid(Window) && IsDisposing())
+	{
+		Application::ValidateWindows();
+	}
+
 	Dispatch("OnClosed", &ArgsOnClosed);
 }
 
@@ -135,7 +147,7 @@ void WinAPI::OnInitMenuPopup_Impl(HWND hwnd, HMENU hMenu, unsigned int item, boo
 void WinAPI::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept
 {
 	ArgsOnKeyDown = KeyEventArgs(static_cast<Keys>(vk));
-	Dispatch("OnKeyDown",  &ArgsOnKeyDown);
+	Dispatch("OnKeyDown", &ArgsOnKeyDown);
 }
 
 void WinAPI::OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat) noexcept
@@ -333,7 +345,7 @@ WinAPI::WinAPI() noexcept
 	m_IsMouseOver(false),
 	m_IsClicking(false)
 {
-	
+
 }
 
 WinAPI::~WinAPI()

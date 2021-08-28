@@ -26,7 +26,6 @@ void TestApplication::Initialize()
 	//j.SetBackgroundColor(Color::Blue());
 	window->AddLabel("abcdef", 5, 100);
 
-
 	window->GetMouse().EnableRaw();
 	window->GetKeyboard().DisableAutorepeat();
 

@@ -2,7 +2,7 @@
 
 #include "UserApplication.h"
 
-class TestApplication : public UserApplication
+class TestApplication : public UserApplication<TestApplication>
 {
 private:
 
@@ -14,16 +14,6 @@ private:
 	TextBox* txtBox3;
 
 public:
-
-	TestApplication()
-	{
-		Initialize();
-	}
-
-	virtual ~TestApplication()
-	{
-
-	}
 
 	void Initialize() override;
 };

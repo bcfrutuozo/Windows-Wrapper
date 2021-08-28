@@ -11,11 +11,9 @@ public:
 
 	};
 
-private:
+protected:
 
-	WindowCollection Windows;
-
-public:
+	static WindowCollection Windows;
 
 	Application();
 	~Application();
@@ -24,8 +22,11 @@ public:
 	Application& operator=(const Application&) = delete;	// Copy assignment constructor
 	Application& operator=(Application&&) = delete;			// Move assignment constructor
 
+public:
+
 	void AddWindow(Window* window);
-	Window& AddWindow(const std::string& name, int width, int height);
+	static bool ValidateWindows();
 	virtual void Initialize() = 0;
-	virtual const int Run() = 0;
+	static void TryCloseApplication() noexcept;
+	static void Exit() noexcept;
 };

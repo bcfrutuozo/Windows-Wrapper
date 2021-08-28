@@ -1,5 +1,8 @@
 #include "UserApplication.h"
 
+// Singleton WndClass
+UserApplication* UserApplication::App;
+
 UserApplication::UserApplication()
 {
 
@@ -10,6 +13,8 @@ UserApplication::~UserApplication()
 
 const int UserApplication::Run()
 {
+	App->Initialize();
+
 	MSG msg;
 
 	while (GetMessage(&msg, nullptr, 0, 0) != 0)

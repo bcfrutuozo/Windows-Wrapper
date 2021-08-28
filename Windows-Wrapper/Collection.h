@@ -26,8 +26,7 @@ public:
 
 	Collection()
 		:
-		Owner(nullptr),
-		pNext(nullptr)
+		Collection(nullptr)
 	{ }
 
 	Collection(T* owner)
@@ -139,6 +138,7 @@ public:
 				--this->Count;
 
 				T* c = dynamic_cast<T*>(temp->GetCurrent());
+				delete temp;
 
 				return true;
 			}

@@ -5,6 +5,7 @@ Enumerator::Enumerator(Object* item)
 	:
 	Enumerator(item, nullptr, nullptr)
 {
+	// Overrite Begin pointer because it's the first Enumerator
 	Begin = this;
 }
 
@@ -18,6 +19,7 @@ Enumerator::Enumerator(Object* const item, Enumerator* const prior)
 Enumerator::Enumerator(Object* const item, Enumerator* const prior, Enumerator* const next)
 	:
 	Item(item),
+	Begin(prior == nullptr ? nullptr : prior->Begin),
 	Prior(prior),
 	Next(next)
 {

@@ -33,8 +33,7 @@ int CALLBACK WinMain(
 	try
 	{
 		SetProcessDPIAware();
-		App = new TestApplication();
-		ret = App->Run();
+		ret = TestApplication::Run();
 	}
 	catch (const std::exception& e)
 	{
@@ -45,13 +44,6 @@ int CALLBACK WinMain(
 	{
 		ret = -1;
 		MessageBox(nullptr, "No details available", "Unknown Exception", MB_OK | MB_ICONEXCLAMATION);
-	}
-
-	
-	if (App != nullptr)
-	{
-		delete App;
-		App = nullptr;
 	}
 
 #ifdef _DEBUG

@@ -48,6 +48,11 @@ bool Component::IsDisposed() const noexcept
 	return Disposed;
 }
 
+bool Component::IsDisposing() const noexcept
+{
+	return Disposing;
+}
+
 bool Component::IsDesignMode()
 {
 	return m_Site == nullptr ? false : m_Site->IsDesignMode();
@@ -70,6 +75,7 @@ void Component::SetSite(ISite* const site)
 
 void Component::Dispose()
 {
+	Disposing = true;
 	Dispose(true);
 }
 
