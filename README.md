@@ -1,5 +1,5 @@
 # Windows-Wrapper
-Win32 API wrapper to make our lives easier when using C++.
+Win32 API wrapper to make our lives easier when using C++ (It's **STILL** under development and **STILL ONLY** basic classes were implemented).
 
 There's a lot of background work to deal with when instantiating a window (in Windows) and manage its Controls in C++.
 The main goal of this project is to help a fellow programmer who wants to create a GUI for a C++ application but always struggles with it.
@@ -63,7 +63,7 @@ void TestClick(Object* sender, EventArgs* e)
 void TestMouseMove(Object* sender, MouseEventHandler* e)
 {
 	int x = e->X;
-  int y = e->Y;
+	int y = e->Y;
 }
 
 ```
