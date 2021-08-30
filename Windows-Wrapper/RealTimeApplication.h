@@ -3,6 +3,8 @@
 #include "Application.h"
 #include "Timer.h"
 
+constexpr auto SPEEDFACTOR = 1.0f;
+
 template<typename T>
 class RealTimeApplication : public Application
 {

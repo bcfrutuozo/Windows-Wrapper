@@ -18,7 +18,7 @@ protected:
 	UserApplication(UserApplication&&) = delete;					// Move constructor
 	UserApplication& operator=(const UserApplication&) = delete;	// Copy assignment constructor
 	UserApplication& operator=(UserApplication&&) = delete;			// Move assignment constructor
-	virtual ~UserApplication() = default
+	virtual ~UserApplication() = default;
 
 public:
 
