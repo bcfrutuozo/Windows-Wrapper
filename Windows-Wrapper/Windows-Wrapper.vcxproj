@@ -154,6 +154,7 @@
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="Label.cpp" />
     <ClCompile Include="Site.cpp" />
+    <ClCompile Include="TestRealTimeApplication.cpp" />
     <ClCompile Include="ToolStrip.cpp" />
     <ClCompile Include="MessageMapper.cpp" />
     <ClCompile Include="Padding.cpp" />
@@ -183,7 +184,7 @@
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="Point.cpp" />
     <ClCompile Include="Size.cpp" />
-    <ClCompile Include="TestApplication.cpp" />
+    <ClCompile Include="TestUserApplication.cpp" />
     <ClCompile Include="TextBox.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Type.cpp" />
@@ -212,6 +213,7 @@
     <ClInclude Include="Keys.h" />
     <ClInclude Include="Label.h" />
     <ClInclude Include="Site.h" />
+    <ClInclude Include="TestRealTimeApplication.h" />
     <ClInclude Include="ToolStrip.h" />
     <ClInclude Include="MessageMapper.h" />
     <ClInclude Include="MouseButtons.h" />
@@ -237,7 +239,7 @@
     <ClInclude Include="IHandle.h" />
     <ClInclude Include="IHidable.h" />
     <ClInclude Include="IntPtr.h" />
-    <ClInclude Include="TestApplication.h" />
+    <ClInclude Include="TestUserApplication.h" />
     <ClInclude Include="Utilities.h" />
     <ClInclude Include="WinAPI.h" />
     <ClInclude Include="Keyboard.h" />

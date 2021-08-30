@@ -1,8 +1,8 @@
 #pragma once
 
-#include "UserApplication.h"
+#include "RealTimeApplication.h"
 
-class TestApplication : public UserApplication<TestApplication>
+class TestRealTimeApplication : public RealTimeApplication<TestRealTimeApplication>
 {
 private:
 
@@ -15,6 +15,8 @@ private:
 
 public:
 
+	void HandleInput(float dt) override;
+	void Process(float dt) override;
 	void Initialize() override;
 };
 

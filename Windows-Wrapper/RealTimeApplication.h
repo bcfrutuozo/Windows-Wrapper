@@ -3,8 +3,6 @@
 #include "Application.h"
 #include "Timer.h"
 
-constexpr auto SPEEDFACTOR = 1.0f;
-
 template<typename T>
 class RealTimeApplication : public Application
 {
@@ -13,153 +11,19 @@ private:
 	static T App;
 	static Timer Timer;
 
-	static void HandleInput(float dt)
-	{
-		//auto window = GetWindow();
-
-	//while (const auto& e = window->GetKeyboard().ReadKey())
-	//{
-	//	if (!e->IsPress())
-	//	{
-	//		switch (e->GetCode())
-	//		{
-	//		case VK_ESCAPE:
-	//			if (window->IsCursorEnabled())
-	//			{
-	//				window->DisableCursor();
-	//				window->GetMouse().EnableRaw();
-	//			}
-	//			else
-	//			{
-	//				window->EnableCursor();
-	//				window->GetMouse().DisableRaw();
-	//			}
-	//			break;
-	//		}
-	//	}
-	//}
-
-	//if (!window->IsCursorEnabled())
-	//{
-	//	if (window->GetKeyboard().IsKeyPressed('Y'))
-	//	{
-	//		
-	//	}
-
-	//	if (window->GetKeyboard().IsKeyPressed('R'))
-	//	{
-
-	//	}
-
-	//	if (window->GetKeyboard().IsKeyPressed('O'))
-	//	{
-
-	//	}
-
-	//	if (window->GetKeyboard().IsKeyPressed('P'))
-	//	{
-	//	}
-
-	//	if (window->GetKeyboard().IsKeyPressed('Q'))
-	//	{
-	//		/*Color x = m_Window->();
-	//		x.SetR(x.GetR() - 1);
-
-	//		if (x.GetR() >= 0) m_Window->SetForeColor(x);*/
-	//		//cameras->Translate({ 0.0f, 0.0f, dt });
-	//	}
-	//	if (window->GetKeyboard().IsKeyPressed('A'))
-	//	{
-	//		/*Color x = m_Window->GetForeColor();
-	//		x.SetG(x.GetG() - 1);
-
-	//		if (x.GetG() >= 0) m_Window->SetForeColor(x);*/
-	//		//cameras->Translate({ -dt, 0.0f, 0.0f });
-	//	}
-	//	if (window->GetKeyboard().IsKeyPressed('Z'))
-	//	{
-	//		/*Color x = m_Window->GetForeColor();
-	//		x.SetB(x.GetB() - 1);
-
-	//		if (x.GetB() >= 0) m_Window->SetForeColor(x);*/
-	//		//cameras->Translate({ 0.0f, 0.0f, -dt });
-	//	}
-	//	if (window->GetKeyboard().IsKeyPressed('W'))
-	//	{
-	//		/*Color x = m_Window->GetForeColor();
-	//		x.SetR(x.GetR() + 1);
-
-	//		if (x.GetR() < 256) m_Window->SetForeColor(x);*/
-
-	//		//cameras->Translate({ dt, 0.0f, 0.0f });
-	//	}
-	//	if (window->GetKeyboard().IsKeyPressed('S'))
-	//	{
-	//		/*Color x = m_Window->GetForeColor();
-	//		x.SetG(x.GetG() + 1);
-
-	//		if (x.GetG() < 256) m_Window->SetForeColor(x);*/
-
-	//		//cameras->Translate({ 0.0f, dt, 0.0f });
-	//	}
-	//	if (window->GetKeyboard().IsKeyPressed('X'))
-	//	{
-	//		/*Color x = m_Window->GetForeColor();
-	//		x.SetB(x.GetB() + 1);
-
-	//		if (x.GetB() < 256) m_Window->SetForeColor(x);*/
-
-	//		//cameras->Translate({ 0.0f, -dt, 0.0f });
-	//	}
-	//}
-
-
-	//while (const auto& delta = window->GetMouse().ReadRawDelta())
-	//{
-	//	if (!window->IsCursorEnabled())
-	//	{
-	//		//cameras->Rotate(static_cast<float>(delta->x), static_cast<float>(delta->y));
-	//	}
-	//}
-	}
-
-	static void Process(float dt)
-	{
-		// Time elapse on window title
-	
-		//const float t = m_Timer.Peek();
-		std::ostringstream oss;
-		oss << "Timer elapsed: " << std::setprecision(1) << std::fixed << dt << "s";
-		//window->SetText(oss.str().c_str());
-
-		// renderGraph.Execute(window.Gfx());
-
-		// Present the frame
-		//window.Gfx().EndFrame();
-		//renderGraph.Reset();
-	}
-	
-
 protected:
 
-	RealTimeApplication()
-	{
-		//auto window = GetWindow();
-	//window->GetMouse().DisableRaw();
-	//window->GetKeyboard().EnableAutorepeat();
-	}
-
-	~RealTimeApplication()
-	{
-
-	}
-
+	RealTimeApplication() = default;
 	RealTimeApplication(const RealTimeApplication&) = delete;			// Copy constructor
 	RealTimeApplication(RealTimeApplication&&) = delete;				// Move constructor
 	RealTimeApplication& operator=(const Application&) = delete;		// Copy assignment constructor
 	RealTimeApplication& operator=(RealTimeApplication&&) = delete;		// Move assignment constructor
+	~RealTimeApplication() = default;
 
 public:
+
+	virtual void HandleInput(float dt) = 0;
+	virtual void Process(float dt) = 0;
 
 	static const int Run()
 	{
@@ -189,8 +53,8 @@ public:
 			// WHY DID I DO THIS?
 			// I STILL DON'T KNOW, BUT IT'S BETTER TO START WITH THE HARD PART :D
 			Sleep(1);
-			HandleInput(dt);
-			Process(dt);
+			App.HandleInput(dt);
+			App.Process(dt);
 		}
 	}
 };

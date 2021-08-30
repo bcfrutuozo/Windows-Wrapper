@@ -1,4 +1,5 @@
-#include "TestApplication.h"
+#include "TestUserApplication.h"
+#include "TestRealTimeApplication.h"
 
 #ifdef _DEBUG
 #define _CRTDBG_MAP_ALLOC  
@@ -28,7 +29,7 @@ int CALLBACK WinMain(
 	try
 	{
 		SetProcessDPIAware();
-		ret = TestApplication::Run();
+		ret = TestRealTimeApplication::Run();
 	}
 	catch (const std::exception& e)
 	{

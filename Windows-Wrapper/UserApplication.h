@@ -13,16 +13,12 @@ private:
 
 protected:
 
-	UserApplication()
-	{ }
-
-	virtual ~UserApplication()
-	{ }
-
+	UserApplication() = default;
 	UserApplication(const UserApplication&) = delete;				// Copy constructor
 	UserApplication(UserApplication&&) = delete;					// Move constructor
 	UserApplication& operator=(const UserApplication&) = delete;	// Copy assignment constructor
 	UserApplication& operator=(UserApplication&&) = delete;			// Move assignment constructor
+	virtual ~UserApplication() = default
 
 public:
 
@@ -47,8 +43,6 @@ public:
 
 		return 0;
 	}
-
-	static double x;
 };
 
 template<typename T>

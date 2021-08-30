@@ -58,7 +58,7 @@
     <ClCompile Include="Padding.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="ProgressBar.cpp" />
-    <ClCompile Include="TestApplication.cpp" />
+    <ClCompile Include="TestUserApplication.cpp" />
     <ClCompile Include="ToolStrip.cpp" />
     <ClCompile Include="Label.cpp" />
     <ClCompile Include="Component.cpp" />
@@ -69,6 +69,7 @@
       <Filter>Events</Filter>
     </ClCompile>
     <ClCompile Include="Enumerator.cpp" />
+    <ClCompile Include="TestRealTimeApplication.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RealTimeApplication.h" />
@@ -189,7 +190,7 @@
     <ClInclude Include="Padding.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="ProgressBar.h" />
-    <ClInclude Include="TestApplication.h" />
+    <ClInclude Include="TestUserApplication.h" />
     <ClInclude Include="ToolStrip.h" />
     <ClInclude Include="Label.h" />
     <ClInclude Include="IDisposable.h">
@@ -225,6 +226,7 @@
       <Filter>Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="Enumerator.h" />
+    <ClInclude Include="TestRealTimeApplication.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interfaces">

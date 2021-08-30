@@ -4,16 +4,6 @@
 
 Application::WindowCollection Application::Windows;
 
-Application::Application()
-{
-
-}
-
-Application::~Application()
-{
-
-}
-
 void Application::AddWindow(Window* window)
 {
 	Windows.Add(window);

@@ -1,4 +1,4 @@
-#include "TestApplication.h"
+#include "TestUserApplication.h"
 #include "KeyEventArgs.h"
 #include "ToolStrip.h"
 #include "Color.h"
@@ -12,7 +12,7 @@ void TestClick(Object* sender, EventArgs* e)
 	b->Dispose();
 }
 
-void TestApplication::Initialize()
+void TestUserApplication::Initialize()
 {
 	Window* window = new Window("Teste", 1920, 1080);
 	AddWindow(window);

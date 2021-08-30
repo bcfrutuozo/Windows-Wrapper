@@ -15,12 +15,12 @@ protected:
 
 	static WindowCollection Windows;
 
-	Application();
-	~Application();
+	Application() = default;
 	Application(const Application&) = delete;				// Copy constructor
 	Application(Application&&) = delete;					// Move constructor
 	Application& operator=(const Application&) = delete;	// Copy assignment constructor
 	Application& operator=(Application&&) = delete;			// Move assignment constructor
+	~Application() = default;
 
 public:
 
