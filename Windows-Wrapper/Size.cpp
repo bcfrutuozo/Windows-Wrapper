@@ -52,12 +52,12 @@ Size Size::Add(Size lhs, Size rhs) noexcept
 
 Size Size::CeilingF(SizeF s) noexcept
 {
-	return Size(ceil(s.Width), ceil(s.Height));
+	return Size(static_cast<int>(ceil(s.Width)), static_cast<int>(ceil(s.Height)));
 }
 
 Size Size::RoundF(SizeF s) noexcept
 {
-	return Size(round(s.Width), round(s.Height));
+	return Size(static_cast<int>(round(s.Width)), static_cast<int>(round(s.Height)));
 }
 
 Size Size::Subtract(Size lhs, Size rhs) noexcept
@@ -67,7 +67,7 @@ Size Size::Subtract(Size lhs, Size rhs) noexcept
 
 Size Size::Truncate(SizeF s) noexcept
 {
-	return Size(trunc(s.Width), trunc(s.Height));
+	return Size(static_cast<int>(trunc(s.Width)), static_cast<int>(trunc(s.Height)));
 }
 
 Size Size::operator+(Size s) noexcept
@@ -84,7 +84,7 @@ Size Size::operator/(int i)
 Size Size::operator/(float f)
 {
 	assert(f != 0);
-	return Size(Width / f, Height / f);
+	return Size(static_cast<int>(static_cast<float>(Width) / f), static_cast<int>(static_cast<float>(Height) / f));
 }
 
 Size Size::operator*(int i) noexcept
@@ -171,7 +171,7 @@ PointF SizeF::ToPointF() noexcept
 
 Size SizeF::ToSize() noexcept
 {
-	return Size(Width, Height);
+	return Size(static_cast<int>(Width), static_cast<int>(Height));
 }
 
 SizeF SizeF::operator+(SizeF s) noexcept

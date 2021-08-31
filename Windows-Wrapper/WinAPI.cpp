@@ -54,10 +54,7 @@ int WinAPI::OnClosing_Impl(HWND hwnd) noexcept
 		if (GetType() == typeid(Window))
 		{
 			Dispose();
-			if (IsDisposing())
-			{
-				Application::ValidateWindows();
-			}
+			Application::RemoveWindow(dynamic_cast<Window*>(this));
 		}
 
 		Application::TryCloseApplication();
@@ -599,7 +596,7 @@ void WinAPI::Disable() noexcept
 	EnableWindow(static_cast<HWND>(Handle.ToPointer()), false);
 }
 
-void WinAPI::Update()
+void WinAPI::Update() const noexcept
 {
 	InvalidateRect(static_cast<HWND>(Handle.ToPointer()), nullptr, true);
 }

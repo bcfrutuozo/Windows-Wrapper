@@ -11,6 +11,9 @@ constexpr double PI_D = 3.1415926535897932;
 
 namespace Math
 {
+	static const XMVECTOR g_RayEpsilon = XMVectorSet(1e-20f, 1e-20f, 1e-20f, 1e-20f);
+	static const XMVECTOR g_RayNegEpsilon = XMVectorSet(-1e-20f, -1e-20f, -1e-20f, -1e-20f);
+
 	inline float Length(const XMFLOAT2& v)
 	{
 		return sqrtf(v.x * v.x + v.y * v.y);
@@ -226,11 +229,8 @@ namespace Math
 	//
 	//	Modified for Windows-Wrapper to return barycentrics
 	//-----------------------------------------------------------------------------
-		inline bool XM_CALLCONV RayTriangleIntersects(FXMVECTOR origin, FXMVECTOR direction, FXMVECTOR v0, GXMVECTOR v1, HXMVECTOR v2, float& distance, XMFLOAT2& bary)
+	inline bool XM_CALLCONV RayTriangleIntersects(FXMVECTOR origin, FXMVECTOR direction, FXMVECTOR v0, GXMVECTOR v1, HXMVECTOR v2, float& distance, XMFLOAT2& bary)
 	{
-		const XMVECTOR g_RayEpsilon = XMVectorSet(1e-20f, 1e-20f, 1e-20f, 1e-20f);
-		const XMVECTOR g_RayNegEpsilon = XMVectorSet(-1e-20f, -1e-20f, -1e-20f, -1e-20f);
-
 		XMVECTOR zero = XMVectorZero();
 
 		XMVECTOR e1 = XMVectorSubtract(v1, v0);

@@ -133,6 +133,11 @@ Control::Control() noexcept
 
 }
 
+Font Control::GetFont() const noexcept
+{
+	return m_Font;
+}
+
 Control::Control(Control* parent, const std::string& text) noexcept
 	:
 	Control(parent, text, 0, 0, 0, 0)
@@ -140,17 +145,23 @@ Control::Control(Control* parent, const std::string& text) noexcept
 
 }
 
+void Control::SetFont(Font font) noexcept
+{
+	m_Font = font;
+	Update();
+}
+
 Control::Control(Control* parent, const std::string& text, int width, int height, int x, int y) noexcept
 	:
-	Font("Segoe", 9.0f, false, false, false, false, GraphicsUnit::Point),		// Default application font for controls
+	m_Font("Segoe", 9, false, false, false, false, GraphicsUnit::Point),		// Default application font for controls
 	Parent(parent),
 	Text(text),
 	m_Size(width, height),
 	Location(x, y),
 	m_BackgroundColor(Color::Control()),
-	m_ForeColor(Color::Black()),
+	m_ForeColor(Color::WindowText()),
 	m_Padding(0),
-	m_Margin(0),
+	m_Margin(3, 3, 3, 3),	// Default margin for controls
 	m_TabIndex(m_IncrementalTabIndex++),
 	m_IsTabSelected(false),
 	m_MinSize(0u),
@@ -384,9 +395,9 @@ Control* Control::GetPreviousControl() noexcept
 {
 	if (const auto& root = dynamic_cast<Control*>(GetWindow()))
 	{
-		int searchIndex = m_TabIndex == 0 ? m_IncrementalTabIndex - 1 : m_TabIndex - 1;
+		auto searchIndex = m_TabIndex == 0 ? m_IncrementalTabIndex - 1 : m_TabIndex - 1;
 
-		for (int i = searchIndex; i >= 0; --i)
+		for (auto i = searchIndex; i >= 0; --i)
 		{
 			const auto& ret = root->GetByTabIndex(i);
 			if (ret != nullptr && ret->IsEnabled())
@@ -395,6 +406,9 @@ Control* Control::GetPreviousControl() noexcept
 			}
 		}
 	}
+
+	// Returning nullptr is extremely important, otherwise it will be a trash pointer and will launch an exception trying to process it
+	return nullptr;
 }
 
 bool Control::HasChildren() const noexcept
@@ -406,9 +420,9 @@ Control* Control::GetNextControl() noexcept
 {
 	if (const auto& root = dynamic_cast<Control*>(GetWindow()))
 	{
-		int searchIndex = m_TabIndex >= m_IncrementalTabIndex - 1 ? 0 : m_TabIndex + 1;
+		auto searchIndex = m_TabIndex >= m_IncrementalTabIndex - 1 ? 0 : m_TabIndex + 1;
 
-		for (int i = searchIndex; i < m_IncrementalTabIndex; ++i)
+		for (auto i = searchIndex; i < m_IncrementalTabIndex; ++i)
 		{
 			const auto& ret = root->GetByTabIndex(i);
 			if (ret != nullptr && ret->IsEnabled())
@@ -493,7 +507,7 @@ Size Control::CalculateSizeByFont() noexcept
 	if (m_Size.Height == 0)
 	{
 		int height = 5;
-		for (int i = 5, j = 0; i < Font.GetSizeInPixels(); ++i, ++j)
+		for (int i = 5, j = 0; i < m_Font.GetSizeInPixels(); ++i, ++j)
 		{
 			if (j == 2)
 			{
@@ -508,16 +522,22 @@ Size Control::CalculateSizeByFont() noexcept
 
 		// Size is always the default plus the calculated area size
 		r.Height = Font::DefaultHeight() + height;
+
+		// Adjust height margin
+		r.Height += m_Margin.Top + m_Margin.Bottom;
 	}
 
 	if (m_Size.Width == 0)
 	{
 		SIZE s;
 		HDC hdc = GetDC(static_cast<HWND>(GetWindow()->Handle.ToPointer()));
-		GetTextExtentPoint32(hdc, Text.c_str(), Text.length(), &s);
+		GetTextExtentPoint32(hdc, Text.c_str(), static_cast<int>(Text.length()), &s);
 		ReleaseDC(static_cast<HWND>(GetWindow()->Handle.ToPointer()), hdc);
 		DeleteDC(hdc);
 		r.Width = s.cx;
+
+		// Adjust width margin
+		r.Width += m_Margin.Left + m_Margin.Right;
 	}
 
 	return r;
@@ -557,7 +577,7 @@ Window* Control::GetWindow() noexcept
 }
 
 // Exceptions
-const std::string& Control::ControlException::TranslateErrorCode(HRESULT hr) noexcept
+const std::string Control::ControlException::TranslateErrorCode(HRESULT hr) noexcept
 {
 	char* pMessageBuffer = nullptr;
 
@@ -618,7 +638,7 @@ HRESULT Control::HRException::GetErrorCode() const noexcept
 	return hr;
 }
 
-const std::string& Control::HRException::GetErrorDescription() const noexcept
+const std::string Control::HRException::GetErrorDescription() const noexcept
 {
 	return ControlException::TranslateErrorCode(hr);
 }

@@ -4,6 +4,14 @@
 
 class Application
 {
+	friend class Window;
+	friend class WinAPI;
+
+private:
+
+	static void AddWindow(Window* window);
+	static bool RemoveWindow(Window* window);
+
 public:
 
 	class WindowCollection final : public Collection<Window>
@@ -24,8 +32,6 @@ protected:
 
 public:
 
-	void AddWindow(Window* window);
-	static bool ValidateWindows();
 	virtual void Initialize() = 0;
 	static void TryCloseApplication() noexcept;
 	static void Exit() noexcept;

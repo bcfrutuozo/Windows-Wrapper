@@ -61,7 +61,7 @@ private:
 
 protected:
 
-	void Initialize() noexcept override;
+	void Initialize() override;
 
 public:
 
@@ -82,18 +82,17 @@ public:
 	void UpdateMenuStrip() noexcept;
 	//MenuBar& GetMenuStrip() noexcept;
 
-	// Buttons
-	Button& AddButton(const std::string& name, int width, int height, int x, int y) noexcept;
-	TextBox& AddTextBox(const std::string& name, int width, int x, int y) noexcept;
-	ProgressBar& AddProgressBar(int width, int height, int x, int y) noexcept;
-	ProgressBar& AddProgressBar(const std::string& text, int width, int height, int x, int y) noexcept;
-	ToolStrip& AddToolStrip() noexcept;
-	Label& AddLabel(const std::string& text, int x, int y) noexcept;
+	Button* AddButton(const std::string& name, int width, int height, int x, int y) noexcept;
+	TextBox* AddTextBox(const std::string& name, int width, int x, int y) noexcept;
+	ProgressBar* AddProgressBar(int width, int height, int x, int y) noexcept;
+	ProgressBar* AddProgressBar(const std::string& text, int width, int height, int x, int y) noexcept;
+	ToolStrip* AddToolStrip() noexcept;
+	Label* AddLabel(const std::string& text, int x, int y) noexcept;
 
 	void SetText(const std::string& text);
 	void EnableCursor() noexcept;
 	void DisableCursor() noexcept;
 	bool IsCursorEnabled() const noexcept;
-	Keyboard& GetKeyboard() noexcept;
-	Mouse& GetMouse() noexcept;
+	Keyboard& GetKeyboard() const;
+	Mouse& GetMouse() const;
 };

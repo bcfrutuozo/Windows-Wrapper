@@ -74,13 +74,13 @@ private:
 
 public:
 
-	BorderStyle BorderStyle = BorderStyle::Fixed3D;
+	BorderStyle BorderStyle;
 
 	TextBox(Control* parent, int width, int x, int y);
 	TextBox(Control* parent, const std::string& name, int width, int x, int y);
 	virtual ~TextBox();
 
-	int GetSelectionLenght() const noexcept;
+	size_t GetSelectionLenght() const noexcept;
 	std::string GetSelectedText() const noexcept;
 	void Hide() override;
 	void Initialize() override;

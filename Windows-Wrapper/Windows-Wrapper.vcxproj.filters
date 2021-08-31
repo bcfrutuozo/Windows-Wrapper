@@ -227,6 +227,7 @@
     </ClInclude>
     <ClInclude Include="Enumerator.h" />
     <ClInclude Include="TestRealTimeApplication.h" />
+    <ClInclude Include="FlatButtonAppearance.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interfaces">

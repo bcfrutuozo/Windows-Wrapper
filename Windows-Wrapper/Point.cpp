@@ -55,7 +55,7 @@ Point Point::Add(Point p, Size s) noexcept
 
 Point Point::CeilingF(PointF p) noexcept
 {
-	return Point(ceil(p.X), ceil(p.Y));
+	return Point(static_cast<int>(ceil(p.X)), static_cast<int>(ceil(p.Y)));
 }
 
 Point Point::Offset(int x, int y) noexcept
@@ -70,7 +70,7 @@ Point Point::Offset(Point p) noexcept
 
 Point Point::RoundF(PointF p) noexcept
 {
-	return Point(round(p.X), round(p.Y));
+	return Point(static_cast<int>(round(p.X)), static_cast<int>(round(p.Y)));
 }
 
 Point Point::Subtract(Point p, Size s) noexcept
@@ -80,7 +80,7 @@ Point Point::Subtract(Point p, Size s) noexcept
 
 Point Point::Truncate(PointF p) noexcept
 {
-	return Point(trunc(p.X), trunc(p.Y));
+	return Point(static_cast<int>(trunc(p.X)), static_cast<int>(trunc(p.Y)));
 }
 
 Point Point::operator+(Size s) noexcept
@@ -124,17 +124,17 @@ const bool PointF::IsEmpty() const noexcept
 
 PointF PointF::Add(Point p, Size s) noexcept
 {
-	return PointF(p.X + s.Width, p.Y + s.Height);
+	return PointF(static_cast<float>(p.X + s.Width), static_cast<float>(p.Y + s.Height));
 }
 
 PointF PointF::Add(Point p, SizeF s) noexcept
 {
-	return PointF(p.X + s.Width, p.Y + s.Height);
+	return PointF(static_cast<float>(p.X) + s.Width, static_cast<float>(p.Y) + s.Height);
 }
 
 PointF PointF::Subtract(PointF p, Size s) noexcept
 {
-	return PointF(p.X - s.Width, p.Y - s.Height);
+	return PointF(p.X - static_cast<float>(s.Width), p.Y - static_cast<float>(s.Height));
 }
 
 PointF PointF::Subtract(PointF p, SizeF s) noexcept

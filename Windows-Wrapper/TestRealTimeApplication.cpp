@@ -130,10 +130,8 @@ void TestRealTimeApplication::Process(float dt)
 void TestRealTimeApplication::Initialize()
 {
 	Window* window = new Window("Teste", 1920, 1080);
-	AddWindow(window);
 	Window* window2 = new Window("Oieee", 500, 500);
-	AddWindow(window2);
-	window2->AddButton("Boiolaaaa", 250, 250, 125, 125);
+	window2->AddButton("Button2", 250, 250, 125, 125);
 
 	//ToolStrip& p = window->AddToolStrip();
 	//ToolStrip& j = window->AddToolStrip();
@@ -173,28 +171,27 @@ void TestRealTimeApplication::Initialize()
 	//menu1.OnClickSet(&TestClick);
 	//menu2.OnClickSet(&TestClick);
 
-	button1 = &window->AddButton("Abc", 200, 80, 50, 100);
+	button1 = window->AddButton("Abc", 200, 80, 50, 100);
 	button1->OnMouseEnterSet([](Object* sender, EventArgs* e)
 		{
-			OutputDebugString("Teste Mouseenter Button1");
+			printf_s("Teste Mouseenter Button1");
 		}
 	);
 	button1->OnMouseLeaveSet([](Object* sender, EventArgs* e)
 		{
-			OutputDebugString("Teste Mouseleave Button1");
+			printf_s("Teste Mouseleave Button1");
 		}
 	);
 
-	button2 = &window->AddButton("XYZ", 100, 40, 200, 200);
+	button2 = window->AddButton("XYZ", 100, 40, 200, 200);
 	button2->OnClickSet([](Object* sender, EventArgs* e)
 		{
 			Button* b = (Button*)sender;
 			b->Dispose();
 		}
 	);
-	button2->Font.SetStyle(FontStyle::Strikeout);
 
-	txtBox1 = &window->AddTextBox("TextBox", 400, 20, 400);
+	txtBox1 = window->AddTextBox("TextBox", 400, 20, 400);
 	txtBox1->BorderStyle = BorderStyle::None;
 	txtBox1->OnKeyPressSet([](Object* sender, KeyPressEventArgs* e)
 		{
@@ -211,7 +208,7 @@ void TestRealTimeApplication::Initialize()
 		}
 	);
 
-	txtBox2 = &window->AddTextBox("TextBox2", 400, 20, 460);
+	txtBox2 = window->AddTextBox("TextBox2", 400, 20, 460);
 	txtBox2->BorderStyle = BorderStyle::FixedSingle;
 	txtBox2->OnKeyPressSet([](Object* sender, KeyPressEventArgs* e)
 		{
@@ -228,7 +225,7 @@ void TestRealTimeApplication::Initialize()
 		}
 	);
 
-	txtBox3 = &window->AddTextBox("TextBox3", 400, 20, 560);
+	txtBox3 = window->AddTextBox("TextBox3", 400, 20, 560);
 	txtBox3->BorderStyle = BorderStyle::Fixed3D;
 	txtBox3->OnKeyPressSet([](Object* sender, KeyPressEventArgs* e)
 		{
@@ -245,5 +242,5 @@ void TestRealTimeApplication::Initialize()
 		}
 	);
 
-	progressBar = &window->AddProgressBar("abc", 300, 50, 400, 20);
+	progressBar = window->AddProgressBar("abc", 300, 50, 400, 20);
 }

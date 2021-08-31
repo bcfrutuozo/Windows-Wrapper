@@ -9,43 +9,22 @@ void Application::AddWindow(Window* window)
 	Windows.Add(window);
 }
 
-bool Application::ValidateWindows()
+bool Application::RemoveWindow(Window* window)
 {
-	// COMPLETE UNOPTIMIZED!
-	// NEED TO IMPLEMENT A FASTER WAY TO HANDLE THIS
-	std::stack<Window*> s;
-
-	for (const auto w : Windows)
+	if (Windows.Contains(window) && window->IsDisposing())
 	{
-		if (w->IsDisposing())
-		{
-			s.push(w);
-		}
+		return Windows.Remove(window);
 	}
 
-	if (s.empty())
-	{
-		return true;
-	}
-	
-	while (!s.empty())
-	{
-		auto& w = s.top();
-		Windows.Remove(w);
-		s.pop();
-	}
-
-	return true;
+	return false;
 }
 
 void Application::TryCloseApplication() noexcept
 {
-	if (Windows.GetCount() > 0)
+	if (Windows.IsEmpty())
 	{
-		return;
-	}
-
-	PostQuitMessage(0);
+		PostQuitMessage(0);
+	}	
 }
 
 void Application::Exit() noexcept

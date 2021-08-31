@@ -412,7 +412,7 @@ void TextBox::OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) n
 void TextBox::OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept
 {
 	// Create a solid black caret. 
-	CreateCaret(hwnd, (HBITMAP)NULL, 2, Font.GetSizeInPixels());
+	CreateCaret(hwnd, (HBITMAP)NULL, 2, m_Font.GetSizeInPixels());
 	EnableCaret();
 	InputRedraw(hwnd);
 
@@ -560,7 +560,7 @@ void TextBox::PrintDebug() const noexcept
 	oss << "  Text: ";
 	for (int i = 0; i < Text.size(); ++i) oss << " " << Text[i] << " ";
 	oss << "\\0" << std::endl;
-	OutputDebugString(oss.str().c_str());
+	printf_s(oss.str().c_str());
 }
 
 void TextBox::InputDelete(HWND hWnd, DeleteInputType deleteType) noexcept
@@ -669,9 +669,20 @@ void TextBox::InputDraw(HWND hWnd, HDC& hdc) noexcept
 	HBITMAP hbmMem = CreateCompatibleBitmap(hdc, m_Size.Width, m_Size.Height);
 	HBITMAP hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
 
-	HFONT hFont = CreateFont(Font.GetSizeInPixels(), 0, 0, 0, Font.IsBold() ? FW_BOLD : FW_NORMAL, Font.IsItalic(), Font.IsUnderline(), Font.IsStrikeOut(), ANSI_CHARSET,
-		OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
-		DEFAULT_PITCH | FF_DONTCARE, Font.GetName().c_str());
+	HFONT hFont = CreateFont(m_Font.GetSizeInPixels(), 
+		0, 
+		0, 
+		0, 
+		m_Font.IsBold() ? FW_BOLD : FW_NORMAL, 
+		m_Font.IsItalic(), 
+		m_Font.IsUnderline(), 
+		m_Font.IsStrikeOut(),
+		ANSI_CHARSET,
+		OUT_TT_PRECIS, 
+		CLIP_DEFAULT_PRECIS, 
+		DEFAULT_QUALITY,
+		DEFAULT_PITCH | FF_DONTCARE, 
+		m_Font.GetName().c_str());
 
 	RECT r, cr;
 	GetClientRect(hWnd, &cr);
@@ -777,7 +788,7 @@ void TextBox::InputDraw(HWND hWnd, HDC& hdc) noexcept
 	cr.bottom -= m_Margin.Bottom;
 
 	// Adjust text in center based on default TextBox size with font size as 1
-	int spacingForAlignment = cr.bottom - Font.GetSizeInPixels();
+	int spacingForAlignment = cr.bottom - m_Font.GetSizeInPixels();
 	cr.top += (spacingForAlignment / 2) - 4;	// 4 Pixels extra for small TextBox and underline characteres
 
 	// BOTTOM ALIGNMENT
@@ -795,7 +806,7 @@ void TextBox::InputDraw(HWND hWnd, HDC& hdc) noexcept
 		SetBkMode(hdcMem, TRANSPARENT);
 		SetTextColor(hdcMem, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
 		DrawText(hdcMem, Text.c_str(), -1, &r, DT_LEFT | DT_VCENTER);
-		DrawText(hdcMem, Text.c_str(), m_CursorIndex, &r, DT_LEFT | DT_VCENTER | DT_CALCRECT);
+		DrawText(hdcMem, Text.c_str(), static_cast<int>(m_CursorIndex), &r, DT_LEFT | DT_VCENTER | DT_CALCRECT);
 
 		if (m_CursorIndex == 0)
 		{
@@ -870,29 +881,29 @@ void TextBox::PaintSelection(HDC& hdc, RECT& r, size_t start, size_t end) const 
 
 	if (start != 0)
 	{
-		GetTextExtentPoint32(hdc, Text.substr(0, start).c_str(), start, &s);
+		GetTextExtentPoint32(hdc, Text.substr(0, start).c_str(), static_cast<int>(start), &s);
 		SetBkMode(hdc, TRANSPARENT);
 		SetBkColor(hdc, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
 		SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-		TextOut(hdc, r.left, r.top, Text.substr(0, start).c_str(), start);
+		TextOut(hdc, r.left, r.top, Text.substr(0, start).c_str(), static_cast<int>(start));
 		currentX += s.cx;
 	}
 
-	GetTextExtentPoint32(hdc, Text.substr(start, end - start).c_str(), end - start, &s);
+	GetTextExtentPoint32(hdc, Text.substr(start, end - start).c_str(), static_cast<int>(end - start), &s);
 	SetBkMode(hdc, OPAQUE);
 	SetBkColor(hdc, RGB(0, 120, 215));
 	SetTextColor(hdc, RGB(255, 255, 255));
-	TextOut(hdc, r.left + currentX, r.top, Text.substr(start, end - start).c_str(), end - start);
+	TextOut(hdc, r.left + currentX, r.top, Text.substr(start, end - start).c_str(), static_cast<int>(end - start));
 	currentX += s.cx;
 	r.right = currentX;
 
 	if (end != Text.length())
 	{
-		GetTextExtentPoint32(hdc, Text.substr(end, Text.length() - end).c_str(), Text.length() - end, &s);
+		GetTextExtentPoint32(hdc, Text.substr(end, Text.length() - end).c_str(), static_cast<int>(Text.length() - end), &s);
 		SetBkMode(hdc, TRANSPARENT);
 		SetBkColor(hdc, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
 		SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-		TextOut(hdc, r.left + currentX, r.top, Text.substr(end, Text.length() - end).c_str(), Text.length() - end);
+		TextOut(hdc, r.left + currentX, r.top, Text.substr(end, Text.length() - end).c_str(), static_cast<int>(Text.length() - end));
 	}
 }
 
@@ -910,7 +921,8 @@ TextBox::TextBox(Control* parent, const std::string& name, int width, int x, int
 	m_CursorIndex(Text.length()),
 	m_IsCaretVisible(false),
 	m_IsMultiline(false),
-	m_MaximumLenght(32767)
+	m_MaximumLenght(32767),
+	BorderStyle(BorderStyle::Fixed3D)
 {
 	Initialize();
 }
@@ -929,10 +941,10 @@ void TextBox::Initialize()
 		WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPSIBLINGS | SS_LEFT,										// Style values
 		Location.X,																							// X position
 		Location.Y,																							// Y position
-		m_Size.Width,																							// Width
+		m_Size.Width,																						// Width
 		m_Size.Height,																						// Height
 		static_cast<HWND>(Parent->Handle.ToPointer()),														// Parent handle
-		(HMENU)GetId(),						                												// Menu handle
+		(HMENU)GetId(),						                								// Menu handle
 		TextBoxClass::GetInstance(),																		// Module instance handle
 		this																								// Pointer to the button instance to work along with HandleMessageSetup function.
 	);
@@ -943,13 +955,11 @@ void TextBox::Initialize()
 	}
 
 	// Set default TextBox margin to 3 pixels
-	m_Margin = 3;
 	m_BackgroundColor = Color::Window();
-	m_ForeColor = Color::WindowText();
 	m_Size = CalculateSizeByFont();
 }
 
-int TextBox::GetSelectionLenght() const noexcept
+size_t TextBox::GetSelectionLenght() const noexcept
 {
 	if (m_CursorIndex < m_SelectIndex)
 	{

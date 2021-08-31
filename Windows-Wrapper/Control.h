@@ -78,6 +78,7 @@ protected:
 	Color m_BackgroundColor;
 	Padding m_Margin;
 	Padding m_Padding;
+	Font m_Font;
 	unsigned int m_MinSize;
 
 	// Forces the implementation and call on individual childs because each WinApi control
@@ -86,16 +87,14 @@ protected:
 	virtual void Initialize() = 0;
 
 	template<typename T, typename... Args>
-	T& Create(Args... a)
+	T* Create(Args... a)
 	{
 		T* item = new T(a...);
 		Controls.Add(item);
-		return dynamic_cast<T&>(*item);
+		return item;
 	}
 
 public:
-
-	Font Font;
 
 	class ControlCollection : public Collection<Control>
 	{
@@ -155,13 +154,15 @@ public:
 	Control* GetByHandle(const IntPtr p) noexcept;
 	int GetTabIndex() const noexcept;
 	void SetTabIndex(const unsigned int& index) noexcept;
+	Font GetFont() const noexcept;
+	void SetFont(Font font) noexcept;
 
 	// Control Exception
 	class ControlException : public Exception
 	{
 	public:
 
-		static const std::string& TranslateErrorCode(HRESULT hr) noexcept;
+		static const std::string TranslateErrorCode(HRESULT hr) noexcept;
 	};
 
 	// HRException
@@ -178,6 +179,6 @@ public:
 		const char* what() const noexcept override;
 		const char* GetType() const noexcept;
 		HRESULT GetErrorCode() const noexcept;
-		const std::string& GetErrorDescription() const noexcept;
+		const std::string GetErrorDescription() const noexcept;
 	};
 };

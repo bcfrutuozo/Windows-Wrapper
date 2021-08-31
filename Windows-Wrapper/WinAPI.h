@@ -127,5 +127,5 @@ public:
 	bool IsClicking() const noexcept;
 	void Enable() noexcept;
 	void Disable() noexcept;
-	virtual void Update();
+	virtual void Update() const noexcept;
 };

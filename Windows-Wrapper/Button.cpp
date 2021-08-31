@@ -32,17 +32,6 @@ HINSTANCE Button::ButtonClass::GetInstance() noexcept
 	return m_ButtonClass.m_Instance;
 }
 
-Button::FlatButtonAppearance::FlatButtonAppearance()
-	:
-	BorderColor(Color::Border()),
-	BorderSize(1),
-	CheckedBackColor(Color::Default()),
-	MouseDownBackColor(Color(204, 228, 247, 255)),
-	MouseOverBackColor(Color(229, 241, 251, 255))
-{
-
-};
-
 int Button::OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept
 {
 	return 1;	// To avoid flickering
@@ -93,7 +82,7 @@ void Button::OnPaint_Impl(HWND hwnd) noexcept
 
 	// ONLY STANDARD BUTTON TYPE IS IMPLEMENTED
 	// NEED TO DRAW FLAT, POPUP AND SYSTEM STYLES
-	switch (FlatStyle)
+	switch (m_FlatStyle)
 	{
 	case FlatStyle::Flat:
 	{
@@ -325,13 +314,22 @@ void Button::OnPaint_Impl(HWND hwnd) noexcept
 
 	//FillRect(hdc, &rc, m_Brush);
 
-
-
 	SetBkMode(hdcMem, TRANSPARENT);
 	SetTextColor(hdcMem, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-	HFONT hFont = CreateFont(Font.GetSizeInPixels(), 0, 0, 0, Font.IsBold() ? FW_BOLD : FW_NORMAL, Font.IsItalic(), Font.IsUnderline(), Font.IsStrikeOut(), ANSI_CHARSET,
-		OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
-		DEFAULT_PITCH | FF_DONTCARE, Font.GetName().c_str());
+	HFONT hFont = CreateFont(m_Font.GetSizeInPixels(),
+		0,
+		0, 
+		0, 
+		m_Font.IsBold() ? FW_BOLD : FW_NORMAL, 
+		m_Font.IsItalic(), 
+		m_Font.IsUnderline(), 
+		m_Font.IsStrikeOut(), 
+		ANSI_CHARSET,
+		OUT_TT_PRECIS, 
+		CLIP_DEFAULT_PRECIS, 
+		DEFAULT_QUALITY,
+		DEFAULT_PITCH | FF_DONTCARE, 
+		m_Font.GetName().c_str());
 	SelectObject(hdcMem, hFont);
 	DrawText(hdcMem, GetText().c_str(), -1, &rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	DeleteObject(hFont);
@@ -356,8 +354,8 @@ void Button::OnPaint_Impl(HWND hwnd) noexcept
 Button::Button(Control* parent, const std::string& name, int width, int height, int x, int y)
 	:
 	Control(parent, name, width, height, x, y),
-	FlatStyle(FlatStyle::Standard),
-	FlatAppearance()
+	m_FlatStyle(FlatStyle::Standard),
+	m_FlatAppearance()
 {
 	Initialize();
 }
@@ -406,4 +404,26 @@ void Button::Show()
 		IsVisible = true;
 		ShowWindow(static_cast<HWND>(Handle.ToPointer()), SW_SHOWDEFAULT);
 	}
+}
+
+FlatButtonAppearance Button::GetFlatButtonAppearance() const noexcept
+{
+	return m_FlatAppearance;
+}
+
+void Button::SetFlatButtonAppearance(FlatButtonAppearance appearance) noexcept
+{
+	m_FlatAppearance = appearance;
+	Update();
+}
+
+FlatStyle Button::GetFlatStyle() const noexcept
+{
+	return m_FlatStyle;
+}
+
+void Button::SetFlatStyle(FlatStyle style) noexcept
+{
+	m_FlatStyle = style;
+	Update();
 }

@@ -15,7 +15,11 @@ int CALLBACK WinMain(
 	_In_ int nCmdShow)
 {
 #ifdef _DEBUG
+	FILE* fp;
 	AllocConsole();
+	freopen_s(&fp, "CONIN$", "r", stdin);
+	freopen_s(&fp, "CONOUT$", "w", stdout);
+	freopen_s(&fp, "CONOUT$", "w", stderr);
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
 	_CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDERR);
 	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_FILE);
@@ -29,7 +33,7 @@ int CALLBACK WinMain(
 	try
 	{
 		SetProcessDPIAware();
-		ret = TestRealTimeApplication::Run();
+		ret = TestUserApplication::Run();
 	}
 	catch (const std::exception& e)
 	{
@@ -43,7 +47,14 @@ int CALLBACK WinMain(
 	}
 
 #ifdef _DEBUG
-	_CrtDumpMemoryLeaks();
+	if (_CrtDumpMemoryLeaks() == TRUE)
+	{
+		printf_s("OHHHH NEIN... Memory leak was detected!");
+	}
+	else
+	{
+		printf_s("No leaks detected! Press any key to close the application...");
+	}
 	while (!_kbhit());
 #endif
 

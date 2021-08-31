@@ -88,12 +88,12 @@ private:
 	void OnMouseLeave() noexcept;
 	void OnMouseEnter() noexcept;
 	void OnRawDelta(int dx, int dy) noexcept;
-	void OnLeftPressed(int x, int y) noexcept;
-	void OnLeftReleased(int x, int y) noexcept;
-	void OnRightPressed(int x, int y) noexcept;
-	void OnRightReleased(int x, int y) noexcept;
-	void OnWheelUp(int x, int y) noexcept;
-	void OnWheelDown(int x, int y) noexcept;
+	void OnLeftPressed() noexcept;
+	void OnLeftReleased() noexcept;
+	void OnRightPressed() noexcept;
+	void OnRightReleased() noexcept;
+	void OnWheelUp() noexcept;
+	void OnWheelDown() noexcept;
 	void TrimBuffer() noexcept;
 	void TrimRawInputBuffer() noexcept;
 	void OnWheelDelta(int x, int y, int delta) noexcept;

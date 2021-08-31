@@ -6,6 +6,9 @@ class Label final : public Control
 {
 private:
 
+	BorderStyle m_BorderStyle;
+	FlatStyle m_FlatStyle;
+
 	// Singleton manages registration/cleanup of window class
 	class LabelClass
 	{
@@ -28,13 +31,15 @@ private:
 
 	virtual void OnPaint_Impl(HWND hwnd) noexcept override;
 
-protected:
-
 public:
 
 	Label(Control* parent, const std::string& text, int x, int y);
 	virtual ~Label() = default;
 
 	void Initialize() override;
+	BorderStyle GetBorderStyle() const noexcept;
+	void SetBorderStyle(BorderStyle style) noexcept;
+	FlatStyle GetFlatStyle() const noexcept;
+	void SetFlatStyle(FlatStyle style) noexcept;
 };
 

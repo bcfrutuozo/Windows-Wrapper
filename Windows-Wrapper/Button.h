@@ -2,12 +2,16 @@
 
 #include "IHidable.h"
 #include "Control.h"
+#include "FlatButtonAppearance.h"
 
 class Button final: public Control, public IHidable
 {
 	friend class WinAPI;
 
 private:
+
+	FlatButtonAppearance m_FlatAppearance;
+	FlatStyle m_FlatStyle;
 
 	// Singleton manages registration/cleanup of window class
 	class ButtonClass
@@ -36,37 +40,15 @@ private:
 
 public:
 
-	class FlatButtonAppearance : public Object
-	{
-	public:
-
-		// Gets or sets the color of the border around the button.
-		Color BorderColor;
-
-		// Gets or sets a value that specifies the size, in pixels, of the border around the button.
-		int BorderSize;
-
-		// Gets or sets the color of the client area of the button when the button is checked and the mouse pointer is outside the bounds of the control.
-		Color CheckedBackColor;
-
-		// Gets or sets the color of the client area of the button when the mouse is pressed within the bounds of the control.
-		Color MouseDownBackColor;
-
-		// Gets or sets the color of the client area of the button when the mouse pointer is within the bounds of the control.
-		Color MouseOverBackColor;
-
-		FlatButtonAppearance();
-		virtual ~FlatButtonAppearance() = default;
-	};
-
-	FlatButtonAppearance FlatAppearance;
-	FlatStyle FlatStyle;
-
 	Button(Control* parent, const std::string& name, int width, int height, int x, int y);
 	virtual ~Button();
 
 	void Hide() override;
 	void Initialize() override;
 	void Show() override;
+	FlatButtonAppearance GetFlatButtonAppearance() const noexcept;
+	void SetFlatButtonAppearance(FlatButtonAppearance appearance) noexcept;
+	FlatStyle GetFlatStyle() const noexcept;
+	void SetFlatStyle(FlatStyle style) noexcept;
 };
 

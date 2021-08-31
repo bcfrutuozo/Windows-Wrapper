@@ -37,9 +37,19 @@ void ToolStrip::OnPaint_Impl(HWND hWnd) noexcept
 	PAINTSTRUCT ps;
 	BeginPaint(hWnd, &ps);
 
-	HFONT hFont = CreateFont(Font.GetSizeInPixels(), 0, 0, 0, Font.IsBold() ? FW_BOLD : FW_NORMAL, Font.IsItalic(), Font.IsUnderline(), Font.IsStrikeOut(), ANSI_CHARSET,
-		OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
-		DEFAULT_PITCH | FF_DONTCARE, Font.GetName().c_str());
+	HFONT hFont = CreateFont(m_Font.GetSizeInPixels(),
+		0, 
+		0, 
+		0, 
+		m_Font.IsBold() ? FW_BOLD : FW_NORMAL, 
+		m_Font.IsItalic(), 
+		m_Font.IsUnderline(), 
+		m_Font.IsStrikeOut(),
+		ANSI_CHARSET,
+		OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS,
+		DEFAULT_QUALITY,
+		DEFAULT_PITCH | FF_DONTCARE,
+		m_Font.GetName().c_str());
 
 	SendMessage(hWnd, WM_SETFONT, (WPARAM)hFont, TRUE);
 

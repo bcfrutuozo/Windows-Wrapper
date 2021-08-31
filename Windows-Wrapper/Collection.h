@@ -64,150 +64,6 @@ private:
 		return true;
 	}
 
-protected:
-
-	Enumerator* pNext;
-
-public:
-
-	IEnumerator* GetEnumerator() const noexcept override
-	{
-		return pNext;
-	}
-
-	Collection()
-		:
-		Collection(nullptr)
-	{ }
-
-	Collection(T* owner)
-		:
-		Owner(owner),
-		pNext(nullptr)
-	{ }
-
-	Collection(const Collection& src)
-	{
-		*this = src;
-	}
-
-	Collection& operator=(const Collection& src)
-	{
-		if (&src != this)
-		{
-			if (!this->IsEmpty())
-			{
-				delete pNext;
-				pNext = nullptr;
-			}
-
-			if (!src.IsEmpty())
-			{
-				pNext = new Enumerator(*src.pNext);
-			}
-		}
-		return *this;
-	}
-
-	T* operator[](size_t i) const noexcept
-	{
-		assert(i < this->Count);
-
-		auto e = pNext->Begin;
-		if (i == 0)
-		{
-			return dynamic_cast<T*>(e->GetCurrent());
-		}
-
-		for (size_t p = 0; p < i; ++p, e = e->Next)
-		{
-			if (p == i)
-			{
-				return dynamic_cast<T*>(e->GetCurrent());
-			}
-		}
-	}
-
-	virtual ~Collection()
-	{
-		if (Owner != nullptr)
-		{
-			Owner = nullptr;
-		}
-
-		Clear();
-	}
-
-	void Add(T* const item) noexcept override
-	{
-		if (this->Count == 0)
-		{
-			pNext = new Enumerator(item);
-		}
-		else
-		{
-			auto p = new Enumerator(item, pNext, nullptr);
-			pNext->Next = p;
-			pNext = p;
-		}
-
-		++this->Count;
-	}
-
-	bool Remove(T* const item) noexcept override
-	{
-		Enumerator* search = pNext;
-
-		while (search != nullptr)
-		{
-			if (search->GetCurrent() == item)
-			{
-				return Remove(search);
-			}
-			else
-			{
-				search = search->Prior;
-			}
-		}
-
-		return false;
-	}
-
-	void Clear() noexcept override
-	{
-		if (this->Count == 0)
-		{
-			return;
-		}
-
-		while (pNext != nullptr)
-		{
-			Enumerator* temp = nullptr;
-			if (pNext->Prior != nullptr)
-			{
-				temp = pNext->Prior;
-			}
-
-			Remove(pNext);
-			pNext = temp;
-		}
-	}
-
-	bool Contains(T* const item) const noexcept override
-	{
-		Enumerator* search = pNext;
-
-		while (search != nullptr)
-		{
-			if (search->GetCurrent() == item)
-			{
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	class Iterator
 	{
 	private:
@@ -290,8 +146,155 @@ public:
 		}
 	};
 
+protected:
+
+	Enumerator* pNext;
+
+public:
+
 	Iterator begin() { return{ this->Count == 0 ? nullptr : pNext->Begin }; }
 	Iterator end() { return{}; }
 	ConstIterator begin() const { return{ this->Count == 0 ? nullptr : pNext->Begin }; }
 	ConstIterator end() const { return{}; }
+
+	IEnumerator* GetEnumerator() const noexcept override
+	{
+		return pNext;
+	}
+
+	Collection()
+		:
+		Collection(nullptr)
+	{ }
+
+	Collection(T* owner)
+		:
+		Owner(owner),
+		pNext(nullptr)
+	{ }
+
+	Collection(const Collection& src)
+	{
+		*this = src;
+	}
+
+	Collection& operator=(const Collection& src)
+	{
+		if (&src != this)
+		{
+			if (!this->IsEmpty())
+			{
+				delete pNext;
+				pNext = nullptr;
+			}
+
+			if (!src.IsEmpty())
+			{
+				pNext = new Enumerator(*src.pNext);
+			}
+		}
+		return *this;
+	}
+
+	T* operator[](size_t index) const
+	{
+		if (index >= this->Count)
+		{
+			throw std::out_of_range("Invalid Enumerator range");
+		}
+
+		auto e = pNext->Begin;
+		T* r = nullptr;
+		
+		for (size_t i = 0; i < index; ++i, e = e->Next)
+		{
+			if (i == index)
+			{
+				r = dynamic_cast<T*>(e->GetCurrent());
+				break;
+			}
+		}
+
+		return r;
+	}
+
+	virtual ~Collection()
+	{
+		if (Owner != nullptr)
+		{
+			Owner = nullptr;
+		}
+
+		Clear();
+	}
+
+	void Add(T* const item) noexcept override
+	{
+		if (this->Count == 0)
+		{
+			pNext = new Enumerator(item);
+		}
+		else
+		{
+			auto p = new Enumerator(item, pNext, nullptr);
+			pNext->Next = p;
+			pNext = p;
+		}
+
+		++this->Count;
+	}
+
+	bool Remove(T* const item) noexcept override
+	{
+		Enumerator* search = pNext;
+
+		while (search != nullptr)
+		{
+			if (search->GetCurrent() == item)
+			{
+				return Remove(search);
+			}
+			else
+			{
+				search = search->Prior;
+			}
+		}
+
+		return false;
+	}
+
+	void Clear() noexcept override
+	{
+		if (this->Count == 0)
+		{
+			return;
+		}
+
+		while (pNext != nullptr)
+		{
+			Enumerator* temp = nullptr;
+			if (pNext->Prior != nullptr)
+			{
+				temp = pNext->Prior;
+			}
+
+			Remove(pNext);
+			pNext = temp;
+		}
+	}
+
+	bool Contains(T* const item) const noexcept override
+	{
+		Enumerator* search = pNext;
+
+		while (search != nullptr)
+		{
+			if (search->GetCurrent() == item)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
 };

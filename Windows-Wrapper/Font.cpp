@@ -1,26 +1,25 @@
 #include "Font.h"
 
-float Font::PixelToPoint(float sizeInPixels) const noexcept
+int Font::PixelToPoint(int sizeInPixels) noexcept
 {
-	HDC hdc = CreateCompatibleDC(0);
-	float value = std::abs(static_cast<float>(MulDiv(sizeInPixels, 72, GetDeviceCaps(hdc, LOGPIXELSY))));
+	HDC hdc = CreateCompatibleDC(nullptr);
+	int value = std::abs(MulDiv(sizeInPixels, 72, GetDeviceCaps(hdc, LOGPIXELSY)));
 	DeleteDC(hdc);
 	return value;
 }
 
-float Font::PointToPixel(float sizeInPoints) const noexcept
+int Font::PointToPixel(int sizeInPoints) noexcept
 {
-	HDC hdc = CreateCompatibleDC(0);
+	HDC hdc = CreateCompatibleDC(nullptr);
 	int pointPerInch = 72;
 	int deviceCaps = GetDeviceCaps(hdc, LOGPIXELSY);
-	LOGFONT logFont;
-	strcpy_s(logFont.lfFaceName, m_Name.c_str());
-	logFont.lfHeight = -MulDiv(m_Size, deviceCaps, pointPerInch);
+	int fntSize;
+	fntSize = -MulDiv(sizeInPoints, deviceCaps, pointPerInch);
 	DeleteDC(hdc);
-	return std::abs(logFont.lfHeight);
+	return std::abs(fntSize);
 }
 
-Font::Font(const std::string& name, const float& size, bool isBold, bool isItalic, bool isUnderline, bool isStrikeout, GraphicsUnit unit)
+Font::Font(const std::string& name, const int& size, bool isBold, bool isItalic, bool isUnderline, bool isStrikeout, GraphicsUnit unit)
 	:
 	m_IsBold(isBold),
 	m_IsItalic(isItalic),
@@ -52,12 +51,12 @@ bool Font::IsStrikeOut() const noexcept
 	return m_IsStrikeOut;
 }
 
-float Font::GetSize() const noexcept
+int Font::GetSize() const noexcept
 {
 	return m_Size;
 }
 
-float Font::GetSizeInPixels() const noexcept
+int Font::GetSizeInPixels() const noexcept
 {
 	switch (m_Unit)
 	{
@@ -92,7 +91,7 @@ float Font::GetSizeInPixels() const noexcept
 	}
 }
 
-void Font::SetSize(const float& size) noexcept
+void Font::SetSize(const int& size) noexcept
 {
 	m_Size = size;
 }

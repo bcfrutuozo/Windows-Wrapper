@@ -6,8 +6,17 @@
 
 class IComponent : public IDisposable
 {
+protected:
+
+	IComponent()
+		:
+		m_Site(nullptr)
+	{	};
+
+	virtual ~IComponent() = default;
+
 public:
 
-	ISite* m_Site = nullptr;
+	ISite* m_Site;
 	EventArgs ArgsDisposed;
 };

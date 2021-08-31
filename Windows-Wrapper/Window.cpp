@@ -1,6 +1,7 @@
 #include "Window.h"
 #include "OnClosedEventHandler.h"
 #include "OnClosingEventHandler.h"
+#include "Application.h"
 
 #include <sstream>
 
@@ -81,7 +82,7 @@ void Window::OnClosedSet(const std::function<void(Object*, OnClosedEventArgs*)>&
 	Events.Register(new OnClosedEventHandler("OnClosing", callback));
 }
 
-void Window::Initialize() noexcept
+void Window::Initialize()
 {
 	// Calculate window size based on desired client region
 	RECT r;
@@ -133,6 +134,9 @@ void Window::Initialize() noexcept
 
 	// Force window redraw to set Background color
 	m_BackgroundColor = Color::Control();
+
+	// Add window the the application windows container
+	Application::AddWindow(this);
 	Update();
 }
 
@@ -187,34 +191,34 @@ void Window::UpdateMenuStrip() noexcept
 //	return Create<MenuBar>(this);
 //}
 
-Button& Window::AddButton(const std::string& name, int width, int height, int x, int y) noexcept
+Button* Window::AddButton(const std::string& name, int width, int height, int x, int y) noexcept
 {
 	return Create<Button>(this, name, width, height, x, y);
 }
 
-TextBox& Window::AddTextBox(const std::string& name, int width, int x, int y) noexcept
+TextBox* Window::AddTextBox(const std::string& name, int width, int x, int y) noexcept
 {
 	return Create<TextBox>(this, name, width, x, y);
 }
 
-ProgressBar& Window::AddProgressBar(int width, int height, int x, int y) noexcept
+ProgressBar* Window::AddProgressBar(int width, int height, int x, int y) noexcept
 {
 	return Create<ProgressBar>(this, width, height, x, y);
 }
 
-ProgressBar& Window::AddProgressBar(const std::string& text, int width, int height, int x, int y) noexcept
+ProgressBar* Window::AddProgressBar(const std::string& text, int width, int height, int x, int y) noexcept
 {
 	return Create<ProgressBar>(this, text, width, height, x, y);
 }
 
-ToolStrip& Window::AddToolStrip() noexcept
+ToolStrip* Window::AddToolStrip() noexcept
 {
-	ToolStrip& t = Create<ToolStrip>(this);
-	m_MinSize += t.GetSize().Height; // Invalidate the window header size
+	ToolStrip* t = Create<ToolStrip>(this);
+	m_MinSize += t->GetSize().Height; // Invalidate the window header size
 	return t;
 }
 
-Label& Window::AddLabel(const std::string& text, int x, int y) noexcept
+Label* Window::AddLabel(const std::string& text, int x, int y) noexcept
 {
 	return Create<Label>(this, text, x, y);
 }
@@ -298,9 +302,20 @@ void Window::OnPaint_Impl(HWND hwnd) noexcept
 	// to let the user customize the control.
 	//Dispatch("OnPaint", new PaintEventArgs());
 
-	HFONT hFont = CreateFont(Font.GetSizeInPixels(), 0, 0, 0, Font.IsBold() ? FW_BOLD : FW_NORMAL, Font.IsItalic(), Font.IsUnderline(), Font.IsStrikeOut(), ANSI_CHARSET,
-		OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
-		DEFAULT_PITCH | FF_DONTCARE, Font.GetName().c_str());
+	HFONT hFont = CreateFont(m_Font.GetSizeInPixels(), 
+		0, 
+		0, 
+		0, 
+		m_Font.IsBold() ? FW_BOLD : FW_NORMAL, 
+		m_Font.IsItalic(), 
+		m_Font.IsUnderline(), 
+		m_Font.IsStrikeOut(), 
+		ANSI_CHARSET,
+		OUT_TT_PRECIS,
+		CLIP_DEFAULT_PRECIS,
+		DEFAULT_QUALITY,
+		DEFAULT_PITCH | FF_DONTCARE,
+		m_Font.GetName().c_str());
 
 	SendMessage(hwnd, WM_SETFONT, (WPARAM)hFont, TRUE);
 
@@ -317,7 +332,7 @@ bool Window::IsCursorEnabled() const noexcept
 	return m_IsCursorEnabled;
 }
 
-Keyboard& Window::GetKeyboard() noexcept
+Keyboard& Window::GetKeyboard() const
 {
 	if (!m_Keyboard)
 	{
@@ -328,7 +343,7 @@ Keyboard& Window::GetKeyboard() noexcept
 	return *m_Keyboard;
 }
 
-Mouse& Window::GetMouse() noexcept
+Mouse& Window::GetMouse() const
 {
 	if (!m_Mouse)
 	{

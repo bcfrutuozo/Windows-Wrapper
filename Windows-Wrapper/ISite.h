@@ -7,12 +7,23 @@ class IContainer;
 
 class ISite
 {
+	friend class Container;
+
 protected:
 
-	IComponent* m_Component = nullptr;
-	IContainer* m_Container = nullptr;
+	IComponent* m_Component;
+	IContainer* m_Container;
 	bool m_DesingMode;
 	std::string m_Name;
+
+	ISite()
+		:
+		m_Component(nullptr),
+		m_Container(nullptr),
+		m_DesingMode(false)
+	{	}
+
+	virtual ~ISite() = default;
 
 public:
 
