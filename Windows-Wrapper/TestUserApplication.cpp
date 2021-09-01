@@ -15,31 +15,33 @@ void TestClick(Object* sender, EventArgs* e)
 void TestUserApplication::Initialize()
 {
 	Window* window = new Window("Teste", 500, 500);
+	window->GetMouse().EnableRaw();
+	window->GetKeyboard().DisableAutorepeat();
+
+	auto t1 = window->AddToolStrip();
+	auto t2 = window->AddToolStrip();
 	//window2->AddButton("Boiolaaaa", 250, 250, 125, 125);
 
 	//ToolStrip& p = window->AddToolStrip();
 	//ToolStrip& j = window->AddToolStrip();
 	//p.SetBackgroundColor(Color::Black());
 	//j.SetBackgroundColor(Color::Blue());
-	auto l = window->AddLabel("abcdef", 300, 100);
-	auto f = l->GetFont();
-	f.SetSize(16);
-	f.SetStyle(FontStyle::Bold);
-	f.SetStyle(FontStyle::Strikeout);
-	l->SetBorderStyle(BorderStyle::None);
-	l->SetFont(f);
-
-	button1 = window->AddButton("Abc", 200, 80, 50, 100);
-	button1->OnClickSet([](Object* sender, EventArgs* e)
-		{
-			printf_s("Teste Mouseenter Button1");
-		}
-	);
-
-	txtBox1 = window->AddTextBox("TextBox", 400, 20, 400);
-
-	window->GetMouse().EnableRaw();
-	window->GetKeyboard().DisableAutorepeat();
+	//auto l = window->AddLabel("abcdef", 300, 100);
+	//auto f = l->GetFont();
+	//f.SetSize(16);
+	//f.SetStyle(FontStyle::Bold);
+	//f.SetStyle(FontStyle::Strikeout);
+	//l->SetBorderStyle(BorderStyle::None);
+	//l->SetFont(f);
+	//
+	//button1 = window->AddButton("Abc", 200, 80, 50, 100);
+	//button1->OnClickSet([](Object* sender, EventArgs* e)
+	//	{
+	//		printf_s("Teste Mouseenter Button1");
+	//	}
+	//);
+	//
+	//txtBox1 = window->AddTextBox("TextBox", 400, 20, 400);
 	
 	////auto& mb = window->GetMenuStrip();
 	////auto& item1 = mb.AddItem("Arquivo");

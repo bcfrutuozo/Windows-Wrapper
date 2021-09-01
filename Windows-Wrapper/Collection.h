@@ -1,17 +1,18 @@
 #pragma once
 
 #include "Object.h"
-#include "ICollection.h"
+#include "IList.h"
 #include "Enumerator.h"
 
 #include <cassert>
 
 template<typename T>
-class Collection : public ICollection<T>, public Object
+class Collection : public IList<T>, public Object
 {
 private:
 
 	T* Owner;
+	bool m_ReadOnly;
 
 	void ResetIndices(Enumerator* begin) noexcept
 	{
@@ -196,7 +197,7 @@ public:
 		return *this;
 	}
 
-	T* operator[](size_t index) const
+	T* operator[](size_t index) const override
 	{
 		if (index >= this->Count)
 		{
@@ -205,7 +206,7 @@ public:
 
 		auto e = pNext->Begin;
 		T* r = nullptr;
-		
+
 		for (size_t i = 0; i < index; ++i, e = e->Next)
 		{
 			if (i == index)
@@ -296,5 +297,74 @@ public:
 		}
 
 		return false;
+	}
+
+	int IndexOf(T* item) const noexcept override
+	{
+		int index = 0;
+
+		for (auto it = begin(); it != end(); ++it, ++index)
+		{
+			if (*it == item)
+			{
+				break;
+			}
+		}
+
+		return index;
+	}
+
+	void Insert(int index, T* item) noexcept override
+	{
+		if (index < 0 || index >= this->Count)
+		{
+			throw std::out_of_range("Invalid index");
+		}
+
+		auto e = pNext->Begin;
+		Enumerator* prior = nullptr;
+		Enumerator* next = nullptr;
+
+		for (size_t i = 0; i < index; ++i, e = e->Next)
+		{
+			if (i == index)
+			{
+				prior = e;
+			}
+
+			if (i == index + 1)
+			{
+				next = e;
+				break;
+			}
+		}
+
+		auto n = new Enumerator(item, prior, next);
+		prior->Next = n;
+		next->Prior = n;
+
+		++this->Count;
+	}
+
+	bool IsReadOnly() const noexcept override
+	{
+		return m_ReadOnly;
+	}
+
+	bool RemoveAt(int index) override
+	{
+		if (index >= this->Count)
+		{
+			throw std::out_of_range("Invalid index");
+		}
+
+		int i = 0;
+		for (auto it = begin(); it != end(); ++it, ++i)
+		{
+			if (index == i)
+			{
+				return Remove(*it);
+			}
+		}
 	}
 };

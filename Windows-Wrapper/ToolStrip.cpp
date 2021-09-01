@@ -68,7 +68,9 @@ ToolStrip::ToolStrip(Control* parent)
 		parent->GetSize().Width - (parent->GetMargin().Left + parent->GetMargin().Right),
 		0,	// Height is calculated base on Font size
 		parent->GetMargin().Left,
-		parent->m_MinSize + parent->GetMargin().Top)
+		parent->m_MinSize + parent->GetMargin().Top),
+	m_DockStyle(DockStyle::Top),
+	m_GripStyle(ToolStripGripStyle::Visible)
 {
 	Initialize();
 }
@@ -99,6 +101,39 @@ void ToolStrip::Initialize()
 	m_Margin = 3;
 	m_BackgroundColor = Color::Control();
 	m_ForeColor = Color::WindowText();
+}
+
+DockStyle ToolStrip::GetDockStyle() const noexcept
+{
+	return m_DockStyle;
+}
+
+void ToolStrip::SetDockStyle(DockStyle style) noexcept
+{
+	m_DockStyle = style;
+	Update();
+}
+
+ToolStripGripStyle ToolStrip::GetGripStyle() const noexcept
+{
+	return m_GripStyle;
+}
+
+void ToolStrip::SetGripStyle(ToolStripGripStyle style) noexcept
+{
+	m_GripStyle = style;
+	Update();
+}
+
+ToolStripRenderMode ToolStrip::GetRenderMode() const noexcept
+{
+	return m_Renderer;
+}
+
+void ToolStrip::SetRenderMode(ToolStripRenderMode mode) noexcept
+{
+	m_Renderer = mode;
+	Update();
 }
 
 //Button& ToolStrip::AddButton(const std::string& text) noexcept

@@ -13,6 +13,7 @@ class Component : public Object, public IComponent
 	friend class Button;
 	friend class ProgressBar;
 	friend class TextBox;
+	friend class ListControl;
 
 private:
 

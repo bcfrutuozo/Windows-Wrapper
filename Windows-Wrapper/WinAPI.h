@@ -27,6 +27,7 @@ class WinAPI : public Component, public IHandle
 	friend class ProgressBar;
 	friend class Label;
 	friend class ToolStrip;
+	friend class ListControl;
 
 private:
 

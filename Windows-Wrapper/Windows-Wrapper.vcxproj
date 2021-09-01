@@ -155,6 +155,8 @@
     <ClCompile Include="EventDispatcher.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="Label.cpp" />
+    <ClCompile Include="ListControl.cpp" />
+    <ClCompile Include="MenuStrip.cpp" />
     <ClCompile Include="Site.cpp" />
     <ClCompile Include="TestRealTimeApplication.cpp" />
     <ClCompile Include="ToolStrip.cpp" />
@@ -201,6 +203,7 @@
     <ClInclude Include="Collection.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Container.h" />
+    <ClInclude Include="ConvertEventArgs.h" />
     <ClInclude Include="Enumerator.h" />
     <ClInclude Include="EventDispatcher.h" />
     <ClInclude Include="FlatButtonAppearance.h" />
@@ -212,9 +215,14 @@
     <ClInclude Include="IEnumerable.h" />
     <ClInclude Include="IEnumerator.h" />
     <ClInclude Include="IEvent.h" />
+    <ClInclude Include="IList.h" />
     <ClInclude Include="ISite.h" />
     <ClInclude Include="Keys.h" />
     <ClInclude Include="Label.h" />
+    <ClInclude Include="ListControl.h" />
+    <ClInclude Include="ListControlConvertEventArgs.h" />
+    <ClInclude Include="ListControlConvertEventHandler.h" />
+    <ClInclude Include="MenuStrip.h" />
     <ClInclude Include="Site.h" />
     <ClInclude Include="TestRealTimeApplication.h" />
     <ClInclude Include="ToolStrip.h" />

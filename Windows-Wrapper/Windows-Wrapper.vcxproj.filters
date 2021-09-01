@@ -70,6 +70,8 @@
     </ClCompile>
     <ClCompile Include="Enumerator.cpp" />
     <ClCompile Include="TestRealTimeApplication.cpp" />
+    <ClCompile Include="MenuStrip.cpp" />
+    <ClCompile Include="ListControl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RealTimeApplication.h" />
@@ -228,6 +230,20 @@
     <ClInclude Include="Enumerator.h" />
     <ClInclude Include="TestRealTimeApplication.h" />
     <ClInclude Include="FlatButtonAppearance.h" />
+    <ClInclude Include="MenuStrip.h" />
+    <ClInclude Include="ListControl.h" />
+    <ClInclude Include="IList.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="ConvertEventArgs.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="ListControlConvertEventArgs.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="ListControlConvertEventHandler.h">
+      <Filter>Events</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interfaces">

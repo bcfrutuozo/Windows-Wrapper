@@ -13,6 +13,7 @@ public:
 
 	virtual void Add(T* const item) noexcept = 0;
 	virtual bool Remove(T* const item) noexcept = 0;
+	virtual bool IsReadOnly() const noexcept = 0;
 	virtual void Clear() noexcept = 0;
 	virtual bool Contains(T* const item) const noexcept = 0;
 	
