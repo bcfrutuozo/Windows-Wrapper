@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Control.h"
+#include "ListItem.h"
 #include "IList.h"
 #include "ListControlConvertEventHandler.h"
 
@@ -8,10 +9,7 @@ class ListControl : public Control
 {
 private:
 
-	Object* m_DataSource;
 	bool m_AllowSelection;
-	unsigned int m_SelectedIndex;
-	Object* m_SelectedValue;
 
 	EventHandler* OnDataSourceChanged;
 	EventHandler* OnDisplayMemberChanged;
@@ -21,6 +19,11 @@ private:
 	EventHandler* OnFormattingEnabledChanged;
 	EventHandler* OnSelectedValueChanged;
 	EventHandler* OnValueMemberChanged;
+
+protected:
+
+	int m_SelectedIndex;
+	ListItem* m_SelectedValue;
 
 	// Singleton manages registration/cleanup of window class
 	class ListClass
@@ -44,9 +47,22 @@ private:
 
 	int OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept override;
 
+	ListControl(Control* parent, const std::string& name, int width, int x, int y);
+	ListControl(Control* parent, const std::string& name, int width, int height, int x, int y);
+
 public:
 
-	ListControl();
+	class ListItemCollection : public Collection<ListItem>
+	{
+	public:
+
+		ListItemCollection(ListControl* owner);
+		ListItemCollection(ListControl* owner, ListItemCollection& value);
+		ListItemCollection(ListControl* owner, ListItem* value[]);
+	};
+
+	ListItemCollection* Items;
+
 	virtual ~ListControl();
 
 	void OnDataSourceChangedSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept;
@@ -58,12 +74,15 @@ public:
 	void OnSelectedValueChangedSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept;
 	void OnValueMemberChangedSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept;
 
+	void Initialize() override;
 	bool IsSelectionAllowed();
 	void EnableSelection() noexcept;
 	void DisableSelection() noexcept;
-	void SetDataSource(Object* dataSource) noexcept;
-	unsigned int GetSelectedIndex() const noexcept;
+	ListItemCollection* const GetDataSource() const noexcept { return Items; }
+	void SetDataSource(ListItemCollection* const dataSource) noexcept;
+	int GetSelectedIndex() const noexcept;
 	void SetSelectedIndex(unsigned int index) noexcept;
-	Object* GetSelectedValue() const noexcept;
+	ListItem* GetSelectedValue() const noexcept;
+	void SetSelectedValue(const ListItem& item);
 };
 

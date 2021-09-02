@@ -37,9 +37,47 @@ int ListControl::OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept
 	return 1;	// To avoid flickering
 }
 
-ListControl::ListControl()
+
+ListControl::ListItemCollection::ListItemCollection(ListControl* owner)
 	:
-	m_DataSource(nullptr),
+	Collection(owner)
+{
+
+}
+
+ListControl::ListItemCollection::ListItemCollection(ListControl* owner, ListItemCollection& value)
+	:
+	Collection(owner)
+{
+	for (const auto& item : value)
+	{
+		Add(item);
+	}
+}
+
+ListControl::ListItemCollection::ListItemCollection(ListControl* owner, ListItem* value[])
+	:
+	Collection(owner)
+{
+	while (value != nullptr)
+	{
+		Add(*value);
+		++value;
+	}
+}
+
+ListControl::ListControl(Control* parent, const std::string& name, int width, int x, int y)
+	:
+	ListControl(parent, name, width, 0, x, y)	// Default control size without font is 9
+{
+
+}
+
+ListControl::ListControl(Control* parent, const std::string& name, int width, int height, int x, int y)
+	:
+	Control(parent, name, width, height, x, y),	// Default control size without font is 9
+	m_AllowSelection(true),
+	Items(nullptr),
 	OnDataSourceChanged(nullptr),
 	OnDisplayMemberChanged(nullptr),
 	OnFormat(nullptr),
@@ -47,19 +85,16 @@ ListControl::ListControl()
 	OnFormatStringChanged(nullptr),
 	OnFormattingEnabledChanged(nullptr),
 	OnSelectedValueChanged(nullptr),
-	OnValueMemberChanged(nullptr)
+	OnValueMemberChanged(nullptr),
+	m_SelectedIndex(-1),	// Negative value because positive implies a valid selection
+	m_SelectedValue(nullptr)
 {
-
+	Initialize();
 }
 
 ListControl::~ListControl()
 {
-	if (m_DataSource != nullptr)
-	{
-		delete m_DataSource;
-		m_DataSource = nullptr;
-	}
-
+	if (Items != nullptr) { delete Items; Items = nullptr; }
 	if (OnDataSourceChanged != nullptr) { delete OnDataSourceChanged; OnDataSourceChanged = nullptr; }
 	if (OnDisplayMemberChanged != nullptr) { delete OnDisplayMemberChanged; OnDisplayMemberChanged = nullptr; }
 	if (OnFormat != nullptr) { delete OnFormat; OnFormat = nullptr; }
@@ -118,6 +153,32 @@ void ListControl::OnValueMemberChangedSet(const std::function<void(Object*, Even
 	Events.Register(OnValueMemberChanged);
 }
 
+void ListControl::Initialize()
+{
+	// Create window and get its handle
+	Handle = CreateWindow(
+		ListClass::GetName(),																			// Class name
+		Text.c_str(),																						// Window title
+		WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPSIBLINGS | SS_LEFT,										// Style values
+		Location.X,																							// X position
+		Location.Y,																							// Y position
+		m_Size.Width,																						// Width
+		m_Size.Height,																						// Height
+		static_cast<HWND>(Parent->Handle.ToPointer()),														// Parent handle
+		(HMENU)GetId(),						                								// Menu handle
+		ListClass::GetInstance(),																		// Module instance handle
+		this																								// Pointer to the button instance to work along with HandleMessageSetup function.
+	);
+
+	if (Handle.IsNull())
+	{
+		throw CTL_LAST_EXCEPT();
+	}
+
+	// Set default TextBox margin to 3 pixels
+	m_BackgroundColor = Color::Window();
+}
+
 bool ListControl::IsSelectionAllowed()
 {
 	return m_AllowSelection;
@@ -133,25 +194,14 @@ void ListControl::DisableSelection() noexcept
 	m_AllowSelection = false;
 }
 
-void ListControl::SetDataSource(Object* dataSource) noexcept
+void ListControl::SetDataSource(ListItemCollection* const dataSource) noexcept
 {
-	if (!dynamic_cast<IList<Object>*>(dataSource))
-	{
-		throw std::invalid_argument("DataSource type must be inherited from IList or IListSource");
-	}
-
-	if (m_DataSource != nullptr)
-	{
-		delete m_DataSource;
-		m_DataSource = nullptr;
-	}
-
-	m_DataSource = dataSource;
+	Items = dataSource;
 	Dispatch("OnDataSourceChanged", &ArgsDefault);
 	Update();
 }
 
-unsigned int ListControl::GetSelectedIndex() const noexcept
+int ListControl::GetSelectedIndex() const noexcept
 {
 	return m_SelectedIndex;
 }
@@ -159,10 +209,32 @@ unsigned int ListControl::GetSelectedIndex() const noexcept
 void ListControl::SetSelectedIndex(unsigned int index) noexcept
 {
 	m_SelectedIndex = index;
+	m_SelectedValue = (*Items)[m_SelectedIndex];
 	Update();
 }
 
-Object* ListControl::GetSelectedValue() const noexcept
+ListItem* ListControl::GetSelectedValue() const noexcept
 {
-	return (*dynamic_cast<IList<Object>*>(m_DataSource))[m_SelectedIndex];
+	return (*Items)[m_SelectedIndex];
+}
+
+void ListControl::SetSelectedValue(const ListItem& item)
+{
+	bool err = true;
+
+	for (size_t i = 0; i < Items->GetCount(); ++i)
+	{
+		const auto& it = (*Items)[i];
+		if (it->Id == item.Id && it->Value == item.Value)
+		{
+			SetSelectedIndex(i);
+			err = false;
+			break;
+		}
+	}
+
+	if (err)
+	{
+		throw std::invalid_argument("ListItem does not exist");
+	}
 }

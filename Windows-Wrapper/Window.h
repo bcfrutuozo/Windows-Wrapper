@@ -4,6 +4,8 @@
 #include "Color.h"
 #include "Keyboard.h"
 #include "Mouse.h"
+#include "ListBox.h"
+#include "ComboBox.h"
 #include "MenuBar.h"
 #include "Button.h"
 #include "TextBox.h"
@@ -17,7 +19,7 @@
 #include <optional>
 #include <string>
 
-class Window final : public Control, public IHidable
+class Window final : public Control
 {
 	friend class Menu;
 	friend class WinAPI;
@@ -70,9 +72,6 @@ public:
 	Window& operator=(const Window&) = default;
 	virtual ~Window();
 
-	void Hide() override;
-	void Show() override;
-
 	void OnClosedSet(const std::function<void(Object*, OnClosedEventArgs*)>& callback) noexcept;
 	void OnClosingSet(const std::function<void(Object*, OnClosingEventArgs*)>& callback) noexcept;
 	void OnShownSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept;
@@ -84,6 +83,8 @@ public:
 
 	Button* AddButton(const std::string& name, int width, int height, int x, int y) noexcept;
 	TextBox* AddTextBox(const std::string& name, int width, int x, int y) noexcept;
+	ListBox* AddListBox(int width, int height, int x, int y) noexcept;
+	ComboBox* AddComboBox(const std::string& name, int width, int x, int y) noexcept;
 	ProgressBar* AddProgressBar(int width, int height, int x, int y) noexcept;
 	ProgressBar* AddProgressBar(const std::string& text, int width, int height, int x, int y) noexcept;
 	ToolStrip* AddToolStrip() noexcept;

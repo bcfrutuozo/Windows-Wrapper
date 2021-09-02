@@ -42,6 +42,8 @@ private:
 	// Variable to check if control is tab selected
 	bool m_IsTabSelected;
 
+	bool m_IsVisible;
+
 	void OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept override;
 	void OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept override;
 	void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept override;
@@ -140,7 +142,7 @@ public:
 
 	bool HasChildren() const noexcept;
 	Size CalculateSizeByFont() noexcept;
-	bool IsEnabled() const noexcept;
+	bool IsEnabled() const noexcept override;
 	Window* GetWindow() noexcept;
 	Size GetSize() const noexcept;
 	Padding GetMargin() const noexcept;
@@ -156,6 +158,9 @@ public:
 	void SetTabIndex(const unsigned int& index) noexcept;
 	Font GetFont() const noexcept;
 	void SetFont(Font font) noexcept;
+	bool IsShown() const noexcept;
+	void Hide() noexcept;
+	void Show() noexcept;
 
 	// Control Exception
 	class ControlException : public Exception

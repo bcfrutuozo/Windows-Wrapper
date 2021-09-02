@@ -1,9 +1,8 @@
 #pragma once
 
-#include "IHidable.h"
 #include "Control.h"
 
-class TextBox final: public Control, public IHidable
+class TextBox final: public Control
 {
 private:
 
@@ -82,9 +81,7 @@ public:
 
 	size_t GetSelectionLenght() const noexcept;
 	std::string GetSelectedText() const noexcept;
-	void Hide() override;
 	void Initialize() override;
-	void Show() override;
 
 	unsigned int GetMaximumLength() const noexcept;
 	void SetMaximumLength(unsigned int maximumLength) noexcept;

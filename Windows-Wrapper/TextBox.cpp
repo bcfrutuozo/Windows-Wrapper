@@ -983,24 +983,6 @@ std::string TextBox::GetSelectedText() const noexcept
 	}
 }
 
-void TextBox::Hide()
-{
-	if (IsShown())
-	{
-		IsVisible = false;
-		ShowWindow(static_cast<HWND>(Handle.ToPointer()), SW_HIDE);
-	}
-}
-
-void TextBox::Show()
-{
-	if (!IsShown())
-	{
-		IsVisible = true;
-		ShowWindow(static_cast<HWND>(Handle.ToPointer()), SW_SHOWDEFAULT);
-	}
-}
-
 unsigned int TextBox::GetMaximumLength() const noexcept
 {
 	return m_MaximumLenght;

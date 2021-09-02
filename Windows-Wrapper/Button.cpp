@@ -388,24 +388,6 @@ void Button::Initialize()
 	}
 }
 
-void Button::Hide()
-{
-	if (IsShown())
-	{
-		IsVisible = false;
-		ShowWindow(static_cast<HWND>(Handle.ToPointer()), SW_HIDE);
-	}
-}
-
-void Button::Show()
-{
-	if (!IsShown())
-	{
-		IsVisible = true;
-		ShowWindow(static_cast<HWND>(Handle.ToPointer()), SW_SHOWDEFAULT);
-	}
-}
-
 FlatButtonAppearance Button::GetFlatButtonAppearance() const noexcept
 {
 	return m_FlatAppearance;

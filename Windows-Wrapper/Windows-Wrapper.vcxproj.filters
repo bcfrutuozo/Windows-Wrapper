@@ -72,6 +72,9 @@
     <ClCompile Include="TestRealTimeApplication.cpp" />
     <ClCompile Include="MenuStrip.cpp" />
     <ClCompile Include="ListControl.cpp" />
+    <ClCompile Include="ListBox.cpp" />
+    <ClCompile Include="ComboBox.cpp" />
+    <ClCompile Include="ListItem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RealTimeApplication.h" />
@@ -134,9 +137,6 @@
     </ClInclude>
     <ClInclude Include="MouseEventArgs.h">
       <Filter>Events</Filter>
-    </ClInclude>
-    <ClInclude Include="IHidable.h">
-      <Filter>Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="EventHandler.h">
       <Filter>Events</Filter>
@@ -244,6 +244,9 @@
     <ClInclude Include="ListControlConvertEventHandler.h">
       <Filter>Events</Filter>
     </ClInclude>
+    <ClInclude Include="ListBox.h" />
+    <ClInclude Include="ComboBox.h" />
+    <ClInclude Include="ListItem.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interfaces">

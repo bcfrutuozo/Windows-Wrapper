@@ -1,10 +1,9 @@
 #pragma once
 
-#include "IHidable.h"
 #include "Control.h"
 #include "FlatButtonAppearance.h"
 
-class Button final: public Control, public IHidable
+class Button final: public Control
 {
 	friend class WinAPI;
 
@@ -43,9 +42,7 @@ public:
 	Button(Control* parent, const std::string& name, int width, int height, int x, int y);
 	virtual ~Button();
 
-	void Hide() override;
 	void Initialize() override;
-	void Show() override;
 	FlatButtonAppearance GetFlatButtonAppearance() const noexcept;
 	void SetFlatButtonAppearance(FlatButtonAppearance appearance) noexcept;
 	FlatStyle GetFlatStyle() const noexcept;

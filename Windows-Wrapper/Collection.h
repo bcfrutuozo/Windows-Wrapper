@@ -11,7 +11,7 @@ class Collection : public IList<T>, public Object
 {
 private:
 
-	T* Owner;
+	Object* Owner;
 	bool m_ReadOnly;
 
 	void ResetIndices(Enumerator* begin) noexcept
@@ -168,7 +168,7 @@ public:
 		Collection(nullptr)
 	{ }
 
-	Collection(T* owner)
+	Collection(Object* owner)
 		:
 		Owner(owner),
 		pNext(nullptr)
@@ -207,7 +207,7 @@ public:
 		auto e = pNext->Begin;
 		T* r = nullptr;
 
-		for (size_t i = 0; i < index; ++i, e = e->Next)
+		for (size_t i = 0; i <= index; ++i, e = e->Next)
 		{
 			if (i == index)
 			{

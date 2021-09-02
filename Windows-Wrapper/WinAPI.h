@@ -10,6 +10,7 @@
 #include "MouseEventArgs.h"
 #include "KeyEventArgs.h"
 #include "KeyPressEventArgs.h"
+#include "MessageMapper.h"
 
 class Window;
 
@@ -28,6 +29,8 @@ class WinAPI : public Component, public IHandle
 	friend class Label;
 	friend class ToolStrip;
 	friend class ListControl;
+	friend class ComboBox;
+	friend class ListBox;
 
 private:
 
@@ -104,7 +107,6 @@ private:
 
 protected:
 
-
 	WinAPI() noexcept;
 	virtual ~WinAPI();
 
@@ -123,9 +125,16 @@ protected:
 	void SetClickingState(bool state) noexcept;
 
 public:
+
+#if _DEBUG
+
+	// Setting a static MessageMapper would cause memory leak because class destructor would not destroy it
+	MessageMapper m;
+#endif
 	
 	bool IsMouseOver() const noexcept;
 	bool IsClicking() const noexcept;
+	virtual bool IsEnabled() const noexcept;
 	void Enable() noexcept;
 	void Disable() noexcept;
 	virtual void Update() const noexcept;

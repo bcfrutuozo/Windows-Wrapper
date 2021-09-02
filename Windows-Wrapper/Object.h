@@ -5,6 +5,8 @@
 
 #include <string>
 
+class ListItem;
+
 class Object : public IEquatable<Object>
 {
 private:
@@ -26,6 +28,7 @@ public:
 	bool static Equals(const Object& lhs, const Object& rhs) noexcept;
 	inline const std::string& GetHashCode() const noexcept;
 	inline const Type GetType() const noexcept;
-	inline const bool ReferenceEquals(const Object& b) const noexcept;
+	const bool ReferenceEquals(const Object& b) const noexcept;
 	inline virtual const std::string ToString() const noexcept;
+	virtual ListItem ToListItem() const noexcept;
 };

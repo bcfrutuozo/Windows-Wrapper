@@ -30,8 +30,8 @@ Enumerator::Enumerator(const Enumerator& src)
 {
 	Item = src.Item;
 	Begin = src.Begin;
-	Next = new Enumerator(*src.Next);
-	Prior = new Enumerator(*src.Prior);
+	Next = src.Next;
+	Prior = src.Prior;
 }
 
 Enumerator::~Enumerator()

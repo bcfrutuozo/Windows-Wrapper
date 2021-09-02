@@ -1,6 +1,7 @@
 #include "TestUserApplication.h"
 #include "KeyEventArgs.h"
 #include "ToolStrip.h"
+#include "ListBox.h"
 #include "Color.h"
 
 #include "Event.h"
@@ -18,8 +19,16 @@ void TestUserApplication::Initialize()
 	window->GetMouse().EnableRaw();
 	window->GetKeyboard().DisableAutorepeat();
 
-	auto t1 = window->AddToolStrip();
-	auto t2 = window->AddToolStrip();
+	auto lb = window->AddListBox(300, 200, 10, 10);
+
+	auto list = new ListControl::ListItemCollection(lb);
+	for (size_t i = 0; i < 10; ++i)
+	{
+		list->Add(new ListItem(i, "Abc"));
+	}
+	lb->SetDataSource(list);
+
+	//auto t1 = window->AddComboBox("ComboBox", 300, 120, 120);
 	//window2->AddButton("Boiolaaaa", 250, 250, 125, 125);
 
 	//ToolStrip& p = window->AddToolStrip();

@@ -149,13 +149,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ComboBox.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="Container.cpp" />
     <ClCompile Include="Enumerator.cpp" />
     <ClCompile Include="EventDispatcher.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="Label.cpp" />
+    <ClCompile Include="ListBox.cpp" />
     <ClCompile Include="ListControl.cpp" />
+    <ClCompile Include="ListItem.cpp" />
     <ClCompile Include="MenuStrip.cpp" />
     <ClCompile Include="Site.cpp" />
     <ClCompile Include="TestRealTimeApplication.cpp" />
@@ -201,6 +204,7 @@
     <ClInclude Include="CancelEventArgs.h" />
     <ClInclude Include="CancelEventHandler.h" />
     <ClInclude Include="Collection.h" />
+    <ClInclude Include="ComboBox.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Container.h" />
     <ClInclude Include="ConvertEventArgs.h" />
@@ -219,9 +223,11 @@
     <ClInclude Include="ISite.h" />
     <ClInclude Include="Keys.h" />
     <ClInclude Include="Label.h" />
+    <ClInclude Include="ListBox.h" />
     <ClInclude Include="ListControl.h" />
     <ClInclude Include="ListControlConvertEventArgs.h" />
     <ClInclude Include="ListControlConvertEventHandler.h" />
+    <ClInclude Include="ListItem.h" />
     <ClInclude Include="MenuStrip.h" />
     <ClInclude Include="Site.h" />
     <ClInclude Include="TestRealTimeApplication.h" />
@@ -248,7 +254,6 @@
     <ClInclude Include="Application.h" />
     <ClInclude Include="IEquatable.h" />
     <ClInclude Include="IHandle.h" />
-    <ClInclude Include="IHidable.h" />
     <ClInclude Include="IntPtr.h" />
     <ClInclude Include="TestUserApplication.h" />
     <ClInclude Include="Utilities.h" />

@@ -207,6 +207,29 @@ Control::Control(const std::string& text, int width, int height, int x, int y) n
 
 }
 
+bool Control::IsShown() const noexcept
+{
+	return m_IsVisible;
+}
+
+void Control::Hide() noexcept
+{
+	if (IsShown())
+	{
+		m_IsVisible = false;
+		ShowWindow(static_cast<HWND>(Handle.ToPointer()), SW_HIDE);
+	}
+}
+
+void Control::Show() noexcept
+{
+	if (!IsShown())
+	{
+		m_IsVisible = true;
+		ShowWindow(static_cast<HWND>(Handle.ToPointer()), SW_SHOWDEFAULT);
+	}
+}
+
 Control::~Control()
 {
 	if (OnActivate != nullptr) { delete OnActivate; OnActivate = nullptr; }

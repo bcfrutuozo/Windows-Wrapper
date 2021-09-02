@@ -183,3 +183,11 @@ enum class ToolStripRenderMode
 	//     determines the painting style.
 	ManagerRenderMode
 };
+
+enum class SelectionMode
+{
+	None,
+	Single,
+	MultiSimple,
+	MultiExtended
+};

@@ -5,7 +5,7 @@
 
 #include <thread>
 
-class ProgressBar : public Control
+class ProgressBar final: public Control
 {
 private:
 

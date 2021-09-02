@@ -228,6 +228,7 @@ void WinAPI::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags
 {
 	SetMouseOverState(true);
 	SetClickingState(true);
+	Update();
 	ArgsOnMouseDown = MouseEventArgs(MouseButtons::Left, 1, 0, x, y);
 	Dispatch("OnMouseDown", &ArgsOnMouseDown);
 }
@@ -387,6 +388,11 @@ LRESULT WINAPI WinAPI::HandleMessageForwarder(HWND hWnd, UINT msg, WPARAM lParam
 // Member function responsible to handle the messages of each different type of control 
 LRESULT WINAPI WinAPI::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
+
+#if _DEBUG
+	printf_s(m(msg, wParam, lParam).c_str());
+#endif
+	
 	switch (msg)
 	{
 	case WM_SETCURSOR:
@@ -582,6 +588,11 @@ bool WinAPI::IsMouseOver() const noexcept
 bool WinAPI::IsClicking() const noexcept
 {
 	return m_IsClicking;
+}
+
+bool WinAPI::IsEnabled() const noexcept
+{
+	return m_Enabled;
 }
 
 void WinAPI::Enable() noexcept

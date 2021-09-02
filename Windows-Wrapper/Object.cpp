@@ -1,4 +1,5 @@
 #include "Object.h"
+#include "ListItem.h"
 
 Object::Object() noexcept
 	:
@@ -32,7 +33,7 @@ inline const Type Object::GetType() const noexcept
 	return Type(typeid(*this));
 }
 
-inline const bool Object::ReferenceEquals(const Object& b) const noexcept
+const bool Object::ReferenceEquals(const Object& b) const noexcept
 {
 	return std::addressof(*this) == std::addressof(b);
 }
@@ -41,4 +42,9 @@ inline const std::string Object::ToString() const noexcept
 {
 	// Default ToString method return it's type, unless the function is override in the derived class.
 	return GetType().ToString();
+}
+
+ListItem Object::ToListItem() const noexcept
+{
+	throw std::logic_error("ToListItem is not implemented");
 }

@@ -49,24 +49,6 @@ Window::Window(const std::string& name, int width, int height)
 	Initialize();
 }
 
-void Window::Hide()
-{
-	if (IsShown())
-	{
-		IsVisible = false;
-		ShowWindow(static_cast<HWND>(Handle.ToPointer()), SW_HIDE);
-	}
-}
-
-void Window::Show()
-{
-	if (!IsShown())
-	{
-		IsVisible = true;
-		ShowWindow(static_cast<HWND>(Handle.ToPointer()), SW_SHOWDEFAULT);
-	}
-}
-
 void Window::OnClosingSet(const std::function<void(Object*, OnClosingEventArgs*)>& callback) noexcept
 {
 	Events.Register(new OnClosingEventHandler("OnClosing", callback));
@@ -201,6 +183,16 @@ TextBox* Window::AddTextBox(const std::string& name, int width, int x, int y) no
 	return Create<TextBox>(this, name, width, x, y);
 }
 
+ListBox* Window::AddListBox(int width, int height, int x, int y) noexcept
+{
+	return Create<ListBox>(this, width, height, x, y);
+}
+
+ComboBox* Window::AddComboBox(const std::string& name, int width, int x, int y) noexcept
+{
+	return Create<ComboBox>(this, name, width, x, y);
+}
+
 ProgressBar* Window::AddProgressBar(int width, int height, int x, int y) noexcept
 {
 	return Create<ProgressBar>(this, width, height, x, y);
@@ -302,14 +294,14 @@ void Window::OnPaint_Impl(HWND hwnd) noexcept
 	// to let the user customize the control.
 	//Dispatch("OnPaint", new PaintEventArgs());
 
-	HFONT hFont = CreateFont(m_Font.GetSizeInPixels(), 
-		0, 
-		0, 
-		0, 
-		m_Font.IsBold() ? FW_BOLD : FW_NORMAL, 
-		m_Font.IsItalic(), 
-		m_Font.IsUnderline(), 
-		m_Font.IsStrikeOut(), 
+	HFONT hFont = CreateFont(m_Font.GetSizeInPixels(),
+		0,
+		0,
+		0,
+		m_Font.IsBold() ? FW_BOLD : FW_NORMAL,
+		m_Font.IsItalic(),
+		m_Font.IsUnderline(),
+		m_Font.IsStrikeOut(),
 		ANSI_CHARSET,
 		OUT_TT_PRECIS,
 		CLIP_DEFAULT_PRECIS,
