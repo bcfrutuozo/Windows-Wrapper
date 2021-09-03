@@ -39,7 +39,7 @@ int TextBox::OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept
 	return 1;   // Returns 1 to avoid flickering
 }
 
-int TextBox::OnGetDLGCode(HWND hwnd, LPMSG msg) noexcept
+int TextBox::OnGetDLGCode_Impl(HWND hwnd, LPMSG msg) noexcept
 {
 	return DLGC_WANTALLKEYS | DLGC_WANTARROWS;
 }

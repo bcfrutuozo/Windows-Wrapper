@@ -41,6 +41,12 @@ private:
 	bool m_IsClicking;
 	bool m_Enabled;
 
+	// Scrolling
+	int m_HorizontalScrolling;
+	int m_VerticalScrolling;
+	int m_VerticalScrollingUnit;
+	int m_VerticalScrollPaging;
+
 	// Event fields
 	EventArgs ArgsDefault;
 	OnClosingEventArgs ArgsOnClosing;
@@ -69,7 +75,8 @@ private:
 	virtual int OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept;
 	virtual void OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept;
 	virtual void OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept;
-	virtual int OnGetDLGCode(HWND hwnd, LPMSG msg) noexcept;
+	virtual int OnGetDLGCode_Impl(HWND hwnd, LPMSG msg) noexcept;
+	virtual void OnHorizontalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int code, int pos) noexcept;
 
 	/* Sent when a menu is about to become active. It occurs when the user clicks an item on the menu bar or presses
 	a menu key. This allows the application to modify the menu before it is displayed. */
@@ -104,6 +111,7 @@ private:
 	virtual int OnSetCursor_Impl(HWND hwnd, HWND hwndCursor, unsigned int codeHitTest, unsigned int msg) noexcept;
 	virtual void OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy) noexcept;
 	virtual void OnShowWindow_Impl(HWND hwnd, bool fShow, unsigned int status) noexcept;
+	virtual void OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, UINT code, int pos) noexcept;
 
 protected:
 

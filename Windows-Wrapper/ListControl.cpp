@@ -159,7 +159,7 @@ void ListControl::Initialize()
 	Handle = CreateWindow(
 		ListClass::GetName(),																			// Class name
 		Text.c_str(),																						// Window title
-		WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPSIBLINGS | SS_LEFT,										// Style values
+		WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPSIBLINGS,										// Style values
 		Location.X,																							// X position
 		Location.Y,																							// Y position
 		m_Size.Width,																						// Width

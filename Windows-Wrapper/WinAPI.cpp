@@ -71,6 +71,11 @@ void WinAPI::OnClosed_Impl(HWND hwnd) noexcept
 
 void WinAPI::OnCreate_Impl(HWND hwnd, LPCREATESTRUCT lpCreateStruct) noexcept
 {
+	HDC hdc = GetDC(hwnd);
+
+	// Free the device context. 
+	ReleaseDC(hwnd, hdc);
+
 	Dispatch("OnCreate", &ArgsDefault);
 }
 
@@ -125,9 +130,14 @@ void WinAPI::OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept
 	Dispatch("OnLostFocus", &ArgsDefault);
 }
 
-int WinAPI::OnGetDLGCode(HWND hwnd, LPMSG msg) noexcept
+int WinAPI::OnGetDLGCode_Impl(HWND hwnd, LPMSG msg) noexcept
 {
 	return 0;
+}
+
+void WinAPI::OnHorizontalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int code, int pos) noexcept
+{
+
 }
 
 void WinAPI::OnInitMenu_Impl(HWND hwnd, HMENU hMenu) noexcept
@@ -307,7 +317,22 @@ int WinAPI::OnSetCursor_Impl(HWND hwnd, HWND hwndCursor, unsigned int codeHitTes
 
 void WinAPI::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy) noexcept
 {
+	SCROLLINFO si;
 
+	si.cbSize = sizeof(SCROLLINFO);
+	si.fMask = SIF_PAGE;
+
+	si.nPage = cx;
+	SetScrollInfo(hwnd, SB_HORZ, &si, FALSE);
+
+	// FIX: Make sure uHeight has the right value:
+	/*{
+		RECT rc;
+		GetClientRect(hwnd, &rc);
+		cy = rc.bottom - rc.top;
+	}*/
+	si.nPage = cy;
+	SetScrollInfo(hwnd, SB_VERT, &si, TRUE);
 }
 
 void WinAPI::OnShowWindow_Impl(HWND hwnd, bool fShow, unsigned int status) noexcept
@@ -322,6 +347,68 @@ void WinAPI::OnShowWindow_Impl(HWND hwnd, bool fShow, unsigned int status) noexc
 	}
 
 	Dispatch("OnVisibleChanged", &ArgsDefault);
+}
+
+void WinAPI::OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int code, int pos) noexcept
+{
+	std::ostringstream oss;
+
+	int nPos;
+	int nOldPos;
+	SCROLLINFO si;
+
+	// Get current scrollbar state:
+	si.cbSize = sizeof(SCROLLINFO);
+	si.fMask = SIF_RANGE | SIF_PAGE | SIF_POS | SIF_TRACKPOS;
+	GetScrollInfo(hwnd, SB_VERT, &si);
+
+	nOldPos = si.nPos;
+
+	// Compute new nPos.
+	// Note we do not care where nPos falls between nMin and nMax. See below.
+	switch (code) {
+	case SB_TOP:            nPos = si.nMin; break;
+	case SB_BOTTOM:         nPos = si.nMax; break;
+	case SB_LINEUP:         nPos = si.nPos - m_VerticalScrollingUnit; break;
+	case SB_LINEDOWN:       nPos = si.nPos + m_VerticalScrollingUnit; break;
+		//case SB_PAGEUP:         nPos = si.nPos - CustomLogicalPage(si.nPage); break;
+		//case SB_PAGEDOWN:       nPos = si.nPos + CustomLogicalPage(si.nPage); break;
+	case SB_THUMBTRACK:     nPos = si.nTrackPos; break;
+	default:
+	case SB_THUMBPOSITION:  nPos = si.nPos; break;
+	}
+
+	oss << "cbSize: " << si.cbSize << std::endl
+		<< "fMask: " << si.fMask << std::endl
+		<< "nMin: " << si.nMin << std::endl
+		<< "nMax: " << si.nMax << std::endl
+		<< "nPage: " << si.nPage << std::endl
+		<< "nPos: " << si.nPos << std::endl
+		<< "nTrackPos: " << si.nTrackPos << std::endl << std::endl;
+
+	printf_s(oss.str().c_str());
+
+	// Update the scrollbar state (nPos) and repaint it. The function ensures
+	// the nPos does not fall out of the allowed range between nMin and nMax
+	// hence we ask for the corrected nPos again.
+	if (nPos < 0)
+	{
+		nPos = 0;
+	}
+
+	if (nPos > 100)
+	{
+		nPos = 100;
+	}
+
+	SetScrollPos(hwnd, SB_VERT, nPos, TRUE);
+	m_VerticalScrolling = GetScrollPos(hwnd, SB_VERT);
+
+	// Refresh the control (repaint it to reflect the new nPos). Note we
+	// here multiply with some unspecified scrolling unit which specifies
+	// amount of pixels corresponding to the 1 scrolling unit.
+	// We will discuss ScrollWindowEx() more later in the article.
+	ScrollWindowEx(hwnd, 0, (nOldPos - nPos) * m_VerticalScrollPaging, NULL, NULL, NULL, NULL, SW_ERASE | SW_INVALIDATE);
 }
 
 WinAPI::WinAPI() noexcept
@@ -340,7 +427,11 @@ WinAPI::WinAPI() noexcept
 	m_Enabled(true),
 	m_Id(m_CurrentIndex++),
 	m_IsMouseOver(false),
-	m_IsClicking(false)
+	m_IsClicking(false),
+	m_HorizontalScrolling(0),
+	m_VerticalScrolling(0),
+	m_VerticalScrollingUnit(0),
+	m_VerticalScrollPaging(0)
 {
 
 }
@@ -388,11 +479,10 @@ LRESULT WINAPI WinAPI::HandleMessageForwarder(HWND hWnd, UINT msg, WPARAM lParam
 // Member function responsible to handle the messages of each different type of control 
 LRESULT WINAPI WinAPI::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-
 #if _DEBUG
-	printf_s(m(msg, wParam, lParam).c_str());
+	//printf_s(m(msg, wParam, lParam).c_str());
 #endif
-	
+
 	switch (msg)
 	{
 	case WM_SETCURSOR:
@@ -436,6 +526,11 @@ LRESULT WINAPI WinAPI::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
 	case WM_ACTIVATE:
 	{
 		OnActivate_Impl(hWnd, static_cast<unsigned int>(LOWORD(wParam)), (HWND)(lParam), static_cast<bool> (HIWORD(wParam)));
+		break;
+	}
+	case WM_SIZE:
+	{
+		OnSize_Impl(hWnd, (unsigned int)wParam, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam));
 		break;
 	}
 	/********************** MENU MESSAGES ***********************/
@@ -487,7 +582,7 @@ LRESULT WINAPI WinAPI::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
 
 	case WM_GETDLGCODE:
 	{
-		return OnGetDLGCode(hWnd, (LPMSG)(lParam));
+		return OnGetDLGCode_Impl(hWnd, (LPMSG)(lParam));
 	}
 
 	/********************** MOUSE MESSAGES **********************/
@@ -560,8 +655,19 @@ LRESULT WINAPI WinAPI::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
 		break;
 	}
 	/****************** END RAW MOUSE MESSAGES ******************/
+	/********************* SCROLL MESSAGES **********************/
+	case WM_HSCROLL:
+	{
+		OnHorizontalScrolling_Impl(hWnd, (HWND)lParam, (unsigned int)LOWORD(wParam), (int)(short)HIWORD(wParam));
+		break;
 	}
-
+	case WM_VSCROLL:
+	{
+		OnVerticalScrolling_Impl(hWnd, (HWND)lParam, (unsigned int)LOWORD(wParam), (int)(short)HIWORD(wParam));
+		break;
+	}
+	}
+	/******************* END SCROLL MESSAGES ********************/
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 

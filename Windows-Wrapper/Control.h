@@ -31,6 +31,7 @@ class Control : public WinAPI
 	friend class Button;
 	friend class ToolStrip;
 	friend class TextBox;
+	friend class ListBox;
 
 private:
 

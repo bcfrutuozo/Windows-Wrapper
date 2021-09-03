@@ -22,9 +22,11 @@ void TestUserApplication::Initialize()
 	auto lb = window->AddListBox(300, 200, 10, 10);
 
 	auto list = new ListControl::ListItemCollection(lb);
-	for (size_t i = 0; i < 10; ++i)
+	for (size_t i = 0; i < 20; ++i)
 	{
-		list->Add(new ListItem(i, "Abc"));
+		std::ostringstream oss;
+		oss << "Item: " << i;
+		list->Add(new ListItem(i, oss.str()));
 	}
 	lb->SetDataSource(list);
 

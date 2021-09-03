@@ -51,7 +51,7 @@ private:
 	};
 
 	int OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept override;
-	int OnGetDLGCode(HWND hwnd, LPMSG msg) noexcept override;
+	int OnGetDLGCode_Impl(HWND hwnd, LPMSG msg) noexcept override;
 	void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept override;
 	void OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat) noexcept override;
 	void OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept override;
