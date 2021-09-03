@@ -19,10 +19,10 @@ void TestUserApplication::Initialize()
 	window->GetMouse().EnableRaw();
 	window->GetKeyboard().DisableAutorepeat();
 
-	auto lb = window->AddListBox(300, 200, 10, 10);
+	auto lb = window->AddListBox(500, 500, 10, 10);
 
 	auto list = new ListControl::ListItemCollection(lb);
-	for (size_t i = 0; i < 20; ++i)
+	for (size_t i = 0; i < 200; ++i)
 	{
 		std::ostringstream oss;
 		oss << "Item: " << i;

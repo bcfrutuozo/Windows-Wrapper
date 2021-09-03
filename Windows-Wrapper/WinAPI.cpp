@@ -320,7 +320,7 @@ void WinAPI::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy) noexcept
 	SCROLLINFO si;
 
 	si.cbSize = sizeof(SCROLLINFO);
-	si.fMask = SIF_PAGE;
+	si.fMask = SIF_PAGE | SIF_RANGE;
 
 	si.nPage = cx;
 	SetScrollInfo(hwnd, SB_HORZ, &si, FALSE);
@@ -331,6 +331,8 @@ void WinAPI::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy) noexcept
 		GetClientRect(hwnd, &rc);
 		cy = rc.bottom - rc.top;
 	}*/
+	si.nMin = 0;
+	si.nMax = 20;
 	si.nPage = cy;
 	SetScrollInfo(hwnd, SB_VERT, &si, TRUE);
 }
