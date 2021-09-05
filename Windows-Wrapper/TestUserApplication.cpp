@@ -15,11 +15,11 @@ void TestClick(Object* sender, EventArgs* e)
 
 void TestUserApplication::Initialize()
 {
-	Window* window = new Window("Teste", 500, 500);
+	Window* window = new Window("Teste", 1920, 1080);
 	window->GetMouse().EnableRaw();
 	window->GetKeyboard().DisableAutorepeat();
 
-	auto lb = window->AddListBox(500, 500, 10, 10);
+	auto lb = window->AddListBox(400, 400, 10, 10);
 
 	auto list = new ListControl::ListItemCollection(lb);
 	for (size_t i = 0; i < 200; ++i)
@@ -29,6 +29,11 @@ void TestUserApplication::Initialize()
 		list->Add(new ListItem(i, oss.str()));
 	}
 	lb->SetDataSource(list);
+	auto f = lb->GetFont();
+	f.SetStyle(FontStyle::Bold);
+	f.SetSize(24);
+	lb->SetFont(f);
+	lb->SetBorderStyle(BorderStyle::FixedSingle);
 
 	//auto t1 = window->AddComboBox("ComboBox", 300, 120, 120);
 	//window2->AddButton("Boiolaaaa", 250, 250, 125, 125);

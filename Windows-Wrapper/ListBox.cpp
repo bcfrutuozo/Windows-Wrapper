@@ -31,6 +31,7 @@ void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 void ListBox::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
 {
 	size_t i = 0;
+
 	for (auto it = m_RowPosition.begin(); it != m_RowPosition.end(); ++it, ++i)
 	{
 		if (y >= it->top && y <= it->bottom && x >= it->left && x <= it->right)
@@ -74,21 +75,125 @@ void ListBox::OnPaint_Impl(HWND hwnd) noexcept
 
 	SelectObject(hdcMem, hFont);
 
+	RECT r;
+
+	r.left = r.top = 0;
+	r.right = m_Size.Width;
+	r.bottom = m_Size.Height;
+
+	switch (m_BorderStyle)
+	{
+	case BorderStyle::None:
+	{
+		break;
+	}
+	case BorderStyle::FixedSingle:
+	{
+		if (m_IsTabSelected)
+		{
+			// Draw outer border
+			HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(0, 0, 0));
+			HGDIOBJ old_pen = SelectObject(hdcMem, pen);
+			Rectangle(hdcMem, r.left, r.top, r.right, r.bottom);
+
+			// Move inside rectangle for inner board
+			r.left += 1;
+			r.top += 1;
+			r.right -= 1;
+			r.bottom -= 1;
+
+			//Clean up
+			SelectObject(hdcMem, old_pen);
+			DeleteObject(old_pen);
+			SelectObject(hdcMem, pen);
+			DeleteObject(pen);
+		}
+		else
+		{
+			if (IsMouseOver())
+			{
+				// Draw outer border
+				HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(0, 120, 215));
+				HGDIOBJ old_pen = SelectObject(hdcMem, pen);
+				Rectangle(hdcMem, r.left, r.top, r.right, r.bottom);
+
+				// Move inside rectangle for inner board
+				r.left += 1;
+				r.top += 1;
+				r.right -= 1;
+				r.bottom -= 1;
+
+				//Clean up
+				SelectObject(hdcMem, old_pen);
+				DeleteObject(old_pen);
+				SelectObject(hdcMem, pen);
+				DeleteObject(pen);
+			}
+			else
+			{
+				// Draw outer border
+				HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(122, 122, 122));
+				HGDIOBJ old_pen = SelectObject(hdcMem, pen);
+				Rectangle(hdcMem, r.left, r.top, r.right, r.bottom);
+
+				// Move inside rectangle for inner board
+				r.left += 1;
+				r.top += 1;
+				r.right -= 1;
+				r.bottom -= 1;
+
+				//Clean up
+				SelectObject(hdcMem, old_pen);
+				DeleteObject(old_pen);
+				SelectObject(hdcMem, pen);
+				DeleteObject(pen);
+			}
+		}
+		break;
+	}
+	case BorderStyle::Fixed3D:
+	{
+		// Draw outer border
+		HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(130, 135, 144));
+		HGDIOBJ old_pen = SelectObject(hdcMem, pen);
+		Rectangle(hdcMem, r.left, r.top, r.right, r.bottom);
+
+		// Move inside rectangle for inner board
+		r.left += 1;
+		r.top += 1;
+		r.right -= 1;
+		r.bottom -= 1;
+
+		// Draw outer border
+		pen = CreatePen(PS_INSIDEFRAME, 1, RGB(255, 255, 255));
+		old_pen = SelectObject(hdcMem, pen);
+		Rectangle(hdcMem, r.left, r.top, r.right, r.bottom);
+
+		// Move inside rectangle for inner board
+		r.left += 1;
+		r.top += 1;
+		r.right -= 1;
+		r.bottom -= 1;
+
+		//Clean up
+		SelectObject(hdcMem, old_pen);
+		DeleteObject(old_pen);
+		SelectObject(hdcMem, pen);
+		DeleteObject(pen);
+
+		break;
+	}
+	}
+
 	// Example test draw with the desired font to calculate each ListBox item size
 
 	const char* verifier = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	GetTextExtentPoint32(hdcMem, verifier, 27, &m_SingleSize);
 
-	const auto& dataSource = GetDataSource();
-	m_RowPosition.clear();
-	if (m_RowPosition.size() < dataSource->GetCount())
-	{
-		m_RowPosition.resize(dataSource->GetCount());
-	}
-
 	// Drawable block inside ListBox
-	RECT r(m_Margin.Left, m_Margin.Top, m_Size.Width - m_Margin.Right, m_Size.Height - m_Margin.Bottom);
-	if ((static_cast<unsigned long long>(r.bottom) - r.top) < (m_SingleSize.cy * dataSource->GetCount()))
+	RECT rc(m_Margin.Left + r.left, m_Margin.Top + r.top, r.right - m_Margin.Right, r.bottom - m_Margin.Bottom);
+	const auto& dataSource = GetDataSource();
+	if ((static_cast<unsigned long long>(rc.bottom) - rc.top) < (m_SingleSize.cy * dataSource->GetCount()))
 	{
 		m_IsVerticalScrollVisible = true;
 	}
@@ -96,11 +201,16 @@ void ListBox::OnPaint_Impl(HWND hwnd) noexcept
 	{
 		m_IsVerticalScrollVisible = false;
 	}
+	m_RowPosition.clear();
+	if (m_RowPosition.size() < dataSource->GetCount())
+	{
+		m_RowPosition.resize(dataSource->GetCount());
+	}
 
 	SCROLLINFO si;
 	// Get current scrollbar state:
 	si.cbSize = sizeof(SCROLLINFO);
-	si.fMask = SIF_RANGE | SIF_PAGE | SIF_POS | SIF_TRACKPOS;
+	si.fMask = SIF_POS;
 	GetScrollInfo(hwnd, SB_VERT, &si);
 
 	size_t i = 0;
@@ -112,10 +222,14 @@ void ListBox::OnPaint_Impl(HWND hwnd) noexcept
 		}
 		else
 		{
-			RECT cr;
-			CopyRect(&cr, &r);
-			cr.top = (m_SingleSize.cy * i) - (si.nPos * m_SingleSize.cy);
+			RECT cr, tmp;
+
+			// Rectangle TMP is used only to get the client rect to get the end of the line for bordering
+			GetClientRect(hwnd, &tmp);
+			CopyRect(&cr, &rc);
+			cr.top = (m_SingleSize.cy * i) - (si.nPos * m_SingleSize.cy) + m_Margin.Top;
 			cr.bottom = (cr.top + m_SingleSize.cy);
+			cr.right = tmp.right - m_Margin.Right;
 			m_RowPosition[i] = cr;
 
 			if (cr.bottom < m_Size.Height)
@@ -124,6 +238,11 @@ void ListBox::OnPaint_Impl(HWND hwnd) noexcept
 				{
 					SetBkColor(hdcMem, RGB(0, 120, 215));
 					SetTextColor(hdcMem, RGB(255, 255, 255));
+					// Draw background
+					HBRUSH brush = CreateSolidBrush(RGB(0, 120, 215));
+					FillRect(hdcMem, &cr, brush);
+					SelectObject(hdcMem, brush);
+					DeleteObject(brush);
 				}
 				else
 				{
@@ -137,17 +256,9 @@ void ListBox::OnPaint_Impl(HWND hwnd) noexcept
 		}
 	}
 
-	auto totalSizeVertical = m_RowPosition.back().bottom - m_RowPosition.front().top;
 	auto totalInScreen = m_Size.Height / m_SingleSize.cy;
-	auto remainingSteps = dataSource->GetCount() - totalInScreen;
-	m_VerticalScrollPaging = ((static_cast<float>(m_Size.Height) / static_cast<float>(totalSizeVertical))) * 100.0f;
 
 	HandleMessageForwarder(hwnd, WM_SIZE, MAKEWPARAM(0, 0), MAKELPARAM(m_RowPosition.back().right - m_RowPosition.back().left, totalInScreen + 1));
-
-	if (ShowScrollBar(hwnd, SB_VERT, m_IsVerticalScrollVisible) == 0)
-	{
-		throw CTL_LAST_EXCEPT();
-	}
 
 	// Perform the bit-block transfer between the memory Device Context which has the next bitmap
 	// with the current image to avoid flickering
@@ -167,6 +278,11 @@ void ListBox::OnPaint_Impl(HWND hwnd) noexcept
 
 void ListBox::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy) noexcept
 {
+	if (ShowScrollBar(hwnd, SB_VERT, m_IsVerticalScrollVisible) == 0)
+	{
+		throw CTL_LAST_EXCEPT();
+	}
+
 	if (m_IsVerticalScrollVisible)
 	{
 		SCROLLINFO si;
@@ -177,12 +293,6 @@ void ListBox::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy) noexcep
 		si.nPage = cx;
 		SetScrollInfo(hwnd, SB_HORZ, &si, FALSE);
 
-		// FIX: Make sure uHeight has the right value:
-		/*{
-			RECT rc;
-			GetClientRect(hwnd, &rc);
-			cy = rc.bottom - rc.top;
-		}*/
 		auto maxSize = GetDataSource()->GetCount();
 		si.nMin = 0;
 		si.nMax = maxSize;
@@ -193,8 +303,6 @@ void ListBox::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy) noexcep
 
 void ListBox::OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int code, int pos) noexcept
 {
-	std::ostringstream oss;
-
 	int nPos;
 	int nOldPos;
 	SCROLLINFO si;
@@ -220,16 +328,6 @@ void ListBox::OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int cod
 	case SB_THUMBPOSITION:  nPos = si.nPos; break;
 	}
 
-	oss << "cbSize: " << si.cbSize << std::endl
-		<< "fMask: " << si.fMask << std::endl
-		<< "nMin: " << si.nMin << std::endl
-		<< "nMax: " << si.nMax << std::endl
-		<< "nPage: " << si.nPage << std::endl
-		<< "nPos: " << si.nPos << std::endl
-		<< "nTrackPos: " << si.nTrackPos << std::endl << std::endl;
-
-	printf_s(oss.str().c_str());
-
 	// Update the scrollbar state (nPos) and repaint it. The function ensures
 	// the nPos does not fall out of the allowed range between nMin and nMax
 	// hence we ask for the corrected nPos again.
@@ -252,7 +350,7 @@ void ListBox::OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int cod
 	// amount of pixels corresponding to the 1 scrolling unit.
 	// We will discuss ScrollWindowEx() more later in the article.
 	auto up = nOldPos > nPos;
-	
+
 	for (auto it = m_RowPosition.begin(); it != m_RowPosition.end(); ++it)
 	{
 		if (up)
@@ -268,8 +366,6 @@ void ListBox::OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int cod
 	}
 
 	Update();
-
-	//ScrollWindowEx(hwnd, 0, inc, NULL, NULL, NULL, NULL, SW_ERASE | SW_INVALIDATE);
 }
 
 ListBox::ListBox(Control* parent, int width, int height, int x, int y)
@@ -284,18 +380,21 @@ ListBox::ListBox(Control* parent, int width, int height, int x, int y)
 	m_BorderStyle(BorderStyle::Fixed3D),
 	m_SingleSize({ 0 })
 {
-	if (ShowScrollBar(static_cast<HWND>(Handle.ToPointer()), SB_HORZ, m_IsHorizontalScrollVisible) == 0)
-	{
-		throw CTL_LAST_EXCEPT();
-	}
 
-	if (ShowScrollBar(static_cast<HWND>(Handle.ToPointer()), SB_VERT, m_IsVerticalScrollVisible) == 0)
-	{
-		throw CTL_LAST_EXCEPT();
-	}
 }
 
 ListBox::~ListBox()
 {
 
+}
+
+BorderStyle ListBox::GetBorderStyle() const noexcept
+{
+	return m_BorderStyle;
+}
+
+void ListBox::SetBorderStyle(BorderStyle style) noexcept
+{
+	m_BorderStyle = style;
+	Update();
 }

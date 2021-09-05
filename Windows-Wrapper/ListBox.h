@@ -26,4 +26,7 @@ public:
 
 	ListBox(Control* parent, int width, int height, int x, int y);
 	virtual ~ListBox();
+
+	BorderStyle GetBorderStyle() const noexcept;
+	void SetBorderStyle(BorderStyle style) noexcept;
 };
