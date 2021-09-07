@@ -1,6 +1,6 @@
 #include "Application.h"
-
-#include <stack>
+#include "WinAPI.h"
+#include "Window.h"
 
 Application::WindowCollection Application::Windows;
 

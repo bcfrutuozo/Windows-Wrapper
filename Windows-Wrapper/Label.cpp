@@ -1,37 +1,5 @@
 #include "Label.h"
 
-// Singleton ButtonClass
-Label::LabelClass Label::LabelClass::m_LabelClass;
-
-// ProgressBar class declarations
-Label::LabelClass::LabelClass() noexcept
-	:
-	m_Instance(GetModuleHandle(nullptr))
-{
-	WNDCLASSEX wc = { 0 };
-	wc.cbSize = sizeof(wc);
-	wc.style = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;
-	wc.lpfnWndProc = HandleMessageSetup;
-	wc.hInstance = GetInstance();
-	wc.lpszClassName = GetName();
-	RegisterClassEx(&wc);
-}
-
-Label::LabelClass::~LabelClass()
-{
-	UnregisterClass(m_ClassName, GetInstance());
-}
-
-const char* Label::LabelClass::GetName() noexcept
-{
-	return m_ClassName;
-}
-
-HINSTANCE Label::LabelClass::GetInstance() noexcept
-{
-	return m_LabelClass.m_Instance;
-}
-
 void Label::OnPaint_Impl(HWND hwnd) noexcept
 {
 	PAINTSTRUCT ps;
@@ -177,16 +145,16 @@ void Label::Initialize()
 {
 	// Create window and get its handle
 	Handle = CreateWindow(
-		LabelClass::GetName(),							// Class name
+		WindowClass::GetName(),							// Class name
 		Text.c_str(),									// Window title
 		WS_CHILD | WS_VISIBLE | WS_TABSTOP,				// Style values
 		Location.X,										// X position
 		Location.Y,										// Y position
-		m_Size.Width,										// Width
+		m_Size.Width,									// Width
 		m_Size.Height,									// Height
 		static_cast<HWND>(Parent->Handle.ToPointer()),	// Parent handle
-		NULL,						                	// Menu handle
-		LabelClass::GetInstance(),						// Module instance handle
+		nullptr,						               	// Menu handle
+		WindowClass::GetInstance(),						// Module instance handle
 		this											// Pointer to the button instance to work along with HandleMessageSetup function.
 	);
 

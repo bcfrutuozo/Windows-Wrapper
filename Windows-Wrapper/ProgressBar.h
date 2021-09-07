@@ -17,26 +17,6 @@ private:
 	std::thread m_UpdateThread;
 	volatile int m_Speed;
 
-	// Singleton manages registration/cleanup of window class
-	class ProgressBarClass
-	{
-	private:
-
-		static constexpr const char* m_ClassName = "Progress Bar Class";
-		static ProgressBarClass m_ProgressBarClass;
-		HINSTANCE m_Instance;
-
-		ProgressBarClass() noexcept;
-		~ProgressBarClass() noexcept;
-		ProgressBarClass(const ProgressBarClass&) = delete;
-		ProgressBarClass& operator=(const ProgressBarClass&) = delete;
-
-	public:
-
-		static const char* GetName() noexcept;
-		static HINSTANCE GetInstance() noexcept;
-	};
-
 	int OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept override;
 	void OnPaint_Impl(HWND hwnd) noexcept override;
 	void OnPaintMarquee_Thread(HWND hwnd) noexcept;

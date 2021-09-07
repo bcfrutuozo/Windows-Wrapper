@@ -155,11 +155,15 @@
     <ClCompile Include="Enumerator.cpp" />
     <ClCompile Include="EventDispatcher.cpp" />
     <ClCompile Include="Font.cpp" />
+    <ClCompile Include="HorizontalScrollBar.cpp" />
     <ClCompile Include="Label.cpp" />
     <ClCompile Include="ListBox.cpp" />
     <ClCompile Include="ListControl.cpp" />
     <ClCompile Include="ListItem.cpp" />
+    <ClCompile Include="ListItemCollection.cpp" />
     <ClCompile Include="MenuStrip.cpp" />
+    <ClCompile Include="ScrollableControl.cpp" />
+    <ClCompile Include="ScrollBar.cpp" />
     <ClCompile Include="Site.cpp" />
     <ClCompile Include="TestRealTimeApplication.cpp" />
     <ClCompile Include="ToolStrip.cpp" />
@@ -196,8 +200,10 @@
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Type.cpp" />
     <ClCompile Include="Utilities.cpp" />
+    <ClCompile Include="VerticalScrollBar.cpp" />
     <ClCompile Include="WinAPI.cpp" />
     <ClCompile Include="Window.cpp" />
+    <ClCompile Include="WindowClass.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -212,6 +218,7 @@
     <ClInclude Include="EventDispatcher.h" />
     <ClInclude Include="FlatButtonAppearance.h" />
     <ClInclude Include="Font.h" />
+    <ClInclude Include="HorizontalScrollBar.h" />
     <ClInclude Include="ICollection.h" />
     <ClInclude Include="IComponent.h" />
     <ClInclude Include="IContainer.h" />
@@ -228,7 +235,10 @@
     <ClInclude Include="ListControlConvertEventArgs.h" />
     <ClInclude Include="ListControlConvertEventHandler.h" />
     <ClInclude Include="ListItem.h" />
+    <ClInclude Include="ListItemCollection.h" />
     <ClInclude Include="MenuStrip.h" />
+    <ClInclude Include="ScrollableControl.h" />
+    <ClInclude Include="ScrollBar.h" />
     <ClInclude Include="Site.h" />
     <ClInclude Include="TestRealTimeApplication.h" />
     <ClInclude Include="ToolStrip.h" />
@@ -257,6 +267,7 @@
     <ClInclude Include="IntPtr.h" />
     <ClInclude Include="TestUserApplication.h" />
     <ClInclude Include="Utilities.h" />
+    <ClInclude Include="VerticalScrollBar.h" />
     <ClInclude Include="WinAPI.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="KeyEventArgs.h" />
@@ -289,6 +300,7 @@
     <ClInclude Include="UserApplication.h" />
     <ClInclude Include="uuid.h" />
     <ClInclude Include="Window.h" />
+    <ClInclude Include="WindowClass.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />

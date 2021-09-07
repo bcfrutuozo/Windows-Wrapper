@@ -15,5 +15,10 @@ public:
 
 	ComboBox(Control* parent, const std::string& name, int width, int x, int y);
 	virtual ~ComboBox();
+
+	void IncrementHorizontalScroll() noexcept override;
+	void DecrementHorizontalScroll() noexcept override;
+	void IncrementVerticalScroll() noexcept override;
+	void DecrementVerticalScroll() noexcept override;
 };
 

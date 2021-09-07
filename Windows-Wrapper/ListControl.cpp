@@ -1,69 +1,8 @@
 #include "ListControl.h"
 
-// Singleton ButtonClass
-ListControl::ListClass ListControl::ListClass::m_ListClass;
-
-// ProgressBar class declarations
-ListControl::ListClass::ListClass() noexcept
-	:
-	m_Instance(GetModuleHandle(nullptr))
-{
-	WNDCLASSEX wc = { 0 };
-	wc.cbSize = sizeof(wc);
-	wc.style = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;
-	wc.lpfnWndProc = HandleMessageSetup;
-	wc.hInstance = GetInstance();
-	wc.lpszClassName = GetName();
-	RegisterClassEx(&wc);
-}
-
-ListControl::ListClass::~ListClass()
-{
-	UnregisterClass(m_ClassName, GetInstance());
-}
-
-const char* ListControl::ListClass::GetName() noexcept
-{
-	return m_ClassName;
-}
-
-HINSTANCE ListControl::ListClass::GetInstance() noexcept
-{
-	return m_ListClass.m_Instance;
-}
-
 int ListControl::OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept
 {
 	return 1;	// To avoid flickering
-}
-
-
-ListControl::ListItemCollection::ListItemCollection(ListControl* owner)
-	:
-	Collection(owner)
-{
-
-}
-
-ListControl::ListItemCollection::ListItemCollection(ListControl* owner, ListItemCollection& value)
-	:
-	Collection(owner)
-{
-	for (const auto& item : value)
-	{
-		Add(item);
-	}
-}
-
-ListControl::ListItemCollection::ListItemCollection(ListControl* owner, ListItem* value[])
-	:
-	Collection(owner)
-{
-	while (value != nullptr)
-	{
-		Add(*value);
-		++value;
-	}
 }
 
 ListControl::ListControl(Control* parent, const std::string& name, int width, int x, int y)
@@ -75,7 +14,7 @@ ListControl::ListControl(Control* parent, const std::string& name, int width, in
 
 ListControl::ListControl(Control* parent, const std::string& name, int width, int height, int x, int y)
 	:
-	Control(parent, name, width, height, x, y),	// Default control size without font is 9
+	ScrollableControl(parent, name, width, height, x, y),	// Default control size without font is 9
 	m_AllowSelection(true),
 	Items(nullptr),
 	OnDataSourceChanged(nullptr),
@@ -87,7 +26,8 @@ ListControl::ListControl(Control* parent, const std::string& name, int width, in
 	OnSelectedValueChanged(nullptr),
 	OnValueMemberChanged(nullptr),
 	m_SelectedIndex(-1),	// Negative value because positive implies a valid selection
-	m_SelectedValue(nullptr)
+	m_SelectedValue(nullptr),
+	m_IsRebinding(false)
 {
 	Initialize();
 }
@@ -157,17 +97,17 @@ void ListControl::Initialize()
 {
 	// Create window and get its handle
 	Handle = CreateWindow(
-		ListClass::GetName(),																			// Class name
-		Text.c_str(),																						// Window title
-		WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPSIBLINGS,										// Style values
-		Location.X,																							// X position
-		Location.Y,																							// Y position
-		m_Size.Width,																						// Width
-		m_Size.Height,																						// Height
-		static_cast<HWND>(Parent->Handle.ToPointer()),														// Parent handle
-		(HMENU)GetId(),						                								// Menu handle
-		ListClass::GetInstance(),																		// Module instance handle
-		this																								// Pointer to the button instance to work along with HandleMessageSetup function.
+		WindowClass::GetName(),									// Class name
+		Text.c_str(),											// Window title
+		WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPSIBLINGS,	// Style values
+		Location.X,												// X position
+		Location.Y,												// Y position
+		m_Size.Width,											// Width
+		m_Size.Height,											// Height
+		static_cast<HWND>(Parent->Handle.ToPointer()),			// Parent handle
+		nullptr,						                		// Menu handle
+		WindowClass::GetInstance(),								// Module instance handle
+		this													// Pointer to the class instance to work along with HandleMessageSetup function.
 	);
 
 	if (Handle.IsNull())
@@ -177,6 +117,10 @@ void ListControl::Initialize()
 
 	// Set default TextBox margin to 3 pixels
 	m_BackgroundColor = Color::Window();
+
+	// Initialize scrollbars after control creation
+	HorizontalScrollBar.Initialize();
+	VerticalScrollBar.Initialize();
 }
 
 bool ListControl::IsSelectionAllowed()
@@ -198,6 +142,7 @@ void ListControl::SetDataSource(ListItemCollection* const dataSource) noexcept
 {
 	Items = dataSource;
 	Dispatch("OnDataSourceChanged", &ArgsDefault);
+	m_IsRebinding = true;
 	Update();
 }
 

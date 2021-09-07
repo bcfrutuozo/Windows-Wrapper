@@ -1,11 +1,10 @@
 #pragma once
 
-#include "Control.h"
-#include "ListItem.h"
-#include "IList.h"
+#include "ScrollableControl.h"
+#include "ListItemCollection.h"
 #include "ListControlConvertEventHandler.h"
 
-class ListControl : public Control
+class ListControl : public ScrollableControl
 {
 private:
 
@@ -24,26 +23,7 @@ protected:
 
 	int m_SelectedIndex;
 	ListItem* m_SelectedValue;
-
-	// Singleton manages registration/cleanup of window class
-	class ListClass
-	{
-	private:
-
-		static constexpr const char* m_ClassName = "List Class";
-		static ListClass m_ListClass;
-		HINSTANCE m_Instance;
-
-		ListClass() noexcept;
-		~ListClass() noexcept;
-		ListClass(const ListClass&) = delete;
-		ListClass& operator=(const ListClass&) = delete;
-
-	public:
-
-		static const char* GetName() noexcept;
-		static HINSTANCE GetInstance() noexcept;
-	};
+	bool m_IsRebinding;
 
 	int OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept override;
 
@@ -51,15 +31,6 @@ protected:
 	ListControl(Control* parent, const std::string& name, int width, int height, int x, int y);
 
 public:
-
-	class ListItemCollection : public Collection<ListItem>
-	{
-	public:
-
-		ListItemCollection(ListControl* owner);
-		ListItemCollection(ListControl* owner, ListItemCollection& value);
-		ListItemCollection(ListControl* owner, ListItem* value[]);
-	};
 
 	ListItemCollection* Items;
 

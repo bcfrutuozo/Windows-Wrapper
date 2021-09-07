@@ -12,26 +12,6 @@ private:
 	FlatButtonAppearance m_FlatAppearance;
 	FlatStyle m_FlatStyle;
 
-	// Singleton manages registration/cleanup of window class
-	class ButtonClass
-	{
-	private:
-
-		static constexpr const char* m_ClassName = "Button Class";
-		static ButtonClass m_ButtonClass;
-		HINSTANCE m_Instance;
-
-		ButtonClass() noexcept;
-		~ButtonClass() noexcept;
-		ButtonClass(const ButtonClass&) = delete;
-		ButtonClass& operator=(const ButtonClass&) = delete;
-
-	public:
-
-		static const char* GetName() noexcept;
-		static HINSTANCE GetInstance() noexcept;
-	};
-
 	int OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept override;
 	void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept override;
 	void OnKeyUp_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept override;

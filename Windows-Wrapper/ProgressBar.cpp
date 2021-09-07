@@ -1,37 +1,5 @@
 #include "ProgressBar.h"
 
-// Singleton ProgressBarClass
-ProgressBar::ProgressBarClass ProgressBar::ProgressBarClass::m_ProgressBarClass;
-
-// ProgressBar class declarations
-ProgressBar::ProgressBarClass::ProgressBarClass() noexcept
-	:
-	m_Instance(GetModuleHandle(nullptr))
-{
-	WNDCLASSEX wc = { 0 };
-	wc.cbSize = sizeof(wc);
-	wc.style = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;
-	wc.lpfnWndProc = HandleMessageSetup;
-	wc.hInstance = GetInstance();
-	wc.lpszClassName = GetName();
-	RegisterClassEx(&wc);
-}
-
-ProgressBar::ProgressBarClass::~ProgressBarClass()
-{
-	UnregisterClass(m_ClassName, GetInstance());
-}
-
-const char* ProgressBar::ProgressBarClass::GetName() noexcept
-{
-	return m_ClassName;
-}
-
-HINSTANCE ProgressBar::ProgressBarClass::GetInstance() noexcept
-{
-	return m_ProgressBarClass.m_Instance;
-}
-
 int ProgressBar::OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept
 {
 	return 1;	// Reduce control flickering
@@ -282,16 +250,16 @@ void ProgressBar::Initialize()
 {
 	// Create window and get its handle
 	Handle = CreateWindow(
-		ProgressBarClass::GetName(),					// Class name
+		WindowClass::GetName(),							// Class name
 		Text.c_str(),									// Window title
 		WS_CHILD | WS_VISIBLE,							// Style values
 		Location.X,										// X position
 		Location.Y,										// Y position
-		m_Size.Width,										// Width
+		m_Size.Width,									// Width
 		m_Size.Height,									// Height
 		static_cast<HWND>(Parent->Handle.ToPointer()),	// Parent handle
-		NULL,						                	// Menu handle
-		ProgressBarClass::GetInstance(),				// Module instance handle
+		nullptr,						                // Menu handle
+		WindowClass::GetInstance(),						// Module instance handle
 		this											// Pointer to the button instance to work along with HandleMessageSetup function.
 	);
 

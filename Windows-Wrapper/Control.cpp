@@ -184,8 +184,8 @@ Control::Control(Control* parent, const std::string& text, int width, int height
 	OnMouseRightDoubleClick(nullptr),
 	OnMouseUp(nullptr),
 	OnMouseWheel(nullptr),
-	OnVisibleChanged(nullptr)
-
+	OnVisibleChanged(nullptr),
+	m_IsVisible(false)
 {
 	if (m_Size.Height == 0 || m_Size.Width == 0)
 	{

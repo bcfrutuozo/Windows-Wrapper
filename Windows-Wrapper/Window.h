@@ -1,18 +1,18 @@
 #pragma once
 
 #include "Control.h"
-#include "Color.h"
-#include "Keyboard.h"
-#include "Mouse.h"
 #include "ListBox.h"
 #include "ComboBox.h"
 #include "MenuBar.h"
 #include "Button.h"
 #include "TextBox.h"
 #include "ProgressBar.h"
+#include "ToolStrip.h"
 #include "OnClosedEventArgs.h"
 #include "OnClosingEventArgs.h"
-#include "ToolStrip.h"
+#include "Color.h"
+#include "Keyboard.h"
+#include "Mouse.h"
 
 #include <memory>
 #include <vector>
@@ -25,26 +25,6 @@ class Window final : public Control
 	friend class WinAPI;
 
 private:
-
-	// Singleton manages registration/cleanup of window class
-	class WindowClass
-	{
-	private:
-
-		static constexpr const char* m_ClassName = "Window Class";
-		static WindowClass m_WindowClass;
-		HINSTANCE m_Instance;
-
-		WindowClass() noexcept;
-		~WindowClass() noexcept;
-		WindowClass(const WindowClass&) = delete;
-		WindowClass& operator=(const WindowClass&) = delete;
-
-	public:
-
-		static const char* GetName() noexcept;
-		static HINSTANCE GetInstance() noexcept;
-	};
 
 	bool m_IsCursorEnabled;
 	bool m_IsMenuStripEnabled;

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Common.h"
 #include "WinAPI.h"
 #include "Exception.h"
 #include "Color.h"
@@ -160,8 +159,8 @@ public:
 	Font GetFont() const noexcept;
 	void SetFont(Font font) noexcept;
 	bool IsShown() const noexcept;
-	void Hide() noexcept;
-	void Show() noexcept;
+	virtual void Hide() noexcept;
+	virtual void Show() noexcept;
 
 	// Control Exception
 	class ControlException : public Exception

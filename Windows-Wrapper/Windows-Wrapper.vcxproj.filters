@@ -75,6 +75,12 @@
     <ClCompile Include="ListBox.cpp" />
     <ClCompile Include="ComboBox.cpp" />
     <ClCompile Include="ListItem.cpp" />
+    <ClCompile Include="ScrollBar.cpp" />
+    <ClCompile Include="ListItemCollection.cpp" />
+    <ClCompile Include="ScrollableControl.cpp" />
+    <ClCompile Include="VerticalScrollBar.cpp" />
+    <ClCompile Include="HorizontalScrollBar.cpp" />
+    <ClCompile Include="WindowClass.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RealTimeApplication.h" />
@@ -247,6 +253,12 @@
     <ClInclude Include="ListBox.h" />
     <ClInclude Include="ComboBox.h" />
     <ClInclude Include="ListItem.h" />
+    <ClInclude Include="ScrollBar.h" />
+    <ClInclude Include="ListItemCollection.h" />
+    <ClInclude Include="ScrollableControl.h" />
+    <ClInclude Include="VerticalScrollBar.h" />
+    <ClInclude Include="HorizontalScrollBar.h" />
+    <ClInclude Include="WindowClass.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interfaces">

@@ -186,32 +186,24 @@ void ListBox::OnPaint_Impl(HWND hwnd) noexcept
 	}
 
 	// Example test draw with the desired font to calculate each ListBox item size
-
-	const char* verifier = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	GetTextExtentPoint32(hdcMem, verifier, 27, &m_SingleSize);
+	SIZE m_SingleSize;
+	const char* verifier = "A";
+	GetTextExtentPoint32(hdcMem, verifier, 2, &m_SingleSize);
+	SetSingleHorizontalIncrement(m_SingleSize.cx);
+	SetSingleVerticalIncrement(m_SingleSize.cy);
 
 	// Drawable block inside ListBox
 	RECT rc(m_Margin.Left + r.left, m_Margin.Top + r.top, r.right - m_Margin.Right, r.bottom - m_Margin.Bottom);
 	const auto& dataSource = GetDataSource();
-	if ((static_cast<unsigned long long>(rc.bottom) - rc.top) < (m_SingleSize.cy * dataSource->GetCount()))
-	{
-		m_IsVerticalScrollVisible = true;
-	}
-	else
-	{
-		m_IsVerticalScrollVisible = false;
-	}
-	m_RowPosition.clear();
-	if (m_RowPosition.size() < dataSource->GetCount())
-	{
-		m_RowPosition.resize(dataSource->GetCount());
-	}
 
-	SCROLLINFO si;
-	// Get current scrollbar state:
-	si.cbSize = sizeof(SCROLLINFO);
-	si.fMask = SIF_POS;
-	GetScrollInfo(hwnd, SB_VERT, &si);
+	if (m_IsRebinding)
+	{
+		m_RowPosition.clear();
+		if (m_RowPosition.size() < dataSource->GetCount())
+		{
+			m_RowPosition.resize(dataSource->GetCount());
+		}
+	}
 
 	size_t i = 0;
 	for (auto it = dataSource->begin(); it != dataSource->end(); ++it, ++i)
@@ -222,17 +214,31 @@ void ListBox::OnPaint_Impl(HWND hwnd) noexcept
 		}
 		else
 		{
-			RECT cr, tmp;
+			if ((static_cast<unsigned long long>(rc.bottom) - rc.top) < (m_SingleSize.cy * dataSource->GetCount()))
+			{
+				VerticalScrollBar.Show();
+				VerticalScrollBar.SetMaximumValue(dataSource->GetCount());
+			}
+			else
+			{
+				VerticalScrollBar.Hide();
+				VerticalScrollBar.SetMaximumValue(0);
+			}
 
-			// Rectangle TMP is used only to get the client rect to get the end of the line for bordering
-			GetClientRect(hwnd, &tmp);
+			RECT cr;
 			CopyRect(&cr, &rc);
-			cr.top = (m_SingleSize.cy * i) - (si.nPos * m_SingleSize.cy) + m_Margin.Top;
+			cr.top = (m_SingleSize.cy * i) - (VerticalScrollBar.GetScrolling() * m_SingleSize.cy) + rc.top;
 			cr.bottom = (cr.top + m_SingleSize.cy);
-			cr.right = tmp.right - m_Margin.Right;
+			cr.right -= m_Margin.Right;
+
+			if (VerticalScrollBar.IsShown())
+			{
+				cr.right -= VerticalScrollBar.GetSize().Width;
+			}
+			
 			m_RowPosition[i] = cr;
 
-			if (cr.bottom < m_Size.Height)
+			if (cr.bottom < m_Size.Height && cr.top >= rc.top)
 			{
 				if (m_SelectedIndex == i)
 				{
@@ -258,7 +264,10 @@ void ListBox::OnPaint_Impl(HWND hwnd) noexcept
 
 	auto totalInScreen = m_Size.Height / m_SingleSize.cy;
 
-	HandleMessageForwarder(hwnd, WM_SIZE, MAKEWPARAM(0, 0), MAKELPARAM(m_RowPosition.back().right - m_RowPosition.back().left, totalInScreen + 1));
+	if (VerticalScrollBar.IsShown() && m_IsRebinding)
+	{
+		HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_SIZE, MAKEWPARAM(0, 0), MAKELPARAM(m_RowPosition.back().right - m_RowPosition.back().left, totalInScreen + 1));
+	}
 
 	// Perform the bit-block transfer between the memory Device Context which has the next bitmap
 	// with the current image to avoid flickering
@@ -276,96 +285,76 @@ void ListBox::OnPaint_Impl(HWND hwnd) noexcept
 	EndPaint(hwnd, &ps);
 }
 
-void ListBox::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy) noexcept
+void ListBox::IncrementHorizontalScroll() noexcept
 {
-	if (ShowScrollBar(hwnd, SB_VERT, m_IsVerticalScrollVisible) == 0)
+	if (!IsHorizontalScrollEnabled())
 	{
-		throw CTL_LAST_EXCEPT();
+		return;
 	}
 
-	if (m_IsVerticalScrollVisible)
+	auto inc = GetSingleHorizontalIncrement();
+	for (auto& r : m_RowPosition)
 	{
-		SCROLLINFO si;
+		r.left += inc;
+		r.right += inc;
 
-		si.cbSize = sizeof(SCROLLINFO);
-		si.fMask = SIF_PAGE | SIF_RANGE;
-
-		si.nPage = cx;
-		SetScrollInfo(hwnd, SB_HORZ, &si, FALSE);
-
-		auto maxSize = GetDataSource()->GetCount();
-		si.nMin = 0;
-		si.nMax = maxSize;
-		si.nPage = cy;
-		SetScrollInfo(hwnd, SB_VERT, &si, TRUE);
+		// Invalidates only the item entry region. Otherwise scrollbar would flicker because it's a control inside a control being redraw all the time.
+		InvalidateRect(static_cast<HWND>(Handle.ToPointer()), &r, false);
 	}
 }
 
-void ListBox::OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int code, int pos) noexcept
+void ListBox::DecrementHorizontalScroll() noexcept
 {
-	int nPos;
-	int nOldPos;
-	SCROLLINFO si;
-
-	// Get current scrollbar state:
-	si.cbSize = sizeof(SCROLLINFO);
-	si.fMask = SIF_RANGE | SIF_PAGE | SIF_POS | SIF_TRACKPOS;
-	GetScrollInfo(hwnd, SB_VERT, &si);
-
-	nOldPos = si.nPos;
-
-	// Compute new nPos.
-	// Note we do not care where nPos falls between nMin and nMax. See below.
-	switch (code) {
-	case SB_TOP:            nPos = si.nMin; break;
-	case SB_BOTTOM:         nPos = si.nMax; break;
-	case SB_LINEUP:         nPos = si.nPos - 1; break;
-	case SB_LINEDOWN:       nPos = si.nPos + 1; break;
-		//case SB_PAGEUP:         nPos = si.nPos - CustomLogicalPage(si.nPage); break;
-		//case SB_PAGEDOWN:       nPos = si.nPos + CustomLogicalPage(si.nPage); break;
-	case SB_THUMBTRACK:     nPos = si.nTrackPos; break;
-	default:
-	case SB_THUMBPOSITION:  nPos = si.nPos; break;
-	}
-
-	// Update the scrollbar state (nPos) and repaint it. The function ensures
-	// the nPos does not fall out of the allowed range between nMin and nMax
-	// hence we ask for the corrected nPos again.
-	if (nPos < 0)
+	if (!IsHorizontalScrollEnabled())
 	{
 		return;
 	}
 
-	auto maxValue = GetDataSource()->GetCount();
-	if (nPos > maxValue)
+	auto inc = GetSingleHorizontalIncrement();
+	for (auto& r : m_RowPosition)
+	{
+		r.left -= inc;
+		r.right -= inc;
+
+		// Invalidates only the item entry region. Otherwise scrollbar would flicker because it's a control inside a control being redraw all the time.
+		InvalidateRect(static_cast<HWND>(Handle.ToPointer()), &r, false);
+	}
+}
+
+void ListBox::IncrementVerticalScroll() noexcept
+{
+	if (!IsVerticalScrollEnabled())
 	{
 		return;
 	}
 
-	SetScrollPos(hwnd, SB_VERT, nPos, TRUE);
-	m_VerticalScrolling = GetScrollPos(hwnd, SB_VERT);
-
-	// Refresh the control (repaint it to reflect the new nPos). Note we
-	// here multiply with some unspecified scrolling unit which specifies
-	// amount of pixels corresponding to the 1 scrolling unit.
-	// We will discuss ScrollWindowEx() more later in the article.
-	auto up = nOldPos > nPos;
-
-	for (auto it = m_RowPosition.begin(); it != m_RowPosition.end(); ++it)
+	auto inc = GetSingleVerticalIncrement();
+	for (auto& r : m_RowPosition)
 	{
-		if (up)
-		{
-			it->bottom -= m_SingleSize.cy;
-			it->top -= m_SingleSize.cy;
-		}
-		else
-		{
-			it->bottom += m_SingleSize.cy;
-			it->top += m_SingleSize.cy;
-		}
+		r.bottom += inc;
+		r.top += inc;
+
+		// Invalidates only the item entry region. Otherwise scrollbar would flicker because it's a control inside a control being redraw all the time.
+		InvalidateRect(static_cast<HWND>(Handle.ToPointer()), &r, false);
+	}
+}
+
+void ListBox::DecrementVerticalScroll() noexcept
+{
+	if (!IsVerticalScrollEnabled())
+	{
+		return;
 	}
 
-	Update();
+	auto inc = GetSingleVerticalIncrement();
+	for (auto& r : m_RowPosition)
+	{
+		r.bottom -= inc;
+		r.top -= inc;
+
+		// Invalidates only the item entry region. Otherwise scrollbar would flicker because it's a control inside a control being redraw all the time.
+		InvalidateRect(static_cast<HWND>(Handle.ToPointer()), &r, false);
+	}
 }
 
 ListBox::ListBox(Control* parent, int width, int height, int x, int y)
@@ -373,12 +362,10 @@ ListBox::ListBox(Control* parent, int width, int height, int x, int y)
 	ListControl(parent, "", width, height, x, y),
 	m_IsMultiColumn(false),
 	m_IsHorizontalScrollVisible(false),
-	m_IsVerticalScrollVisible(false),
 	m_IsScrollAlwaysVisible(false),
 	m_SelectionMode(SelectionMode::Single),
 	m_DockStyle(DockStyle::None),
-	m_BorderStyle(BorderStyle::Fixed3D),
-	m_SingleSize({ 0 })
+	m_BorderStyle(BorderStyle::Fixed3D)
 {
 
 }

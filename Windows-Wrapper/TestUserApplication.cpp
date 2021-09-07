@@ -19,9 +19,9 @@ void TestUserApplication::Initialize()
 	window->GetMouse().EnableRaw();
 	window->GetKeyboard().DisableAutorepeat();
 
-	auto lb = window->AddListBox(400, 400, 10, 10);
+	auto lb = window->AddListBox(400, 400, 500, 500);
 
-	auto list = new ListControl::ListItemCollection(lb);
+	auto list = new ListItemCollection(lb);
 	for (size_t i = 0; i < 200; ++i)
 	{
 		std::ostringstream oss;
@@ -36,7 +36,7 @@ void TestUserApplication::Initialize()
 	lb->SetBorderStyle(BorderStyle::FixedSingle);
 
 	//auto t1 = window->AddComboBox("ComboBox", 300, 120, 120);
-	//window2->AddButton("Boiolaaaa", 250, 250, 125, 125);
+	//window2->AddButton("Teste", 250, 250, 125, 125);
 
 	//ToolStrip& p = window->AddToolStrip();
 	//ToolStrip& j = window->AddToolStrip();
@@ -50,14 +50,14 @@ void TestUserApplication::Initialize()
 	//l->SetBorderStyle(BorderStyle::None);
 	//l->SetFont(f);
 	//
-	//button1 = window->AddButton("Abc", 200, 80, 50, 100);
-	//button1->OnClickSet([](Object* sender, EventArgs* e)
-	//	{
-	//		printf_s("Teste Mouseenter Button1");
-	//	}
-	//);
-	//
-	//txtBox1 = window->AddTextBox("TextBox", 400, 20, 400);
+	button1 = window->AddButton("Abc", 200, 80, 50, 100);
+	button1->OnClickSet([](Object* sender, EventArgs* e)
+		{
+			printf_s("Button1 Click Test");
+		}
+	);
+	
+	txtBox1 = window->AddTextBox("TextBox", 400, 20, 400);
 	
 	////auto& mb = window->GetMenuStrip();
 	////auto& item1 = mb.AddItem("Arquivo");
@@ -127,22 +127,17 @@ void TestUserApplication::Initialize()
 	//	}
 	//);
 	//
-	//txtBox2 = &window->AddTextBox("TextBox2", 400, 20, 460);
-	//txtBox2->BorderStyle = BorderStyle::FixedSingle;
-	//txtBox2->OnKeyPressSet([](Object* sender, KeyPressEventArgs* e)
-	//	{
-	//		TextBox* t = (TextBox*)sender;
-	//		if (e->KeyChar == 'p')
-	//		{
-	//			t->Dispose();
-	//		}
-	//		//if (e->KeyChar == 'q')
-	//		//{
-	//	//		e->Handled = true;
-	//	//		return;
-	//		//}
-	//	}
-	//);
+	txtBox2 = window->AddTextBox("TextBox2", 400, 20, 460);
+	txtBox2->BorderStyle = BorderStyle::FixedSingle;
+	txtBox2->OnKeyPressSet([](Object* sender, KeyPressEventArgs* e)
+		{
+			TextBox* t = (TextBox*)sender;
+			if (e->KeyChar == 'p')
+			{
+				t->Dispose();
+			}
+		}
+	);
 	//
 	//txtBox3 = &window->AddTextBox("TextBox3", 400, 20, 560);
 	//txtBox3->BorderStyle = BorderStyle::Fixed3D;

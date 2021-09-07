@@ -30,26 +30,6 @@ private:
 		CutAndPaste,
 	};
 
-	// Singleton manages registration/cleanup of window class
-	class TextBoxClass
-	{
-	private:
-
-		static constexpr const char* m_ClassName = "TextBox Class";
-		static TextBoxClass m_TextBoxClass;
-		HINSTANCE m_Instance;
-
-		TextBoxClass() noexcept;
-		~TextBoxClass() noexcept;
-		TextBoxClass(const TextBoxClass&) = delete;
-		TextBoxClass& operator=(const TextBoxClass&) = delete;
-
-	public:
-
-		static const char* GetName() noexcept;
-		static HINSTANCE GetInstance() noexcept;
-	};
-
 	int OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept override;
 	int OnGetDLGCode_Impl(HWND hwnd, LPMSG msg) noexcept override;
 	void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept override;

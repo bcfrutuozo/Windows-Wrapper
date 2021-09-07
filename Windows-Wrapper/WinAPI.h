@@ -1,5 +1,6 @@
 #pragma once
 
+#include "WindowClass.h"
 #include "Component.h"
 #include "IHandle.h"
 #include "Event.h"
@@ -21,6 +22,7 @@ class WinAPI : public Component, public IHandle
 	* It will be useful to implement hidden methods from the final user and at the same time,
 	* improve the Interops between WinAPI controls
 	*/
+	friend class WindowClass;
 	friend class Control;
 	friend class Button;
 	friend class TextBox;
@@ -31,6 +33,9 @@ class WinAPI : public Component, public IHandle
 	friend class ListControl;
 	friend class ComboBox;
 	friend class ListBox;
+	friend class ScrollBar;
+	friend class HorizontalScrollBar;
+	friend class VerticalScrollBar;
 
 private:
 

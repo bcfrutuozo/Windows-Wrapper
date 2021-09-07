@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Common.h"
+#include "Collection.h"
 #include "Window.h"
 
 class Application

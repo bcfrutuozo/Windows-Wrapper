@@ -2,38 +2,6 @@
 
 #include <algorithm>
 
-// Singleton TextBoxClass
-TextBox::TextBoxClass TextBox::TextBoxClass::m_TextBoxClass;
-
-// TextBox class declarations
-TextBox::TextBoxClass::TextBoxClass() noexcept
-	:
-	m_Instance(GetModuleHandle(nullptr))
-{
-	WNDCLASSEX wc = { 0 };
-	wc.cbSize = sizeof(wc);
-	wc.style = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;
-	wc.lpfnWndProc = HandleMessageSetup;
-	wc.hInstance = GetInstance();
-	wc.lpszClassName = GetName();
-	RegisterClassEx(&wc);
-}
-
-TextBox::TextBoxClass::~TextBoxClass()
-{
-	UnregisterClass(m_ClassName, GetInstance());
-}
-
-const char* TextBox::TextBoxClass::GetName() noexcept
-{
-	return m_ClassName;
-}
-
-HINSTANCE TextBox::TextBoxClass::GetInstance() noexcept
-{
-	return m_TextBoxClass.m_Instance;
-}
-
 int TextBox::OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept
 {
 	return 1;   // Returns 1 to avoid flickering
@@ -936,17 +904,17 @@ void TextBox::Initialize()
 {
 	// Create window and get its handle
 	Handle = CreateWindow(
-		TextBoxClass::GetName(),																			// Class name
-		Text.c_str(),																						// Window title
-		WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPSIBLINGS | SS_LEFT,										// Style values
-		Location.X,																							// X position
-		Location.Y,																							// Y position
-		m_Size.Width,																						// Width
-		m_Size.Height,																						// Height
-		static_cast<HWND>(Parent->Handle.ToPointer()),														// Parent handle
-		(HMENU)GetId(),						                								// Menu handle
-		TextBoxClass::GetInstance(),																		// Module instance handle
-		this																								// Pointer to the button instance to work along with HandleMessageSetup function.
+		WindowClass::GetName(),											 // Class name
+		Text.c_str(),													 // Window title
+		WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPSIBLINGS | SS_LEFT,	 // Style values
+		Location.X,														 // X position
+		Location.Y,														 // Y position
+		m_Size.Width,													 // Width
+		m_Size.Height,													 // Height
+		static_cast<HWND>(Parent->Handle.ToPointer()),					 // Parent handle
+		nullptr,						                				 // Menu handle
+		WindowClass::GetInstance(),										 // Module instance handle
+		this															 // Pointer to the button instance to work along with HandleMessageSetup function.
 	);
 
 	if (Handle.IsNull())

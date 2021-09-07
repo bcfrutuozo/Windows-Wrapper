@@ -9,26 +9,6 @@ private:
 	BorderStyle m_BorderStyle;
 	FlatStyle m_FlatStyle;
 
-	// Singleton manages registration/cleanup of window class
-	class LabelClass
-	{
-	private:
-
-		static constexpr const char* m_ClassName = "Label Class";
-		static LabelClass m_LabelClass;
-		HINSTANCE m_Instance;
-
-		LabelClass() noexcept;
-		~LabelClass() noexcept;
-		LabelClass(const LabelClass&) = delete;
-		LabelClass& operator=(const LabelClass&) = delete;
-
-	public:
-
-		static const char* GetName() noexcept;
-		static HINSTANCE GetInstance() noexcept;
-	};
-
 	virtual void OnPaint_Impl(HWND hwnd) noexcept override;
 
 public:

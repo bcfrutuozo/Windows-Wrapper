@@ -5,39 +5,6 @@
 
 #include <sstream>
 
-// Singleton WndClass
-Window::WindowClass Window::WindowClass::m_WindowClass;
-
-// Window class declarations
-Window::WindowClass::WindowClass() noexcept
-	:
-	m_Instance(GetModuleHandle(nullptr))
-{
-	WNDCLASSEX wc = { 0 };
-	wc.cbSize = sizeof(wc);
-	wc.style = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;
-	wc.lpfnWndProc = HandleMessageSetup;
-	wc.hInstance = GetInstance();
-	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wc.lpszClassName = GetName();
-	RegisterClassEx(&wc);
-}
-
-Window::WindowClass::~WindowClass()
-{
-	UnregisterClass(m_ClassName, GetInstance());
-}
-
-const char* Window::WindowClass::GetName() noexcept
-{
-	return m_ClassName;
-}
-
-HINSTANCE Window::WindowClass::GetInstance() noexcept
-{
-	return m_WindowClass.m_Instance;
-}
-
 Window::Window(const std::string& name, int width, int height)
 	:
 	Control(nullptr, name, width, height, 0, 0),
@@ -79,17 +46,17 @@ void Window::Initialize()
 
 	// Create window and get its handle
 	Handle = CreateWindow(
-		WindowClass::GetName(),																							// Class name
-		Text.c_str(),																									// Window title
-		WS_OVERLAPPEDWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU | WS_CLIPCHILDREN | WS_VISIBLE,	// Style values
-		CW_USEDEFAULT,																									// X position
-		CW_USEDEFAULT,																									// Y position
-		(r.right - r.left),																								// Width
-		(r.bottom - r.top),																								// Height
-		nullptr,																										// Parent handle
-		nullptr,																										// Menu handle
-		WindowClass::GetInstance(),																						// Module instance handle
-		this																											// Pointer to the window instance to work along with HandleMessageSetup function.
+		WindowClass::GetName(),																								// Class name
+		Text.c_str(),																										// Window title
+		WS_OVERLAPPEDWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU | WS_CLIPCHILDREN,					// Style values
+		CW_USEDEFAULT,																										// X position
+		CW_USEDEFAULT,																										// Y position
+		(r.right - r.left),																									// Width
+		(r.bottom - r.top),																									// Height
+		nullptr,																											// Parent handle
+		nullptr,																											// Menu handle
+		WindowClass::GetInstance(),																							// Module instance handle
+		this																												// Pointer to the window instance to work along with HandleMessageSetup function.
 	);
 
 	if (Handle.IsNull())
@@ -119,6 +86,7 @@ void Window::Initialize()
 
 	// Add window the the application windows container
 	Application::AddWindow(this);
+	Show();	// Force call Show because all window starts as not visible
 	Update();
 }
 
