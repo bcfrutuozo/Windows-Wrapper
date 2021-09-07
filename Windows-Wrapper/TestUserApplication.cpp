@@ -31,7 +31,7 @@ void TestUserApplication::Initialize()
 	lb->SetDataSource(list);
 	auto f = lb->GetFont();
 	f.SetStyle(FontStyle::Bold);
-	f.SetSize(24);
+	f.SetSize(18);
 	lb->SetFont(f);
 	lb->SetBorderStyle(BorderStyle::FixedSingle);
 

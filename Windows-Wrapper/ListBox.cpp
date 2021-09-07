@@ -193,7 +193,11 @@ void ListBox::OnPaint_Impl(HWND hwnd) noexcept
 	SetSingleVerticalIncrement(m_SingleSize.cy);
 
 	// Drawable block inside ListBox
-	RECT rc(m_Margin.Left + r.left, m_Margin.Top + r.top, r.right - m_Margin.Right, r.bottom - m_Margin.Bottom);
+	m_DrawableArea.left = m_Margin.Left + r.left;
+	m_DrawableArea.top = m_Margin.Top + r.top;
+	m_DrawableArea.right = r.right - m_Margin.Right;
+	m_DrawableArea.bottom = r.bottom - m_Margin.Bottom;
+
 	const auto& dataSource = GetDataSource();
 
 	if (m_IsRebinding)
@@ -214,7 +218,7 @@ void ListBox::OnPaint_Impl(HWND hwnd) noexcept
 		}
 		else
 		{
-			if ((static_cast<unsigned long long>(rc.bottom) - rc.top) < (m_SingleSize.cy * dataSource->GetCount()))
+			if ((static_cast<unsigned long long>(m_DrawableArea.bottom) - m_DrawableArea.top) < (m_SingleSize.cy * dataSource->GetCount()))
 			{
 				VerticalScrollBar.Show();
 				VerticalScrollBar.SetMaximumValue(dataSource->GetCount());
@@ -226,8 +230,8 @@ void ListBox::OnPaint_Impl(HWND hwnd) noexcept
 			}
 
 			RECT cr;
-			CopyRect(&cr, &rc);
-			cr.top = (m_SingleSize.cy * i) - (VerticalScrollBar.GetScrolling() * m_SingleSize.cy) + rc.top;
+			CopyRect(&cr, &m_DrawableArea);
+			cr.top = (m_SingleSize.cy * i) - (VerticalScrollBar.GetScrolling() * m_SingleSize.cy) + m_DrawableArea.top;
 			cr.bottom = (cr.top + m_SingleSize.cy);
 			cr.right -= m_Margin.Right;
 
@@ -238,7 +242,7 @@ void ListBox::OnPaint_Impl(HWND hwnd) noexcept
 			
 			m_RowPosition[i] = cr;
 
-			if (cr.bottom < m_Size.Height && cr.top >= rc.top)
+			if (cr.bottom <= m_DrawableArea.bottom && cr.top >= m_DrawableArea.top)
 			{
 				if (m_SelectedIndex == i)
 				{
@@ -262,11 +266,10 @@ void ListBox::OnPaint_Impl(HWND hwnd) noexcept
 		}
 	}
 
-	auto totalInScreen = m_Size.Height / m_SingleSize.cy;
-
 	if (VerticalScrollBar.IsShown() && m_IsRebinding)
 	{
-		HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_SIZE, MAKEWPARAM(0, 0), MAKELPARAM(m_RowPosition.back().right - m_RowPosition.back().left, totalInScreen + 1));
+		auto totalInScreen = static_cast<size_t>(std::ceil(static_cast<float>((m_DrawableArea.bottom - m_DrawableArea.top)) / static_cast<float>(GetSingleVerticalIncrement())));
+		HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_SIZE, MAKEWPARAM(0, 0), MAKELPARAM(m_RowPosition.back().right - m_RowPosition.back().left, totalInScreen));
 	}
 
 	// Perform the bit-block transfer between the memory Device Context which has the next bitmap
@@ -333,10 +336,13 @@ void ListBox::IncrementVerticalScroll() noexcept
 	{
 		r.bottom += inc;
 		r.top += inc;
-
-		// Invalidates only the item entry region. Otherwise scrollbar would flicker because it's a control inside a control being redraw all the time.
-		InvalidateRect(static_cast<HWND>(Handle.ToPointer()), &r, false);
 	}
+
+	// Invalidates only the item entry region. Otherwise scrollbar would flicker because it's a control inside a control being redraw all the time.
+	RECT tmp;
+	CopyRect(&tmp, &m_DrawableArea);
+	tmp.right -= VerticalScrollBar.GetSize().Width;
+	InvalidateRect(static_cast<HWND>(Handle.ToPointer()), &tmp, false);
 }
 
 void ListBox::DecrementVerticalScroll() noexcept
@@ -351,10 +357,13 @@ void ListBox::DecrementVerticalScroll() noexcept
 	{
 		r.bottom -= inc;
 		r.top -= inc;
-
-		// Invalidates only the item entry region. Otherwise scrollbar would flicker because it's a control inside a control being redraw all the time.
-		InvalidateRect(static_cast<HWND>(Handle.ToPointer()), &r, false);
 	}
+
+	// Invalidates only the item entry region. Otherwise scrollbar would flicker because it's a control inside a control being redraw all the time.
+	RECT tmp;
+	CopyRect(&tmp, &m_DrawableArea);
+	tmp.right -= VerticalScrollBar.GetSize().Width;
+	InvalidateRect(static_cast<HWND>(Handle.ToPointer()), &tmp, false);
 }
 
 ListBox::ListBox(Control* parent, int width, int height, int x, int y)
@@ -365,7 +374,8 @@ ListBox::ListBox(Control* parent, int width, int height, int x, int y)
 	m_IsScrollAlwaysVisible(false),
 	m_SelectionMode(SelectionMode::Single),
 	m_DockStyle(DockStyle::None),
-	m_BorderStyle(BorderStyle::Fixed3D)
+	m_BorderStyle(BorderStyle::Fixed3D),
+	m_DrawableArea({0})
 {
 
 }
