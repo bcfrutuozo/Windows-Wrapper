@@ -5,8 +5,8 @@ ScrollableControl::ScrollableControl(Control* parent, const std::string& name, i
 	Control(parent, name, width, height, x, y),
 	HorizontalScrollBar(this, m_Size.Width - m_Margin.Left - m_Margin.Right, GetSystemMetrics(SM_CYHSCROLL), m_Margin.Left, m_Size.Height - GetSystemMetrics(SM_CYHSCROLL) - m_Margin.Bottom),
 	VerticalScrollBar(this, GetSystemMetrics(SM_CXVSCROLL), m_Size.Height - m_Margin.Top - m_Margin.Bottom, m_Size.Width - GetSystemMetrics(SM_CXVSCROLL) - m_Margin.Right, m_Margin.Top),
-	m_SingleHorizontalIncrement(0),
-	m_SingleVerticalIncrement(0),
+	m_ItemWidth(0),
+	m_ItemHeight(0),
 	m_IsHorizontalScrollEnabled(false),
 	m_IsVerticalScrollEnabled(false)
 {
@@ -48,22 +48,22 @@ void ScrollableControl::DisableVerticalScroll() noexcept
 	VerticalScrollBar.Hide();
 }
 
-size_t ScrollableControl::GetSingleHorizontalIncrement() const noexcept
+size_t ScrollableControl::GetItemWidth() const noexcept
 {
-	return m_SingleHorizontalIncrement;
+	return m_ItemWidth;
 }
 
-void ScrollableControl::SetSingleHorizontalIncrement(const size_t& increment) noexcept
+void ScrollableControl::SetItemWidth(const size_t& width) noexcept
 {
-	m_SingleHorizontalIncrement = increment;
+	m_ItemWidth = width;
 }
 
-size_t ScrollableControl::GetSingleVerticalIncrement() const noexcept
+size_t ScrollableControl::GetItemHeight() const noexcept
 {
-	return m_SingleVerticalIncrement;
+	return m_ItemHeight;
 }
 
-void ScrollableControl::SetSingleVerticalIncrement(const size_t& increment) noexcept
+void ScrollableControl::SetItemHeight(const size_t& height) noexcept
 {
-	m_SingleVerticalIncrement = increment;
+	m_ItemHeight = height;
 }

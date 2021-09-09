@@ -140,6 +140,11 @@ void ListControl::DisableSelection() noexcept
 
 void ListControl::SetDataSource(ListItemCollection* const dataSource) noexcept
 {
+	if (dataSource->GetCount() > 32767)
+	{
+		throw std::logic_error("Maximum ListBox items allowed is 32767");
+	}
+
 	Items = dataSource;
 	Dispatch("OnDataSourceChanged", &ArgsDefault);
 	m_IsRebinding = true;

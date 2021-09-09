@@ -37,6 +37,18 @@ void VerticalScrollBar::OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsign
 
 	nOldPos = si.nPos;
 
+	std::ostringstream oss;
+	oss << "Code: " << code << " | Pos: " << pos << std::endl
+		<< "cbSize: " << si.cbSize << std::endl
+		<< "fMask: " << si.fMask << std::endl
+		<< "nMax: " << si.nMax << std::endl
+		<< "nMin: " << si.nMin << std::endl
+		<< "nPage: " << si.nPage << std::endl
+		<< "nPos: " << si.nPos << std::endl
+		<< "nTrackPos: " << si.nTrackPos << std::endl << std::endl;
+
+	printf_s(oss.str().c_str());
+
 	// Compute new nPos.
 	// Note we do not care where nPos falls between nMin and nMax. See below.
 	switch (code) {
@@ -46,7 +58,7 @@ void VerticalScrollBar::OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsign
 	case SB_LINEDOWN:       nPos = si.nPos + 1; break;
 		//case SB_PAGEUP:         nPos = si.nPos - CustomLogicalPage(si.nPage); break;
 		//case SB_PAGEDOWN:       nPos = si.nPos + CustomLogicalPage(si.nPage); break;
-	case SB_THUMBTRACK:     nPos = si.nTrackPos; break;
+	case SB_THUMBTRACK:     nPos = pos; break;
 	default:
 	case SB_THUMBPOSITION:  nPos = si.nPos; break;
 	}

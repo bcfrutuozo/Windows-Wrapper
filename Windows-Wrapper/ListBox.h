@@ -14,6 +14,7 @@ private:
 	BorderStyle m_BorderStyle;
 	std::vector<RECT> m_RowPosition;
 	RECT m_DrawableArea;
+	size_t m_TotalItemsInDrawableArea;
 
 	void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept override;
 	void OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept override;

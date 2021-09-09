@@ -15,14 +15,14 @@ void TestClick(Object* sender, EventArgs* e)
 
 void TestUserApplication::Initialize()
 {
-	Window* window = new Window("Teste", 1920, 1080);
+	Window* window = new Window("Teste", 1000, 1000);
 	window->GetMouse().EnableRaw();
 	window->GetKeyboard().DisableAutorepeat();
 
-	auto lb = window->AddListBox(400, 400, 500, 500);
+	auto lb = window->AddListBox(400, 200, 500, 50);
 
 	auto list = new ListItemCollection(lb);
-	for (size_t i = 0; i < 200; ++i)
+	for (size_t i = 0; i < 32767; ++i)
 	{
 		std::ostringstream oss;
 		oss << "Item: " << i;
@@ -31,9 +31,9 @@ void TestUserApplication::Initialize()
 	lb->SetDataSource(list);
 	auto f = lb->GetFont();
 	f.SetStyle(FontStyle::Bold);
-	f.SetSize(18);
+	f.SetSize(11);
 	lb->SetFont(f);
-	lb->SetBorderStyle(BorderStyle::FixedSingle);
+	lb->SetBorderStyle(BorderStyle::Fixed3D);
 
 	//auto t1 = window->AddComboBox("ComboBox", 300, 120, 120);
 	//window2->AddButton("Teste", 250, 250, 125, 125);

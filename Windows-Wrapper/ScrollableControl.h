@@ -10,8 +10,8 @@ private:
 
 	bool m_IsHorizontalScrollEnabled;
 	bool m_IsVerticalScrollEnabled;
-	size_t m_SingleHorizontalIncrement;
-	size_t m_SingleVerticalIncrement;
+	size_t m_ItemWidth;
+	size_t m_ItemHeight;
 
 protected:
 
@@ -29,10 +29,10 @@ public:
 	bool IsVerticalScrollEnabled() const noexcept;
 	void EnableVerticalScroll() noexcept;
 	void DisableVerticalScroll() noexcept;
-	size_t GetSingleHorizontalIncrement() const noexcept;
-	void SetSingleHorizontalIncrement(const size_t& increment) noexcept;
-	size_t GetSingleVerticalIncrement() const noexcept;
-	void SetSingleVerticalIncrement(const size_t& increment) noexcept;
+	size_t GetItemWidth() const noexcept;
+	void SetItemWidth(const size_t& width) noexcept;
+	size_t GetItemHeight() const noexcept;
+	void SetItemHeight(const size_t& height) noexcept;
 
 	virtual void IncrementHorizontalScroll() noexcept = 0;
 	virtual void DecrementHorizontalScroll() noexcept = 0;

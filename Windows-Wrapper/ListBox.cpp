@@ -6,9 +6,19 @@ void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 	{
 	case VK_DOWN:
 	{
-		if (m_SelectedIndex < GetDataSource()->GetCount())
+		if (m_SelectedIndex < GetDataSource()->GetCount() - 1)
 		{
 			++m_SelectedIndex;
+
+			if (m_RowPosition[m_SelectedIndex].bottom > m_DrawableArea.bottom)
+			{
+				HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_SelectedIndex - m_TotalItemsInDrawableArea + 1), 0);
+			}
+
+			if (m_RowPosition[m_SelectedIndex].top < m_DrawableArea.top)
+			{
+				HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_SelectedIndex), 0);
+			}
 		}
 
 		break;
@@ -18,6 +28,16 @@ void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 		if (m_SelectedIndex > 0)
 		{
 			--m_SelectedIndex;
+			
+			if (m_RowPosition[m_SelectedIndex].bottom > m_DrawableArea.bottom)
+			{
+				HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_SelectedIndex - m_TotalItemsInDrawableArea + 1), 0);
+			}
+
+			if (m_RowPosition[m_SelectedIndex].top < m_DrawableArea.top)
+			{
+				HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_SelectedIndex), 0);
+			}
 		}
 
 		break;
@@ -32,12 +52,15 @@ void ListBox::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlag
 {
 	size_t i = 0;
 
-	for (auto it = m_RowPosition.begin(); it != m_RowPosition.end(); ++it, ++i)
+	if (y >= m_DrawableArea.top && y <= m_DrawableArea.bottom && x >= m_DrawableArea.left && x <= m_DrawableArea.right)
 	{
-		if (y >= it->top && y <= it->bottom && x >= it->left && x <= it->right)
+		for (auto it = m_RowPosition.begin(); it != m_RowPosition.end(); ++it, ++i)
 		{
-			SetSelectedIndex(i);
-			break;
+			if (y >= it->top && y <= it->bottom && x >= it->left && x <= it->right)
+			{
+				SetSelectedIndex(i);		
+				break;
+			}
 		}
 	}
 
@@ -189,8 +212,8 @@ void ListBox::OnPaint_Impl(HWND hwnd) noexcept
 	SIZE m_SingleSize;
 	const char* verifier = "A";
 	GetTextExtentPoint32(hdcMem, verifier, 2, &m_SingleSize);
-	SetSingleHorizontalIncrement(m_SingleSize.cx);
-	SetSingleVerticalIncrement(m_SingleSize.cy);
+	SetItemWidth(m_SingleSize.cx);
+	SetItemHeight(m_SingleSize.cy);
 
 	// Drawable block inside ListBox
 	m_DrawableArea.left = m_Margin.Left + r.left;
@@ -207,6 +230,39 @@ void ListBox::OnPaint_Impl(HWND hwnd) noexcept
 		{
 			m_RowPosition.resize(dataSource->GetCount());
 		}
+
+		m_TotalItemsInDrawableArea = 0;
+
+		// Adjust size according to visible amount of items
+		auto totalSize = m_DrawableArea.bottom - m_DrawableArea.top;
+		size_t currentSize = 0;
+		while (currentSize < totalSize)
+		{
+			currentSize += GetItemHeight();
+		}
+
+		currentSize += m_Margin.Top + m_Margin.Bottom;
+		switch (m_BorderStyle)
+		{
+		case BorderStyle::None:
+		{
+			break;
+		}
+		case BorderStyle::FixedSingle:
+		{
+			// 1 on top and 1 on bottom
+			currentSize += 2;
+			break;
+		}
+		case BorderStyle::Fixed3D:
+		{
+			// 2 on top and 2 on bottom
+			currentSize += 4;
+			break;
+		}
+		}
+
+		SetWindowPos(hwnd, nullptr, Location.X, Location.Y, m_Size.Width, currentSize, 0);
 	}
 
 	size_t i = 0;
@@ -244,6 +300,11 @@ void ListBox::OnPaint_Impl(HWND hwnd) noexcept
 
 			if (cr.bottom <= m_DrawableArea.bottom && cr.top >= m_DrawableArea.top)
 			{
+				if (m_IsRebinding)
+				{
+					++m_TotalItemsInDrawableArea;
+				}
+
 				if (m_SelectedIndex == i)
 				{
 					SetBkColor(hdcMem, RGB(0, 120, 215));
@@ -268,8 +329,8 @@ void ListBox::OnPaint_Impl(HWND hwnd) noexcept
 
 	if (VerticalScrollBar.IsShown() && m_IsRebinding)
 	{
-		auto totalInScreen = static_cast<size_t>(std::ceil(static_cast<float>((m_DrawableArea.bottom - m_DrawableArea.top)) / static_cast<float>(GetSingleVerticalIncrement())));
-		HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_SIZE, MAKEWPARAM(0, 0), MAKELPARAM(m_RowPosition.back().right - m_RowPosition.back().left, totalInScreen));
+		auto totalSize = static_cast<size_t>(std::ceil(static_cast<float>((m_DrawableArea.bottom - m_DrawableArea.top)) / static_cast<float>(GetItemHeight())));
+		HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_SIZE, MAKEWPARAM(0, 0), MAKELPARAM(m_RowPosition.back().right - m_RowPosition.back().left, totalSize));
 	}
 
 	// Perform the bit-block transfer between the memory Device Context which has the next bitmap
@@ -295,7 +356,7 @@ void ListBox::IncrementHorizontalScroll() noexcept
 		return;
 	}
 
-	auto inc = GetSingleHorizontalIncrement();
+	auto inc = GetItemWidth();
 	for (auto& r : m_RowPosition)
 	{
 		r.left += inc;
@@ -313,7 +374,7 @@ void ListBox::DecrementHorizontalScroll() noexcept
 		return;
 	}
 
-	auto inc = GetSingleHorizontalIncrement();
+	auto inc = GetItemWidth();
 	for (auto& r : m_RowPosition)
 	{
 		r.left -= inc;
@@ -331,7 +392,7 @@ void ListBox::IncrementVerticalScroll() noexcept
 		return;
 	}
 
-	auto inc = GetSingleVerticalIncrement();
+	auto inc = GetItemHeight();
 	for (auto& r : m_RowPosition)
 	{
 		r.bottom += inc;
@@ -352,7 +413,7 @@ void ListBox::DecrementVerticalScroll() noexcept
 		return;
 	}
 
-	auto inc = GetSingleVerticalIncrement();
+	auto inc = GetItemHeight();
 	for (auto& r : m_RowPosition)
 	{
 		r.bottom -= inc;
@@ -375,7 +436,8 @@ ListBox::ListBox(Control* parent, int width, int height, int x, int y)
 	m_SelectionMode(SelectionMode::Single),
 	m_DockStyle(DockStyle::None),
 	m_BorderStyle(BorderStyle::Fixed3D),
-	m_DrawableArea({0})
+	m_DrawableArea({0}),
+	m_TotalItemsInDrawableArea(0)
 {
 
 }
