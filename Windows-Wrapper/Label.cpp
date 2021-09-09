@@ -26,8 +26,7 @@ void Label::OnPaint_Impl(HWND hwnd) noexcept
 
 	SIZE s;
 	GetTextExtentPoint32(ps.hdc, Text.c_str(), static_cast<int>(Text.length()), &s);
-	m_Size = Size(s.cx + m_Margin.Left + m_Margin.Right + 8, s.cy + m_Margin.Top + m_Margin.Bottom + 2);
-	SetWindowPos(hwnd, HWND_TOP, Location.X, Location.Y, m_Size.Width, m_Size.Height, 0);
+	Resize(Size(s.cx + m_Margin.Left + m_Margin.Right + 8, s.cy + m_Margin.Top + m_Margin.Bottom + 2));
 
 	RECT r;
 	GetClientRect(hwnd, &r);
@@ -148,8 +147,8 @@ void Label::Initialize()
 		WindowClass::GetName(),							// Class name
 		Text.c_str(),									// Window title
 		WS_CHILD | WS_VISIBLE | WS_TABSTOP,				// Style values
-		Location.X,										// X position
-		Location.Y,										// Y position
+		m_Location.X,										// X position
+		m_Location.Y,										// Y position
 		m_Size.Width,									// Width
 		m_Size.Height,									// Height
 		static_cast<HWND>(Parent->Handle.ToPointer()),	// Parent handle

@@ -340,8 +340,8 @@ void Button::Initialize()
 		WindowClass::GetName(),							// Class name
 		Text.c_str(),									// Window title
 		WS_CHILD | WS_VISIBLE | WS_TABSTOP,				// Style values
-		Location.X,										// X position
-		Location.Y,										// Y position
+		m_Location.X,										// X position
+		m_Location.Y,										// Y position
 		m_Size.Width,									// Width
 		m_Size.Height,									// Height
 		static_cast<HWND>(Parent->Handle.ToPointer()),	// Parent handle

@@ -16,7 +16,7 @@ void VerticalScrollBar::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int c
 		si.nPage = cx;
 		SetScrollInfo(hwnd, SB_HORZ, &si, false);
 		si.nMin = 0;
-		si.nMax = MaximumValue;
+		si.nMax = MaximumValue - 1;
 		si.nPage = cy;
 		SetScrollInfo(hwnd, SB_VERT, &si, true);
 	}
@@ -71,10 +71,20 @@ void VerticalScrollBar::OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsign
 		return;
 	}
 
-	if (nPos > MaximumValue)
+	if (nPos > si.nMax)
 	{
 		return;
 	}
+
+	/*if (code != SB_THUMBTRACK && nPos + si.nPage > MaximumValue)
+	{
+		return;
+	}
+
+	if (code == SB_THUMBTRACK && nPos + si.nPage > MaximumValue)
+	{
+		nPos = MaximumValue - si.nPage;
+	}*/
 
 	SetScrollPos(hwnd, SB_VERT, nPos, TRUE);
 	Scrolling = GetScrollPos(hwnd, SB_VERT);

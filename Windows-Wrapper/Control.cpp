@@ -157,7 +157,7 @@ Control::Control(Control* parent, const std::string& text, int width, int height
 	Parent(parent),
 	Text(text),
 	m_Size(width, height),
-	Location(x, y),
+	m_Location(x, y),
 	m_BackgroundColor(Color::Control()),
 	m_ForeColor(Color::WindowText()),
 	m_Padding(0),
@@ -212,6 +212,11 @@ bool Control::IsShown() const noexcept
 	return m_IsVisible;
 }
 
+Point Control::GetLocation() const noexcept
+{
+	return m_Location;
+}
+
 void Control::Hide() noexcept
 {
 	if (IsShown())
@@ -228,6 +233,18 @@ void Control::Show() noexcept
 		m_IsVisible = true;
 		ShowWindow(static_cast<HWND>(Handle.ToPointer()), SW_SHOWDEFAULT);
 	}
+}
+
+void Control::SetLocation(Point p) noexcept
+{
+	m_Location = p;
+	SetWindowPos(static_cast<HWND>(Handle.ToPointer()), nullptr, m_Location.X, m_Location.Y, m_Size.Width, m_Size.Height, SWP_NOZORDER);
+}
+
+void Control::SetLocation(int x, int y) noexcept
+{
+	m_Location = Point(x, y);
+	SetWindowPos(static_cast<HWND>(Handle.ToPointer()), nullptr, m_Location.X, m_Location.Y, m_Size.Width, m_Size.Height, SWP_NOZORDER);
 }
 
 Control::~Control()
@@ -579,6 +596,18 @@ bool Control::IsEnabled() const noexcept
 	}
 
 	return true;
+}
+
+void Control::Resize(Size s) noexcept
+{
+	m_Size = s;
+	SetWindowPos(static_cast<HWND>(Handle.ToPointer()), nullptr, m_Location.X, m_Location.Y, m_Size.Width, m_Size.Height, SWP_NOZORDER);
+}
+
+void Control::Resize(int width, int height) noexcept
+{
+	m_Size = Size(width, height);
+	SetWindowPos(static_cast<HWND>(Handle.ToPointer()), nullptr, m_Location.X, m_Location.Y, m_Size.Width, m_Size.Height, SWP_NOZORDER);
 }
 
 Window* Control::GetWindow() noexcept

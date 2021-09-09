@@ -72,7 +72,7 @@ private:
 
 protected:
 
-	Point Location;
+	Point m_Location;
 	Control* Parent;
 	std::string Text;
 	Size m_Size;
@@ -145,6 +145,8 @@ public:
 	bool IsEnabled() const noexcept override;
 	Window* GetWindow() noexcept;
 	Size GetSize() const noexcept;
+	void Resize(Size s) noexcept;
+	void Resize(int width, int height) noexcept;
 	Padding GetMargin() const noexcept;
 	Control* GetByTabIndex(const unsigned int& index) noexcept;
 	void SetForeColor(const Color& color) noexcept;
@@ -158,6 +160,9 @@ public:
 	void SetTabIndex(const unsigned int& index) noexcept;
 	Font GetFont() const noexcept;
 	void SetFont(Font font) noexcept;
+	Point GetLocation() const noexcept;
+	void SetLocation(Point p) noexcept;
+	void SetLocation(int x, int y) noexcept;
 	bool IsShown() const noexcept;
 	virtual void Hide() noexcept;
 	virtual void Show() noexcept;

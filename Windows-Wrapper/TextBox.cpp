@@ -630,8 +630,7 @@ void TextBox::InputDraw(HWND hWnd, HDC& hdc) noexcept
 	PrintDebug(); // Show string, cursor and selection indices on Output Window
 #endif
 
-	m_Size = CalculateSizeByFont();
-	SetWindowPos(hWnd, HWND_TOP, Location.X, Location.Y, m_Size.Width, m_Size.Height, 0);
+	Resize(CalculateSizeByFont());
 
 	HDC hdcMem = CreateCompatibleDC(hdc);
 	HBITMAP hbmMem = CreateCompatibleBitmap(hdc, m_Size.Width, m_Size.Height);
@@ -907,8 +906,8 @@ void TextBox::Initialize()
 		WindowClass::GetName(),											 // Class name
 		Text.c_str(),													 // Window title
 		WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPSIBLINGS | SS_LEFT,	 // Style values
-		Location.X,														 // X position
-		Location.Y,														 // Y position
+		m_Location.X,														 // X position
+		m_Location.Y,														 // Y position
 		m_Size.Width,													 // Width
 		m_Size.Height,													 // Height
 		static_cast<HWND>(Parent->Handle.ToPointer()),					 // Parent handle

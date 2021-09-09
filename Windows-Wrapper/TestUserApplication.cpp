@@ -19,10 +19,10 @@ void TestUserApplication::Initialize()
 	window->GetMouse().EnableRaw();
 	window->GetKeyboard().DisableAutorepeat();
 
-	auto lb = window->AddListBox(400, 200, 500, 50);
+	auto lb = window->AddListBox(400, 240, 500, 50);
 
 	auto list = new ListItemCollection(lb);
-	for (size_t i = 0; i < 32767; ++i)
+	for (size_t i = 0; i < 31; ++i)
 	{
 		std::ostringstream oss;
 		oss << "Item: " << i;
@@ -30,8 +30,9 @@ void TestUserApplication::Initialize()
 	}
 	lb->SetDataSource(list);
 	auto f = lb->GetFont();
-	f.SetStyle(FontStyle::Bold);
-	f.SetSize(11);
+	f.SetStyle(FontStyle::Italic);
+	f.SetStyle(FontStyle::Underline);
+	f.SetSize(32);
 	lb->SetFont(f);
 	lb->SetBorderStyle(BorderStyle::Fixed3D);
 
