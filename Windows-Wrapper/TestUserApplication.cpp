@@ -31,12 +31,11 @@ void TestUserApplication::Initialize()
 	lb->SetDataSource(list);
 	auto f = lb->GetFont();
 	f.SetStyle(FontStyle::Italic);
-	f.SetStyle(FontStyle::Underline);
-	f.SetSize(21);
+	f.SetSize(27);
 	lb->SetFont(f);
 	lb->SetBorderStyle(BorderStyle::Fixed3D);
-	lb->EnableMultiColumn();
-	lb->SetColumnWidth(150);
+	//lb->EnableMultiColumn();
+	//lb->SetColumnWidth(150);
 
 	//auto t1 = window->AddComboBox("ComboBox", 300, 120, 120);
 	//window2->AddButton("Teste", 250, 250, 125, 125);

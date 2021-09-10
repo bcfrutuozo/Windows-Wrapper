@@ -13,13 +13,9 @@ void VerticalScrollBar::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int c
 		SCROLLINFO si;
 		si.cbSize = sizeof(SCROLLINFO);
 		si.fMask = SIF_PAGE | SIF_RANGE;
-		si.nPage = cx;
-		SetScrollInfo(hwnd, SB_HORZ, &si, false);
 		si.nMin = 0;
 		si.nMax = MaximumValue - 1;
 		si.nPage = cy;
-		si.nPos = 0;
-		si.nTrackPos = 0;
 		SetScrollInfo(hwnd, SB_VERT, &si, true);
 	}
 

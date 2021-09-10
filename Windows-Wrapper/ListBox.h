@@ -9,6 +9,7 @@ private:
 	bool m_IsMultiColumn;
 	bool m_IsHorizontalScrollVisible;
 	bool m_IsScrollAlwaysVisible;
+	bool m_IsFormatChanged;
 	SelectionMode m_SelectionMode;
 	DockStyle m_DockStyle;
 	BorderStyle m_BorderStyle;
@@ -22,6 +23,9 @@ private:
 	void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept override;
 	void OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept override;
 	void OnPaint_Impl(HWND hwnd) noexcept override;
+
+	void CalculateListBoxParameters(HWND hwnd, HDC& hdc);
+	void Draw(HWND hwnd, HDC& hdc);
 
 	void IncrementHorizontalScroll() noexcept override;
 	void DecrementHorizontalScroll() noexcept override;
