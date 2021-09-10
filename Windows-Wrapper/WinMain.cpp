@@ -1,5 +1,6 @@
 #include "TestUserApplication.h"
 #include "TestRealTimeApplication.h"
+#include "Control.h"
 
 #ifdef _DEBUG
 #define _CRTDBG_MAP_ALLOC  
@@ -34,6 +35,11 @@ int CALLBACK WinMain(
 	{
 		SetProcessDPIAware();
 		ret = TestUserApplication::Run();
+	}
+	catch (const Control::HRException& e)
+	{
+		ret = -1;
+		MessageBox(nullptr, e.what(), "Standard Exception", MB_OK | MB_ICONEXCLAMATION);
 	}
 	catch (const std::exception& e)
 	{

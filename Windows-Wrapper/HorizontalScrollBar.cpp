@@ -10,7 +10,10 @@ void HorizontalScrollBar::OnHorizontalScrolling_Impl(HWND hwnd, HWND hwndCtl, un
 	// Get current scrollbar state:
 	si.cbSize = sizeof(SCROLLINFO);
 	si.fMask = SIF_RANGE | SIF_PAGE | SIF_POS | SIF_TRACKPOS;
-	GetScrollInfo(hwnd, SB_VERT, &si);
+	if (GetScrollInfo(hwnd, SB_HORZ, &si) == 0)
+	{
+		throw CTL_LAST_EXCEPT();
+	}
 
 	nOldPos = si.nPos;
 
@@ -23,7 +26,7 @@ void HorizontalScrollBar::OnHorizontalScrolling_Impl(HWND hwnd, HWND hwndCtl, un
 	case SB_LINERIGHT:       nPos = si.nPos + 1; break;
 		//case SB_PAGELEFT:         nPos = si.nPos - CustomLogicalPage(si.nPage); break;
 		//case SB_PAGERIGHT:       nPos = si.nPos + CustomLogicalPage(si.nPage); break;
-	case SB_THUMBTRACK:     nPos = si.nTrackPos; break;
+	case SB_THUMBTRACK:     nPos = pos; break;
 	default:
 	case SB_THUMBPOSITION:  nPos = si.nPos; break;
 	}
@@ -36,13 +39,13 @@ void HorizontalScrollBar::OnHorizontalScrolling_Impl(HWND hwnd, HWND hwndCtl, un
 		return;
 	}
 
-	if (nPos > MaximumValue)
+	if (nPos > si.nMax)
 	{
 		return;
 	}
 
-	SetScrollPos(hwnd, SB_VERT, nPos, TRUE);
-	Scrolling = GetScrollPos(hwnd, SB_VERT);
+	SetScrollPos(hwnd, SB_HORZ, nPos, true);
+	Scrolling = GetScrollPos(hwnd, SB_HORZ);
 
 	// Refresh the control (repaint it to reflect the new nPos). Note we
 	// here multiply with some unspecified scrolling unit which specifies
@@ -65,10 +68,12 @@ void HorizontalScrollBar::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int
 		si.cbSize = sizeof(SCROLLINFO);
 		si.fMask = SIF_PAGE | SIF_RANGE;
 		si.nPage = cx;
-		SetScrollInfo(hwnd, SB_VERT, &si, false);
+		SetScrollInfo(hwnd, SB_HORZ, &si, true);
 		si.nMin = 0;
-		si.nMax = MaximumValue;
+		si.nMax = MaximumValue - 1;
 		si.nPage = cy;
+		si.nPos = 0;
+		si.nTrackPos = 0;
 		SetScrollInfo(hwnd, SB_HORZ, &si, true);
 	}
 

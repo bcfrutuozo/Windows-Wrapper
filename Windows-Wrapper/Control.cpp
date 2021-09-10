@@ -217,7 +217,7 @@ Point Control::GetLocation() const noexcept
 	return m_Location;
 }
 
-void Control::Hide() noexcept
+void Control::Hide()
 {
 	if (IsShown())
 	{
@@ -226,7 +226,7 @@ void Control::Hide() noexcept
 	}
 }
 
-void Control::Show() noexcept
+void Control::Show()
 {
 	if (!IsShown())
 	{

@@ -12,11 +12,14 @@ private:
 	bool m_IsVerticalScrollEnabled;
 	size_t m_ItemWidth;
 	size_t m_ItemHeight;
+	size_t m_MinimumItemWidth;
 
 protected:
 
 	HorizontalScrollBar HorizontalScrollBar;
 	VerticalScrollBar VerticalScrollBar;
+
+	void SetMinimumItemWidth(const size_t& weight) noexcept;
 
 public:
 
@@ -30,7 +33,7 @@ public:
 	void EnableVerticalScroll() noexcept;
 	void DisableVerticalScroll() noexcept;
 	size_t GetItemWidth() const noexcept;
-	void SetItemWidth(const size_t& width) noexcept;
+	void SetItemWidth(const size_t& width);
 	size_t GetItemHeight() const noexcept;
 	void SetItemHeight(const size_t& height) noexcept;
 

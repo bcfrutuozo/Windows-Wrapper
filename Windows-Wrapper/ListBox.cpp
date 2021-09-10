@@ -212,7 +212,8 @@ void ListBox::OnPaint_Impl(HWND hwnd) noexcept
 	SIZE m_SingleSize;
 	const char* verifier = "A";
 	GetTextExtentPoint32(hdcMem, verifier, 2, &m_SingleSize);
-	SetItemWidth(m_SingleSize.cx);
+	SetMinimumItemWidth(m_SingleSize.cx);
+	SetItemWidth(m_IsMultiColumn ? m_ColumnWidth : m_SingleSize.cx);
 	SetItemHeight(m_SingleSize.cy);
 
 	// Drawable block inside ListBox
@@ -225,6 +226,102 @@ void ListBox::OnPaint_Impl(HWND hwnd) noexcept
 
 	if (m_IsRebinding)
 	{
+		// Horizontal ScrollBar
+		if (m_IsMultiColumn)
+		{
+			size_t currentSizeX = 0;
+			auto totalSizeX = m_DrawableArea.right - m_DrawableArea.left;
+
+			while (currentSizeX < totalSizeX)
+			{
+				currentSizeX += GetItemWidth();
+			}
+
+			if (currentSizeX != totalSizeX)
+			{
+				currentSizeX += m_Margin.Left + m_Margin.Right;
+				switch (m_BorderStyle)
+				{
+				case BorderStyle::None:
+				{
+					break;
+				}
+				case BorderStyle::FixedSingle:
+				{
+					// 1 on top and 1 on bottom
+					currentSizeX += 2;
+					break;
+				}
+				case BorderStyle::Fixed3D:
+				{
+					// 2 on top and 2 on bottom
+					currentSizeX += 4;
+					break;
+				}
+				}
+
+				int oldHeightX = m_Size.Width;
+				m_Size.Width = currentSizeX;
+				Resize(currentSizeX, m_Size.Height);
+				auto hSize = HorizontalScrollBar.GetSize();
+				hSize.Width += (currentSizeX - oldHeightX);
+				HorizontalScrollBar.Resize(hSize);
+
+				EndPaint(hwnd, &ps);
+				OnPaint_Impl(hwnd);
+				return;
+			}
+		}
+
+		// Vertical ScrollBar
+		else
+		{
+			size_t currentSizeY = 0;
+			auto totalSizeY = m_DrawableArea.bottom - m_DrawableArea.top;
+
+			while (currentSizeY < totalSizeY)
+			{
+				currentSizeY += GetItemHeight();
+			}
+
+			if (currentSizeY != totalSizeY)
+			{
+				currentSizeY += m_Margin.Top + m_Margin.Bottom;
+				switch (m_BorderStyle)
+				{
+				case BorderStyle::None:
+				{
+					break;
+				}
+				case BorderStyle::FixedSingle:
+				{
+					// 1 on top and 1 on bottom
+					currentSizeY += 2;
+					break;
+				}
+				case BorderStyle::Fixed3D:
+				{
+					// 2 on top and 2 on bottom
+					currentSizeY += 4;
+					break;
+				}
+				}
+
+				int oldHeightY = m_Size.Height;
+				m_Size.Height = currentSizeY;
+				Resize(m_Size.Width, currentSizeY);
+				auto vSize = VerticalScrollBar.GetSize();
+				vSize.Height += (currentSizeY - oldHeightY);
+				VerticalScrollBar.Resize(vSize);
+
+				EndPaint(hwnd, &ps);
+				OnPaint_Impl(hwnd);
+				return;
+			}
+		}
+
+
+		// This block will only be executed once after resize
 		m_RowPosition.clear();
 		if (m_RowPosition.size() < dataSource->GetCount())
 		{
@@ -232,70 +329,100 @@ void ListBox::OnPaint_Impl(HWND hwnd) noexcept
 		}
 
 		m_TotalItemsInDrawableArea = 0;
+	}
 
-		// Adjust size according to visible amount of items
-		auto totalSize = m_DrawableArea.bottom - m_DrawableArea.top;
-		size_t currentSize = 0;
-		while (currentSize < totalSize)
+
+	int rowNumber = (m_DrawableArea.bottom - m_DrawableArea.top) / GetItemHeight();
+	int columnNumber = (static_cast<unsigned long long>(m_DrawableArea.right) - m_DrawableArea.left) / GetItemWidth();
+
+	if (m_IsMultiColumn)
+	{
+		if ((static_cast<unsigned long long>(m_DrawableArea.bottom) - m_DrawableArea.top) < (GetItemHeight() * dataSource->GetCount()) * columnNumber)
 		{
-			currentSize += GetItemHeight();
+			HorizontalScrollBar.Show();
+			HorizontalScrollBar.SetMaximumValue(dataSource->GetCount());
+		}
+		else
+		{
+			HorizontalScrollBar.Hide();
+			HorizontalScrollBar.SetMaximumValue(0);
 		}
 
-		if (currentSize != totalSize)
+		// Reduce HorizontalScroll before getting correct positions
+		if (HorizontalScrollBar.IsShown())
 		{
-			currentSize += m_Margin.Top + m_Margin.Bottom;
-			switch (m_BorderStyle)
-			{
-			case BorderStyle::None:
-			{
-				break;
-			}
-			case BorderStyle::FixedSingle:
-			{
-				// 1 on top and 1 on bottom
-				currentSize += 2;
-				break;
-			}
-			case BorderStyle::Fixed3D:
-			{
-				// 2 on top and 2 on bottom
-				currentSize += 4;
-				break;
-			}
-			}
-
-			int oldHeight = m_Size.Height;
-			m_Size.Height = currentSize;
-			auto vSize = VerticalScrollBar.GetSize();
-			vSize.Height += (currentSize - oldHeight);
-			Resize(m_Size.Width, currentSize);
-			VerticalScrollBar.Resize(vSize);
-			EndPaint(hwnd, &ps);
-			OnPaint_Impl(hwnd);
-			return;
+			m_DrawableArea.bottom -= HorizontalScrollBar.GetSize().Height;
+		}
+	}
+	else
+	{
+		if ((static_cast<unsigned long long>(m_DrawableArea.bottom) - m_DrawableArea.top) < (GetItemHeight() * dataSource->GetCount()))
+		{
+			VerticalScrollBar.Show();
+			VerticalScrollBar.SetMaximumValue(dataSource->GetCount());
+		}
+		else
+		{
+			VerticalScrollBar.Hide();
+			VerticalScrollBar.SetMaximumValue(0);
 		}
 	}
 
 	size_t i = 0;
+	size_t i2 = -1;
 	for (auto it = dataSource->begin(); it != dataSource->end(); ++it, ++i)
 	{
 		if (m_IsMultiColumn)
 		{
-			int columnNumber = (m_Size.Width - m_Margin.Right) / m_SingleSize.cx;
+			// HORRORIZONTAL
+
+			RECT cr;
+			CopyRect(&cr, &m_DrawableArea);
+			
+			if (i % rowNumber == 0) ++i2;
+
+			cr.top = (GetItemHeight() * (i % rowNumber)) - (VerticalScrollBar.GetScrolling() * GetItemHeight()) + m_DrawableArea.top;
+			cr.bottom = (cr.top + GetItemHeight());
+			cr.left = (HorizontalScrollBar.GetScrolling() * GetItemWidth()) + m_DrawableArea.left + (GetItemWidth() * i2);
+			cr.right = cr.left + GetItemWidth() - m_Margin.Right;
+
+			std::ostringstream oss;
+			oss << "i2: " << i2 << std::endl;
+			printf_s(oss.str().c_str());
+
+			m_RowPosition[i] = cr;
+
+			if (cr.left >= m_DrawableArea.left && cr.right <= m_DrawableArea.right)
+			{
+				if (m_IsRebinding)
+				{
+					++m_TotalItemsInDrawableArea;
+				}
+
+				if (m_SelectedIndex == i)
+				{
+					SetBkColor(hdcMem, RGB(0, 120, 215));
+					SetTextColor(hdcMem, RGB(255, 255, 255));
+					// Draw background
+					HBRUSH brush = CreateSolidBrush(RGB(0, 120, 215));
+					FillRect(hdcMem, &cr, brush);
+					SelectObject(hdcMem, brush);
+					DeleteObject(brush);
+				}
+				else
+				{
+					SetBkColor(hdcMem, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+					SetTextColor(hdcMem, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
+				}
+
+				DrawText(hdcMem, (*dataSource)[i]->Value.c_str(), -1, &cr, DT_LEFT | DT_VCENTER);
+				DrawText(hdcMem, Text.c_str(), static_cast<int>((*dataSource)[i]->Value.length()), &cr, DT_LEFT | DT_VCENTER | DT_CALCRECT);
+			}
+
+			// HORRORIZONTAL
 		}
 		else
 		{
-			if ((static_cast<unsigned long long>(m_DrawableArea.bottom) - m_DrawableArea.top) < (m_SingleSize.cy * dataSource->GetCount()))
-			{
-				VerticalScrollBar.Show();
-				VerticalScrollBar.SetMaximumValue(dataSource->GetCount());
-			}
-			else
-			{
-				VerticalScrollBar.Hide();
-				VerticalScrollBar.SetMaximumValue(0);
-			}
-
 			RECT cr;
 			CopyRect(&cr, &m_DrawableArea);
 			cr.top = (GetItemHeight() * i) - (VerticalScrollBar.GetScrolling() * GetItemHeight()) + m_DrawableArea.top;
@@ -338,11 +465,21 @@ void ListBox::OnPaint_Impl(HWND hwnd) noexcept
 		}
 	}
 
-	if (VerticalScrollBar.IsShown() && m_IsRebinding)
+	if (m_IsMultiColumn)
 	{
-		// auto totalSize = static_cast<size_t>(std::ceil(static_cast<float>((m_DrawableArea.bottom - m_DrawableArea.top)) / static_cast<float>(GetItemHeight())));
-		HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_SIZE, MAKEWPARAM(0, 0), MAKELPARAM(m_RowPosition.back().right - m_RowPosition.back().left, m_TotalItemsInDrawableArea));
-		m_IsRebinding = false;
+		if (HorizontalScrollBar.IsShown() && m_IsRebinding)
+		{
+			HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_SIZE, MAKEWPARAM(0, 0), MAKELPARAM(GetItemWidth() - columnNumber, m_TotalItemsInDrawableArea));
+			m_IsRebinding = false;
+		}
+	}
+	else
+	{
+		if (VerticalScrollBar.IsShown() && m_IsRebinding)
+		{
+			HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_SIZE, MAKEWPARAM(0, 0), MAKELPARAM(m_RowPosition.back().right - m_RowPosition.back().left, m_TotalItemsInDrawableArea));
+			m_IsRebinding = false;
+		}
 	}
 
 	// Perform the bit-block transfer between the memory Device Context which has the next bitmap
@@ -449,7 +586,8 @@ ListBox::ListBox(Control* parent, int width, int height, int x, int y)
 	m_DockStyle(DockStyle::None),
 	m_BorderStyle(BorderStyle::Fixed3D),
 	m_DrawableArea({ 0 }),
-	m_TotalItemsInDrawableArea(0)
+	m_TotalItemsInDrawableArea(0),
+	m_ColumnWidth(120)
 {
 
 }
@@ -457,6 +595,40 @@ ListBox::ListBox(Control* parent, int width, int height, int x, int y)
 ListBox::~ListBox()
 {
 
+}
+
+bool ListBox::IsMultiColumn() const noexcept
+{
+	return m_IsMultiColumn;
+}
+
+void ListBox::EnableMultiColumn() noexcept
+{
+	if (!m_IsMultiColumn)
+	{
+		m_IsMultiColumn = true;
+		Update();
+	}
+}
+
+void ListBox::DisableMultiColumn() noexcept
+{
+	if (m_IsMultiColumn)
+	{
+		m_IsMultiColumn = false;
+		Update();
+	}
+}
+
+size_t ListBox::GetColumnWidth() noexcept
+{
+	return m_ColumnWidth;
+}
+
+void ListBox::SetColumnWidth(const size_t& width) noexcept
+{
+	m_ColumnWidth = width;
+	Update();
 }
 
 BorderStyle ListBox::GetBorderStyle() const noexcept

@@ -18,6 +18,8 @@ void VerticalScrollBar::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int c
 		si.nMin = 0;
 		si.nMax = MaximumValue - 1;
 		si.nPage = cy;
+		si.nPos = 0;
+		si.nTrackPos = 0;
 		SetScrollInfo(hwnd, SB_VERT, &si, true);
 	}
 
@@ -37,7 +39,7 @@ void VerticalScrollBar::OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsign
 
 	nOldPos = si.nPos;
 
-	std::ostringstream oss;
+	/*std::ostringstream oss;
 	oss << "Code: " << code << " | Pos: " << pos << std::endl
 		<< "cbSize: " << si.cbSize << std::endl
 		<< "fMask: " << si.fMask << std::endl
@@ -47,7 +49,7 @@ void VerticalScrollBar::OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsign
 		<< "nPos: " << si.nPos << std::endl
 		<< "nTrackPos: " << si.nTrackPos << std::endl << std::endl;
 
-	printf_s(oss.str().c_str());
+	printf_s(oss.str().c_str());*/
 
 	// Compute new nPos.
 	// Note we do not care where nPos falls between nMin and nMax. See below.
@@ -86,7 +88,7 @@ void VerticalScrollBar::OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsign
 		nPos = MaximumValue - si.nPage;
 	}*/
 
-	SetScrollPos(hwnd, SB_VERT, nPos, TRUE);
+	SetScrollPos(hwnd, SB_VERT, nPos, true);
 	Scrolling = GetScrollPos(hwnd, SB_VERT);
 
 	// Refresh the control (repaint it to reflect the new nPos). Note we
@@ -106,4 +108,5 @@ VerticalScrollBar::VerticalScrollBar(ScrollableControl* parent, int width, int h
 
 VerticalScrollBar::~VerticalScrollBar()
 {
+
 }

@@ -164,8 +164,8 @@ public:
 	void SetLocation(Point p) noexcept;
 	void SetLocation(int x, int y) noexcept;
 	bool IsShown() const noexcept;
-	virtual void Hide() noexcept;
-	virtual void Show() noexcept;
+	virtual void Hide();
+	virtual void Show();
 
 	// Control Exception
 	class ControlException : public Exception

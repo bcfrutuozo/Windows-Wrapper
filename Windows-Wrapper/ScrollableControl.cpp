@@ -1,5 +1,9 @@
 #include "ScrollableControl.h"
 
+void ScrollableControl::SetMinimumItemWidth(const size_t& weight) noexcept
+{
+}
+
 ScrollableControl::ScrollableControl(Control* parent, const std::string& name, int width, int height, int x, int y)
 	:
 	Control(parent, name, width, height, x, y),
@@ -8,7 +12,8 @@ ScrollableControl::ScrollableControl(Control* parent, const std::string& name, i
 	m_ItemWidth(0),
 	m_ItemHeight(0),
 	m_IsHorizontalScrollEnabled(false),
-	m_IsVerticalScrollEnabled(false)
+	m_IsVerticalScrollEnabled(false),
+	m_MinimumItemWidth(0)
 {
 
 }
@@ -53,8 +58,13 @@ size_t ScrollableControl::GetItemWidth() const noexcept
 	return m_ItemWidth;
 }
 
-void ScrollableControl::SetItemWidth(const size_t& width) noexcept
+void ScrollableControl::SetItemWidth(const size_t& width)
 {
+	if (width < m_MinimumItemWidth)
+	{
+		throw std::logic_error("Desired width for each column is smaller than a single character.");
+	}
+
 	m_ItemWidth = width;
 }
 

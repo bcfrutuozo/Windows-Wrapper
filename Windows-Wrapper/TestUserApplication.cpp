@@ -19,7 +19,7 @@ void TestUserApplication::Initialize()
 	window->GetMouse().EnableRaw();
 	window->GetKeyboard().DisableAutorepeat();
 
-	auto lb = window->AddListBox(400, 240, 500, 50);
+	auto lb = window->AddListBox(600, 240, 300, 50);
 
 	auto list = new ListItemCollection(lb);
 	for (size_t i = 0; i < 31; ++i)
@@ -35,6 +35,8 @@ void TestUserApplication::Initialize()
 	f.SetSize(32);
 	lb->SetFont(f);
 	lb->SetBorderStyle(BorderStyle::Fixed3D);
+	lb->EnableMultiColumn();
+	lb->SetColumnWidth(300);
 
 	//auto t1 = window->AddComboBox("ComboBox", 300, 120, 120);
 	//window2->AddButton("Teste", 250, 250, 125, 125);
