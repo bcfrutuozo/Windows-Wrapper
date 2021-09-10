@@ -610,6 +610,16 @@ void Control::Resize(int width, int height) noexcept
 	SetWindowPos(static_cast<HWND>(Handle.ToPointer()), nullptr, m_Location.X, m_Location.Y, m_Size.Width, m_Size.Height, SWP_NOZORDER);
 }
 
+Color Control::GetForeColor() const noexcept
+{
+	return m_ForeColor;
+}
+
+Color Control::GetBackgroundColor() const noexcept
+{
+	return m_BackgroundColor;
+}
+
 Window* Control::GetWindow() noexcept
 {
 	if (GetType() == typeid(Window))

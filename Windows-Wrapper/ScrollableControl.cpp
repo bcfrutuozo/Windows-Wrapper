@@ -7,7 +7,7 @@ void ScrollableControl::SetMinimumItemWidth(const size_t& weight) noexcept
 ScrollableControl::ScrollableControl(Control* parent, const std::string& name, int width, int height, int x, int y)
 	:
 	Control(parent, name, width, height, x, y),
-	HorizontalScrollBar(this, m_Size.Width - m_Margin.Left - m_Margin.Right, GetSystemMetrics(SM_CYHSCROLL), m_Margin.Left, m_Size.Height - GetSystemMetrics(SM_CYHSCROLL) - m_Margin.Bottom),
+	HorizontalScrollBar(this, m_Size.Width - m_Margin.Left - m_Margin.Right, GetSystemMetrics(SM_CYHSCROLL) + 1, m_Margin.Left, m_Size.Height - (GetSystemMetrics(SM_CYHSCROLL) + 1) - m_Margin.Bottom),
 	VerticalScrollBar(this, GetSystemMetrics(SM_CXVSCROLL), m_Size.Height - m_Margin.Top - m_Margin.Bottom, m_Size.Width - GetSystemMetrics(SM_CXVSCROLL) - m_Margin.Right, m_Margin.Top),
 	m_ItemWidth(0),
 	m_ItemHeight(0),
@@ -30,12 +30,18 @@ bool ScrollableControl::IsHorizontalScrollEnabled() const noexcept
 
 void ScrollableControl::EnableHorizontalScroll() noexcept
 {
-	HorizontalScrollBar.Show();
+	if (!IsHorizontalScrollEnabled())
+	{
+		HorizontalScrollBar.Show();
+	}
 }
 
 void ScrollableControl::DisableHorizontalScroll() noexcept
 {
-	HorizontalScrollBar.Hide();
+	if (IsHorizontalScrollEnabled())
+	{
+		HorizontalScrollBar.Hide();
+	}
 }
 
 bool ScrollableControl::IsVerticalScrollEnabled() const noexcept
@@ -45,12 +51,18 @@ bool ScrollableControl::IsVerticalScrollEnabled() const noexcept
 
 void ScrollableControl::EnableVerticalScroll() noexcept
 {
-	VerticalScrollBar.Show();
+	if (!VerticalScrollBar.IsShown())
+	{
+		VerticalScrollBar.Show();
+	}
 }
 
 void ScrollableControl::DisableVerticalScroll() noexcept
 {
-	VerticalScrollBar.Hide();
+	if (VerticalScrollBar.IsShown())
+	{
+		VerticalScrollBar.Hide();
+	}
 }
 
 size_t ScrollableControl::GetItemWidth() const noexcept

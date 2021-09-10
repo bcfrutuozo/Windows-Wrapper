@@ -10,7 +10,6 @@ class ScrollBar : public Control
 protected:
 
 	ScrollableControl* Owner;
-	bool IsScrollVisible;
 	size_t Scrolling;
 	size_t MaximumValue;
 
@@ -23,8 +22,6 @@ public:
 	virtual ~ScrollBar();
 
 	void Initialize() override;
-	void Show() noexcept override;
-	void Hide() noexcept override;
 	size_t GetScrolling() const noexcept;
 
 	void SetMaximumValue(size_t maxValue) noexcept;

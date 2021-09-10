@@ -20,6 +20,10 @@ void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 				HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_SelectedIndex), 0);
 			}
 		}
+		else
+		{
+			HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_SelectedIndex), 0);
+		}
 
 		break;
 	}
@@ -39,9 +43,74 @@ void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 				HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_SelectedIndex), 0);
 			}
 		}
+		else
+		{
+			HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, 0), 0);
+		}
 
 		break;
 	}
+	case VK_LEFT:
+	{
+		if (!m_IsMultiColumn)
+		{
+			break;
+		}
+
+		if (m_SelectedIndex > m_RowNumber - 1)
+		{
+			m_SelectedIndex -= m_RowNumber;
+
+			if (m_RowPosition[m_SelectedIndex].right > m_DrawableArea.right)
+			{
+				HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_SelectedIndex / m_RowNumber - m_TotalItemsInDrawableArea + 1), 0);
+			}
+
+			if (m_RowPosition[m_SelectedIndex].left < m_DrawableArea.left)
+			{
+				HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_SelectedIndex / m_RowNumber), 0);
+			}
+		}
+		else
+		{
+			HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, 0), 0);
+		}
+
+		break;
+	}
+
+	case VK_RIGHT:
+	{
+		if (!m_IsMultiColumn)
+		{
+			break;
+		}
+
+		if (m_SelectedIndex < GetDataSource()->GetCount() - m_RowNumber)
+		{
+			int old = m_SelectedIndex;
+			m_SelectedIndex += m_RowNumber;
+
+			int c = 0;
+
+			if (m_RowPosition[m_SelectedIndex].right > m_DrawableArea.right)
+			{
+				HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_SelectedIndex / m_RowNumber - m_TotalItemsInDrawableArea + 1), 0);
+			}
+
+			if (m_RowPosition[m_SelectedIndex].left < m_DrawableArea.left)
+			{
+				HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_SelectedIndex / m_RowNumber), 0);
+			}
+		}
+		else
+		{
+			HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_SelectedIndex / m_RowNumber), 0);
+		}
+
+		break;
+	}
+
 	}
 
 	Update();
@@ -262,9 +331,13 @@ void ListBox::OnPaint_Impl(HWND hwnd) noexcept
 
 				int oldHeightX = m_Size.Width;
 				m_Size.Width = currentSizeX;
-				Resize(currentSizeX, m_Size.Height);
+				Resize(currentSizeX, m_Size.Height + 1); // Height + 1 is because of the HorizontalScrollBar must have at least one extra pixel to draw the inner window
 				auto hSize = HorizontalScrollBar.GetSize();
 				hSize.Width += (currentSizeX - oldHeightX);
+
+				auto scrollLoc = HorizontalScrollBar.GetLocation();
+				scrollLoc.Y += 1;	// Increment location by 1 because it has a single pixel for the inner windows
+				HorizontalScrollBar.SetLocation(scrollLoc);
 				HorizontalScrollBar.Resize(hSize);
 
 				EndPaint(hwnd, &ps);
@@ -331,25 +404,26 @@ void ListBox::OnPaint_Impl(HWND hwnd) noexcept
 		m_TotalItemsInDrawableArea = 0;
 	}
 
-
-	int rowNumber = (m_DrawableArea.bottom - m_DrawableArea.top) / GetItemHeight();
-	int columnNumber = (static_cast<unsigned long long>(m_DrawableArea.right) - m_DrawableArea.left) / GetItemWidth();
+	bool hEnabled = false;
+	bool vEnabled = false;
+	m_RowNumber = (m_DrawableArea.bottom - m_DrawableArea.top) / GetItemHeight();
+	m_ColumnNumber = (static_cast<unsigned long long>(m_DrawableArea.right) - m_DrawableArea.left) / GetItemWidth();
 
 	if (m_IsMultiColumn)
 	{
-		if ((static_cast<unsigned long long>(m_DrawableArea.bottom) - m_DrawableArea.top) < (GetItemHeight() * dataSource->GetCount()) * columnNumber)
+		if ((static_cast<unsigned long long>(m_DrawableArea.right) - m_DrawableArea.left) < (GetItemWidth() * m_ColumnNumber + 1))
 		{
-			HorizontalScrollBar.Show();
-			HorizontalScrollBar.SetMaximumValue(dataSource->GetCount());
+			HorizontalScrollBar.SetMaximumValue(static_cast<size_t>(std::ceil(static_cast<float>(dataSource->GetCount()) / static_cast<float>((m_RowNumber)))));
+			hEnabled = true;
 		}
 		else
 		{
-			HorizontalScrollBar.Hide();
 			HorizontalScrollBar.SetMaximumValue(0);
+			hEnabled = false;
 		}
 
 		// Reduce HorizontalScroll before getting correct positions
-		if (HorizontalScrollBar.IsShown())
+		if (hEnabled)
 		{
 			m_DrawableArea.bottom -= HorizontalScrollBar.GetSize().Height;
 		}
@@ -358,13 +432,13 @@ void ListBox::OnPaint_Impl(HWND hwnd) noexcept
 	{
 		if ((static_cast<unsigned long long>(m_DrawableArea.bottom) - m_DrawableArea.top) < (GetItemHeight() * dataSource->GetCount()))
 		{
-			VerticalScrollBar.Show();
-			VerticalScrollBar.SetMaximumValue(dataSource->GetCount());
+			VerticalScrollBar.SetMaximumValue((dataSource->GetCount()));
+			vEnabled = true;
 		}
 		else
 		{
-			VerticalScrollBar.Hide();
 			VerticalScrollBar.SetMaximumValue(0);
+			vEnabled = false;
 		}
 	}
 
@@ -378,23 +452,20 @@ void ListBox::OnPaint_Impl(HWND hwnd) noexcept
 
 			RECT cr;
 			CopyRect(&cr, &m_DrawableArea);
-			
-			if (i % rowNumber == 0) ++i2;
 
-			cr.top = (GetItemHeight() * (i % rowNumber)) - (VerticalScrollBar.GetScrolling() * GetItemHeight()) + m_DrawableArea.top;
+			int r = i % m_RowNumber;
+			if (r == 0) ++i2;
+
+			cr.top = (GetItemHeight() * r) + m_DrawableArea.top;
 			cr.bottom = (cr.top + GetItemHeight());
-			cr.left = (HorizontalScrollBar.GetScrolling() * GetItemWidth()) + m_DrawableArea.left + (GetItemWidth() * i2);
+			cr.left = + m_DrawableArea.left - (HorizontalScrollBar.GetScrolling() * GetItemWidth()) + (GetItemWidth() * i2);
 			cr.right = cr.left + GetItemWidth() - m_Margin.Right;
-
-			std::ostringstream oss;
-			oss << "i2: " << i2 << std::endl;
-			printf_s(oss.str().c_str());
 
 			m_RowPosition[i] = cr;
 
 			if (cr.left >= m_DrawableArea.left && cr.right <= m_DrawableArea.right)
 			{
-				if (m_IsRebinding)
+				if (m_IsRebinding && r == 0)
 				{
 					++m_TotalItemsInDrawableArea;
 				}
@@ -429,7 +500,7 @@ void ListBox::OnPaint_Impl(HWND hwnd) noexcept
 			cr.bottom = (cr.top + GetItemHeight());
 			cr.right -= m_Margin.Right;
 
-			if (VerticalScrollBar.IsShown())
+			if (vEnabled)
 			{
 				cr.right -= VerticalScrollBar.GetSize().Width;
 			}
@@ -467,18 +538,36 @@ void ListBox::OnPaint_Impl(HWND hwnd) noexcept
 
 	if (m_IsMultiColumn)
 	{
-		if (HorizontalScrollBar.IsShown() && m_IsRebinding)
+		if (hEnabled)
 		{
-			HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_SIZE, MAKEWPARAM(0, 0), MAKELPARAM(GetItemWidth() - columnNumber, m_TotalItemsInDrawableArea));
-			m_IsRebinding = false;
+			EnableHorizontalScroll();
+
+			if (m_IsRebinding)
+			{
+				HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_SIZE, MAKEWPARAM(0, 0), MAKELPARAM(m_TotalItemsInDrawableArea, 0));
+				m_IsRebinding = false;
+			}
+		}
+		else
+		{
+			DisableHorizontalScroll();
 		}
 	}
 	else
 	{
-		if (VerticalScrollBar.IsShown() && m_IsRebinding)
+		if (vEnabled)
 		{
-			HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_SIZE, MAKEWPARAM(0, 0), MAKELPARAM(m_RowPosition.back().right - m_RowPosition.back().left, m_TotalItemsInDrawableArea));
-			m_IsRebinding = false;
+			EnableVerticalScroll();
+
+			if (m_IsRebinding)
+			{
+				HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_SIZE, MAKEWPARAM(0, 0), MAKELPARAM(m_RowPosition.back().right - m_RowPosition.back().left, m_TotalItemsInDrawableArea));
+				m_IsRebinding = false;
+			}
+		}
+		else
+		{
+			DisableVerticalScroll();
 		}
 	}
 
@@ -512,7 +601,7 @@ void ListBox::IncrementHorizontalScroll() noexcept
 		r.right += inc;
 
 		// Invalidates only the item entry region. Otherwise scrollbar would flicker because it's a control inside a control being redraw all the time.
-		InvalidateRect(static_cast<HWND>(Handle.ToPointer()), &r, false);
+		InvalidateRect(static_cast<HWND>(Handle.ToPointer()), &m_DrawableArea, false);
 	}
 }
 
@@ -530,7 +619,7 @@ void ListBox::DecrementHorizontalScroll() noexcept
 		r.right -= inc;
 
 		// Invalidates only the item entry region. Otherwise scrollbar would flicker because it's a control inside a control being redraw all the time.
-		InvalidateRect(static_cast<HWND>(Handle.ToPointer()), &r, false);
+		InvalidateRect(static_cast<HWND>(Handle.ToPointer()), &m_DrawableArea, false);
 	}
 }
 

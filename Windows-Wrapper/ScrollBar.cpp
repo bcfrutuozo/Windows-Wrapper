@@ -15,6 +15,11 @@ void ScrollBar::OnPaint_Impl(HWND hwnd) noexcept
 	HBITMAP hbmMem = CreateCompatibleBitmap(ps.hdc, m_Size.Width, m_Size.Height);
 	HBITMAP hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
 
+	HBRUSH bgColor = CreateSolidBrush(RGB(Parent->GetBackgroundColor().GetR(), Parent->GetBackgroundColor().GetG(), Parent->GetBackgroundColor().GetB()));
+	FillRect(hdcMem, &ps.rcPaint, bgColor);
+	SelectObject(hdcMem, bgColor);
+	DeleteObject(bgColor);
+
 	// Perform the bit-block transfer between the memory Device Context which has the next bitmap
 	// with the current image to avoid flickering
 	BitBlt(ps.hdc, 0, 0, m_Size.Width, m_Size.Height, hdcMem, 0, 0, SRCCOPY);
@@ -25,7 +30,6 @@ ScrollBar::ScrollBar(ScrollableControl* parent, int width, int height, int x, in
 	:
 	Control(parent, "", width, height, x, y),
 	Owner(parent),
-	IsScrollVisible(false),
 	Scrolling(0),
 	MaximumValue(100)
 {
@@ -56,26 +60,6 @@ void ScrollBar::Initialize()
 	if (Handle.IsNull())
 	{
 		throw CTL_LAST_EXCEPT();
-	}
-}
-
-void ScrollBar::Show() noexcept
-{
-	Control::Show();
-
-	if (IsShown())
-	{
-		IsScrollVisible = true;
-	}
-}
-
-void ScrollBar::Hide() noexcept
-{
-	Control::Hide();
-
-	if (IsShown())
-	{
-		IsScrollVisible = false;
 	}
 }
 

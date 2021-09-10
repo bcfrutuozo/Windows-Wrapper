@@ -3,12 +3,12 @@
 
 void VerticalScrollBar::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy) noexcept
 {
-	if (ShowScrollBar(hwnd, SB_VERT, IsScrollVisible) == 0)
+	if (ShowScrollBar(hwnd, SB_VERT, true) == 0)
 	{
 		throw CTL_LAST_EXCEPT();
 	}
 
-	if (IsScrollVisible)
+	if (IsShown())
 	{
 		SCROLLINFO si;
 		si.cbSize = sizeof(SCROLLINFO);

@@ -16,6 +16,8 @@ private:
 	RECT m_DrawableArea;
 	size_t m_TotalItemsInDrawableArea;
 	size_t m_ColumnWidth;
+	size_t m_RowNumber;
+	size_t m_ColumnNumber;
 
 	void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept override;
 	void OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept override;

@@ -22,7 +22,7 @@ void TestUserApplication::Initialize()
 	auto lb = window->AddListBox(600, 240, 300, 50);
 
 	auto list = new ListItemCollection(lb);
-	for (size_t i = 0; i < 31; ++i)
+	for (size_t i = 0; i < 5001; ++i)
 	{
 		std::ostringstream oss;
 		oss << "Item: " << i;
@@ -32,11 +32,11 @@ void TestUserApplication::Initialize()
 	auto f = lb->GetFont();
 	f.SetStyle(FontStyle::Italic);
 	f.SetStyle(FontStyle::Underline);
-	f.SetSize(32);
+	f.SetSize(21);
 	lb->SetFont(f);
 	lb->SetBorderStyle(BorderStyle::Fixed3D);
 	lb->EnableMultiColumn();
-	lb->SetColumnWidth(300);
+	lb->SetColumnWidth(150);
 
 	//auto t1 = window->AddComboBox("ComboBox", 300, 120, 120);
 	//window2->AddButton("Teste", 250, 250, 125, 125);

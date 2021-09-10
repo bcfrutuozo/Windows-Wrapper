@@ -149,7 +149,9 @@ public:
 	void Resize(int width, int height) noexcept;
 	Padding GetMargin() const noexcept;
 	Control* GetByTabIndex(const unsigned int& index) noexcept;
+	Color GetForeColor() const noexcept;
 	void SetForeColor(const Color& color) noexcept;
+	Color GetBackgroundColor() const noexcept;
 	void SetBackgroundColor(const Color& color) noexcept;
 	const std::string& GetText() const noexcept;
 	Control* GetPreviousControl() noexcept;

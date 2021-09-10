@@ -57,23 +57,19 @@ void HorizontalScrollBar::OnHorizontalScrolling_Impl(HWND hwnd, HWND hwndCtl, un
 
 void HorizontalScrollBar::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy) noexcept
 {
-	if (ShowScrollBar(hwnd, SB_HORZ, IsScrollVisible) == 0)
+	if (ShowScrollBar(hwnd, SB_HORZ, true) == 0)
 	{
 		throw CTL_LAST_EXCEPT();
 	}
 
-	if (IsScrollVisible)
+	if (IsShown())
 	{
 		SCROLLINFO si;
 		si.cbSize = sizeof(SCROLLINFO);
 		si.fMask = SIF_PAGE | SIF_RANGE;
-		si.nPage = cx;
-		SetScrollInfo(hwnd, SB_HORZ, &si, true);
 		si.nMin = 0;
 		si.nMax = MaximumValue - 1;
-		si.nPage = cy;
-		si.nPos = 0;
-		si.nTrackPos = 0;
+		si.nPage = cx;
 		SetScrollInfo(hwnd, SB_HORZ, &si, true);
 	}
 
