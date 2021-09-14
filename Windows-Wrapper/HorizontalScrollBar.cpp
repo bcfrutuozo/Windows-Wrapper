@@ -17,8 +17,6 @@ void HorizontalScrollBar::OnHorizontalScrolling_Impl(HWND hwnd, HWND hwndCtl, un
 
 	nOldPos = si.nPos;
 
-	// Compute new nPos.
-	// Note we do not care where nPos falls between nMin and nMax. See below.
 	switch (code) {
 	case SB_LEFT:            nPos = si.nMin; break;
 	case SB_RIGHT:         nPos = si.nMax; break;
@@ -31,9 +29,6 @@ void HorizontalScrollBar::OnHorizontalScrolling_Impl(HWND hwnd, HWND hwndCtl, un
 	case SB_THUMBPOSITION:  nPos = si.nPos; break;
 	}
 
-	// Update the scrollbar state (nPos) and repaint it. The function ensures
-	// the nPos does not fall out of the allowed range between nMin and nMax
-	// hence we ask for the corrected nPos again.
 	if (nPos < 0)
 	{
 		return;
@@ -47,11 +42,7 @@ void HorizontalScrollBar::OnHorizontalScrolling_Impl(HWND hwnd, HWND hwndCtl, un
 	SetScrollPos(hwnd, SB_HORZ, nPos, true);
 	Scrolling = GetScrollPos(hwnd, SB_HORZ);
 
-	// Refresh the control (repaint it to reflect the new nPos). Note we
-	// here multiply with some unspecified scrolling unit which specifies
-	// amount of pixels corresponding to the 1 scrolling unit.
-	// We will discuss ScrollWindowEx() more later in the article.
-	nOldPos > nPos ? Owner->DecrementHorizontalScroll() : Owner->IncrementHorizontalScroll();
+	InvalidateRect(static_cast<HWND>(Owner->Handle.ToPointer()), Owner->GetDrawableArea(), false);
 	WinAPI::OnHorizontalScrolling_Impl(hwnd, hwndCtl, code, pos);
 }
 

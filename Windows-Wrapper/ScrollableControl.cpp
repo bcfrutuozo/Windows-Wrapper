@@ -1,7 +1,22 @@
 #include "ScrollableControl.h"
+#include "ScrollBar.h"
+
+LPRECT const ScrollableControl::GetDrawableArea() noexcept
+{
+	return &m_DrawableArea;
+}
+
+LPRECT const ScrollableControl::ResetDrawableArea() noexcept
+{
+	m_DrawableArea.left = m_DrawableArea.top = 0;
+	m_DrawableArea.right = m_Size.Width;
+	m_DrawableArea.bottom = m_Size.Height;
+	return &m_DrawableArea;
+}
 
 void ScrollableControl::SetMinimumItemWidth(const size_t& weight) noexcept
 {
+	m_MinimumItemWidth = weight;
 }
 
 ScrollableControl::ScrollableControl(Control* parent, const std::string& name, int width, int height, int x, int y)
@@ -15,7 +30,7 @@ ScrollableControl::ScrollableControl(Control* parent, const std::string& name, i
 	m_IsVerticalScrollEnabled(false),
 	m_MinimumItemWidth(0)
 {
-
+	ResetDrawableArea();
 }
 
 ScrollableControl::~ScrollableControl()

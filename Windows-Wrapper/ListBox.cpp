@@ -8,21 +8,30 @@ void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 	{
 		if (m_SelectedIndex < GetDataSource()->GetCount() - 1)
 		{
+			auto drawableArea = GetDrawableArea();
 			++m_SelectedIndex;
 
-			if (m_RowPosition[m_SelectedIndex].bottom > m_DrawableArea.bottom)
+			if (m_RowPosition[m_SelectedIndex].bottom > drawableArea->bottom && IsVerticalScrollEnabled())
 			{
 				HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_SelectedIndex - m_TotalItemsInDrawableArea + 1), 0);
 			}
 
-			if (m_RowPosition[m_SelectedIndex].top < m_DrawableArea.top)
+			if (m_RowPosition[m_SelectedIndex].top < drawableArea->top && IsVerticalScrollEnabled())
 			{
 				HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_SelectedIndex), 0);
+			}
+
+			if (m_RowPosition[m_SelectedIndex].right > drawableArea->right && IsHorizontalScrollEnabled())
+			{
+				HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, (m_SelectedIndex / m_RowNumber) - 1), 0);
 			}
 		}
 		else
 		{
-			HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_SelectedIndex), 0);
+			if (IsVerticalScrollEnabled())
+			{
+				HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_SelectedIndex), 0);
+			}
 		}
 
 		break;
@@ -31,21 +40,30 @@ void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 	{
 		if (m_SelectedIndex > 0)
 		{
+			auto drawableArea = GetDrawableArea();
 			--m_SelectedIndex;
 
-			if (m_RowPosition[m_SelectedIndex].bottom > m_DrawableArea.bottom)
+			if (m_RowPosition[m_SelectedIndex].bottom > drawableArea->bottom && IsVerticalScrollEnabled())
 			{
 				HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_SelectedIndex - m_TotalItemsInDrawableArea + 1), 0);
 			}
 
-			if (m_RowPosition[m_SelectedIndex].top < m_DrawableArea.top)
+			if (m_RowPosition[m_SelectedIndex].top < drawableArea->top && IsVerticalScrollEnabled())
 			{
 				HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_SelectedIndex), 0);
+			}
+
+			if (m_RowPosition[m_SelectedIndex].left < drawableArea->left && IsHorizontalScrollEnabled())
+			{
+				HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_SelectedIndex / m_RowNumber), 0);
 			}
 		}
 		else
 		{
-			HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, 0), 0);
+			if (IsVerticalScrollEnabled())
+			{
+				HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, 0), 0);
+			}
 		}
 
 		break;
@@ -59,21 +77,25 @@ void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 
 		if (m_SelectedIndex > m_RowNumber - 1)
 		{
+			auto drawableArea = GetDrawableArea();
 			m_SelectedIndex -= m_RowNumber;
 
-			if (m_RowPosition[m_SelectedIndex].right > m_DrawableArea.right)
+			if (m_RowPosition[m_SelectedIndex].right > drawableArea->right && IsHorizontalScrollEnabled())
 			{
 				HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_SelectedIndex / m_RowNumber - m_TotalItemsInDrawableArea + 1), 0);
 			}
 
-			if (m_RowPosition[m_SelectedIndex].left < m_DrawableArea.left)
+			if (m_RowPosition[m_SelectedIndex].left < drawableArea->left && IsHorizontalScrollEnabled())
 			{
 				HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_SelectedIndex / m_RowNumber), 0);
 			}
 		}
 		else
 		{
-			HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, 0), 0);
+			if (IsHorizontalScrollEnabled())
+			{
+				HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, 0), 0);
+			}
 		}
 
 		break;
@@ -88,24 +110,27 @@ void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 
 		if (m_SelectedIndex < GetDataSource()->GetCount() - m_RowNumber)
 		{
-			int old = m_SelectedIndex;
+			auto drawableArea = GetDrawableArea();
 			m_SelectedIndex += m_RowNumber;
 
 			int c = 0;
 
-			if (m_RowPosition[m_SelectedIndex].right > m_DrawableArea.right)
+			if (m_RowPosition[m_SelectedIndex].right > drawableArea->right && IsHorizontalScrollEnabled())
 			{
 				HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_SelectedIndex / m_RowNumber - m_TotalItemsInDrawableArea + 1), 0);
 			}
 
-			if (m_RowPosition[m_SelectedIndex].left < m_DrawableArea.left)
+			if (m_RowPosition[m_SelectedIndex].left < drawableArea->left && IsHorizontalScrollEnabled())
 			{
 				HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_SelectedIndex / m_RowNumber), 0);
 			}
 		}
 		else
 		{
-			HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_SelectedIndex / m_RowNumber), 0);
+			if (IsHorizontalScrollEnabled())
+			{
+				HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_SelectedIndex / m_RowNumber), 0);
+			}
 		}
 
 		break;
@@ -121,7 +146,8 @@ void ListBox::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlag
 {
 	size_t i = 0;
 
-	if (y >= m_DrawableArea.top && y <= m_DrawableArea.bottom && x >= m_DrawableArea.left && x <= m_DrawableArea.right)
+	const auto drawableArea = GetDrawableArea();
+	if (y >= drawableArea->top && y <= drawableArea->bottom && x >= drawableArea->left && x <= drawableArea->right)
 	{
 		for (auto it = m_RowPosition.begin(); it != m_RowPosition.end(); ++it, ++i)
 		{
@@ -146,9 +172,6 @@ void ListBox::OnPaint_Impl(HWND hwnd) noexcept
 
 void ListBox::CalculateListBoxParameters(HWND hwnd, HDC& hdc)
 {
-	RECT r;
-	GetClientRect(hwnd, &r);
-
 	// Example test draw with the desired font to calculate each ListBox item size
 	SIZE m_SingleSize;
 	const char* verifier = "A";
@@ -164,12 +187,13 @@ void ListBox::CalculateListBoxParameters(HWND hwnd, HDC& hdc)
 	}
 
 	// Drawable block inside ListBox
-	m_DrawableArea.left = m_Margin.Left + r.left + bordersize;
-	m_DrawableArea.top = m_Margin.Top + r.top + bordersize;
-	m_DrawableArea.right = r.right - m_Margin.Right - bordersize;
-	m_DrawableArea.bottom = r.bottom - m_Margin.Bottom - bordersize;
+	auto drawableArea = ResetDrawableArea();
+	drawableArea->left += m_Margin.Left + bordersize;
+	drawableArea->top += m_Margin.Top + bordersize;
+	drawableArea->right -= m_Margin.Right + bordersize;
+	drawableArea->bottom -= m_Margin.Bottom + bordersize;
 
-	SetItemWidth(m_IsMultiColumn ? m_ColumnWidth : m_DrawableArea.right - m_DrawableArea.left);
+	SetItemWidth(m_IsMultiColumn ? m_ColumnWidth : drawableArea->right - drawableArea->left);
 	SetItemHeight(m_SingleSize.cy);
 
 	int itemsNumber = GetDataSource()->GetCount();
@@ -184,117 +208,125 @@ void ListBox::CalculateListBoxParameters(HWND hwnd, HDC& hdc)
 		}
 	}
 
-	if (m_IsRebinding || m_IsFormatChanged)
+	// Reset the amount of items in drawable area for recalculation
+	m_TotalItemsInDrawableArea = 0;
+
+	size_t newWidth = 0;
+	size_t newHeight = 0;
+	auto oldWidth = drawableArea->right - drawableArea->left;
+	auto oldHeight = drawableArea->bottom - drawableArea->top;
+
+	m_RowNumber = !m_IsMultiColumn ? itemsNumber : (oldHeight) / GetItemHeight();
+	m_ColumnNumber = !m_IsMultiColumn ? 1 : (oldWidth) / GetItemWidth();
+
+	if (m_IsMultiColumn)
 	{
-		m_RowNumber = !m_IsMultiColumn ? itemsNumber : (m_DrawableArea.bottom - m_DrawableArea.top) / GetItemHeight();
-		m_ColumnNumber = !m_IsMultiColumn ? 1 : (m_DrawableArea.right - m_DrawableArea.left) / GetItemWidth();
-
-		// Reset the amount of items in drawable area for recalculation
-		m_TotalItemsInDrawableArea = 0;
-
-		if (m_IsMultiColumn)
+		if (m_RowNumber * m_ColumnNumber > itemsNumber)
 		{
-			size_t newWidth = 0;
-			auto oldWidth = m_DrawableArea.right - m_DrawableArea.left;
+			HorizontalScrollBar.SetMaximumValue(0);
+			HorizontalScrollBar.Hide();
+		}
+		else
+		{
+			m_RowNumber = m_ColumnNumber = 0;
+			while (newWidth < oldWidth)
+			{
+				newWidth += GetItemWidth();
+				++m_ColumnNumber;
+				++m_TotalItemsInDrawableArea;
+			}
+
+			while (newHeight < oldHeight)
+			{
+				newHeight += GetItemHeight();
+				++m_RowNumber;
+			}
+
+			// Recalculate drawable area to check if HorizontalScrollBar is needed
+			
+			drawableArea->right = newWidth + m_Margin.Left + (bordersize * 2);
+			drawableArea->bottom = newHeight + m_Margin.Top + (bordersize * 2);
 
 			if (m_RowNumber * m_ColumnNumber > itemsNumber)
 			{
 				HorizontalScrollBar.SetMaximumValue(0);
 				HorizontalScrollBar.Hide();
+				newWidth += m_Margin.Left + m_Margin.Right + (bordersize * 2);
+				oldHeight = m_Size.Width;
+				m_Size.Width = newWidth;
+				Resize(newWidth, m_Size.Height);
 			}
 			else
 			{
-				while (newWidth < oldWidth)
-				{
-					newWidth += GetItemWidth();
-				}
-
-				m_DrawableArea.bottom -= HorizontalScrollBar.GetSize().Height;
-
+				auto hLoc = HorizontalScrollBar.GetLocation();
 				auto hSize = HorizontalScrollBar.GetSize();
 				hSize.Width += (newWidth - oldWidth);
-				m_DrawableArea.right = newWidth + m_Margin.Right + (bordersize * 2);
 				newWidth += m_Margin.Left + m_Margin.Right + (bordersize * 2);
-				int oldHeightX = m_Size.Width;
+				oldWidth = m_Size.Width;
+				
+				newHeight += m_Margin.Top + m_Margin.Bottom + (bordersize * 2) + hSize.Height;
+				oldHeight = m_Size.Height;
+				m_Size.Height = newHeight;
 				m_Size.Width = newWidth;
-
+				Resize(newWidth, newHeight);
+				HorizontalScrollBar.SetLocation(hLoc.X, hLoc.Y + (newHeight - oldHeight));
 				HorizontalScrollBar.Resize(hSize);
-				HorizontalScrollBar.SetMaximumValue(itemsNumber);
+				HorizontalScrollBar.SetMaximumValue(std::ceil(static_cast<float>(itemsNumber) / (m_RowNumber)));
 				HorizontalScrollBar.Show();
-				Resize(newWidth, m_Size.Height);
-
-				m_RowNumber = !m_IsMultiColumn ? itemsNumber : (m_DrawableArea.bottom - m_DrawableArea.top) / GetItemHeight();
-				m_ColumnNumber = !m_IsMultiColumn ? 1 : (m_DrawableArea.right - m_DrawableArea.left) / GetItemWidth();
-
-				size_t max = 0;
-				while (max < newWidth)
-				{
-					max += GetItemWidth();
-
-					if (max > newWidth)
-					{
-						break;
-					}
-
-					++m_TotalItemsInDrawableArea;
-				}
-
 				HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_SIZE, MAKEWPARAM(0, 0), MAKELPARAM(m_TotalItemsInDrawableArea, 0));
 			}
 		}
+	}
+	else
+	{
+		if (oldHeight > (GetItemHeight() * itemsNumber))
+		{
+			VerticalScrollBar.SetMaximumValue(0);
+			VerticalScrollBar.Hide();
+		}
 		else
 		{
-			size_t newHeight = 0;
-			auto oldHeight = m_DrawableArea.bottom - m_DrawableArea.top;
-
-			if (oldHeight > (GetItemHeight() * itemsNumber))
+			while (newHeight < oldHeight)
 			{
-				VerticalScrollBar.SetMaximumValue(0);
-				VerticalScrollBar.Hide();
+				newHeight += GetItemHeight();
 			}
-			else
+
+			drawableArea->right -= VerticalScrollBar.GetSize().Width;
+
+			// Recalculate the new item width size
+			SetItemWidth(m_IsMultiColumn ? m_ColumnWidth : drawableArea->right - drawableArea->left);
+
+			drawableArea->bottom = newHeight + m_Margin.Top + (bordersize * 2);
+			newHeight += m_Margin.Top + m_Margin.Bottom + (bordersize * 2);
+			int oldHeightY = m_Size.Height;
+			m_Size.Height = newHeight;
+			auto vSize = VerticalScrollBar.GetSize();
+			vSize.Height += (newHeight - oldHeightY);
+			VerticalScrollBar.Resize(vSize);
+			VerticalScrollBar.SetMaximumValue(itemsNumber);
+			VerticalScrollBar.Show();
+			Resize(m_Size.Width, newHeight + 1);
+
+			size_t max = 0;
+			while (max < newHeight)
 			{
-				while (newHeight < oldHeight)
+				max += GetItemHeight();
+
+				if (max > newHeight)
 				{
-					newHeight += GetItemHeight();
+					break;
 				}
 
-				m_DrawableArea.right -= VerticalScrollBar.GetSize().Width;
-
-				// Recalculate the new item width size
-				SetItemWidth(m_IsMultiColumn ? m_ColumnWidth : m_DrawableArea.right - m_DrawableArea.left);
-
-				m_DrawableArea.bottom = newHeight + m_Margin.Bottom + (bordersize * 2);
-				newHeight += m_Margin.Top + m_Margin.Bottom + (bordersize * 2);
-				int oldHeightY = m_Size.Height;
-				m_Size.Height = newHeight;
-				auto vSize = VerticalScrollBar.GetSize();
-				vSize.Height += (newHeight - oldHeightY);
-				VerticalScrollBar.Resize(vSize);
-				VerticalScrollBar.SetMaximumValue(itemsNumber);
-				VerticalScrollBar.Show();
-				Resize(m_Size.Width, newHeight + 1);
-
-				size_t max = 0;
-				while (max < newHeight)
-				{
-					max += GetItemHeight();
-
-					if (max > newHeight)
-					{
-						break;
-					}
-
-					++m_TotalItemsInDrawableArea;
-				}
-
-				HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_SIZE, MAKEWPARAM(0, 0), MAKELPARAM(0, m_TotalItemsInDrawableArea));
+				++m_TotalItemsInDrawableArea;
 			}
+
+			HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_SIZE, MAKEWPARAM(0, 0), MAKELPARAM(0, m_TotalItemsInDrawableArea));
 		}
-
-		m_IsRebinding = false;
-		m_IsFormatChanged = false;
 	}
+
+	m_IsRebinding = false;
+	m_IsFormatChanged = false;
+
 }
 
 void ListBox::Draw(HWND hwnd, HDC& hdc)
@@ -320,6 +352,7 @@ void ListBox::Draw(HWND hwnd, HDC& hdc)
 	HBITMAP hbmMem;
 	HBITMAP hbmOld;
 
+	auto drawableArea = GetDrawableArea();
 	bool drawFullWindow = false;
 	if (m_IsRebinding || m_IsFormatChanged)
 	{
@@ -332,7 +365,7 @@ void ListBox::Draw(HWND hwnd, HDC& hdc)
 	else
 	{
 		hdcMem = CreateCompatibleDC(hdc);
-		hbmMem = CreateCompatibleBitmap(hdc, m_DrawableArea.right - m_DrawableArea.left, m_DrawableArea.bottom - m_DrawableArea.top + m_Margin.Bottom);
+		hbmMem = CreateCompatibleBitmap(hdc, drawableArea->right - drawableArea->left, drawableArea->bottom - drawableArea->top + m_Margin.Bottom);
 		hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
 	}
 
@@ -451,46 +484,33 @@ void ListBox::Draw(HWND hwnd, HDC& hdc)
 
 	const auto& dataSource = GetDataSource();
 
-	size_t i = 0;
-	size_t i2 = -1;
-	for (auto it = dataSource->begin(); it != dataSource->end(); ++it, ++i)
+	for (auto [i, r, c] = std::tuple{ 0, 0, 0 }; i < dataSource->GetCount(); ++i, ++r)
 	{
-		if (m_IsMultiColumn)
+		RECT cr;
+		CopyRect(&cr, drawableArea);
+
+		cr.top = drawableArea->top - (GetItemHeight() * VerticalScrollBar.GetScrolling()) + (GetItemHeight() * r);
+		cr.bottom = (cr.top + GetItemHeight());
+		cr.left = drawableArea->left - (HorizontalScrollBar.GetScrolling() * GetItemWidth()) + (GetItemWidth() * c);
+		cr.right = cr.left + GetItemWidth() - m_Margin.Right;
+
+		if (r == m_RowNumber - 1)
 		{
-			RECT cr;
-			CopyRect(&cr, &m_DrawableArea);
-
-			int r = i % m_RowNumber;
-			if (r == 0) ++i2;
-
-			cr.top = (GetItemHeight() * r) + m_DrawableArea.top;
-			cr.bottom = (cr.top + GetItemHeight());
-			cr.left = m_DrawableArea.left - (HorizontalScrollBar.GetScrolling() * GetItemWidth()) + (GetItemWidth() * i2);
-			cr.right = cr.left + GetItemWidth() - m_Margin.Right;
-
-			m_RowPosition[i] = cr;
+			r = -1;
+			++c;
 		}
-		else
-		{
-			RECT cr;
-			CopyRect(&cr, &m_DrawableArea);
-			cr.top = (GetItemHeight() * i) - (VerticalScrollBar.GetScrolling() * GetItemHeight()) + m_DrawableArea.top;
-			cr.bottom = (cr.top + GetItemHeight());
-			m_RowPosition[i] = cr;
-		}
-	}
 
-	// Pure draw
-	for (size_t i = 0; i < m_RowPosition.size(); ++i)
-	{
-		auto cr = m_RowPosition[i];
-		if (cr.left >= m_DrawableArea.left && cr.right <= m_DrawableArea.right && cr.top >= m_DrawableArea.top && cr.bottom <= m_DrawableArea.bottom)
+		m_RowPosition[i] = cr;
+
+		if (cr.left >= drawableArea->left &&
+			cr.top >= drawableArea->top &&
+			cr.right <= drawableArea->right &&
+			cr.bottom <= drawableArea->bottom)
 		{
 			if (m_SelectedIndex == i)
 			{
 				SetBkColor(hdcMem, RGB(0, 120, 215));
 				SetTextColor(hdcMem, RGB(255, 255, 255));
-				// Draw background
 				HBRUSH brush = CreateSolidBrush(RGB(0, 120, 215));
 				FillRect(hdcMem, &cr, brush);
 				SelectObject(hdcMem, brush);
@@ -515,7 +535,7 @@ void ListBox::Draw(HWND hwnd, HDC& hdc)
 	}
 	else
 	{
-		BitBlt(hdc, 0, 0, m_DrawableArea.right - m_DrawableArea.left, m_DrawableArea.bottom - m_DrawableArea.top + m_Margin.Bottom, hdcMem, 0, 0, SRCCOPY);
+		BitBlt(hdc, 0, 0, drawableArea->right - drawableArea->left, drawableArea->bottom - drawableArea->top + m_Margin.Bottom, hdcMem, 0, 0, SRCCOPY);
 	}
 
 	SelectObject(hdcMem, hbmOld);
@@ -528,78 +548,6 @@ void ListBox::Draw(HWND hwnd, HDC& hdc)
 	DeleteDC(hdcMem);
 }
 
-void ListBox::IncrementHorizontalScroll() noexcept
-{
-	if (!IsHorizontalScrollEnabled())
-	{
-		return;
-	}
-
-	auto inc = GetItemWidth();
-	for (auto& r : m_RowPosition)
-	{
-		r.left += inc;
-		r.right += inc;
-
-		// Invalidates only the item entry region. Otherwise scrollbar would flicker because it's a control inside a control being redraw all the time.
-		InvalidateRect(static_cast<HWND>(Handle.ToPointer()), &m_DrawableArea, false);
-	}
-}
-
-void ListBox::DecrementHorizontalScroll() noexcept
-{
-	if (!IsHorizontalScrollEnabled())
-	{
-		return;
-	}
-
-	auto inc = GetItemWidth();
-	for (auto& r : m_RowPosition)
-	{
-		r.left -= inc;
-		r.right -= inc;
-
-		// Invalidates only the item entry region. Otherwise scrollbar would flicker because it's a control inside a control being redraw all the time.
-		InvalidateRect(static_cast<HWND>(Handle.ToPointer()), &m_DrawableArea, false);
-	}
-}
-
-void ListBox::IncrementVerticalScroll() noexcept
-{
-	if (!IsVerticalScrollEnabled())
-	{
-		return;
-	}
-
-	auto inc = GetItemHeight();
-	for (auto& r : m_RowPosition)
-	{
-		r.bottom += inc;
-		r.top += inc;
-	}
-
-	// Invalidates only the item entry region. Otherwise scrollbar would flicker because it's a control inside a control being redraw all the time.
-	InvalidateRect(static_cast<HWND>(Handle.ToPointer()), &m_DrawableArea, false);
-}
-
-void ListBox::DecrementVerticalScroll() noexcept
-{
-	if (!IsVerticalScrollEnabled())
-	{
-		return;
-	}
-
-	auto inc = GetItemHeight();
-	for (auto& r : m_RowPosition)
-	{
-		r.bottom -= inc;
-		r.top -= inc;
-	}
-
-	// Invalidates only the item entry region. Otherwise scrollbar would flicker because it's a control inside a control being redraw all the time.
-	InvalidateRect(static_cast<HWND>(Handle.ToPointer()), &m_DrawableArea, false);
-}
-
 ListBox::ListBox(Control* parent, int width, int height, int x, int y)
 	:
 	ListControl(parent, "", width, height, x, y),
@@ -609,7 +557,6 @@ ListBox::ListBox(Control* parent, int width, int height, int x, int y)
 	m_SelectionMode(SelectionMode::Single),
 	m_DockStyle(DockStyle::None),
 	m_BorderStyle(BorderStyle::Fixed3D),
-	m_DrawableArea({ 0 }),
 	m_TotalItemsInDrawableArea(0),
 	m_ColumnWidth(120),
 	m_ColumnNumber(1),
@@ -656,8 +603,11 @@ size_t ListBox::GetColumnWidth() noexcept
 
 void ListBox::SetColumnWidth(const size_t& width) noexcept
 {
-	m_ColumnWidth = width;
-	Update();
+	if (m_IsMultiColumn)
+	{
+		m_ColumnWidth = width;
+		Update();
+	}
 }
 
 BorderStyle ListBox::GetBorderStyle() const noexcept

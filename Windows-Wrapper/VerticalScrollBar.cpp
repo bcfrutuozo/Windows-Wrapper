@@ -77,9 +77,7 @@ void VerticalScrollBar::OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsign
 	SetScrollPos(hwnd, SB_VERT, nPos, true);
 	Scrolling = GetScrollPos(hwnd, SB_VERT);
 
-	//ScrollWindowEx(hwnd, 0, (nOldPos - nPos) * 1, NULL, NULL, NULL, NULL, SW_ERASE | SW_INVALIDATE);
-	nOldPos > nPos ? Owner->DecrementVerticalScroll() : Owner->IncrementVerticalScroll();
-	
+	InvalidateRect(static_cast<HWND>(Owner->Handle.ToPointer()), Owner->GetDrawableArea(), false);	
 	WinAPI::OnVerticalScrolling_Impl(hwnd, hwndCtl, code, pos);
 }
 

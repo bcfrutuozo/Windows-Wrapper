@@ -14,7 +14,6 @@ private:
 	DockStyle m_DockStyle;
 	BorderStyle m_BorderStyle;
 	std::vector<RECT> m_RowPosition;
-	RECT m_DrawableArea;
 	size_t m_TotalItemsInDrawableArea;
 	size_t m_ColumnWidth;
 	size_t m_RowNumber;
@@ -26,11 +25,6 @@ private:
 
 	void CalculateListBoxParameters(HWND hwnd, HDC& hdc);
 	void Draw(HWND hwnd, HDC& hdc);
-
-	void IncrementHorizontalScroll() noexcept override;
-	void DecrementHorizontalScroll() noexcept override;
-	void IncrementVerticalScroll() noexcept override;
-	void DecrementVerticalScroll() noexcept override;
 
 public:
 

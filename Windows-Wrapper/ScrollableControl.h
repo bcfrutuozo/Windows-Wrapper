@@ -6,6 +6,10 @@
 
 class ScrollableControl : public Control
 {
+	friend class ScrollBar;
+	friend class HorizontalScrollBar;
+	friend class VerticalScrollBar;
+
 private:
 
 	bool m_IsHorizontalScrollEnabled;
@@ -13,6 +17,7 @@ private:
 	size_t m_ItemWidth;
 	size_t m_ItemHeight;
 	size_t m_MinimumItemWidth;
+	RECT m_DrawableArea;
 
 protected:
 
@@ -20,6 +25,8 @@ protected:
 	VerticalScrollBar VerticalScrollBar;
 
 	void SetMinimumItemWidth(const size_t& weight) noexcept;
+	LPRECT const GetDrawableArea() noexcept;
+	LPRECT const ResetDrawableArea() noexcept;
 
 public:
 
@@ -36,10 +43,5 @@ public:
 	void SetItemWidth(const size_t& width);
 	size_t GetItemHeight() const noexcept;
 	void SetItemHeight(const size_t& height) noexcept;
-
-	virtual void IncrementHorizontalScroll() noexcept = 0;
-	virtual void DecrementHorizontalScroll() noexcept = 0;
-	virtual void IncrementVerticalScroll() noexcept = 0;
-	virtual void DecrementVerticalScroll() noexcept = 0;
 };
 

@@ -74,19 +74,3 @@ ComboBox::~ComboBox()
 {
 
 }
-
-void ComboBox::IncrementHorizontalScroll() noexcept
-{
-}
-
-void ComboBox::DecrementHorizontalScroll() noexcept
-{
-}
-
-void ComboBox::IncrementVerticalScroll() noexcept
-{
-}
-
-void ComboBox::DecrementVerticalScroll() noexcept
-{
-}

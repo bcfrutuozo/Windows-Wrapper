@@ -2,6 +2,8 @@
 
 #include "ScrollBar.h"
 
+class ScrollableControl;
+
 class HorizontalScrollBar : public ScrollBar
 {
 private:

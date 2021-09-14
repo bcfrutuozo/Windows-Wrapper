@@ -314,7 +314,7 @@ public:
 		return index;
 	}
 
-	void Insert(int index, T* item) noexcept override
+	void Insert(int index, T* item) override
 	{
 		if (index < 0 || index >= this->Count)
 		{
