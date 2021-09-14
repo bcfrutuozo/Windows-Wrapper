@@ -19,10 +19,10 @@ void TestUserApplication::Initialize()
 	window->GetMouse().EnableRaw();
 	window->GetKeyboard().DisableAutorepeat();
 
-	auto lb = window->AddListBox(600, 240, 300, 50);
+	auto lb = window->AddListBox(260, 240, 450, 50);
 
 	auto list = new ListItemCollection(lb);
-	for (size_t i = 0; i < 5001; ++i)
+	for (size_t i = 0; i < 32726; ++i)
 	{
 		std::ostringstream oss;
 		oss << "Item: " << i;
@@ -31,11 +31,11 @@ void TestUserApplication::Initialize()
 	lb->SetDataSource(list);
 	auto f = lb->GetFont();
 	f.SetStyle(FontStyle::Italic);
-	f.SetSize(27);
+	f.SetSize(12);
 	lb->SetFont(f);
 	lb->SetBorderStyle(BorderStyle::Fixed3D);
-	//lb->EnableMultiColumn();
-	//lb->SetColumnWidth(150);
+	lb->EnableMultiColumn();
+	lb->SetColumnWidth(120);
 
 	//auto t1 = window->AddComboBox("ComboBox", 300, 120, 120);
 	//window2->AddButton("Teste", 250, 250, 125, 125);

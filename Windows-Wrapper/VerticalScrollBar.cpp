@@ -74,24 +74,12 @@ void VerticalScrollBar::OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsign
 		return;
 	}
 
-	/*if (code != SB_THUMBTRACK && nPos + si.nPage > MaximumValue)
-	{
-		return;
-	}
-
-	if (code == SB_THUMBTRACK && nPos + si.nPage > MaximumValue)
-	{
-		nPos = MaximumValue - si.nPage;
-	}*/
-
 	SetScrollPos(hwnd, SB_VERT, nPos, true);
 	Scrolling = GetScrollPos(hwnd, SB_VERT);
 
-	// Refresh the control (repaint it to reflect the new nPos). Note we
-	// here multiply with some unspecified scrolling unit which specifies
-	// amount of pixels corresponding to the 1 scrolling unit.
-	// We will discuss ScrollWindowEx() more later in the article.
+	//ScrollWindowEx(hwnd, 0, (nOldPos - nPos) * 1, NULL, NULL, NULL, NULL, SW_ERASE | SW_INVALIDATE);
 	nOldPos > nPos ? Owner->DecrementVerticalScroll() : Owner->IncrementVerticalScroll();
+	
 	WinAPI::OnVerticalScrolling_Impl(hwnd, hwndCtl, code, pos);
 }
 

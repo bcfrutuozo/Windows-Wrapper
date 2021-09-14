@@ -186,8 +186,8 @@ void ListBox::CalculateListBoxParameters(HWND hwnd, HDC& hdc)
 
 	if (m_IsRebinding || m_IsFormatChanged)
 	{
-		m_RowNumber = !m_IsMultiColumn ? itemsNumber : m_DrawableArea.bottom - m_DrawableArea.top / GetItemHeight();
-		m_ColumnNumber = !m_IsMultiColumn ? 1 : m_DrawableArea.right - m_DrawableArea.left / GetItemWidth();
+		m_RowNumber = !m_IsMultiColumn ? itemsNumber : (m_DrawableArea.bottom - m_DrawableArea.top) / GetItemHeight();
+		m_ColumnNumber = !m_IsMultiColumn ? 1 : (m_DrawableArea.right - m_DrawableArea.left) / GetItemWidth();
 
 		// Reset the amount of items in drawable area for recalculation
 		m_TotalItemsInDrawableArea = 0;
@@ -197,7 +197,7 @@ void ListBox::CalculateListBoxParameters(HWND hwnd, HDC& hdc)
 			size_t newWidth = 0;
 			auto oldWidth = m_DrawableArea.right - m_DrawableArea.left;
 
-			if ((m_DrawableArea.right - m_DrawableArea.left) > (GetItemWidth() * m_ColumnNumber + 1))
+			if (m_RowNumber * m_ColumnNumber > itemsNumber)
 			{
 				HorizontalScrollBar.SetMaximumValue(0);
 				HorizontalScrollBar.Hide();
@@ -209,24 +209,37 @@ void ListBox::CalculateListBoxParameters(HWND hwnd, HDC& hdc)
 					newWidth += GetItemWidth();
 				}
 
+				m_DrawableArea.bottom -= HorizontalScrollBar.GetSize().Height;
+
+				auto hSize = HorizontalScrollBar.GetSize();
+				hSize.Width += (newWidth - oldWidth);
+				m_DrawableArea.right = newWidth + m_Margin.Right + (bordersize * 2);
 				newWidth += m_Margin.Left + m_Margin.Right + (bordersize * 2);
 				int oldHeightX = m_Size.Width;
 				m_Size.Width = newWidth;
-				Resize(newWidth, m_Size.Height + HorizontalScrollBar.GetSize().Height + 1); // Height + 1 is because of the HorizontalScrollBar must have at least one extra pixel to draw the inner window
-				auto hSize = HorizontalScrollBar.GetSize();
-				hSize.Width += (newWidth - oldHeightX);
-				auto scrollLoc = HorizontalScrollBar.GetLocation();
-				scrollLoc.Y += 1;	// Increment location by 1 because it has a single pixel for the inner windows
-				HorizontalScrollBar.SetLocation(scrollLoc);
-				HorizontalScrollBar.Resize(hSize);
-				HorizontalScrollBar.SetMaximumValue(static_cast<size_t>(std::ceil(static_cast<float>(itemsNumber)) / static_cast<float>((m_RowNumber))));
 
-				m_RowNumber = !m_IsMultiColumn ? itemsNumber : m_DrawableArea.bottom - m_DrawableArea.top / GetItemHeight();
-				m_ColumnNumber = !m_IsMultiColumn ? 1 : m_DrawableArea.right - m_DrawableArea.left / GetItemWidth();
+				HorizontalScrollBar.Resize(hSize);
+				HorizontalScrollBar.SetMaximumValue(itemsNumber);
+				HorizontalScrollBar.Show();
+				Resize(newWidth, m_Size.Height);
+
+				m_RowNumber = !m_IsMultiColumn ? itemsNumber : (m_DrawableArea.bottom - m_DrawableArea.top) / GetItemHeight();
+				m_ColumnNumber = !m_IsMultiColumn ? 1 : (m_DrawableArea.right - m_DrawableArea.left) / GetItemWidth();
+
+				size_t max = 0;
+				while (max < newWidth)
+				{
+					max += GetItemWidth();
+
+					if (max > newWidth)
+					{
+						break;
+					}
+
+					++m_TotalItemsInDrawableArea;
+				}
 
 				HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_SIZE, MAKEWPARAM(0, 0), MAKELPARAM(m_TotalItemsInDrawableArea, 0));
-				m_IsRebinding = false;
-				m_IsFormatChanged = false;
 			}
 		}
 		else
@@ -276,10 +289,11 @@ void ListBox::CalculateListBoxParameters(HWND hwnd, HDC& hdc)
 				}
 
 				HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_SIZE, MAKEWPARAM(0, 0), MAKELPARAM(0, m_TotalItemsInDrawableArea));
-				m_IsRebinding = false;
-				m_IsFormatChanged = false;
 			}
 		}
+
+		m_IsRebinding = false;
+		m_IsFormatChanged = false;
 	}
 }
 
@@ -304,7 +318,7 @@ void ListBox::Draw(HWND hwnd, HDC& hdc)
 
 	HDC hdcMem;
 	HBITMAP hbmMem;
-	HBITMAP hbmOld ;
+	HBITMAP hbmOld;
 
 	bool drawFullWindow = false;
 	if (m_IsRebinding || m_IsFormatChanged)
@@ -443,8 +457,6 @@ void ListBox::Draw(HWND hwnd, HDC& hdc)
 	{
 		if (m_IsMultiColumn)
 		{
-			// HORRORIZONTAL
-
 			RECT cr;
 			CopyRect(&cr, &m_DrawableArea);
 
@@ -453,39 +465,10 @@ void ListBox::Draw(HWND hwnd, HDC& hdc)
 
 			cr.top = (GetItemHeight() * r) + m_DrawableArea.top;
 			cr.bottom = (cr.top + GetItemHeight());
-			cr.left = +m_DrawableArea.left - (HorizontalScrollBar.GetScrolling() * GetItemWidth()) + (GetItemWidth() * i2);
+			cr.left = m_DrawableArea.left - (HorizontalScrollBar.GetScrolling() * GetItemWidth()) + (GetItemWidth() * i2);
 			cr.right = cr.left + GetItemWidth() - m_Margin.Right;
 
 			m_RowPosition[i] = cr;
-
-			if (cr.left >= m_DrawableArea.left && cr.right <= m_DrawableArea.right && cr.top >= m_DrawableArea.top && cr.bottom <= m_DrawableArea.bottom)
-			{
-				if (m_IsRebinding && r == 0)
-				{
-					++m_TotalItemsInDrawableArea;
-				}
-
-				if (m_SelectedIndex == i)
-				{
-					SetBkColor(hdcMem, RGB(0, 120, 215));
-					SetTextColor(hdcMem, RGB(255, 255, 255));
-					// Draw background
-					HBRUSH brush = CreateSolidBrush(RGB(0, 120, 215));
-					FillRect(hdcMem, &cr, brush);
-					SelectObject(hdcMem, brush);
-					DeleteObject(brush);
-				}
-				else
-				{
-					SetBkColor(hdcMem, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-					SetTextColor(hdcMem, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-				}
-
-				DrawText(hdcMem, (*dataSource)[i]->Value.c_str(), -1, &cr, DT_LEFT | DT_VCENTER);
-				DrawText(hdcMem, Text.c_str(), static_cast<int>((*dataSource)[i]->Value.length()), &cr, DT_LEFT | DT_VCENTER | DT_CALCRECT);
-			}
-
-			// HORRORIZONTAL
 		}
 		else
 		{
@@ -493,35 +476,34 @@ void ListBox::Draw(HWND hwnd, HDC& hdc)
 			CopyRect(&cr, &m_DrawableArea);
 			cr.top = (GetItemHeight() * i) - (VerticalScrollBar.GetScrolling() * GetItemHeight()) + m_DrawableArea.top;
 			cr.bottom = (cr.top + GetItemHeight());
-
 			m_RowPosition[i] = cr;
+		}
+	}
 
-			if (cr.left >= m_DrawableArea.left && cr.right <= m_DrawableArea.right && cr.top >= m_DrawableArea.top && cr.bottom <= m_DrawableArea.bottom)
+	// Pure draw
+	for (size_t i = 0; i < m_RowPosition.size(); ++i)
+	{
+		auto cr = m_RowPosition[i];
+		if (cr.left >= m_DrawableArea.left && cr.right <= m_DrawableArea.right && cr.top >= m_DrawableArea.top && cr.bottom <= m_DrawableArea.bottom)
+		{
+			if (m_SelectedIndex == i)
 			{
-				if (m_IsRebinding)
-				{
-					++m_TotalItemsInDrawableArea;
-				}
-
-				if (m_SelectedIndex == i)
-				{
-					SetBkColor(hdcMem, RGB(0, 120, 215));
-					SetTextColor(hdcMem, RGB(255, 255, 255));
-					// Draw background
-					HBRUSH brush = CreateSolidBrush(RGB(0, 120, 215));
-					FillRect(hdcMem, &cr, brush);
-					SelectObject(hdcMem, brush);
-					DeleteObject(brush);
-				}
-				else
-				{
-					SetBkColor(hdcMem, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-					SetTextColor(hdcMem, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-				}
-
-				DrawText(hdcMem, (*dataSource)[i]->Value.c_str(), -1, &cr, DT_LEFT | DT_VCENTER);
-				DrawText(hdcMem, Text.c_str(), static_cast<int>((*dataSource)[i]->Value.length()), &cr, DT_LEFT | DT_VCENTER | DT_CALCRECT);
+				SetBkColor(hdcMem, RGB(0, 120, 215));
+				SetTextColor(hdcMem, RGB(255, 255, 255));
+				// Draw background
+				HBRUSH brush = CreateSolidBrush(RGB(0, 120, 215));
+				FillRect(hdcMem, &cr, brush);
+				SelectObject(hdcMem, brush);
+				DeleteObject(brush);
 			}
+			else
+			{
+				SetBkColor(hdcMem, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+				SetTextColor(hdcMem, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
+			}
+
+			DrawText(hdcMem, (*dataSource)[i]->Value.c_str(), -1, &cr, DT_LEFT | DT_VCENTER);
+			DrawText(hdcMem, Text.c_str(), static_cast<int>((*dataSource)[i]->Value.length()), &cr, DT_LEFT | DT_VCENTER | DT_CALCRECT);
 		}
 	}
 
