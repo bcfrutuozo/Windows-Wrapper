@@ -5,7 +5,7 @@
 
 class Button final: public Control
 {
-	friend class WinAPI;
+	friend class Control;
 
 private:
 
@@ -17,9 +17,10 @@ private:
 	void OnKeyUp_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept override;
 	void OnPaint_Impl(HWND hwnd) noexcept override;
 
+	Button(Control* parent, const std::string& name, int width, int height, int x, int y);
+
 public:
 
-	Button(Control* parent, const std::string& name, int width, int height, int x, int y);
 	virtual ~Button();
 
 	void Initialize() override;

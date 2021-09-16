@@ -4,6 +4,8 @@
 
 class TextBox final: public Control
 {
+	friend class Control;
+
 private:
 
 	// Used to track Caret positioning for input
@@ -51,12 +53,13 @@ private:
 	void InputDraw(HWND hWnd, HDC& hdc) noexcept;
 	void PaintSelection(HDC& hdc, RECT& r, size_t start, size_t end) const noexcept;
 
+	TextBox(Control* parent, int width, int x, int y);
+	TextBox(Control* parent, const std::string& name, int width, int x, int y);
+
 public:
 
 	BorderStyle BorderStyle;
 
-	TextBox(Control* parent, int width, int x, int y);
-	TextBox(Control* parent, const std::string& name, int width, int x, int y);
 	virtual ~TextBox();
 
 	size_t GetSelectionLenght() const noexcept;

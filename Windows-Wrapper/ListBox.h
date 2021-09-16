@@ -2,8 +2,13 @@
 
 #include "ListControl.h"
 
+class ComboBox;
+
 class ListBox : public ListControl
 {
+	friend class ComboBox;
+	friend class Control;
+
 private:
 
 	bool m_IsMultiColumn;
@@ -26,9 +31,10 @@ private:
 	void CalculateListBoxParameters(HWND hwnd, HDC& hdc);
 	void Draw(HWND hwnd, HDC& hdc);
 
+	ListBox(Control* parent, int width, int height, int x, int y);
+
 public:
 
-	ListBox(Control* parent, int width, int height, int x, int y);
 	virtual ~ListBox();
 
 	bool IsMultiColumn() const noexcept;

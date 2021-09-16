@@ -1,4 +1,5 @@
 #include "ListControl.h"
+#include "ComboBox.h"
 
 int ListControl::OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept
 {
@@ -138,12 +139,24 @@ void ListControl::DisableSelection() noexcept
 	m_AllowSelection = false;
 }
 
+ListItemCollection* const ListControl::GetDataSource() const noexcept
+{
+	return Items;
+}
+
 void ListControl::SetDataSource(ListItemCollection* const dataSource) noexcept
 {
-	if (dataSource->GetCount() > 32767)
+	if (dataSource != nullptr && dataSource->GetCount() > 32767)
 	{
 		throw std::logic_error("Maximum ListBox items allowed is 32767");
 	}
+
+	// Destroy the old DataSource to avoid memory leak
+	/*if (Items != nullptr)
+	{
+		delete Items;
+		Items = nullptr;
+	}*/
 
 	Items = dataSource;
 	Dispatch("OnDataSourceChanged", &ArgsDefault);
@@ -165,6 +178,11 @@ void ListControl::SetSelectedIndex(unsigned int index) noexcept
 
 ListItem* ListControl::GetSelectedValue() const noexcept
 {
+	if (m_SelectedIndex == -1)
+	{
+		return nullptr;
+	}
+
 	return (*Items)[m_SelectedIndex];
 }
 
@@ -188,3 +206,9 @@ void ListControl::SetSelectedValue(const ListItem& item)
 		throw std::invalid_argument("ListItem does not exist");
 	}
 }
+
+bool ListControl::IsRebinding() const noexcept
+{
+	return m_IsRebinding;
+}
+

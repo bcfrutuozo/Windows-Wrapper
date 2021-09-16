@@ -4,6 +4,7 @@
 
 class Label final : public Control
 {
+	friend class Control;
 private:
 
 	BorderStyle m_BorderStyle;
@@ -11,10 +12,11 @@ private:
 
 	virtual void OnPaint_Impl(HWND hwnd) noexcept override;
 
+	Label(Control* parent, const std::string& text, int x, int y);
+
 public:
 
-	Label(Control* parent, const std::string& text, int x, int y);
-	virtual ~Label() = default;
+	virtual ~Label();
 
 	void Initialize() override;
 	BorderStyle GetBorderStyle() const noexcept;

@@ -104,3 +104,13 @@ void ScrollableControl::SetItemHeight(const size_t& height) noexcept
 {
 	m_ItemHeight = height;
 }
+
+size_t ScrollableControl::GetHorizontalPage() const noexcept
+{
+	return m_Size.Width / GetItemWidth();
+}
+
+size_t ScrollableControl::GetVerticalPage() const noexcept
+{
+	return m_Size.Height / GetItemHeight();
+}

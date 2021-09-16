@@ -4,6 +4,7 @@
 #include "Application.h"
 
 unsigned int WinAPI::m_CurrentIndex = 1;
+IntPtr WinAPI::m_OpenedControl = nullptr;
 
 void WinAPI::OnActivate_Impl(HWND hwnd, unsigned int state, HWND hwndActDeact, bool minimized) noexcept
 {

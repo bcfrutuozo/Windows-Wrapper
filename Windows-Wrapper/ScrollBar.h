@@ -7,6 +7,8 @@ class ScrollableControl;
 
 class ScrollBar : public Control
 {
+	friend class ScrollableControl;
+
 protected:
 
 	ScrollableControl* Owner;
@@ -16,9 +18,10 @@ protected:
 	int OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept override;
 	void OnPaint_Impl(HWND hwnd) noexcept override;
 
+	ScrollBar(ScrollableControl* parent, int width, int height, int x, int y);
+
 public:
 
-	ScrollBar(ScrollableControl* parent, int width, int height, int x, int y);
 	virtual ~ScrollBar();
 
 	void Initialize() override;

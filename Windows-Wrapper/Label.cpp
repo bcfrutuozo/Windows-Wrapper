@@ -140,6 +140,11 @@ Label::Label(Control* parent, const std::string& text, int x, int y)
 	Initialize();
 }
 
+Label::~Label()
+{
+
+}
+
 void Label::Initialize()
 {
 	// Create window and get its handle

@@ -80,6 +80,14 @@ void Control::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 
 void Control::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
 {
+	if (m_OpenedControl != nullptr)
+	{
+		auto wnd = GetWindow();
+		auto c = wnd->GetByHandle(m_OpenedControl);
+		c->Hide();
+		m_OpenedControl = nullptr;
+	}
+
 	// Trigger tabbing
 	if (Parent != nullptr && GetFocus() != hwnd)
 	{
@@ -147,8 +155,18 @@ Control::Control(Control* parent, const std::string& text) noexcept
 
 void Control::SetFont(Font font) noexcept
 {
+	for (const auto& c : Controls)
+	{
+		c->SetFont(font);
+	}
+
 	m_Font = font;
 	Update();
+}
+
+void Control::SetText(const std::string& text) noexcept
+{
+	Text = text;
 }
 
 Control::Control(Control* parent, const std::string& text, int width, int height, int x, int y) noexcept

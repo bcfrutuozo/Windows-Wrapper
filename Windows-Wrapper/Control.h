@@ -96,6 +96,16 @@ protected:
 		return item;
 	}
 
+	Control() noexcept;
+	Control(Control* parent, const std::string& text) noexcept;
+	Control(Control* parent, const std::string& text, int width, int height, int x, int y) noexcept;
+	Control(const std::string& text) noexcept;
+	Control(const std::string& text, int width, int height, int x, int y) noexcept;
+	Control(const Control&) = default;														// Copy constructor
+	Control(Control&&) = default;															// Move constructor
+	Control& operator=(const Control&) = default;											// Copy assignment constructor
+	Control& operator=(Control&&) = default;												// Move assignment constructor
+
 public:
 
 	class ControlCollection : public Collection<Control>
@@ -107,15 +117,6 @@ public:
 
 	ControlCollection Controls;
 
-	Control() noexcept;
-	Control(Control* parent, const std::string& text) noexcept;
-	Control(Control* parent, const std::string& text, int width, int height, int x, int y) noexcept;
-	Control(const std::string& text) noexcept;
-	Control(const std::string& text, int width, int height, int x, int y) noexcept;
-	Control(const Control&) = default;														// Copy constructor
-	Control(Control&&) = default;															// Move constructor
-	Control& operator=(const Control&) = default;											// Copy assignment constructor
-	Control& operator=(Control&&) = default;												// Move assignment constructor
 	virtual ~Control();																		// Destructor
 
 	void Dispose() override;
@@ -154,6 +155,7 @@ public:
 	Color GetBackgroundColor() const noexcept;
 	void SetBackgroundColor(const Color& color) noexcept;
 	const std::string& GetText() const noexcept;
+	void SetText(const std::string& text) noexcept;
 	Control* GetPreviousControl() noexcept;
 	Control* GetNextControl() noexcept;
 	Control* GetById(unsigned int id) noexcept;

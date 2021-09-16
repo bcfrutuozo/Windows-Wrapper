@@ -7,6 +7,8 @@
 
 class ProgressBar final: public Control
 {
+	friend class Control;
+
 private:
 
 	volatile int m_Value;
@@ -21,12 +23,13 @@ private:
 	void OnPaint_Impl(HWND hwnd) noexcept override;
 	void OnPaintMarquee_Thread(HWND hwnd) noexcept;
 
+	ProgressBar(Control* parent, int width, int height, int x, int y);
+	ProgressBar(Control* parent, const std::string& name, int width, int height, int x, int y);
+
 public:
 
 	int Step;
 
-	ProgressBar(Control* parent, int width, int height, int x, int y);
-	ProgressBar(Control* parent, const std::string& name, int width, int height, int x, int y);
 	virtual ~ProgressBar();
 
 	void Initialize() override;

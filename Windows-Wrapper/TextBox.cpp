@@ -457,14 +457,14 @@ void TextBox::CopyToClipboard() const noexcept
 			end = m_SelectIndex;
 		}
 
-		HGLOBAL clipbuffer;
-		char* buffer;
+		HGLOBAL clipbuffer = NULL;
+		char* buffer = NULL;
 		EmptyClipboard();
 		clipbuffer = GlobalAlloc(GMEM_DDESHARE, end - start + 1);
-		if (clipbuffer > 0)
+		if (clipbuffer != NULL)
 		{
 			buffer = reinterpret_cast<char*>(GlobalLock(clipbuffer));
-			if (buffer > 0)
+			if (buffer != NULL)
 			{
 				strcpy_s(buffer, end - start + 1, Text.substr(start, end - start).c_str());
 			}

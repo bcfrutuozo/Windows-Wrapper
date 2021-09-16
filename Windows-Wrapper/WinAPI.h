@@ -45,6 +45,7 @@ private:
 	bool m_IsMouseOver;
 	bool m_IsClicking;
 	bool m_Enabled;
+	static IntPtr m_OpenedControl;
 
 	// Scrolling
 	int m_HorizontalScrolling;

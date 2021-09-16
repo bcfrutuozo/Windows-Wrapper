@@ -28,10 +28,10 @@ protected:
 	LPRECT const GetDrawableArea() noexcept;
 	LPRECT const ResetDrawableArea() noexcept;
 
-public:
-
 	ScrollableControl(Control* parent, const std::string& name, int width, int height, int x, int y);
 	virtual ~ScrollableControl();
+
+public:
 
 	bool IsHorizontalScrollEnabled() const noexcept;
 	void EnableHorizontalScroll() noexcept;
@@ -43,5 +43,7 @@ public:
 	void SetItemWidth(const size_t& width);
 	size_t GetItemHeight() const noexcept;
 	void SetItemHeight(const size_t& height) noexcept;
+	size_t GetHorizontalPage() const noexcept;
+	size_t GetVerticalPage() const noexcept;
 };
 

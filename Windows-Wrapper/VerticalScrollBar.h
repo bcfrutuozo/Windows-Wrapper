@@ -6,6 +6,8 @@ class ScrollableControl;
 
 class VerticalScrollBar : public ScrollBar
 {
+	friend class ScrollableControl;
+
 private:
 
 	void OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy) noexcept override;

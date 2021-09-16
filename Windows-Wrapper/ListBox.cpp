@@ -1,4 +1,5 @@
 #include "ListBox.h"
+#include "ComboBox.h"
 
 void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept
 {
@@ -23,7 +24,7 @@ void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 
 			if (m_RowPosition[m_SelectedIndex].right > drawableArea->right && IsHorizontalScrollEnabled())
 			{
-				HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, (m_SelectedIndex / m_RowNumber) - 1), 0);
+				HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, (m_SelectedIndex / m_RowNumber) - (m_ColumnNumber - 1)), 0);
 			}
 		}
 		else
@@ -196,7 +197,13 @@ void ListBox::CalculateListBoxParameters(HWND hwnd, HDC& hdc)
 	SetItemWidth(m_IsMultiColumn ? m_ColumnWidth : drawableArea->right - drawableArea->left);
 	SetItemHeight(m_SingleSize.cy);
 
-	int itemsNumber = GetDataSource()->GetCount();
+	const auto& dataSource = GetDataSource();
+
+	int itemsNumber = 0;
+	if (dataSource != nullptr)
+	{
+		itemsNumber = dataSource->GetCount();
+	}
 
 	if (m_IsRebinding)
 	{
@@ -326,7 +333,6 @@ void ListBox::CalculateListBoxParameters(HWND hwnd, HDC& hdc)
 
 	m_IsRebinding = false;
 	m_IsFormatChanged = false;
-
 }
 
 void ListBox::Draw(HWND hwnd, HDC& hdc)
@@ -484,14 +490,29 @@ void ListBox::Draw(HWND hwnd, HDC& hdc)
 
 	const auto& dataSource = GetDataSource();
 
-	for (auto [i, r, c] = std::tuple{ 0, 0, 0 }; i < dataSource->GetCount(); ++i, ++r)
+	/* Logic to draw only visible entries. However, it's much harder to track the selected index
+	because it position cannot be tracked to be handled.
+	
+	for (auto [i, r, c, a] =
+		std::tuple{
+		IsMultiColumn() ? HorizontalScrollBar.GetScrolling() * m_RowNumber : VerticalScrollBar.GetScrolling() * m_ColumnNumber,
+		0,
+		0,
+		0 };
+		a < m_RowNumber * m_ColumnNumber;
+		++i, ++r, ++a)
 	{
+		if (i >= dataSource->GetCount())
+		{
+			break;
+		}
+
 		RECT cr;
 		CopyRect(&cr, drawableArea);
 
-		cr.top = drawableArea->top - (GetItemHeight() * VerticalScrollBar.GetScrolling()) + (GetItemHeight() * r);
+		cr.top = drawableArea->top + (GetItemHeight() * r);
 		cr.bottom = (cr.top + GetItemHeight());
-		cr.left = drawableArea->left - (HorizontalScrollBar.GetScrolling() * GetItemWidth()) + (GetItemWidth() * c);
+		cr.left = drawableArea->left + (GetItemWidth() * c);
 		cr.right = cr.left + GetItemWidth() - m_Margin.Right;
 
 		if (r == m_RowNumber - 1)
@@ -500,30 +521,68 @@ void ListBox::Draw(HWND hwnd, HDC& hdc)
 			++c;
 		}
 
-		m_RowPosition[i] = cr;
-
-		if (cr.left >= drawableArea->left &&
-			cr.top >= drawableArea->top &&
-			cr.right <= drawableArea->right &&
-			cr.bottom <= drawableArea->bottom)
+		if (m_SelectedIndex == i)
 		{
-			if (m_SelectedIndex == i)
+			SetBkColor(hdcMem, RGB(0, 120, 215));
+			SetTextColor(hdcMem, RGB(255, 255, 255));
+			HBRUSH brush = CreateSolidBrush(RGB(0, 120, 215));
+			FillRect(hdcMem, &cr, brush);
+			SelectObject(hdcMem, brush);
+			DeleteObject(brush);
+		}
+		else
+		{
+			SetBkColor(hdcMem, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+			SetTextColor(hdcMem, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
+		}
+
+		DrawText(hdcMem, (*dataSource)[i]->Value.c_str(), -1, &cr, DT_LEFT | DT_VCENTER);
+		DrawText(hdcMem, Text.c_str(), static_cast<int>((*dataSource)[i]->Value.length()), &cr, DT_LEFT | DT_VCENTER | DT_CALCRECT);
+	}*/
+
+	if (dataSource != nullptr)
+	{
+		for (auto [i, r, c] = std::tuple{ 0, 0, 0 }; i < dataSource->GetCount(); ++i, ++r)
+		{
+			RECT cr;
+			CopyRect(&cr, drawableArea);
+
+			cr.top = drawableArea->top - (GetItemHeight() * VerticalScrollBar.GetScrolling()) + (GetItemHeight() * r);
+			cr.bottom = (cr.top + GetItemHeight());
+			cr.left = drawableArea->left - (HorizontalScrollBar.GetScrolling() * GetItemWidth()) + (GetItemWidth() * c);
+			cr.right = cr.left + GetItemWidth() - m_Margin.Right;
+
+			if (r == m_RowNumber - 1)
 			{
-				SetBkColor(hdcMem, RGB(0, 120, 215));
-				SetTextColor(hdcMem, RGB(255, 255, 255));
-				HBRUSH brush = CreateSolidBrush(RGB(0, 120, 215));
-				FillRect(hdcMem, &cr, brush);
-				SelectObject(hdcMem, brush);
-				DeleteObject(brush);
-			}
-			else
-			{
-				SetBkColor(hdcMem, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-				SetTextColor(hdcMem, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
+				r = -1;
+				++c;
 			}
 
-			DrawText(hdcMem, (*dataSource)[i]->Value.c_str(), -1, &cr, DT_LEFT | DT_VCENTER);
-			DrawText(hdcMem, Text.c_str(), static_cast<int>((*dataSource)[i]->Value.length()), &cr, DT_LEFT | DT_VCENTER | DT_CALCRECT);
+			m_RowPosition[i] = cr;
+
+			if (cr.left >= drawableArea->left &&
+				cr.top >= drawableArea->top &&
+				cr.right <= drawableArea->right &&
+				cr.bottom <= drawableArea->bottom)
+			{
+				if (m_SelectedIndex == i)
+				{
+					SetBkColor(hdcMem, RGB(0, 120, 215));
+					SetTextColor(hdcMem, RGB(255, 255, 255));
+					HBRUSH brush = CreateSolidBrush(RGB(0, 120, 215));
+					FillRect(hdcMem, &cr, brush);
+					SelectObject(hdcMem, brush);
+					DeleteObject(brush);
+				}
+				else
+				{
+					SetBkColor(hdcMem, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+					SetTextColor(hdcMem, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
+				}
+
+				DrawText(hdcMem, (*dataSource)[i]->Value.c_str(), -1, &cr, DT_LEFT | DT_VCENTER);
+				DrawText(hdcMem, Text.c_str(), static_cast<int>((*dataSource)[i]->Value.length()), &cr, DT_LEFT | DT_VCENTER | DT_CALCRECT);
+			}
 		}
 	}
 

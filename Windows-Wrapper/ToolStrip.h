@@ -9,6 +9,8 @@
 
 class ToolStrip: public Control
 {
+	friend class Control;
+
 private:
 
 	DockStyle m_DockStyle;
@@ -39,9 +41,10 @@ private:
 
 protected:
 
+	ToolStrip(Control* parent);
+
 public:
 
-	ToolStrip(Control* parent);
 	virtual ~ToolStrip() = default;
 
 	void Initialize() override;
