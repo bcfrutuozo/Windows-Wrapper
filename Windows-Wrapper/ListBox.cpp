@@ -10,7 +10,25 @@ void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 		if (m_SelectedIndex < GetDataSource()->GetCount() - 1)
 		{
 			auto drawableArea = GetDrawableArea();
-			++m_SelectedIndex;
+
+			if (m_SelectionMode == SelectionMode::None) break;
+
+			// If selection is single or is multi but without CTRL or SHIFT pressing
+			if (m_SelectionMode == SelectionMode::Single)
+			{
+				++m_SelectedIndex;
+			}
+			else
+			{
+				if ((!(GetKeyState(VK_CONTROL) & 0x8000) && !((GetKeyState(VK_SHIFT) & 0x8000))))
+				{
+					auto p = *(*Items)[++m_SelectedIndex];
+					p.Selected = true;
+					ListItem* l = new ListItem(p);
+					m_SelectedIndices.Add(new int(l->Id));
+					m_SelectedItems.Add(l);
+				}
+			}
 
 			if (m_RowPosition[m_SelectedIndex].bottom > drawableArea->bottom && IsVerticalScrollEnabled())
 			{
@@ -209,9 +227,22 @@ void ListBox::CalculateListBoxParameters(HWND hwnd, HDC& hdc)
 	{
 		// This block will only be executed once after resize
 		m_RowPosition.clear();
+		
+		if (m_SelectionMode == SelectionMode::MultiSimple || m_SelectionMode == SelectionMode::MultiExtended)
+		{
+			m_SelectedIndices.clear();
+			m_SelectedItems.clear();
+		}
+
 		if (m_RowPosition.size() < itemsNumber)
 		{
 			m_RowPosition.resize(itemsNumber);
+
+			if (m_SelectionMode == SelectionMode::MultiSimple || m_SelectionMode == SelectionMode::MultiExtended)
+			{
+				m_SelectedIndices.resize(itemsNumber);
+				m_SelectedItems.resize(itemsNumber);
+			}
 		}
 	}
 
@@ -630,6 +661,71 @@ ListBox::~ListBox()
 
 }
 
+void ListBox::SetSelectedIndex(int index) noexcept
+{
+	switch (m_SelectionMode)
+	{
+	case SelectionMode::None: throw std::logic_error("Cannot set index with in a ListBox with SelectionMode set as None"); break;
+	case SelectionMode::Single:
+	{
+		m_SelectedIndex = index;
+
+		if (m_SelectedIndex == -1)
+		{
+			m_SelectedValue = "";
+		}
+		else
+		{
+			m_SelectedValue = (*Items)[m_SelectedIndex]->Value;
+		}
+		break;
+	}
+	case SelectionMode::MultiSimple:
+	case SelectionMode::MultiExtended:
+	{
+		// Clear the list if the passed index is equal -1
+		if (index == -1)
+		{
+			m_SelectedIndices.clear();
+		}
+		else
+		{
+			auto entry = m_SelectedIndices[index];
+			if (entry != nullptr)
+			{
+				// Select this item while keeping any previously selected items selected.
+				m_SelectedIndices[index] = (&(*Items)[index]->Id);
+				m_SelectedItems[index] = (*Items)[index];
+				Dispatch("OnSelectedIndexChanged", &ArgsDefault);
+			}
+		}
+	}
+	}
+
+	Update();
+}
+
+void ListBox::SetSelectedValue(const ListItem& item)
+{
+	bool err = true;
+
+	for (size_t i = 0; i < Items->GetCount(); ++i)
+	{
+		const auto& it = (*Items)[i];
+		if (it->Id == item.Id && it->Value == item.Value)
+		{
+			SetSelectedIndex(i);
+			err = false;
+			break;
+		}
+	}
+
+	if (err)
+	{
+		throw std::invalid_argument("ListItem does not exist");
+	}
+}
+
 bool ListBox::IsMultiColumn() const noexcept
 {
 	return m_IsMultiColumn;
@@ -678,4 +774,101 @@ void ListBox::SetBorderStyle(BorderStyle style) noexcept
 {
 	m_BorderStyle = style;
 	Update();
+}
+
+SelectionMode ListBox::GetSelectionMode() const noexcept
+{
+	return m_SelectionMode;
+}
+
+void ListBox::SetSelectionMode(SelectionMode mode) noexcept
+{
+	if (m_SelectionMode == mode)
+	{
+		return;
+	}
+
+	if (m_SelectedIndices.size() > 1)
+	{
+		m_SelectedIndices.clear();
+	}
+
+	m_SelectionMode = mode;
+}
+
+void ListBox::SelectAll() noexcept
+{
+	if (m_SelectionMode == SelectionMode::Single)
+	{
+		throw std::logic_error("Not supported exception");
+	}
+
+	// Clear the SelectedIndices before to add it already ordered
+	m_SelectedIndices.clear();
+
+	for (size_t i = 0; i < Items->GetCount(); ++i)
+	{
+		m_SelectedIndices[i] = &(*Items)[i]->Id;
+		m_SelectedItems[i] = (*Items)[i];
+	}
+}
+
+ListBox::SelectedIndexCollection::SelectedIndexCollection(ListBox* owner)
+	:
+	Collection(owner)
+{
+}
+
+ListBox::SelectedObjectCollection::SelectedObjectCollection(ListBox* owner)
+	:
+	Collection(owner)
+{
+}
+
+void ListBox::SelectedObjectCollection::ClearSelected() noexcept
+{
+	for (const auto& i : *this)
+	{
+		i->Selected = false;
+	}
+}
+
+bool ListBox::SelectedObjectCollection::GetSelected(int index)
+{
+	for (const auto& p : *this)
+	{
+		if (p->Id == index)
+		{
+			if (p->Selected)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
+
+	throw std::runtime_error("Invalid code block");
+}
+
+void ListBox::SelectedObjectCollection::SetSelected(int index, bool isSelected)
+{
+	for (const auto& p : *this)
+	{
+		if (p->Id == index)
+		{
+			if (isSelected)
+			{
+				p->Selected = true;
+				break;
+			}
+			else
+			{
+				p->Selected = false;
+				break;
+			}
+		}
+	}
 }

@@ -68,7 +68,6 @@
     <ClCompile Include="EventDispatcher.cpp">
       <Filter>Events</Filter>
     </ClCompile>
-    <ClCompile Include="Enumerator.cpp" />
     <ClCompile Include="TestRealTimeApplication.cpp" />
     <ClCompile Include="MenuStrip.cpp" />
     <ClCompile Include="ListControl.cpp" />
@@ -223,24 +222,10 @@
     <ClInclude Include="EventDispatcher.h">
       <Filter>Events</Filter>
     </ClInclude>
-    <ClInclude Include="Collection.h" />
-    <ClInclude Include="IEnumerator.h">
-      <Filter>Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="ICollection.h">
-      <Filter>Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="IEnumerable.h">
-      <Filter>Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="Enumerator.h" />
     <ClInclude Include="TestRealTimeApplication.h" />
     <ClInclude Include="FlatButtonAppearance.h" />
     <ClInclude Include="MenuStrip.h" />
     <ClInclude Include="ListControl.h" />
-    <ClInclude Include="IList.h">
-      <Filter>Interfaces</Filter>
-    </ClInclude>
     <ClInclude Include="ConvertEventArgs.h">
       <Filter>Events</Filter>
     </ClInclude>
@@ -259,6 +244,24 @@
     <ClInclude Include="VerticalScrollBar.h" />
     <ClInclude Include="HorizontalScrollBar.h" />
     <ClInclude Include="WindowClass.h" />
+    <ClInclude Include="Collection.h">
+      <Filter>Data Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="Enumerator.h">
+      <Filter>Data Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="ICollection.h">
+      <Filter>Data Structures\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IEnumerable.h">
+      <Filter>Data Structures\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IEnumerator.h">
+      <Filter>Data Structures\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IList.h">
+      <Filter>Data Structures\Interfaces</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interfaces">
@@ -269,6 +272,12 @@
     </Filter>
     <Filter Include="Events">
       <UniqueIdentifier>{68a18714-2cd9-4c42-ab2d-ea88c215dbd4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data Structures">
+      <UniqueIdentifier>{af1358be-4e8a-4e2b-a5f9-b3ca6ab8e8be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data Structures\Interfaces">
+      <UniqueIdentifier>{c6fc4e61-1c7b-41ed-8540-d33500d2d738}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -152,7 +152,6 @@
     <ClCompile Include="ComboBox.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="Container.cpp" />
-    <ClCompile Include="Enumerator.cpp" />
     <ClCompile Include="EventDispatcher.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="HorizontalScrollBar.cpp" />
