@@ -26,7 +26,7 @@ void TestUserApplication::Initialize()
 	{
 		std::ostringstream oss;
 		oss << "Item: " << i;
-		list->Add(new ListItem(i, oss.str()));
+		list->Add(new ListItem(oss.str()));
 	}
 	lb->SetDataSource(list);
 	auto f = lb->GetFont();
@@ -44,7 +44,7 @@ void TestUserApplication::Initialize()
 	{
 		std::ostringstream oss;
 		oss << "Item: " << i;
-		list2->Add(new ListItem(i, oss.str()));
+		list2->Add(new ListItem(oss.str()));
 	}
 	cb->SetDataSource(list2);
 

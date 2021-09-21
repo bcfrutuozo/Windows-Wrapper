@@ -42,6 +42,12 @@
 //#define NOTAPE
 #endif
 
+// Globalize system types as objects
+#include "SystemTypes.h"
+
+// Globalize exceptions
+#include "Exceptions.h"
+
 // Globalize IntPtr.h struct
 #include "IntPtr.h"
 
@@ -63,6 +69,7 @@ using namespace Microsoft::WRL;
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 static const XMFLOAT4X4 IDENTITYMATRIX = XMFLOAT4X4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+
 
 //#define HIDWORD(dw, hw) LOWORD(dw) | (hw << 16)
 //#define LODWORD(dw, lw) (HIWORD(dw) << 16) | lw

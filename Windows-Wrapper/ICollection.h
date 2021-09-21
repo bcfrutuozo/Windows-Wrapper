@@ -2,7 +2,7 @@
 
 #include "IEnumerable.h"
 
-template<typename T>
+template<typename T = Object>
 class ICollection : public IEnumerable<T>
 {
 protected:

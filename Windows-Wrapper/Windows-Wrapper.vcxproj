@@ -149,21 +149,40 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ArgumentException.cpp" />
+    <ClCompile Include="ArgumentNullException.cpp" />
+    <ClCompile Include="ArgumentOutOfRangeException.cpp" />
+    <ClCompile Include="Boolean.cpp" />
+    <ClCompile Include="Byte.cpp" />
+    <ClCompile Include="Char.cpp" />
     <ClCompile Include="ComboBox.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="Container.cpp" />
+    <ClCompile Include="ControlException.cpp" />
+    <ClCompile Include="DateTime.cpp" />
+    <ClCompile Include="Decimal.cpp" />
+    <ClCompile Include="Double.cpp" />
     <ClCompile Include="EventDispatcher.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="HorizontalScrollBar.cpp" />
+    <ClCompile Include="Int16.cpp" />
+    <ClCompile Include="Int32.cpp" />
+    <ClCompile Include="Int64.cpp" />
+    <ClCompile Include="InvalidOperationException.cpp" />
     <ClCompile Include="Label.cpp" />
     <ClCompile Include="ListBox.cpp" />
     <ClCompile Include="ListControl.cpp" />
     <ClCompile Include="ListItem.cpp" />
     <ClCompile Include="ListItemCollection.cpp" />
     <ClCompile Include="MenuStrip.cpp" />
+    <ClCompile Include="NotImplementedException.cpp" />
+    <ClCompile Include="NotSupportedException.cpp" />
+    <ClCompile Include="SByte.cpp" />
     <ClCompile Include="ScrollableControl.cpp" />
     <ClCompile Include="ScrollBar.cpp" />
+    <ClCompile Include="Single.cpp" />
     <ClCompile Include="Site.cpp" />
+    <ClCompile Include="SystemException.cpp" />
     <ClCompile Include="TestRealTimeApplication.cpp" />
     <ClCompile Include="ToolStrip.cpp" />
     <ClCompile Include="MessageMapper.cpp" />
@@ -198,6 +217,8 @@
     <ClCompile Include="TextBox.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Type.cpp" />
+    <ClCompile Include="UInt16.cpp" />
+    <ClCompile Include="UInt64.cpp" />
     <ClCompile Include="Utilities.cpp" />
     <ClCompile Include="VerticalScrollBar.cpp" />
     <ClCompile Include="WinAPI.cpp" />
@@ -206,26 +227,43 @@
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ArgumentNullException.h" />
+    <ClInclude Include="ArgumentOutOfRangeException.h" />
+    <ClInclude Include="Boolean.h" />
+    <ClInclude Include="Byte.h" />
     <ClInclude Include="CancelEventArgs.h" />
     <ClInclude Include="CancelEventHandler.h" />
+    <ClInclude Include="Char.h" />
     <ClInclude Include="Collection.h" />
     <ClInclude Include="ComboBox.h" />
+    <ClInclude Include="DateTime.h" />
+    <ClInclude Include="Decimal.h" />
+    <ClInclude Include="Double.h" />
+    <ClInclude Include="Exceptions.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Container.h" />
+    <ClInclude Include="ControlException.h" />
     <ClInclude Include="ConvertEventArgs.h" />
     <ClInclude Include="Enumerator.h" />
     <ClInclude Include="EventDispatcher.h" />
     <ClInclude Include="FlatButtonAppearance.h" />
     <ClInclude Include="Font.h" />
+    <ClInclude Include="ArgumentException.h" />
     <ClInclude Include="HorizontalScrollBar.h" />
     <ClInclude Include="ICollection.h" />
+    <ClInclude Include="IComparable.h" />
     <ClInclude Include="IComponent.h" />
     <ClInclude Include="IContainer.h" />
+    <ClInclude Include="IConvertible.h" />
     <ClInclude Include="IDisposable.h" />
     <ClInclude Include="IEnumerable.h" />
     <ClInclude Include="IEnumerator.h" />
     <ClInclude Include="IEvent.h" />
+    <ClInclude Include="IFormatProvider.h" />
     <ClInclude Include="IList.h" />
+    <ClInclude Include="Int32.h" />
+    <ClInclude Include="Int64.h" />
+    <ClInclude Include="InvalidOperationException.h" />
     <ClInclude Include="ISite.h" />
     <ClInclude Include="Keys.h" />
     <ClInclude Include="Label.h" />
@@ -236,9 +274,16 @@
     <ClInclude Include="ListItem.h" />
     <ClInclude Include="ListItemCollection.h" />
     <ClInclude Include="MenuStrip.h" />
+    <ClInclude Include="NotImplementedException.h" />
+    <ClInclude Include="NotSupportedException.h" />
+    <ClInclude Include="SByte.h" />
     <ClInclude Include="ScrollableControl.h" />
     <ClInclude Include="ScrollBar.h" />
+    <ClInclude Include="Int16.h" />
+    <ClInclude Include="Single.h" />
     <ClInclude Include="Site.h" />
+    <ClInclude Include="SystemException.h" />
+    <ClInclude Include="SystemTypes.h" />
     <ClInclude Include="TestRealTimeApplication.h" />
     <ClInclude Include="ToolStrip.h" />
     <ClInclude Include="MessageMapper.h" />
@@ -265,7 +310,12 @@
     <ClInclude Include="IHandle.h" />
     <ClInclude Include="IntPtr.h" />
     <ClInclude Include="TestUserApplication.h" />
+    <ClInclude Include="TypeCode.h" />
+    <ClInclude Include="UInt32.h" />
+    <ClInclude Include="UInt64.h" />
+    <ClInclude Include="UInt16.h" />
     <ClInclude Include="Utilities.h" />
+    <ClInclude Include="ValueType.h" />
     <ClInclude Include="VerticalScrollBar.h" />
     <ClInclude Include="WinAPI.h" />
     <ClInclude Include="Keyboard.h" />
@@ -303,6 +353,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
+    <None Include="UInt32.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

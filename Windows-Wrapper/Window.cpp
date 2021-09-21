@@ -1,4 +1,5 @@
 #include "Window.h"
+#include "ControlException.h"
 #include "OnClosedEventHandler.h"
 #include "OnClosingEventHandler.h"
 #include "Application.h"

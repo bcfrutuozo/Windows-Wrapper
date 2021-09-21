@@ -5,9 +5,7 @@
     <ClCompile Include="Control.cpp" />
     <ClCompile Include="dxerr.cpp" />
     <ClCompile Include="DXGIInfoManager.cpp" />
-    <ClCompile Include="Exception.cpp" />
     <ClCompile Include="Graphics.cpp" />
-    <ClCompile Include="IntPtr.cpp" />
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="Mathlib.cpp" />
     <ClCompile Include="Mouse.cpp" />
@@ -80,6 +78,75 @@
     <ClCompile Include="VerticalScrollBar.cpp" />
     <ClCompile Include="HorizontalScrollBar.cpp" />
     <ClCompile Include="WindowClass.cpp" />
+    <ClCompile Include="Exception.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="ArgumentException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="ArgumentNullException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="ArgumentOutOfRangeException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="ControlException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="InvalidOperationException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="NotSupportedException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="NotImplementedException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="IntPtr.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="Boolean.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="Byte.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="Char.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="DateTime.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="Decimal.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="Double.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="Int32.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="Int16.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="Int64.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="SByte.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="Single.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="UInt16.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="UInt64.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RealTimeApplication.h" />
@@ -89,9 +156,7 @@
     <ClInclude Include="Control.h" />
     <ClInclude Include="dxerr.h" />
     <ClInclude Include="DXGIInfoManager.h" />
-    <ClInclude Include="Exception.h" />
     <ClInclude Include="Graphics.h" />
-    <ClInclude Include="IntPtr.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Mathlib.h" />
     <ClInclude Include="Mouse.h" />
@@ -262,6 +327,99 @@
     <ClInclude Include="IList.h">
       <Filter>Data Structures\Interfaces</Filter>
     </ClInclude>
+    <ClInclude Include="Exception.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="NotSupportedException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="ControlException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="InvalidOperationException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="ArgumentNullException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="ArgumentException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Exceptions.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="ArgumentOutOfRangeException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Int32.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="ValueType.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="NotImplementedException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="IComparable.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IntPtr.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="TypeCode.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="IConvertible.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IFormatProvider.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemTypes.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Boolean.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Char.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="UInt16.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="UInt32.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Int64.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="UInt64.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="SByte.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Byte.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Int16.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Single.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Double.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Decimal.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="DateTime.h">
+      <Filter>System</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interfaces">
@@ -279,8 +437,17 @@
     <Filter Include="Data Structures\Interfaces">
       <UniqueIdentifier>{c6fc4e61-1c7b-41ed-8540-d33500d2d738}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Exceptions">
+      <UniqueIdentifier>{ec1049e4-8178-4488-9e38-cf6f5d54e598}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System">
+      <UniqueIdentifier>{3e08ca34-1ccf-43ea-9bcf-059d9791e52d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
+    <None Include="UInt32.cpp">
+      <Filter>System</Filter>
+    </None>
   </ItemGroup>
 </Project>

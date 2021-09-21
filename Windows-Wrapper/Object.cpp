@@ -1,5 +1,6 @@
 #include "Object.h"
 #include "ListItem.h"
+#include "Exceptions.h"
 
 Object::Object() noexcept
 	:
@@ -40,11 +41,11 @@ const bool Object::ReferenceEquals(const Object& b) const noexcept
 
 inline const std::string Object::ToString() const noexcept
 {
-	// Default ToString method return it's type, unless the function is override in the derived class.
+	// Default ToString method return it's type, unless the function is overriden in the derived class.
 	return GetType().ToString();
 }
 
 ListItem Object::ToListItem() const noexcept
 {
-	throw std::logic_error("ToListItem is not implemented");
+	throw NotImplementedException("ToListItem is not implemented in default Object class.");
 }

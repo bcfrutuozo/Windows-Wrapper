@@ -1,7 +1,7 @@
 #pragma once
 
 #include "WinAPI.h"
-#include "Exception.h"
+#include "ControlException.h"
 #include "Color.h"
 #include "Size.h"
 #include "Padding.h"
@@ -19,10 +19,6 @@
 
 #include <memory>
 #include <functional>
-
-// Error exception helper macro
-#define CTL_EXCEPT( hr ) Control::HRException( __LINE__,__FILE__,(hr) )
-#define CTL_LAST_EXCEPT() Control::HRException( __LINE__,__FILE__,GetLastError() )
 
 class Control : public WinAPI
 {
@@ -170,29 +166,4 @@ public:
 	bool IsShown() const noexcept;
 	virtual void Hide();
 	virtual void Show();
-
-	// Control Exception
-	class ControlException : public Exception
-	{
-	public:
-
-		static const std::string TranslateErrorCode(HRESULT hr) noexcept;
-	};
-
-	// HRException
-	class HRException : public Exception
-	{
-	private:
-
-		HRESULT hr;
-
-	public:
-
-		HRException(int line, const char* file, HRESULT hr) noexcept;
-
-		const char* what() const noexcept override;
-		const char* GetType() const noexcept;
-		HRESULT GetErrorCode() const noexcept;
-		const std::string GetErrorDescription() const noexcept;
-	};
 };

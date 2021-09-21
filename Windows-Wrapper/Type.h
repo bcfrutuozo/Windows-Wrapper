@@ -20,5 +20,5 @@ public:
 	bool operator==(const Type& t) const noexcept override;
 	bool Equals(const Type& t) const noexcept override;
 	bool operator==(const type_info& t) const noexcept;
-	virtual const std::string ToString() const noexcept;
+	const std::string ToString() const noexcept;
 };

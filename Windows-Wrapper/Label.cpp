@@ -1,4 +1,5 @@
 #include "Label.h"
+#include "ControlException.h"
 
 void Label::OnPaint_Impl(HWND hwnd) noexcept
 {

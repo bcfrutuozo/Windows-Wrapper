@@ -1,4 +1,5 @@
 #include "Button.h"
+#include "ControlException.h"
 
 int Button::OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept
 {

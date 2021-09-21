@@ -1,6 +1,7 @@
 #include "DXGIInfoManager.h"
 #include "Window.h"
 #include "Graphics.h"
+#include "ControlException.h"
 
 #pragma warning(push)
 #include <dxgidebug.h>
@@ -32,7 +33,7 @@ DXGIInfoManager::DXGIInfoManager()
 	}
 
 	HRESULT hr;
-	GFX_THROW_NOINFO(DxgiGetDebugInterface(__uuidof(IDXGIInfoQueue), &m_DXGIInfoQueue));
+	//GFX_THROW_NOINFO(DxgiGetDebugInterface(__uuidof(IDXGIInfoQueue), &m_DXGIInfoQueue));
 }
 
 void DXGIInfoManager::Set() noexcept
@@ -53,14 +54,14 @@ std::vector<const char*> DXGIInfoManager::GetMessages() const
 		SIZE_T messageLength = 0;
 
 		// Ge the size of the message in bytes
-		GFX_THROW_NOINFO(m_DXGIInfoQueue->GetMessage(DXGI_DEBUG_ALL, i, nullptr, &messageLength));
+		//GFX_THROW_NOINFO(m_DXGIInfoQueue->GetMessage(DXGI_DEBUG_ALL, i, nullptr, &messageLength));
 
 		// Allocate memory for the message
 		auto bytes = std::make_unique<byte[]>(messageLength);
 		auto pMessage = reinterpret_cast<DXGI_INFO_QUEUE_MESSAGE*>(bytes.get());
 
 		// Get the message and push its description into the vector
-		GFX_THROW_NOINFO(m_DXGIInfoQueue->GetMessage(DXGI_DEBUG_ALL, i, pMessage, &messageLength));
+		//GFX_THROW_NOINFO(m_DXGIInfoQueue->GetMessage(DXGI_DEBUG_ALL, i, pMessage, &messageLength));
 		messages.emplace_back(pMessage->pDescription);
 	}
 

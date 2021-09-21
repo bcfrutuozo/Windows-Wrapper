@@ -1,4 +1,5 @@
 ﻿#include "TextBox.h"
+#include "ControlException.h"
 
 #include <algorithm>
 

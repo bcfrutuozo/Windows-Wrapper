@@ -146,24 +146,36 @@ ListItemCollection* const ListControl::GetDataSource() const noexcept
 
 void ListControl::SetDataSource(ListItemCollection* const dataSource) noexcept
 {
-	if (dataSource != nullptr && dataSource->GetCount() > 32767)
+	if (const auto& list = dynamic_cast<IList<ListItem>*>(dataSource))
 	{
-		throw std::logic_error("Maximum ListBox items allowed is 32767");
-	}
+		if (dataSource == Items)
+		{
+			return;
+		}
 
-	// Destroy the old DataSource to avoid memory leak
-	if (Items != nullptr)
+		if (dataSource != nullptr && list->GetCount() > 32767)
+		{
+			throw std::logic_error("Maximum ListBox items allowed is 32767");
+		}
+
+		// Destroy the old DataSource to avoid memory leak
+		if (Items != nullptr)
+		{
+			delete Items;
+			Items = nullptr;
+		}
+
+		SetSelectedIndex(-1);
+
+		Items = dataSource;
+		Dispatch("OnDataSourceChanged", &ArgsDefault);
+		m_IsRebinding = true;
+		Update();
+	}
+	else
 	{
-		delete Items;
-		Items = nullptr;
+		throw ArgumentException("Bad DataSource format for complex binding");
 	}
-
-	SetSelectedIndex(-1);
-
-	Items = dataSource;
-	Dispatch("OnDataSourceChanged", &ArgsDefault);
-	m_IsRebinding = true;
-	Update();
 }
 
 int ListControl::GetSelectedIndex() const noexcept

@@ -6,8 +6,8 @@
 
 #include <cassert>
 
-template<typename T>
-class Collection : public IList<T>, public Object
+template<typename T = Object>
+class Collection : public IList<T>
 {
 private:
 

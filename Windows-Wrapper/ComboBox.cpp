@@ -1,4 +1,5 @@
 #include "ComboBox.h"
+#include "ControlException.h"
 
 void ComboBox::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
 {
@@ -589,7 +590,7 @@ void ComboBox::SetSelectedValue(const ListItem& item)
 	for (size_t i = 0; i < Items->GetCount(); ++i)
 	{
 		const auto& it = (*Items)[i];
-		if (it->Id == item.Id && it->Value == item.Value)
+		if (it->Value == item.Value)
 		{
 			SetSelectedIndex(i);
 			err = false;

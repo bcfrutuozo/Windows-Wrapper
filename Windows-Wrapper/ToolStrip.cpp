@@ -1,4 +1,5 @@
 #include "ToolStrip.h"
+#include "ControlException.h"
 
 // Singleton ButtonClass
 ToolStrip::ToolStripClass ToolStrip::ToolStripClass::m_ToolStripClass;

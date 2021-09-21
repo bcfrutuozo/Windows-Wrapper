@@ -22,11 +22,7 @@ void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 			{
 				if ((!(GetKeyState(VK_CONTROL) & 0x8000) && !((GetKeyState(VK_SHIFT) & 0x8000))))
 				{
-					auto p = *(*Items)[++m_SelectedIndex];
-					p.Selected = true;
-					ListItem* l = new ListItem(p);
-					m_SelectedIndices.Add(new int(l->Id));
-					m_SelectedItems.Add(l);
+					
 				}
 			}
 
@@ -227,22 +223,10 @@ void ListBox::CalculateListBoxParameters(HWND hwnd, HDC& hdc)
 	{
 		// This block will only be executed once after resize
 		m_RowPosition.clear();
-		
-		if (m_SelectionMode == SelectionMode::MultiSimple || m_SelectionMode == SelectionMode::MultiExtended)
-		{
-			m_SelectedIndices.clear();
-			m_SelectedItems.clear();
-		}
 
 		if (m_RowPosition.size() < itemsNumber)
 		{
 			m_RowPosition.resize(itemsNumber);
-
-			if (m_SelectionMode == SelectionMode::MultiSimple || m_SelectionMode == SelectionMode::MultiExtended)
-			{
-				m_SelectedIndices.resize(itemsNumber);
-				m_SelectedItems.resize(itemsNumber);
-			}
 		}
 	}
 
@@ -651,7 +635,9 @@ ListBox::ListBox(Control* parent, int width, int height, int x, int y)
 	m_ColumnWidth(120),
 	m_ColumnNumber(1),
 	m_RowNumber(1),
-	m_IsFormatChanged(false)
+	m_IsFormatChanged(false),
+	m_SelectedIndices(this),
+	m_SelectedItems(this)
 {
 
 }
@@ -686,7 +672,7 @@ void ListBox::SetSelectedIndex(int index) noexcept
 		// Clear the list if the passed index is equal -1
 		if (index == -1)
 		{
-			m_SelectedIndices.clear();
+			//m_SelectedIndices.clear();
 		}
 		else
 		{
@@ -694,8 +680,8 @@ void ListBox::SetSelectedIndex(int index) noexcept
 			if (entry != nullptr)
 			{
 				// Select this item while keeping any previously selected items selected.
-				m_SelectedIndices[index] = (&(*Items)[index]->Id);
-				m_SelectedItems[index] = (*Items)[index];
+				//m_SelectedIndices[index] = (&(*Items)[index]->Id);
+				//m_SelectedItems[index] = (*Items)[index];
 				Dispatch("OnSelectedIndexChanged", &ArgsDefault);
 			}
 		}
@@ -712,7 +698,7 @@ void ListBox::SetSelectedValue(const ListItem& item)
 	for (size_t i = 0; i < Items->GetCount(); ++i)
 	{
 		const auto& it = (*Items)[i];
-		if (it->Id == item.Id && it->Value == item.Value)
+		if (it->Value == item.Value)
 		{
 			SetSelectedIndex(i);
 			err = false;
@@ -722,7 +708,7 @@ void ListBox::SetSelectedValue(const ListItem& item)
 
 	if (err)
 	{
-		throw std::invalid_argument("ListItem does not exist");
+		throw InvalidOperationException("ListItem does not exist");
 	}
 }
 
@@ -788,10 +774,10 @@ void ListBox::SetSelectionMode(SelectionMode mode) noexcept
 		return;
 	}
 
-	if (m_SelectedIndices.size() > 1)
+	/*if (m_SelectedIndices.size() > 1)
 	{
 		m_SelectedIndices.clear();
-	}
+	}*/
 
 	m_SelectionMode = mode;
 }
@@ -804,13 +790,13 @@ void ListBox::SelectAll() noexcept
 	}
 
 	// Clear the SelectedIndices before to add it already ordered
-	m_SelectedIndices.clear();
+	/*m_SelectedIndices.clear();
 
 	for (size_t i = 0; i < Items->GetCount(); ++i)
 	{
 		m_SelectedIndices[i] = &(*Items)[i]->Id;
 		m_SelectedItems[i] = (*Items)[i];
-	}
+	}*/
 }
 
 ListBox::SelectedIndexCollection::SelectedIndexCollection(ListBox* owner)
@@ -829,13 +815,13 @@ void ListBox::SelectedObjectCollection::ClearSelected() noexcept
 {
 	for (const auto& i : *this)
 	{
-		i->Selected = false;
+		//i->Selected = false;
 	}
 }
 
 bool ListBox::SelectedObjectCollection::GetSelected(int index)
 {
-	for (const auto& p : *this)
+	/*for (const auto& p : *this)
 	{
 		if (p->Id == index)
 		{
@@ -848,14 +834,14 @@ bool ListBox::SelectedObjectCollection::GetSelected(int index)
 				return false;
 			}
 		}
-	}
+	}*/
 
 	throw std::runtime_error("Invalid code block");
 }
 
 void ListBox::SelectedObjectCollection::SetSelected(int index, bool isSelected)
 {
-	for (const auto& p : *this)
+	/*for (const auto& p : *this)
 	{
 		if (p->Id == index)
 		{
@@ -870,5 +856,5 @@ void ListBox::SelectedObjectCollection::SetSelected(int index, bool isSelected)
 				break;
 			}
 		}
-	}
+	}*/
 }

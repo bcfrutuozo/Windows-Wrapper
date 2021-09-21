@@ -2,8 +2,8 @@
 
 #include "IEnumerator.h"
 
-template<typename T>
-class IEnumerable
+template<typename T = Object>
+class IEnumerable : public Object
 {
 public:
 
