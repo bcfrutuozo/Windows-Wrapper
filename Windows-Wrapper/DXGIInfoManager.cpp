@@ -1,7 +1,6 @@
 #include "DXGIInfoManager.h"
 #include "Window.h"
 #include "Graphics.h"
-#include "ControlException.h"
 
 #pragma warning(push)
 #include <dxgidebug.h>

@@ -1,6 +1,5 @@
 #include "HorizontalScrollBar.h"
 #include "ScrollableControl.h"
-#include "ControlException.h"
 
 void HorizontalScrollBar::OnHorizontalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int code, int pos) noexcept
 {

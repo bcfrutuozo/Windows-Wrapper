@@ -3,7 +3,7 @@
 #include "IEnumerable.h"
 
 template<typename T>
-class ICollection : public IEnumerable
+class ICollection : public IEnumerable<T>
 {
 protected:
 

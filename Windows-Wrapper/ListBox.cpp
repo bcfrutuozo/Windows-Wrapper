@@ -1,3 +1,4 @@
+
 #include "ListBox.h"
 #include "ComboBox.h"
 
@@ -10,13 +11,23 @@ void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 		if (m_SelectedIndex < GetDataSource()->GetCount() - 1)
 		{
 			auto drawableArea = GetDrawableArea();
-			++m_SelectedIndex;
-					m_SelectedIndices.Add(new int(l->Id));
-					m_SelectedItems.Add(l);
-				}
+
+			if (m_SelectionMode == SelectionMode::None) break;
+
+			// If selection is single or is multi but without CTRL or SHIFT pressing
+			if (m_SelectionMode == SelectionMode::Single)
+			{
+				++m_SelectedIndex;
 			}
+			else
+			{
+				if ((!(GetKeyState(VK_CONTROL) & 0x8000) && !((GetKeyState(VK_SHIFT) & 0x8000))))
+				{
+					/*auto p = *(*Items)[++m_SelectedIndex];
+					p.Selected = true;
+					ListItem* l = new ListItem(p);
 					m_SelectedIndices.Add(new int(l->Id));
-					m_SelectedItems.Add(l);
+					m_SelectedItems.Add(l);*/
 				}
 			}
 
@@ -217,7 +228,7 @@ void ListBox::CalculateListBoxParameters(HWND hwnd, HDC& hdc)
 	{
 		// This block will only be executed once after resize
 		m_RowPosition.clear();
-		
+
 		if (m_SelectionMode == SelectionMode::MultiSimple || m_SelectionMode == SelectionMode::MultiExtended)
 		{
 			m_SelectedIndices.clear();
@@ -227,6 +238,12 @@ void ListBox::CalculateListBoxParameters(HWND hwnd, HDC& hdc)
 		if (m_RowPosition.size() < itemsNumber)
 		{
 			m_RowPosition.resize(itemsNumber);
+
+			if (m_SelectionMode == SelectionMode::MultiSimple || m_SelectionMode == SelectionMode::MultiExtended)
+			{
+				m_SelectedIndices.resize(itemsNumber);
+				m_SelectedItems.resize(itemsNumber);
+			}
 		}
 	}
 
@@ -265,7 +282,7 @@ void ListBox::CalculateListBoxParameters(HWND hwnd, HDC& hdc)
 			}
 
 			// Recalculate drawable area to check if HorizontalScrollBar is needed
-			
+
 			drawableArea->right = newWidth + m_Margin.Left + (bordersize * 2);
 			drawableArea->bottom = newHeight + m_Margin.Top + (bordersize * 2);
 
@@ -285,7 +302,7 @@ void ListBox::CalculateListBoxParameters(HWND hwnd, HDC& hdc)
 				hSize.Width += (newWidth - oldWidth);
 				newWidth += m_Margin.Left + m_Margin.Right + (bordersize * 2);
 				oldWidth = m_Size.Width;
-				
+
 				newHeight += m_Margin.Top + m_Margin.Bottom + (bordersize * 2) + hSize.Height;
 				oldHeight = m_Size.Height;
 				m_Size.Height = newHeight;
@@ -507,7 +524,7 @@ void ListBox::Draw(HWND hwnd, HDC& hdc)
 
 	/* Logic to draw only visible entries. However, it's much harder to track the selected index
 	because it position cannot be tracked to be handled.
-	
+
 	for (auto [i, r, c, a] =
 		std::tuple{
 		IsMultiColumn() ? HorizontalScrollBar.GetScrolling() * m_RowNumber : VerticalScrollBar.GetScrolling() * m_ColumnNumber,
@@ -521,21 +538,17 @@ void ListBox::Draw(HWND hwnd, HDC& hdc)
 		{
 			break;
 		}
-
 		RECT cr;
 		CopyRect(&cr, drawableArea);
-
 		cr.top = drawableArea->top + (GetItemHeight() * r);
 		cr.bottom = (cr.top + GetItemHeight());
 		cr.left = drawableArea->left + (GetItemWidth() * c);
 		cr.right = cr.left + GetItemWidth() - m_Margin.Right;
-
 		if (r == m_RowNumber - 1)
 		{
 			r = -1;
 			++c;
 		}
-
 		if (m_SelectedIndex == i)
 		{
 			SetBkColor(hdcMem, RGB(0, 120, 215));
@@ -550,7 +563,6 @@ void ListBox::Draw(HWND hwnd, HDC& hdc)
 			SetBkColor(hdcMem, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
 			SetTextColor(hdcMem, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
 		}
-
 		DrawText(hdcMem, (*dataSource)[i]->Value.c_str(), -1, &cr, DT_LEFT | DT_VCENTER);
 		DrawText(hdcMem, Text.c_str(), static_cast<int>((*dataSource)[i]->Value.length()), &cr, DT_LEFT | DT_VCENTER | DT_CALCRECT);
 	}*/
@@ -635,9 +647,7 @@ ListBox::ListBox(Control* parent, int width, int height, int x, int y)
 	m_ColumnWidth(120),
 	m_ColumnNumber(1),
 	m_RowNumber(1),
-	m_IsFormatChanged(false),
-	m_SelectedIndices(this),
-	m_SelectedItems(this)
+	m_IsFormatChanged(false)
 {
 
 }
@@ -680,8 +690,8 @@ void ListBox::SetSelectedIndex(int index) noexcept
 			if (entry != nullptr)
 			{
 				// Select this item while keeping any previously selected items selected.
-				m_SelectedIndices[index] = (&(*Items)[index]->Id);
-				m_SelectedItems[index] = (*Items)[index];
+				/*m_SelectedIndices[index] = (&(*Items)[index]->Id);
+				m_SelectedItems[index] = (*Items)[index];*/
 				Dispatch("OnSelectedIndexChanged", &ArgsDefault);
 			}
 		}
@@ -794,8 +804,8 @@ void ListBox::SelectAll() noexcept
 
 	for (size_t i = 0; i < Items->GetCount(); ++i)
 	{
-		m_SelectedIndices[i] = &(*Items)[i]->Id;
-		m_SelectedItems[i] = (*Items)[i];
+		/*m_SelectedIndices[i] = &(*Items)[i]->Id;
+		m_SelectedItems[i] = (*Items)[i];*/
 	}
 }
 
@@ -815,7 +825,7 @@ void ListBox::SelectedObjectCollection::ClearSelected() noexcept
 {
 	for (const auto& i : *this)
 	{
-		i->Selected = false;
+		//i->Selected = false;
 	}
 }
 
@@ -825,14 +835,14 @@ bool ListBox::SelectedObjectCollection::GetSelected(int index)
 	{
 		if (p->Id == index)
 		{
-			if (p->Selected)
+			/*if (p->Selected)
 			{
 				return true;
 			}
 			else
 			{
 				return false;
-			}
+			}*/
 		}
 	}
 
@@ -847,12 +857,12 @@ void ListBox::SelectedObjectCollection::SetSelected(int index, bool isSelected)
 		{
 			if (isSelected)
 			{
-				p->Selected = true;
+				//p->Selected = true;
 				break;
 			}
 			else
 			{
-				p->Selected = false;
+				//p->Selected = false;
 				break;
 			}
 		}

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "WinAPI.h"
-#include "ControlException.h"
 #include "Color.h"
 #include "Size.h"
 #include "Padding.h"
@@ -16,6 +15,7 @@
 #include "OnClosedEventArgs.h"
 #include "OnClosingEventArgs.h"
 #include "Collection.h"
+#include "ControlException.h"
 
 #include <memory>
 #include <functional>

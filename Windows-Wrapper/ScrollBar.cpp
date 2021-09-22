@@ -1,6 +1,5 @@
 #include "ScrollBar.h"
 #include "ScrollableControl.h"
-#include "ControlException.h"
 
 int ScrollBar::OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept
 {

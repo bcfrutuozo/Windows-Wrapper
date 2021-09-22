@@ -2,7 +2,7 @@
 
 #include "ICollection.h"
 
-template<typename T = Object>
+template<typename T>
 class IList : public ICollection<T>
 {
 public:

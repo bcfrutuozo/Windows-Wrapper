@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Exceptions.h"
 #include "WindowClass.h"
 #include "Component.h"
 #include "IHandle.h"

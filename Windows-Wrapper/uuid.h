@@ -12,15 +12,9 @@
 #include <functional>
 #include <type_traits>
 #include <assert.h>
-#include <gsl/span>
+#include <span>
 
-#ifdef _WIN32
 #include <objbase.h>
-#elif defined(__linux__) || defined(__unix__)
-#include <uuid/uuid.h>
-#elif defined(__APPLE__)
-#include <CoreFoundation/CFUUID.h>
-#endif
 
 namespace uuids
 {
@@ -459,7 +453,7 @@ namespace uuids
 	public:
 		constexpr uuid() noexcept : data({}) {};
 
-		explicit uuid(gsl::span<value_type, 16> bytes)
+		explicit uuid(std::span<value_type, 16> bytes)
 		{
 			std::copy(std::cbegin(bytes), std::cend(bytes), std::begin(data));
 		}
@@ -515,9 +509,9 @@ namespace uuids
 		constexpr uuid_const_iterator begin() const noexcept { return uuid_const_iterator(&data[0], 0); }
 		constexpr uuid_const_iterator end() const noexcept { return uuid_const_iterator(&data[0], 16); }
 
-		inline gsl::span<std::byte const, 16> as_bytes() const
+		inline std::span<std::byte const, 16> as_bytes() const
 		{
-			return gsl::span<std::byte const, 16>(reinterpret_cast<std::byte const*>(data.data()), 16);
+			return std::span<std::byte const, 16>(reinterpret_cast<std::byte const*>(data.data()), 16);
 		}
 
 		template <typename TChar>
@@ -653,8 +647,6 @@ namespace uuids
 
 		uuid operator()()
 		{
-#ifdef _WIN32
-
 // Remove compile warnings regarding RPC call
 #pragma warning(push)
 #pragma warning(disable : 6031)
@@ -688,62 +680,6 @@ namespace uuids
 			   } };
 
 			return uuid{ std::begin(bytes), std::end(bytes) };
-
-#elif defined(__linux__) || defined(__unix__)
-
-			uuid_t id;
-			uuid_generate(id);
-
-			std::array<uint8_t, 16> bytes =
-			{ {
-				  id[0],
-				  id[1],
-				  id[2],
-				  id[3],
-				  id[4],
-				  id[5],
-				  id[6],
-				  id[7],
-				  id[8],
-				  id[9],
-				  id[10],
-				  id[11],
-				  id[12],
-				  id[13],
-				  id[14],
-				  id[15]
-			   } };
-
-			return uuid{ std::begin(bytes), std::end(bytes) };
-
-#elif defined(__APPLE__)
-			auto newId = CFUUIDCreate(NULL);
-			auto bytes = CFUUIDGetUUIDBytes(newId);
-			CFRelease(newId);
-
-			std::array<uint8_t, 16> arrbytes =
-			{ {
-				  bytes.byte0,
-				  bytes.byte1,
-				  bytes.byte2,
-				  bytes.byte3,
-				  bytes.byte4,
-				  bytes.byte5,
-				  bytes.byte6,
-				  bytes.byte7,
-				  bytes.byte8,
-				  bytes.byte9,
-				  bytes.byte10,
-				  bytes.byte11,
-				  bytes.byte12,
-				  bytes.byte13,
-				  bytes.byte14,
-				  bytes.byte15
-			   } };
-			return uuid{ std::begin(arrbytes), std::end(arrbytes) };
-#elif
-			return uuid{};
-#endif
 		}
 	};
 

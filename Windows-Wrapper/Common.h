@@ -42,12 +42,6 @@
 //#define NOTAPE
 #endif
 
-// Globalize system types as objects
-#include "SystemTypes.h"
-
-// Globalize exceptions
-#include "Exceptions.h"
-
 // Globalize IntPtr.h struct
 #include "IntPtr.h"
 

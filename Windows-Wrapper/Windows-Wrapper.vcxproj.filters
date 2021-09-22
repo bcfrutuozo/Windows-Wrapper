@@ -66,7 +66,6 @@
     <ClCompile Include="EventDispatcher.cpp">
       <Filter>Events</Filter>
     </ClCompile>
-    <ClCompile Include="Enumerator.cpp" />
     <ClCompile Include="TestRealTimeApplication.cpp" />
     <ClCompile Include="MenuStrip.cpp" />
     <ClCompile Include="ListControl.cpp" />
@@ -79,75 +78,16 @@
     <ClCompile Include="VerticalScrollBar.cpp" />
     <ClCompile Include="HorizontalScrollBar.cpp" />
     <ClCompile Include="WindowClass.cpp" />
-    <ClCompile Include="Exception.cpp">
-      <Filter>Exceptions</Filter>
-    </ClCompile>
-    <ClCompile Include="SystemException.cpp">
-      <Filter>Exceptions</Filter>
-    </ClCompile>
-    <ClCompile Include="ArgumentException.cpp">
-      <Filter>Exceptions</Filter>
-    </ClCompile>
-    <ClCompile Include="ArgumentNullException.cpp">
-      <Filter>Exceptions</Filter>
-    </ClCompile>
-    <ClCompile Include="ArgumentOutOfRangeException.cpp">
-      <Filter>Exceptions</Filter>
-    </ClCompile>
-    <ClCompile Include="ControlException.cpp">
-      <Filter>Exceptions</Filter>
-    </ClCompile>
-    <ClCompile Include="InvalidOperationException.cpp">
-      <Filter>Exceptions</Filter>
-    </ClCompile>
-    <ClCompile Include="NotSupportedException.cpp">
-      <Filter>Exceptions</Filter>
-    </ClCompile>
-    <ClCompile Include="NotImplementedException.cpp">
-      <Filter>Exceptions</Filter>
-    </ClCompile>
-    <ClCompile Include="IntPtr.cpp">
-      <Filter>System</Filter>
-    </ClCompile>
-    <ClCompile Include="Boolean.cpp">
-      <Filter>System</Filter>
-    </ClCompile>
-    <ClCompile Include="Byte.cpp">
-      <Filter>System</Filter>
-    </ClCompile>
-    <ClCompile Include="Char.cpp">
-      <Filter>System</Filter>
-    </ClCompile>
-    <ClCompile Include="DateTime.cpp">
-      <Filter>System</Filter>
-    </ClCompile>
-    <ClCompile Include="Decimal.cpp">
-      <Filter>System</Filter>
-    </ClCompile>
-    <ClCompile Include="Double.cpp">
-      <Filter>System</Filter>
-    </ClCompile>
-    <ClCompile Include="Int32.cpp">
-      <Filter>System</Filter>
-    </ClCompile>
-    <ClCompile Include="Int16.cpp">
-      <Filter>System</Filter>
-    </ClCompile>
-    <ClCompile Include="Int64.cpp">
-      <Filter>System</Filter>
-    </ClCompile>
-    <ClCompile Include="SByte.cpp">
-      <Filter>System</Filter>
-    </ClCompile>
-    <ClCompile Include="Single.cpp">
-      <Filter>System</Filter>
-    </ClCompile>
-    <ClCompile Include="UInt16.cpp">
-      <Filter>System</Filter>
-    </ClCompile>
-    <ClCompile Include="UInt64.cpp">
-      <Filter>System</Filter>
-    </ClCompile>
+    <ClCompile Include="ArgumentException.cpp" />
+    <ClCompile Include="ArgumentNullException.cpp" />
+    <ClCompile Include="ArgumentOutOfRangeException.cpp" />
+    <ClCompile Include="InvalidOperationException.cpp" />
+    <ClCompile Include="NotImplementedException.cpp" />
+    <ClCompile Include="NotSupportedException.cpp" />
+    <ClCompile Include="SystemException.cpp" />
+    <ClCompile Include="Exception.cpp" />
+    <ClCompile Include="IntPtr.cpp" />
+    <ClCompile Include="ControlException.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RealTimeApplication.h" />
@@ -324,6 +264,25 @@
     <ClInclude Include="VerticalScrollBar.h" />
     <ClInclude Include="HorizontalScrollBar.h" />
     <ClInclude Include="WindowClass.h" />
+    <ClInclude Include="ArgumentNullException.h" />
+    <ClInclude Include="ArgumentOutOfRangeException.h" />
+    <ClInclude Include="DateTime.h" />
+    <ClInclude Include="Decimal.h" />
+    <ClInclude Include="Double.h" />
+    <ClInclude Include="Exceptions.h" />
+    <ClInclude Include="ControlException.h" />
+    <ClInclude Include="ArgumentException.h" />
+    <ClInclude Include="IComparable.h" />
+    <ClInclude Include="IConvertible.h" />
+    <ClInclude Include="IFormatProvider.h" />
+    <ClInclude Include="InvalidOperationException.h" />
+    <ClInclude Include="NotImplementedException.h" />
+    <ClInclude Include="NotSupportedException.h" />
+    <ClInclude Include="SystemException.h" />
+    <ClInclude Include="Exception.h" />
+    <ClInclude Include="IntPtr.h" />
+    <ClInclude Include="TypeCode.h" />
+    <ClInclude Include="ValueType.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interfaces">
@@ -344,8 +303,5 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
-    <None Include="UInt32.cpp">
-      <Filter>System</Filter>
-    </None>
   </ItemGroup>
 </Project>

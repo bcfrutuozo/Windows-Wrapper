@@ -1,6 +1,5 @@
 #include "VerticalScrollBar.h"
 #include "ScrollableControl.h"
-#include "ControlException.h"
 
 void VerticalScrollBar::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy) noexcept
 {

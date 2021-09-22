@@ -1,5 +1,4 @@
 #include "ProgressBar.h"
-#include "ControlException.h"
 
 int ProgressBar::OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept
 {

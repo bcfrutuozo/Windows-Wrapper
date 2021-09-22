@@ -1,5 +1,4 @@
 #include "ComboBox.h"
-#include "ControlException.h"
 
 void ComboBox::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
 {
@@ -74,11 +73,9 @@ void ComboBox::OnPaint_Impl(HWND hwnd) noexcept
 		}
 	}
 
-	if (GetSelectedValue() != nullptr)
-	{
-		DrawText(ps.hdc, GetSelectedValue()->Value.c_str(), -1, &rect, DT_LEFT | DT_VCENTER);
-		DrawText(ps.hdc, GetSelectedValue()->Value.c_str(), GetSelectedValue()->Value.length(), &rect, DT_LEFT | DT_VCENTER | DT_CALCRECT);
-	}
+
+	DrawText(ps.hdc, GetSelectedValue().c_str(), -1, &rect, DT_LEFT | DT_VCENTER);
+	DrawText(ps.hdc, GetSelectedValue().c_str(), GetSelectedValue().length(), &rect, DT_LEFT | DT_VCENTER | DT_CALCRECT);
 
 	EndPaint(hwnd, &ps);
 }
@@ -90,7 +87,7 @@ ComboBox::ComboBox(Control* parent, const std::string& name, int width, int x, i
 {
 	// The ComboBox list MUST be inserted on the PARENT. Othewise it will be set in an invalid rectangle of the ComboBox
 	m_ChildWindow = new ComboBoxChildNativeWindow(parent, this, m_Size.Width, 120, m_Location.X, m_Location.Y + m_Size.Height + 5);
-	Parent->Controls.Add(m_ChildWindow);
+	Controls.Add(m_ChildWindow);
 }
 
 ComboBox::~ComboBox()
@@ -357,7 +354,6 @@ void ComboBox::ComboBoxChildNativeWindow::Draw(HWND hwnd, HDC& hdc)
 
 	/* Logic to draw only visible entries. However, it's much harder to track the selected index
 	because it position cannot be tracked to be handled.
-
 	for (auto [i, r, c, a] =
 		std::tuple{
 		IsMultiColumn() ? HorizontalScrollBar.GetScrolling() * m_RowNumber : VerticalScrollBar.GetScrolling() * m_ColumnNumber,
@@ -371,21 +367,17 @@ void ComboBox::ComboBoxChildNativeWindow::Draw(HWND hwnd, HDC& hdc)
 		{
 			break;
 		}
-
 		RECT cr;
 		CopyRect(&cr, drawableArea);
-
 		cr.top = drawableArea->top + (GetItemHeight() * r);
 		cr.bottom = (cr.top + GetItemHeight());
 		cr.left = drawableArea->left + (GetItemWidth() * c);
 		cr.right = cr.left + GetItemWidth() - m_Margin.Right;
-
 		if (r == m_RowNumber - 1)
 		{
 			r = -1;
 			++c;
 		}
-
 		if (m_SelectedIndex == i)
 		{
 			SetBkColor(hdcMem, RGB(0, 120, 215));
@@ -400,7 +392,6 @@ void ComboBox::ComboBoxChildNativeWindow::Draw(HWND hwnd, HDC& hdc)
 			SetBkColor(hdcMem, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
 			SetTextColor(hdcMem, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
 		}
-
 		DrawText(hdcMem, (*dataSource)[i]->Value.c_str(), -1, &cr, DT_LEFT | DT_VCENTER);
 		DrawText(hdcMem, Text.c_str(), static_cast<int>((*dataSource)[i]->Value.length()), &cr, DT_LEFT | DT_VCENTER | DT_CALCRECT);
 	}*/
@@ -567,4 +558,41 @@ void ComboBox::ComboBoxChildNativeWindow::CalculateParameters(HWND hwnd, HDC& hd
 size_t ComboBox::ComboBoxChildNativeWindow::GetMouseOverIndex() const noexcept
 {
 	return m_MouseOverIndex;
+}
+
+void ComboBox::SetSelectedIndex(int index) noexcept
+{
+	m_SelectedIndex = index;
+
+	if (m_SelectedIndex == -1)
+	{
+		m_SelectedValue = "";
+	}
+	else
+	{
+		m_SelectedValue = (*Items)[m_SelectedIndex]->Value;
+	}
+
+	Update();
+}
+
+void ComboBox::SetSelectedValue(const ListItem& item)
+{
+	bool err = true;
+
+	for (size_t i = 0; i < Items->GetCount(); ++i)
+	{
+		const auto& it = (*Items)[i];
+		if (it->Id == item.Id && it->Value == item.Value)
+		{
+			SetSelectedIndex(i);
+			err = false;
+			break;
+		}
+	}
+
+	if (err)
+	{
+		throw std::invalid_argument("ListItem does not exist");
+	}
 }
