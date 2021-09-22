@@ -2,8 +2,8 @@
 
 #include "IEnumerable.h"
 
-template<typename T = Object>
-class ICollection : public IEnumerable<T>
+template<typename T>
+class ICollection : public IEnumerable
 {
 protected:
 

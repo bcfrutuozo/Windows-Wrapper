@@ -27,7 +27,7 @@ ListControl::ListControl(Control* parent, const std::string& name, int width, in
 	OnSelectedValueChanged(nullptr),
 	OnValueMemberChanged(nullptr),
 	m_SelectedIndex(-1),	// Negative value because positive implies a valid selection
-	m_SelectedValue(""),
+	m_SelectedValue(nullptr),
 	m_IsRebinding(false)
 {
 	Initialize();
@@ -158,24 +158,19 @@ void ListControl::SetDataSource(ListItemCollection* const dataSource) noexcept
 			throw std::logic_error("Maximum ListBox items allowed is 32767");
 		}
 
-		// Destroy the old DataSource to avoid memory leak
-		if (Items != nullptr)
-		{
-			delete Items;
-			Items = nullptr;
-		}
-
-		SetSelectedIndex(-1);
-
-		Items = dataSource;
-		Dispatch("OnDataSourceChanged", &ArgsDefault);
-		m_IsRebinding = true;
-		Update();
-	}
-	else
+	// Destroy the old DataSource to avoid memory leak
+	/*if (Items != nullptr)
 	{
-		throw ArgumentException("Bad DataSource format for complex binding");
-	}
+		delete Items;
+		Items = nullptr;
+	}*/
+
+	SetSelectedIndex(-1);
+
+	Items = dataSource;
+	Dispatch("OnDataSourceChanged", &ArgsDefault);
+	m_IsRebinding = true;
+	Update();
 }
 
 int ListControl::GetSelectedIndex() const noexcept
@@ -183,9 +178,42 @@ int ListControl::GetSelectedIndex() const noexcept
 	return m_SelectedIndex;
 }
 
-std::string ListControl::GetSelectedValue() const noexcept
+void ListControl::SetSelectedIndex(unsigned int index) noexcept
 {
-	return m_SelectedValue;
+	m_SelectedIndex = index;
+	m_SelectedValue = (*Items)[m_SelectedIndex];
+	Update();
+}
+
+ListItem* ListControl::GetSelectedValue() const noexcept
+{
+	if (m_SelectedIndex == -1)
+	{
+		return nullptr;
+	}
+
+	return (*Items)[m_SelectedIndex];
+}
+
+void ListControl::SetSelectedValue(const ListItem& item)
+{
+	bool err = true;
+
+	for (size_t i = 0; i < Items->GetCount(); ++i)
+	{
+		const auto& it = (*Items)[i];
+		if (it->Id == item.Id && it->Value == item.Value)
+		{
+			SetSelectedIndex(i);
+			err = false;
+			break;
+		}
+	}
+
+	if (err)
+	{
+		throw std::invalid_argument("ListItem does not exist");
+	}
 }
 
 bool ListControl::IsRebinding() const noexcept

@@ -66,6 +66,7 @@
     <ClCompile Include="EventDispatcher.cpp">
       <Filter>Events</Filter>
     </ClCompile>
+    <ClCompile Include="Enumerator.cpp" />
     <ClCompile Include="TestRealTimeApplication.cpp" />
     <ClCompile Include="MenuStrip.cpp" />
     <ClCompile Include="ListControl.cpp" />
@@ -287,10 +288,24 @@
     <ClInclude Include="EventDispatcher.h">
       <Filter>Events</Filter>
     </ClInclude>
+    <ClInclude Include="Collection.h" />
+    <ClInclude Include="IEnumerator.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="ICollection.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IEnumerable.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Enumerator.h" />
     <ClInclude Include="TestRealTimeApplication.h" />
     <ClInclude Include="FlatButtonAppearance.h" />
     <ClInclude Include="MenuStrip.h" />
     <ClInclude Include="ListControl.h" />
+    <ClInclude Include="IList.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
     <ClInclude Include="ConvertEventArgs.h">
       <Filter>Events</Filter>
     </ClInclude>
@@ -309,117 +324,6 @@
     <ClInclude Include="VerticalScrollBar.h" />
     <ClInclude Include="HorizontalScrollBar.h" />
     <ClInclude Include="WindowClass.h" />
-    <ClInclude Include="Collection.h">
-      <Filter>Data Structures</Filter>
-    </ClInclude>
-    <ClInclude Include="Enumerator.h">
-      <Filter>Data Structures</Filter>
-    </ClInclude>
-    <ClInclude Include="ICollection.h">
-      <Filter>Data Structures\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="IEnumerable.h">
-      <Filter>Data Structures\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="IEnumerator.h">
-      <Filter>Data Structures\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="IList.h">
-      <Filter>Data Structures\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="Exception.h">
-      <Filter>Exceptions</Filter>
-    </ClInclude>
-    <ClInclude Include="NotSupportedException.h">
-      <Filter>Exceptions</Filter>
-    </ClInclude>
-    <ClInclude Include="ControlException.h">
-      <Filter>Exceptions</Filter>
-    </ClInclude>
-    <ClInclude Include="InvalidOperationException.h">
-      <Filter>Exceptions</Filter>
-    </ClInclude>
-    <ClInclude Include="ArgumentNullException.h">
-      <Filter>Exceptions</Filter>
-    </ClInclude>
-    <ClInclude Include="ArgumentException.h">
-      <Filter>Exceptions</Filter>
-    </ClInclude>
-    <ClInclude Include="SystemException.h">
-      <Filter>Exceptions</Filter>
-    </ClInclude>
-    <ClInclude Include="Exceptions.h">
-      <Filter>Exceptions</Filter>
-    </ClInclude>
-    <ClInclude Include="ArgumentOutOfRangeException.h">
-      <Filter>Exceptions</Filter>
-    </ClInclude>
-    <ClInclude Include="Int32.h">
-      <Filter>System</Filter>
-    </ClInclude>
-    <ClInclude Include="ValueType.h">
-      <Filter>System</Filter>
-    </ClInclude>
-    <ClInclude Include="NotImplementedException.h">
-      <Filter>Exceptions</Filter>
-    </ClInclude>
-    <ClInclude Include="IComparable.h">
-      <Filter>Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="IntPtr.h">
-      <Filter>System</Filter>
-    </ClInclude>
-    <ClInclude Include="TypeCode.h">
-      <Filter>System</Filter>
-    </ClInclude>
-    <ClInclude Include="IConvertible.h">
-      <Filter>Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="IFormatProvider.h">
-      <Filter>Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="SystemTypes.h">
-      <Filter>System</Filter>
-    </ClInclude>
-    <ClInclude Include="Boolean.h">
-      <Filter>System</Filter>
-    </ClInclude>
-    <ClInclude Include="Char.h">
-      <Filter>System</Filter>
-    </ClInclude>
-    <ClInclude Include="UInt16.h">
-      <Filter>System</Filter>
-    </ClInclude>
-    <ClInclude Include="UInt32.h">
-      <Filter>System</Filter>
-    </ClInclude>
-    <ClInclude Include="Int64.h">
-      <Filter>System</Filter>
-    </ClInclude>
-    <ClInclude Include="UInt64.h">
-      <Filter>System</Filter>
-    </ClInclude>
-    <ClInclude Include="SByte.h">
-      <Filter>System</Filter>
-    </ClInclude>
-    <ClInclude Include="Byte.h">
-      <Filter>System</Filter>
-    </ClInclude>
-    <ClInclude Include="Int16.h">
-      <Filter>System</Filter>
-    </ClInclude>
-    <ClInclude Include="Single.h">
-      <Filter>System</Filter>
-    </ClInclude>
-    <ClInclude Include="Double.h">
-      <Filter>System</Filter>
-    </ClInclude>
-    <ClInclude Include="Decimal.h">
-      <Filter>System</Filter>
-    </ClInclude>
-    <ClInclude Include="DateTime.h">
-      <Filter>System</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interfaces">
@@ -436,12 +340,6 @@
     </Filter>
     <Filter Include="Data Structures\Interfaces">
       <UniqueIdentifier>{c6fc4e61-1c7b-41ed-8540-d33500d2d738}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Exceptions">
-      <UniqueIdentifier>{ec1049e4-8178-4488-9e38-cf6f5d54e598}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="System">
-      <UniqueIdentifier>{3e08ca34-1ccf-43ea-9bcf-059d9791e52d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

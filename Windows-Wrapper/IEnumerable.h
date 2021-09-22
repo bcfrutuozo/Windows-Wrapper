@@ -2,10 +2,9 @@
 
 #include "IEnumerator.h"
 
-template<typename T = Object>
-class IEnumerable : public Object
+class IEnumerable
 {
 public:
 
-	virtual IEnumerator<T>* GetEnumerator() const noexcept = 0;
+	virtual IEnumerator* GetEnumerator() const noexcept = 0;
 };

@@ -22,7 +22,7 @@ private:
 protected:
 
 	int m_SelectedIndex;
-	std::string m_SelectedValue;
+	ListItem* m_SelectedValue;
 	bool m_IsRebinding;
 	ListItemCollection* Items;
 
@@ -49,9 +49,9 @@ public:
 	void DisableSelection() noexcept;
 	ListItemCollection* const GetDataSource() const noexcept;
 	void SetDataSource(ListItemCollection* const dataSource) noexcept;
-	virtual int GetSelectedIndex() const noexcept;
-	virtual void SetSelectedIndex(int index) noexcept = 0;
-	std::string GetSelectedValue() const noexcept;
-	virtual void SetSelectedValue(const ListItem& item) = 0;
+	int GetSelectedIndex() const noexcept;
+	void SetSelectedIndex(unsigned int index) noexcept;
+	ListItem* GetSelectedValue() const noexcept;
+	void SetSelectedValue(const ListItem& item);
 	bool IsRebinding() const noexcept;
 };

@@ -3,15 +3,15 @@
 
 ListItem::ListItem(const std::string& value)
 	:
-	Value(value),
-	Visible(true),
-	Selected(false)
+	Id(id),
+	Value(value)
 {
 
 }
 
 ListItem::ListItem(const ListItem& src)
 {
+	Id = src.Id;
 	Value = src.Value;
 	Visible = src.Visible;
 	Selected = src.Selected;

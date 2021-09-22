@@ -14,7 +14,7 @@ private:
 	Object* Owner;
 	bool m_ReadOnly;
 
-	void ResetIndices(Enumerator<T>* begin) noexcept
+	void ResetIndices(Enumerator* begin) noexcept
 	{
 		auto start = begin;
 		while (start != nullptr)
@@ -24,11 +24,11 @@ private:
 		}
 	}
 
-	bool Remove(Enumerator<T>* e) noexcept
+	bool Remove(Enumerator* e) noexcept
 	{
-		Enumerator<T>* temp = e;
-		Enumerator<T>* next = e->Next;
-		Enumerator<T>* prior = e->Prior;
+		Enumerator* temp = e;
+		Enumerator* next = e->Next;
+		Enumerator* prior = e->Prior;
 
 		if (this->Count > 1)
 		{
@@ -53,7 +53,7 @@ private:
 
 		--this->Count;
 
-		delete temp->GetCurrent();
+		delete dynamic_cast<T*>(temp->GetCurrent());
 
 		if (temp == temp->Begin)
 		{
@@ -69,12 +69,12 @@ private:
 	{
 	private:
 
-		Enumerator<T>* pElement = nullptr;
+		Enumerator* pElement = nullptr;
 
 	public:
 
 		Iterator() = default;
-		Iterator(Enumerator<T>* pElement)
+		Iterator(Enumerator* pElement)
 			:
 			pElement(pElement)
 		{
@@ -95,7 +95,7 @@ private:
 		{
 			if (pElement != nullptr)
 			{
-				return pElement->GetCurrent();
+				return dynamic_cast<T*>(pElement->GetCurrent());
 			}
 
 			return nullptr;
@@ -110,12 +110,12 @@ private:
 	{
 	private:
 
-		const Enumerator<T>* pElement = nullptr;
+		const Enumerator* pElement = nullptr;
 
 	public:
 
 		ConstIterator() = default;
-		ConstIterator(const Enumerator<T>* pElement)
+		ConstIterator(const Enumerator* pElement)
 			:
 			pElement(pElement)
 		{
@@ -136,7 +136,7 @@ private:
 		{
 			if (pElement != nullptr)
 			{
-				return pElement->GetCurrent();
+				return dynamic_cast<T*>(pElement->GetCurrent());
 			}
 
 			return nullptr;
@@ -149,7 +149,7 @@ private:
 
 protected:
 
-	Enumerator<T>* pNext;
+	Enumerator* pNext;
 
 public:
 
@@ -158,7 +158,7 @@ public:
 	ConstIterator begin() const { return{ this->Count == 0 ? nullptr : pNext->Begin }; }
 	ConstIterator end() const { return{}; }
 
-	IEnumerator<T>* GetEnumerator() const noexcept override
+	IEnumerator* GetEnumerator() const noexcept override
 	{
 		return pNext;
 	}
@@ -191,7 +191,7 @@ public:
 
 			if (!src.IsEmpty())
 			{
-				pNext = new Enumerator<T>(*src.pNext);
+				pNext = new Enumerator(*src.pNext);
 			}
 		}
 		return *this;
@@ -204,14 +204,14 @@ public:
 			throw std::out_of_range("Invalid Enumerator range");
 		}
 
-		Enumerator<T>* e = pNext->Begin;
+		auto e = pNext->Begin;
 		T* r = nullptr;
 
 		for (size_t i = 0; i <= index; ++i, e = e->Next)
 		{
 			if (i == index)
 			{
-				r = e->GetCurrent();
+				r = dynamic_cast<T*>(e->GetCurrent());
 				break;
 			}
 		}
@@ -233,11 +233,11 @@ public:
 	{
 		if (this->Count == 0)
 		{
-			pNext = new Enumerator<T>(item);
+			pNext = new Enumerator(item);
 		}
 		else
 		{
-			auto p = new Enumerator<T>(item, pNext, nullptr);
+			auto p = new Enumerator(item, pNext, nullptr);
 			pNext->Next = p;
 			pNext = p;
 		}
@@ -247,7 +247,7 @@ public:
 
 	bool Remove(T* const item) noexcept override
 	{
-		Enumerator<T>* search = pNext;
+		Enumerator* search = pNext;
 
 		while (search != nullptr)
 		{
@@ -273,7 +273,7 @@ public:
 
 		while (pNext != nullptr)
 		{
-			Enumerator<T>* temp = nullptr;
+			Enumerator* temp = nullptr;
 			if (pNext->Prior != nullptr)
 			{
 				temp = pNext->Prior;
@@ -286,7 +286,7 @@ public:
 
 	bool Contains(T* const item) const noexcept override
 	{
-		Enumerator<T>* search = pNext;
+		Enumerator* search = pNext;
 
 		while (search != nullptr)
 		{
@@ -322,8 +322,8 @@ public:
 		}
 
 		auto e = pNext->Begin;
-		Enumerator<T>* prior = nullptr;
-		Enumerator<T>* next = nullptr;
+		Enumerator* prior = nullptr;
+		Enumerator* next = nullptr;
 
 		for (size_t i = 0; i < index; ++i, e = e->Next)
 		{
@@ -339,10 +339,9 @@ public:
 			}
 		}
 
-		auto n = new Enumerator<T>(item, prior, next);
-		
-		if(prior != nullptr) prior->Next = n;
-		if(next != nullptr) next->Prior = n;
+		auto n = new Enumerator(item, prior, next);
+		prior->Next = n;
+		next->Prior = n;
 
 		++this->Count;
 	}

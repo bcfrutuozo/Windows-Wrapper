@@ -6,10 +6,9 @@ class ListItem : public Object
 {
 public:
 
+	uint32_t Id;
 	std::string Value;
-	bool Visible;
-	bool Selected;
 
-	ListItem(const std::string& value);
+	ListItem(uint32_t id, const std::string& value);
 	ListItem(const ListItem& src);
 };
