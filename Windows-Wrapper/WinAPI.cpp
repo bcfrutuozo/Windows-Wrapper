@@ -6,7 +6,7 @@
 unsigned int WinAPI::m_CurrentIndex = 1;
 IntPtr WinAPI::m_OpenedControl = nullptr;
 
-void WinAPI::OnActivate_Impl(HWND hwnd, unsigned int state, HWND hwndActDeact, bool minimized) noexcept
+void WinAPI::OnActivate_Impl(HWND hwnd, unsigned int state, HWND hwndActDeact, bool minimized)
 {
 	/**************************************************************************************************/
 	/* The low - order word specifies whether the window is being activated or deactivated. This
@@ -39,12 +39,12 @@ void WinAPI::OnActivate_Impl(HWND hwnd, unsigned int state, HWND hwndActDeact, b
 	}
 }
 
-void WinAPI::OnCommand_Impl(HWND hwnd, int id, HWND hwndCtl, unsigned int codeNotify) noexcept
+void WinAPI::OnCommand_Impl(HWND hwnd, int id, HWND hwndCtl, unsigned int codeNotify)
 {
 
 }
 
-int WinAPI::OnClosing_Impl(HWND hwnd) noexcept
+int WinAPI::OnClosing_Impl(HWND hwnd)
 {
 	Dispatch("OnClosing", &ArgsOnClosing);
 
@@ -65,12 +65,12 @@ int WinAPI::OnClosing_Impl(HWND hwnd) noexcept
 	return 1;
 }
 
-void WinAPI::OnClosed_Impl(HWND hwnd) noexcept
+void WinAPI::OnClosed_Impl(HWND hwnd)
 {
 	Dispatch("OnClosed", &ArgsOnClosed);
 }
 
-void WinAPI::OnCreate_Impl(HWND hwnd, LPCREATESTRUCT lpCreateStruct) noexcept
+void WinAPI::OnCreate_Impl(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
 {
 	HDC hdc = GetDC(hwnd);
 
@@ -85,7 +85,7 @@ void WinAPI::OnEnable_Impl(HWND hwnd, bool fEnable)
 
 }
 
-int WinAPI::OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept
+int WinAPI::OnEraseBackground_Impl(HWND hwnd, HDC hdc)
 {
 	// 0 always redraw
 	// Some controls like have 1 to avoid flickering on input
@@ -93,7 +93,7 @@ int WinAPI::OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept
 	return 0;
 }
 
-void WinAPI::OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept
+void WinAPI::OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus)
 {
 	/**************************************************************************************************/
 	/* Remarks
@@ -125,51 +125,51 @@ void WinAPI::OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept
 	Dispatch("OnGotFocus", &ArgsDefault);
 }
 
-void WinAPI::OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept
+void WinAPI::OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus)
 {
 	Update();
 	Dispatch("OnLostFocus", &ArgsDefault);
 }
 
-int WinAPI::OnGetDLGCode_Impl(HWND hwnd, LPMSG msg) noexcept
+int WinAPI::OnGetDLGCode_Impl(HWND hwnd, LPMSG msg)
 {
 	return 0;
 }
 
-void WinAPI::OnHorizontalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int code, int pos) noexcept
+void WinAPI::OnHorizontalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int code, int pos)
 {
 	Dispatch("OnHorizontalScroll", &ArgsDefault);
 }
 
-void WinAPI::OnInitMenu_Impl(HWND hwnd, HMENU hMenu) noexcept
+void WinAPI::OnInitMenu_Impl(HWND hwnd, HMENU hMenu)
 {
 
 }
 
-void WinAPI::OnInitMenuPopup_Impl(HWND hwnd, HMENU hMenu, unsigned int item, bool fSystemMenu) noexcept
+void WinAPI::OnInitMenuPopup_Impl(HWND hwnd, HMENU hMenu, unsigned int item, bool fSystemMenu)
 {
 
 }
 
-void WinAPI::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept
+void WinAPI::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags)
 {
 	ArgsOnKeyDown = KeyEventArgs(static_cast<Keys>(vk));
 	Dispatch("OnKeyDown", &ArgsOnKeyDown);
 }
 
-void WinAPI::OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat) noexcept
+void WinAPI::OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat)
 {
 	ArgsOnKeyPressed = KeyPressEventArgs(c);
 	Dispatch("OnKeyPress", &ArgsOnKeyPressed);
 }
 
-void WinAPI::OnKeyUp_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept
+void WinAPI::OnKeyUp_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags)
 {
 	ArgsOnKeyUp = KeyEventArgs(static_cast<Keys>(vk));
 	Dispatch("OnKeyUp", &ArgsOnKeyUp);
 }
 
-int WinAPI::OnMenuChar_Impl(HWND hwnd, unsigned int ch, unsigned int flags, HMENU hmenu) noexcept
+int WinAPI::OnMenuChar_Impl(HWND hwnd, unsigned int ch, unsigned int flags, HMENU hmenu)
 {
 	/*
 		MNC_CLOSE 1
@@ -184,12 +184,12 @@ int WinAPI::OnMenuChar_Impl(HWND hwnd, unsigned int ch, unsigned int flags, HMEN
 	return 0;
 }
 
-void WinAPI::OnMenuSelect_Impl(HWND hwnd, HMENU hmenu, int item, HMENU hmenuPopup, unsigned int flags) noexcept
+void WinAPI::OnMenuSelect_Impl(HWND hwnd, HMENU hmenu, int item, HMENU hmenuPopup, unsigned int flags)
 {
 
 }
 
-void WinAPI::OnMouseLeave_Impl(HWND hwnd) noexcept
+void WinAPI::OnMouseLeave_Impl(HWND hwnd)
 {
 	SetClickingState(false);
 	SetMouseOverState(false);
@@ -197,7 +197,7 @@ void WinAPI::OnMouseLeave_Impl(HWND hwnd) noexcept
 	Dispatch("OnMouseLeave", &ArgsDefault);
 }
 
-void WinAPI::OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
+void WinAPI::OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags)
 {
 	/**************************************************************************************************/
 	/* As noted above, the x - coordinate is in the low - order short of the return value; the y -
@@ -235,7 +235,7 @@ void WinAPI::OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) no
 	Dispatch("OnMouseMove", &ArgsOnMouseMove);
 }
 
-void WinAPI::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
+void WinAPI::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags)
 {
 	SetMouseOverState(true);
 	SetClickingState(true);
@@ -244,7 +244,7 @@ void WinAPI::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags
 	Dispatch("OnMouseDown", &ArgsOnMouseDown);
 }
 
-void WinAPI::OnMouseLeftUp_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
+void WinAPI::OnMouseLeftUp_Impl(HWND hwnd, int x, int y, unsigned int keyFlags)
 {
 	SetClickingState(false);
 	SetMouseOverState(true);
@@ -256,32 +256,32 @@ void WinAPI::OnMouseLeftUp_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) 
 	Dispatch("OnMouseUp", &ArgsOnMouseUp);
 }
 
-void WinAPI::OnMouseRightDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
+void WinAPI::OnMouseRightDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags)
 {
 	ArgsOnMouseDown = MouseEventArgs(MouseButtons::Right, 1, 0, x, y);
 	Dispatch("OnMouseDown", &ArgsOnMouseDown);
 }
 
-void WinAPI::OnMouseRightUp_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
+void WinAPI::OnMouseRightUp_Impl(HWND hwnd, int x, int y, unsigned int keyFlags)
 {
 	ArgsOnMouseUp = MouseEventArgs(MouseButtons::Right, 1, 0, x, y);
 	Dispatch("OnMouseUp", &ArgsOnMouseUp);
 }
 
-void WinAPI::OnMouseLeftDoubleClick_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
+void WinAPI::OnMouseLeftDoubleClick_Impl(HWND hwnd, int x, int y, unsigned int keyFlags)
 {
 	ArgsOnMouseDoubleClick = MouseEventArgs(MouseButtons::Left, 2, 0, x, y);
 	Dispatch("OnDoubleClick", &ArgsDefault);
 	Dispatch("OnMouseDoubleClick", &ArgsOnMouseDoubleClick);
 }
 
-void WinAPI::OnMouseRightDoubleClick_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
+void WinAPI::OnMouseRightDoubleClick_Impl(HWND hwnd, int x, int y, unsigned int keyFlags)
 {
 	ArgsOnMouseDoubleClick = MouseEventArgs(MouseButtons::Right, 2, 0, x, y);
 	Dispatch("OnMouseDoubleClick", &ArgsOnMouseDoubleClick);
 }
 
-void WinAPI::OnMouseWheel_Impl(HWND hwnd, int x, int y, int delta, unsigned int fwKeys) noexcept
+void WinAPI::OnMouseWheel_Impl(HWND hwnd, int x, int y, int delta, unsigned int fwKeys)
 {
 	switch (fwKeys)
 	{
@@ -296,32 +296,32 @@ void WinAPI::OnMouseWheel_Impl(HWND hwnd, int x, int y, int delta, unsigned int 
 	Dispatch("OnMouseWheel", &ArgsOnMouseWheel);
 }
 
-void WinAPI::OnNextDialogControl_Impl(HWND hwnd, HWND hwndSetFocus, bool fNext) noexcept
+void WinAPI::OnNextDialogControl_Impl(HWND hwnd, HWND hwndSetFocus, bool fNext)
 {
 
 }
 
-int WinAPI::OnNotify_Impl(HWND hwnd, int xPos, int yPos, int zDelta, unsigned int fwKeys) noexcept
+int WinAPI::OnNotify_Impl(HWND hwnd, int xPos, int yPos, int zDelta, unsigned int fwKeys)
 {
 	return 1;
 }
 
-void WinAPI::OnRawInput_Impl(HWND hWnd, unsigned int inputCode, HRAWINPUT hRawInput) noexcept
+void WinAPI::OnRawInput_Impl(HWND hWnd, unsigned int inputCode, HRAWINPUT hRawInput)
 {
 
 }
 
-int WinAPI::OnSetCursor_Impl(HWND hwnd, HWND hwndCursor, unsigned int codeHitTest, unsigned int msg) noexcept
+int WinAPI::OnSetCursor_Impl(HWND hwnd, HWND hwndCursor, unsigned int codeHitTest, unsigned int msg)
 {
 	return 0;
 }
 
-void WinAPI::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy) noexcept
+void WinAPI::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy)
 {
 	Dispatch("OnResize", &ArgsDefault);
 }
 
-void WinAPI::OnShowWindow_Impl(HWND hwnd, bool fShow, unsigned int status) noexcept
+void WinAPI::OnShowWindow_Impl(HWND hwnd, bool fShow, unsigned int status)
 {
 	if (fShow)
 	{
@@ -335,12 +335,12 @@ void WinAPI::OnShowWindow_Impl(HWND hwnd, bool fShow, unsigned int status) noexc
 	Dispatch("OnVisibleChanged", &ArgsDefault);
 }
 
-void WinAPI::OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int code, int pos) noexcept
+void WinAPI::OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int code, int pos)
 {
 	Dispatch("OnVerticalScroll", &ArgsDefault);
 }
 
-WinAPI::WinAPI() noexcept
+WinAPI::WinAPI()
 	:
 	ArgsOnClosing(CloseReason::None, false),
 	ArgsOnClosed(CloseReason::None),
@@ -371,7 +371,7 @@ WinAPI::~WinAPI()
 }
 
 // Static function which handle WinAPI messages to corresponding member function of the control
-LRESULT WINAPI WinAPI::HandleMessageSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+LRESULT WINAPI WinAPI::HandleMessageSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	// Use create parameter passed in from CreateWindow() to store window class pointer at WinAPI side
 	if (msg == WM_NCCREATE)
@@ -396,7 +396,7 @@ LRESULT WINAPI WinAPI::HandleMessageSetup(HWND hWnd, UINT msg, WPARAM wParam, LP
 
 /* This function is the savior...
 Not only it handles the message to the member function but it can also forward a message from one WinControl to another */
-LRESULT WINAPI WinAPI::HandleMessageForwarder(HWND hWnd, UINT msg, WPARAM lParam, LPARAM wParam) noexcept
+LRESULT WINAPI WinAPI::HandleMessageForwarder(HWND hWnd, UINT msg, WPARAM lParam, LPARAM wParam)
 {
 	// Retrieve pointer to window class
 	WinAPI* const pWnd = reinterpret_cast<WinAPI*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
@@ -406,7 +406,7 @@ LRESULT WINAPI WinAPI::HandleMessageForwarder(HWND hWnd, UINT msg, WPARAM lParam
 }
 
 // Member function responsible to handle the messages of each different type of control 
-LRESULT WINAPI WinAPI::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+LRESULT WINAPI WinAPI::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 #if _DEBUG
 	//printf_s(m(msg, wParam, lParam).c_str());
@@ -630,19 +630,19 @@ bool WinAPI::IsEnabled() const noexcept
 	return m_Enabled;
 }
 
-void WinAPI::Enable() noexcept
+void WinAPI::Enable()
 {
 	m_Enabled = true;
 	EnableWindow(static_cast<HWND>(Handle.ToPointer()), true);
 }
 
-void WinAPI::Disable() noexcept
+void WinAPI::Disable()
 {
 	m_Enabled = false;
 	EnableWindow(static_cast<HWND>(Handle.ToPointer()), false);
 }
 
-void WinAPI::Update() const noexcept
+void WinAPI::Update() const
 {
 	InvalidateRect(static_cast<HWND>(Handle.ToPointer()), nullptr, true);
 }

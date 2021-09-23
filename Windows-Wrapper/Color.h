@@ -8,8 +8,8 @@ struct Color : public IEquatable<Color>
 {
 	uint32_t rgba = 0;
 
-	constexpr Color(uint32_t rgba) : rgba(rgba) {}
-	constexpr Color(uint8_t r = 0, uint8_t g = 0, uint8_t b = 0, uint8_t a = 255) : rgba((r << 0) | (g << 8) | (b << 16) | (a << 24)) {}
+	constexpr Color(uint32_t rgba) noexcept : rgba(rgba) {}
+	constexpr Color(uint8_t r = 0, uint8_t g = 0, uint8_t b = 0, uint8_t a = 255) noexcept : rgba((r << 0) | (g << 8) | (b << 16) | (a << 24)) {}
 
 	constexpr uint8_t GetR() const { return (rgba >> 0) & 0xFF; }
 	constexpr uint8_t GetG() const { return (rgba >> 8) & 0xFF; }

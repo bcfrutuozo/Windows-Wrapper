@@ -24,8 +24,8 @@ private:
 protected:
 
 	inline bool CanRaiseEvents();
-	void Dispose(bool disposing) noexcept;
-	void Dispatch(const std::string& name, EventArgs* e) noexcept;
+	void Dispose(bool disposing);
+	void Dispatch(const std::string& name, EventArgs* e);
 
 public:
 

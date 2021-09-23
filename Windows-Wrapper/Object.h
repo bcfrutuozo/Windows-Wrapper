@@ -14,7 +14,7 @@ public:
 	virtual bool operator==(const Object& b) const;
 	virtual bool Equals(const Object* const b) const;
 	bool static Equals(const Object* const lhs, const Object* const rhs);
-	inline const int GetHashCode() const noexcept;
+	inline virtual int GetHashCode() const noexcept;
 	inline const Type GetType() const noexcept;
 	const bool ReferenceEquals(const Object& b) const noexcept;
 	inline virtual const std::string ToString() const noexcept;

@@ -23,7 +23,7 @@ inline bool Object::Equals(const Object* const lhs, const Object* const rhs)
 	return lhs->Equals(rhs);
 }
 
-inline const int Object::GetHashCode() const noexcept
+inline int Object::GetHashCode() const noexcept
 {
 	auto guid = uuid_system_generator{}();
 

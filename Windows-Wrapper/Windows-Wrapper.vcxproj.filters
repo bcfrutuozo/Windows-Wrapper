@@ -121,6 +121,9 @@
     <ClCompile Include="Padding.cpp">
       <Filter>Types</Filter>
     </ClCompile>
+    <ClCompile Include="Int32.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RealTimeApplication.h" />
@@ -327,7 +330,7 @@
     <ClInclude Include="Object.h">
       <Filter>Types</Filter>
     </ClInclude>
-    <ClInclude Include="ValueType.h">
+    <ClInclude Include="ValueTypeTraits.h">
       <Filter>Types</Filter>
     </ClInclude>
     <ClInclude Include="Int32.h">

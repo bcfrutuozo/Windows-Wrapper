@@ -73,67 +73,67 @@ private:
 	OnKeyPressed() have different behaviors on each type of Control. So they are all virtual to decouple each kind of
 	functionality. */
 
-	virtual void OnActivate_Impl(HWND hwnd, unsigned int state, HWND hwndActDeact, bool minimized) noexcept;
-	virtual void OnCommand_Impl(HWND hwnd, int id, HWND hwndCtl, unsigned int codeNotify) noexcept;
-	virtual int OnClosing_Impl(HWND hwnd) noexcept;
-	virtual void OnClosed_Impl(HWND hwnd) noexcept;
-	virtual void OnCreate_Impl(HWND hwnd, LPCREATESTRUCT lpCreateStruct) noexcept;
+	virtual void OnActivate_Impl(HWND hwnd, unsigned int state, HWND hwndActDeact, bool minimized);
+	virtual void OnCommand_Impl(HWND hwnd, int id, HWND hwndCtl, unsigned int codeNotify);
+	virtual int OnClosing_Impl(HWND hwnd);
+	virtual void OnClosed_Impl(HWND hwnd);
+	virtual void OnCreate_Impl(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
 	virtual void OnEnable_Impl(HWND hwnd, bool fEnable);
-	virtual int OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept;
-	virtual void OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept;
-	virtual void OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept;
-	virtual int OnGetDLGCode_Impl(HWND hwnd, LPMSG msg) noexcept;
-	virtual void OnHorizontalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int code, int pos) noexcept;
+	virtual int OnEraseBackground_Impl(HWND hwnd, HDC hdc);
+	virtual void OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus);
+	virtual void OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus);
+	virtual int OnGetDLGCode_Impl(HWND hwnd, LPMSG msg);
+	virtual void OnHorizontalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int code, int pos);
 
 	/* Sent when a menu is about to become active. It occurs when the user clicks an item on the menu bar or presses
 	a menu key. This allows the application to modify the menu before it is displayed. */
-	virtual void OnInitMenu_Impl(HWND hwnd, HMENU hMenu) noexcept;
+	virtual void OnInitMenu_Impl(HWND hwnd, HMENU hMenu);
 
 	/* Sent when a drop-down menu or submenu is about to become active. This allows an application to modify the menu
 	before it is displayed, without changing the entire menu. */
-	virtual void OnInitMenuPopup_Impl(HWND hwnd, HMENU hMenu, unsigned int item, bool fSystemMenu) noexcept;
-	virtual void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept;
-	virtual void OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat) noexcept;
-	virtual void OnKeyUp_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept;
+	virtual void OnInitMenuPopup_Impl(HWND hwnd, HMENU hMenu, unsigned int item, bool fSystemMenu);
+	virtual void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags);
+	virtual void OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat);
+	virtual void OnKeyUp_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags);
 
 	/* Sent when a menu is active and the user presses a key that does not correspond to any mnemonic or accelerator
 	key. This message is sent to the window that owns the menu. */
-	virtual int OnMenuChar_Impl(HWND hwnd, unsigned int ch, unsigned int flags, HMENU hmenu) noexcept;
+	virtual int OnMenuChar_Impl(HWND hwnd, unsigned int ch, unsigned int flags, HMENU hmenu);
 
 	/* Sent to a menu's owner window when the user selects a menu item. */
-	virtual void OnMenuSelect_Impl(HWND hwnd, HMENU hmenu, int item, HMENU hmenuPopup, unsigned int flags) noexcept;
-	virtual void OnMouseLeave_Impl(HWND hwnd) noexcept;
-	virtual void OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept;
-	virtual void OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept;
-	virtual void OnMouseLeftUp_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept;
-	virtual void OnMouseRightDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept;
-	virtual void OnMouseRightUp_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept;
-	virtual void OnMouseLeftDoubleClick_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept;
-	virtual void OnMouseRightDoubleClick_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept;
-	virtual void OnMouseWheel_Impl(HWND hwnd, int x, int y, int delta, unsigned int fwKeys) noexcept;
-	virtual void OnNextDialogControl_Impl(HWND hwnd, HWND hwndSetFocus, bool fNext) noexcept = 0;
-	virtual int OnNotify_Impl(HWND hwnd, int xPos, int yPos, int zDelta, unsigned int fwKeys) noexcept;
+	virtual void OnMenuSelect_Impl(HWND hwnd, HMENU hmenu, int item, HMENU hmenuPopup, unsigned int flags);
+	virtual void OnMouseLeave_Impl(HWND hwnd);
+	virtual void OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags);
+	virtual void OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags);
+	virtual void OnMouseLeftUp_Impl(HWND hwnd, int x, int y, unsigned int keyFlags);
+	virtual void OnMouseRightDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags);
+	virtual void OnMouseRightUp_Impl(HWND hwnd, int x, int y, unsigned int keyFlags);
+	virtual void OnMouseLeftDoubleClick_Impl(HWND hwnd, int x, int y, unsigned int keyFlags);
+	virtual void OnMouseRightDoubleClick_Impl(HWND hwnd, int x, int y, unsigned int keyFlags);
+	virtual void OnMouseWheel_Impl(HWND hwnd, int x, int y, int delta, unsigned int fwKeys);
+	virtual void OnNextDialogControl_Impl(HWND hwnd, HWND hwndSetFocus, bool fNext) = 0;
+	virtual int OnNotify_Impl(HWND hwnd, int xPos, int yPos, int zDelta, unsigned int fwKeys);
 	virtual void OnPaint_Impl(HWND hwnd) noexcept = 0;
-	virtual void OnRawInput_Impl(HWND hWnd, unsigned int inputCode, HRAWINPUT hRawInput) noexcept;
-	virtual int OnSetCursor_Impl(HWND hwnd, HWND hwndCursor, unsigned int codeHitTest, unsigned int msg) noexcept;
-	virtual void OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy) noexcept;
-	virtual void OnShowWindow_Impl(HWND hwnd, bool fShow, unsigned int status) noexcept;
-	virtual void OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, UINT code, int pos) noexcept;
+	virtual void OnRawInput_Impl(HWND hWnd, unsigned int inputCode, HRAWINPUT hRawInput);
+	virtual int OnSetCursor_Impl(HWND hwnd, HWND hwndCursor, unsigned int codeHitTest, unsigned int msg);
+	virtual void OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy);
+	virtual void OnShowWindow_Impl(HWND hwnd, bool fShow, unsigned int status);
+	virtual void OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, UINT code, int pos);
 
 protected:
 
-	WinAPI() noexcept;
+	WinAPI();
 	virtual ~WinAPI();
 
 	// Static function which handle WinAPI messages to corresponding member function of the control
-	static LRESULT WINAPI HandleMessageSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+	static LRESULT WINAPI HandleMessageSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	/* This function is the savior...
 	Not only it handles the message to the member function but it can also forward a message from one WinControl to another */
-	static LRESULT WINAPI HandleMessageForwarder(HWND hWnd, UINT msg, WPARAM lParam, LPARAM wParam) noexcept;
+	static LRESULT WINAPI HandleMessageForwarder(HWND hWnd, UINT msg, WPARAM lParam, LPARAM wParam);
 
 	// Member function responsible to handle the messages of each different type of control 
-	LRESULT WINAPI HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+	LRESULT WINAPI HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	unsigned int GetId() const noexcept;
 	void SetMouseOverState(bool state) noexcept;
@@ -150,7 +150,7 @@ public:
 	bool IsMouseOver() const noexcept;
 	bool IsClicking() const noexcept;
 	virtual bool IsEnabled() const noexcept;
-	void Enable() noexcept;
-	void Disable() noexcept;
-	virtual void Update() const noexcept;
+	void Enable();
+	void Disable();
+	virtual void Update() const;
 };

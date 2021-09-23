@@ -1,21 +1,8 @@
 #pragma once
-//
+
 #include "Object.h"
 #include "IFormatProvider.h"
-//#include "TypeCode.h"
-//#include "Boolean.h"
-//#include "Char.h"
-//#include "SByte.h"
-//#include "Byte.h"
-//#include "Int16.h"
-//#include "UInt16.h"
-//#include "UInt32.h"
-//#include "Int64.h"
-//#include "UInt64.h"
-//#include "Single.h"
-//#include "Double.h"
-//#include "Decimal.h"
-//#include "DateTime.h"
+#include "TypeCode.h"
 
 class Int32;
 
@@ -23,7 +10,7 @@ class IConvertible : public Object
 {
 public:
 //
-//	inline virtual constexpr TypeCode GetTypeCode() const noexcept = 0;
+	inline virtual constexpr TypeCode GetTypeCode() const noexcept = 0;
 //
 //	virtual Boolean ToBoolean(IFormatProvider* provider) const = 0;
 //	virtual Char ToChar(IFormatProvider* provider) const = 0;

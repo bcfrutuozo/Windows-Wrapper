@@ -6,7 +6,7 @@ inline bool Component::CanRaiseEvents()
 	return true;
 }
 
-void Component::Dispose(bool disposing) noexcept
+void Component::Dispose(bool disposing)
 {
 	if (disposing)
 	{
@@ -21,7 +21,7 @@ void Component::Dispose(bool disposing) noexcept
 	Disposed = true;
 }
 
-void Component::Dispatch(const std::string& name, EventArgs* e) noexcept
+void Component::Dispatch(const std::string& name, EventArgs* e)
 {
 	if (CanRaiseEvents() && !IsDisposed())
 	{

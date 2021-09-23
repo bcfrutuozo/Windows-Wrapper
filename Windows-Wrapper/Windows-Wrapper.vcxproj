@@ -160,6 +160,7 @@
     <ClCompile Include="EventDispatcher.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="HorizontalScrollBar.cpp" />
+    <ClCompile Include="Int32.cpp" />
     <ClCompile Include="InvalidOperationException.cpp" />
     <ClCompile Include="Label.cpp" />
     <ClCompile Include="ListBox.cpp" />
@@ -289,7 +290,7 @@
     <ClInclude Include="TestUserApplication.h" />
     <ClInclude Include="TypeCode.h" />
     <ClInclude Include="Utilities.h" />
-    <ClInclude Include="ValueType.h" />
+    <ClInclude Include="ValueTypeTraits.h" />
     <ClInclude Include="VerticalScrollBar.h" />
     <ClInclude Include="WinAPI.h" />
     <ClInclude Include="Keyboard.h" />

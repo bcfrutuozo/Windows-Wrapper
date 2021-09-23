@@ -16,11 +16,6 @@ void TestClick(Object* sender, EventArgs* e)
 
 void TestUserApplication::Initialize()
 {
-	Int32 a = 10;
-	Int32 b;
-	a += 5;
-	auto z = (a + 2);
-	a++;
 	Window* window = new Window("Teste", 1000, 1000);
 	window->GetMouse().EnableRaw();
 	window->GetKeyboard().DisableAutorepeat();
