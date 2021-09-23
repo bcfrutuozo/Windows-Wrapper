@@ -4,23 +4,10 @@
 #include "Type.h"
 #include "Guid.h"
 
-inline bool Object::operator==(const Object& b) const
-{
-	return *this == b;
-}
-
 inline bool Object::Equals(const Object* const b) const
 {
 	if (b == nullptr) return false;
 	return *this == *b;
-}
-
-inline bool Object::Equals(const Object* const lhs, const Object* const rhs)
-{
-	if (lhs == nullptr && rhs == nullptr) return true;
-	if (lhs == nullptr || rhs == nullptr) return false;
-
-	return lhs->Equals(rhs);
 }
 
 inline int Object::GetHashCode() const noexcept
@@ -39,11 +26,6 @@ inline int Object::GetHashCode() const noexcept
 inline const Type Object::GetType() const noexcept
 {
 	return Type(typeid(*this));
-}
-
-const bool Object::ReferenceEquals(const Object& b) const noexcept
-{
-	return std::addressof(*this) == std::addressof(b);
 }
 
 inline const std::string Object::ToString() const noexcept

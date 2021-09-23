@@ -4,6 +4,7 @@
 #include "IFormatProvider.h"
 #include "TypeCode.h"
 
+class Boolean;
 class Int32;
 
 class IConvertible : public Object
@@ -12,7 +13,7 @@ public:
 //
 	inline virtual constexpr TypeCode GetTypeCode() const noexcept = 0;
 //
-//	virtual Boolean ToBoolean(IFormatProvider* provider) const = 0;
+	virtual Boolean ToBoolean(IFormatProvider* provider) const = 0;
 //	virtual Char ToChar(IFormatProvider* provider) const = 0;
 //	virtual SByte ToSByte(IFormatProvider* provider) const = 0;
 //	virtual Byte ToByte(IFormatProvider* provider) const = 0;

@@ -124,6 +124,9 @@
     <ClCompile Include="Int32.cpp">
       <Filter>Types</Filter>
     </ClCompile>
+    <ClCompile Include="Boolean.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RealTimeApplication.h" />
@@ -361,6 +364,9 @@
       <Filter>Types</Filter>
     </ClInclude>
     <ClInclude Include="Padding.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Boolean.h">
       <Filter>Types</Filter>
     </ClInclude>
   </ItemGroup>

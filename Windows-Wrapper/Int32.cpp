@@ -1,4 +1,5 @@
 #include "Int32.h"
+#include "Boolean.h"
 #include "Exceptions.h"
 
 inline int Int32::GetHashCode() const noexcept
@@ -63,6 +64,12 @@ bool Int32::Equals(const Int32* const b) const
 	if (b == nullptr) return false;
 
 	return Get() == b->Get();
+}
+
+Boolean Int32::ToBoolean(IFormatProvider* provider) const
+{
+	//TODO:: CONVERT INT32 TO BOOLEAN
+	return false;
 }
 
 Int32 Int32::ToInt32(IFormatProvider* provider) const

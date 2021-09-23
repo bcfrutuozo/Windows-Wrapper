@@ -1,14 +1,14 @@
 #include "Type.h"
 #include "Exceptions.h"
 
-Type::Type(const type_info& t)
-	:
-	m_Type(t)
-{}
-
-bool Type::operator==(const Type& t) const
+bool Type::operator==(const Type& t) const noexcept
 {
 	return m_Type == t.m_Type;
+}
+
+bool Type::operator==(const type_info& t) const noexcept
+{
+	return m_Type == t;
 }
 
 bool Type::Equals(const Object* const b) const
@@ -27,11 +27,6 @@ bool Type::Equals(const Type* const t) const
 {
 	if (t == nullptr) return false;
 	return m_Type == t->m_Type;
-}
-
-bool Type::operator==(const type_info& t) const noexcept
-{
-	return m_Type == t;
 }
 
 const std::string Type::ToString() const noexcept

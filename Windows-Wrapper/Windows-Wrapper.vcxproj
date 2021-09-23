@@ -152,6 +152,7 @@
     <ClCompile Include="ArgumentException.cpp" />
     <ClCompile Include="ArgumentNullException.cpp" />
     <ClCompile Include="ArgumentOutOfRangeException.cpp" />
+    <ClCompile Include="Boolean.cpp" />
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="ComboBox.cpp" />
     <ClCompile Include="Component.cpp" />
@@ -218,6 +219,7 @@
   <ItemGroup>
     <ClInclude Include="ArgumentNullException.h" />
     <ClInclude Include="ArgumentOutOfRangeException.h" />
+    <ClInclude Include="Boolean.h" />
     <ClInclude Include="CancelEventArgs.h" />
     <ClInclude Include="CancelEventHandler.h" />
     <ClInclude Include="Collection.h" />

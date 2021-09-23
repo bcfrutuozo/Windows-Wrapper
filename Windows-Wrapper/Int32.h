@@ -180,7 +180,9 @@ public:
 	inline int CompareTo(const Int32* const value) const override;
 	inline bool Equals(const Object* const obj) const override;
 	inline bool Equals(const Int32* const value) const override;
+	//OVERRIDE OBJECT TO STRING inline const std::string ToString() const noexcept;
 	//inline String ToString() const noexcept override;
+	Boolean ToBoolean(IFormatProvider* provider) const override;
 	Int32 ToInt32(IFormatProvider* provider) const override;
 
 	static constexpr Int32 MaxValue() { return Int32(0x7fffffff); }
@@ -458,34 +460,3 @@ constexpr bool operator>=(Int32 const& lhs, Int32 const& rhs) noexcept
 {
 	return lhs.Get() >= rhs.Get();
 }
-
-//
-//constexpr bool operator&&(ValueType<bool> const& lhs, bool const& rhs) noexcept
-//{
-//	return lhs.get() && rhs;
-//}
-//
-//constexpr bool operator&&(bool const& lhs, ValueType<bool> const& rhs) noexcept
-//{
-//	return lhs && rhs.get();
-//}
-//
-//constexpr bool operator&&(ValueType<bool> const& lhs, ValueType<bool> const& rhs) noexcept
-//{
-//	return lhs.get() && rhs.get();
-//}
-//
-//constexpr bool operator||(ValueType<bool> const& lhs, bool const& rhs) noexcept
-//{
-//	return lhs.get() || rhs;
-//}
-//
-//constexpr bool operator||(bool const& lhs, ValueType<bool> const& rhs) noexcept
-//{
-//	return lhs || rhs.get();
-//}
-//
-//constexpr bool operator||(ValueType<bool> const& lhs, ValueType<bool> const& rhs) noexcept
-//{
-//	return lhs.get() || rhs.get();
-//}

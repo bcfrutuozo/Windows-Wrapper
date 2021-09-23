@@ -26,6 +26,11 @@ int IntPtr::CompareTo(const IntPtr* const b) const
 	return 0;
 }
 
+int IntPtr::GetHashCode() const noexcept
+{
+	return static_cast<int>(m_Ptr);
+}
+
 bool IntPtr::Equals(const Object* const obj) const
 {
 	if (obj == nullptr) return false;
