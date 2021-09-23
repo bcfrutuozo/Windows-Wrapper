@@ -1,9 +1,10 @@
 #pragma once
 
-#include "IComponent.h"
+#include "IDisposable.h"
 
-#include <string>
 #include <vector>
+
+class IComponent;
 
 class IContainer : public IDisposable
 {

@@ -2,8 +2,6 @@
 
 #include "IEquatable.h"
 
-#include <cmath>
-
 struct PointF;
 struct Size;
 struct SizeF;
@@ -19,8 +17,9 @@ public:
 	Point(int x, int y);
 	Point(Size size);
 
-	inline bool operator==(const Point& p) const noexcept override;
-	inline bool Equals(const Point& p) const noexcept override;
+	inline bool operator==(const Point& p) const;
+	inline bool Equals(const Object* const obj) const override;
+	inline bool Equals(const Point* const p) const override;
 
 	const bool IsEmpty() const noexcept;
 	inline static Point Add(Point p, Size s) noexcept;
@@ -43,8 +42,9 @@ public:
 
 	PointF(float x, float y);
 
-	inline bool operator==(const PointF& p) const noexcept override;
-	inline bool Equals(const PointF& p) const noexcept override;
+	inline bool operator==(const PointF& p) const;
+	inline bool Equals(const Object* obj) const override;
+	inline bool Equals(const PointF* const p) const override;
 
 	const bool IsEmpty() const noexcept;
 	inline static PointF Add(Point p, Size s) noexcept;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EventArgs.h"
+#include "Point.h"
 #include "MouseButtons.h"
 
 class MouseEventArgs : public EventArgs

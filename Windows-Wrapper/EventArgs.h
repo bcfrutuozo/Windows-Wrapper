@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Object.h"
+#include "CommonObject.h"
 
 class EventArgs : public Object
 {

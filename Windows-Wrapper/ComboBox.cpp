@@ -593,6 +593,6 @@ void ComboBox::SetSelectedValue(const ListItem& item)
 
 	if (err)
 	{
-		throw std::invalid_argument("ListItem does not exist");
+		throw ArgumentException("item");
 	}
 }

@@ -2,6 +2,7 @@
 
 #include "WinAPI.h"
 #include "Color.h"
+#include "Point.h"
 #include "Size.h"
 #include "Padding.h"
 #include "EventHandler.h"

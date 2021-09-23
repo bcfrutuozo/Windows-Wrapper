@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Object.h"
 #include "IEvent.h"
 #include "EventArgs.h"
 

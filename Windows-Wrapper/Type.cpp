@@ -1,18 +1,32 @@
 #include "Type.h"
+#include "Exceptions.h"
 
 Type::Type(const type_info& t)
 	:
 	m_Type(t)
 {}
 
-bool Type::operator==(const Type& t) const noexcept
+bool Type::operator==(const Type& t) const
 {
 	return m_Type == t.m_Type;
 }
 
-bool Type::Equals(const Type& t) const noexcept
+bool Type::Equals(const Object* const b) const
 {
-	return m_Type == t.m_Type;
+	if (b == nullptr) return false;
+
+	if (const auto t = dynamic_cast<const Type*>(b))
+	{
+		return m_Type == t->m_Type;
+	}
+
+	throw ArgumentException("Arg_MustBeType");
+}
+
+bool Type::Equals(const Type* const t) const
+{
+	if (t == nullptr) return false;
+	return m_Type == t->m_Type;
 }
 
 bool Type::operator==(const type_info& t) const noexcept

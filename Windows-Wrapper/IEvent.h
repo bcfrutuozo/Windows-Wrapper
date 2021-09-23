@@ -1,11 +1,8 @@
 #pragma once
 
-#include "Object.h"
 #include "EventArgs.h"
 
-#include <string>
-
-class IEvent
+class IEvent : public Object
 {
 public:
 

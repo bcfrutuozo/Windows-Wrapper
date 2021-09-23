@@ -7,7 +7,7 @@
 #include <cassert>
 
 template<typename T>
-class Collection : public IList<T>, public Object
+class Collection : public IList<T>
 {
 private:
 
@@ -201,7 +201,7 @@ public:
 	{
 		if (index >= this->Count)
 		{
-			throw std::out_of_range("Invalid Enumerator range");
+			throw ArgumentOutOfRangeException("index");
 		}
 
 		Enumerator<T>* e = pNext->Begin;

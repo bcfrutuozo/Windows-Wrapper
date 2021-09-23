@@ -1,7 +1,6 @@
 #pragma once
 
 #include "IEquatable.h"
-#include "Point.h"
 
 struct SizeF;
 struct Point;
@@ -17,8 +16,9 @@ public:
 	Size(int width, int height);
 	Size(Point p);
 
-	inline bool operator==(const Size& s) const noexcept override;
-	inline bool Equals(const Size& s) const noexcept override;
+	inline bool operator==(const Size& s) const;
+	inline bool Equals(const Object* const obj) const override;
+	inline bool Equals(const Size* const s) const override;
 
 	const bool IsEmpty() const noexcept;
 	inline static Size Add(Size lhs, Size rhs) noexcept;
@@ -46,8 +46,9 @@ public:
 	SizeF(float width, float height);
 	SizeF(PointF p);
 
-	inline bool operator==(const SizeF& s) const noexcept override;
-	inline bool Equals(const SizeF& s) const noexcept override;
+	inline bool operator==(const SizeF& s) const;
+	inline bool Equals(const Object* const obj) const override;
+	inline bool Equals(const SizeF* const s) const override;
 
 	const bool IsEmpty() const noexcept;
 	inline static SizeF Add(SizeF lhs, SizeF rhs) noexcept;

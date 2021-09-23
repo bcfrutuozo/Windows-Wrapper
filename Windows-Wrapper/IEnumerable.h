@@ -1,9 +1,10 @@
 #pragma once
 
 #include "IEnumerator.h"
+#include "Exceptions.h"
 
 template<typename T>
-class IEnumerable
+class IEnumerable : public Object
 {
 public:
 

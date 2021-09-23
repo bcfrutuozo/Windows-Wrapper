@@ -1,32 +1,39 @@
 #include "Object.h"
 #include "ListItem.h"
 #include "Exceptions.h"
+#include "Type.h"
+#include "Guid.h"
 
-Object::Object() noexcept
-	:
-	m_UUID(uuids::uuid_system_generator{}())
-{
-
-}
-
-inline bool Object::operator==(const Object& b) const noexcept
+inline bool Object::operator==(const Object& b) const
 {
 	return *this == b;
 }
 
-inline bool Object::Equals(const Object& b) const noexcept
+inline bool Object::Equals(const Object* const b) const
 {
-	return *this == b;
+	if (b == nullptr) return false;
+	return *this == *b;
 }
 
-inline bool Object::Equals(const Object& lhs, const Object& rhs) noexcept
+inline bool Object::Equals(const Object* const lhs, const Object* const rhs)
 {
-	return lhs.Equals(rhs);
+	if (lhs == nullptr && rhs == nullptr) return true;
+	if (lhs == nullptr || rhs == nullptr) return false;
+
+	return lhs->Equals(rhs);
 }
 
-inline const std::string& Object::GetHashCode() const noexcept
+inline const int Object::GetHashCode() const noexcept
 {
-	return uuids::to_string(m_UUID);
+	auto guid = uuid_system_generator{}();
+
+	int ret = 0;
+	for (const auto& i : guid)
+	{
+		ret ^= i;
+	}
+
+	return ret;
 }
 
 inline const Type Object::GetType() const noexcept

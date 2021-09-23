@@ -3,7 +3,7 @@
 #include "Common.h"
 #include "IEquatable.h"
 
-struct IntPtr : IEquatable<IntPtr>
+struct IntPtr : public IEquatable<IntPtr>
 {
 private:
 
@@ -16,8 +16,9 @@ public:
 	IntPtr(void*);
 	virtual ~IntPtr();
 
-	bool operator==(const IntPtr& p) const noexcept override;
-	bool Equals(const IntPtr& p) const noexcept override;
+	bool operator==(const IntPtr& p) const;
+	bool Equals(const Object* const obj) const override;
+	bool Equals(const IntPtr* const p) const override;
 
 	int ToInt32() const noexcept;
 	long ToInt64() const noexcept;

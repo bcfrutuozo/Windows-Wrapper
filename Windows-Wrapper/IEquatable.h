@@ -1,8 +1,9 @@
 #pragma once
 
+#include "Object.h"
+
 template<class T>
-class IEquatable
+class IEquatable : public Object
 {
-	virtual bool operator==(const T& b) const noexcept = 0;
-	virtual bool Equals(const T& b) const noexcept = 0;
+	virtual bool Equals(const T* const b) const = 0;
 };

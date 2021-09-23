@@ -1,11 +1,12 @@
 #pragma once
 
+#include "Object.h"
 #include "IEquatable.h"
 
 #include <string>
 #include <typeinfo>
 
-class Type : public IEquatable<Type>
+class Type : public Object, public IEquatable<Type>
 {
 	friend class Object;
 
@@ -17,8 +18,9 @@ private:
 
 public:
 
-	bool operator==(const Type& t) const noexcept override;
-	bool Equals(const Type& t) const noexcept override;
+	bool operator==(const Type& t) const;
+	bool Equals(const Object* const b) const override;
+	bool Equals(const Type* const t) const override;
 	bool operator==(const type_info& t) const noexcept;
 	const std::string ToString() const noexcept;
 };

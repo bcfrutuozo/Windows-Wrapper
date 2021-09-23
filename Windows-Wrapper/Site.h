@@ -1,7 +1,9 @@
 #pragma once
 
 #include "ISite.h"
-#include "Container.h"
+
+class IComponent;
+class Container;
 
 class Site : public ISite
 {

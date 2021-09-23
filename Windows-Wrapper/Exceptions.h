@@ -2,6 +2,7 @@
 
 #include "ArgumentException.h"
 #include "ArgumentNullException.h"
+#include "ArgumentOutOfRangeException.h"
 #include "ControlException.h"
 #include "Exception.h"
 #include "InvalidOperationException.h"
@@ -28,6 +29,16 @@ ArgumentNullException(const std::string& message, Exception* const innerExceptio
 ArgumentNullException(const std::string& message, const std::string& param)
 **************************************************************************************************************************************/
 #define ArgumentNullException(...) ArgumentNullException(__LINE__, __FILE__, ##__VA_ARGS__)
+
+/**************************************************************************************************************************************
+ArgumentNullException macro translations:
+
+ArgumentNullException()
+ArgumentNullException(const std::string& param)
+ArgumentNullException(const std::string& message, Exception* const innerException)
+ArgumentNullException(const std::string& message, const std::string& param)
+**************************************************************************************************************************************/
+#define ArgumentOutOfRangeException(...) ArgumentOutOfRangeException(__LINE__, __FILE__, ##__VA_ARGS__)
 
 /**************************************************************************************************************************************
 ControlException macro translations:

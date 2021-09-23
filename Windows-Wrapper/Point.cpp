@@ -1,5 +1,6 @@
 #include "Point.h"
 #include "Size.h"
+#include "Exceptions.h"
 
 #define LOWORD(l)	((l) & 0xffff)
 #define HIWORD(l)   (((l) >> 16) & 0xffff)
@@ -28,14 +29,27 @@ Point::Point(Size size)
 
 }
 
-bool Point::operator==(const Point& p) const noexcept
+bool Point::operator==(const Point& p) const 
 {
 	return (X == p.X && Y == p.Y);
 }
 
-bool Point::Equals(const Point& p) const noexcept
+bool Point::Equals(const Object* const p) const
 {
-	return (X == p.X && Y == p.Y);
+	if (p == nullptr) return false;
+
+	if (const auto pt = dynamic_cast<const Point*>(p))
+	{
+		return *this == *pt;
+	}
+
+	throw ArgumentException("Arg_MustBePoint");
+}
+
+bool Point::Equals(const Point* const p) const 
+{
+	if (p == nullptr) return false;
+	return *this == *p;
 }
 
 const bool Point::IsEmpty() const noexcept
@@ -102,14 +116,27 @@ PointF::PointF(float x, float y)
 
 }
 
-bool PointF::operator==(const PointF& p) const noexcept
+bool PointF::operator==(const PointF& p) const
 {
 	return (X == p.X && Y == p.Y);
 }
 
-bool PointF::Equals(const PointF& p) const noexcept
+bool PointF::Equals(const Object* const p) const
 {
-	return (X == p.X && Y == p.Y);
+	if (p == nullptr) return false;
+
+	if (const auto pt = dynamic_cast<const PointF*>(p))
+	{
+		return *this == *pt;
+	}
+
+	throw ArgumentException("Arg_MustBePointF");
+}
+
+bool PointF::Equals(const PointF* const p) const
+{
+	if (p == nullptr) return false;
+	return *this == *p;
 }
 
 const bool PointF::IsEmpty() const noexcept

@@ -1,11 +1,11 @@
 #pragma once
 
-#include <string>
+#include "Object.h"
 
 class IComponent;
 class IContainer;
 
-class ISite
+class ISite : public Object
 {
 	friend class Container;
 

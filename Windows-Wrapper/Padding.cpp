@@ -1,4 +1,6 @@
 #include "Padding.h"
+#include "Size.h"
+#include "Exceptions.h"
 
 Padding::Padding(int padding) noexcept
 	:
@@ -20,14 +22,27 @@ Padding::Padding(int left, int top, int right, int bottom) noexcept
 
 }
 
-bool Padding::operator==(const Padding& p) const noexcept
+bool Padding::operator==(const Padding& p) const
 {
 	return Left == p.Left && Top == p.Top && Right == p.Right && Bottom == p.Bottom;
 }
 
-bool Padding::Equals(const Padding& p) const noexcept
+bool Padding::Equals(const Object* const p) const
 {
-	return Left == p.Left && Top == p.Top && Right == p.Right && Bottom == p.Bottom;
+	if (p == nullptr) return false;
+
+	if (const auto pad = dynamic_cast<const Padding*>(p))
+	{
+		return *this == *pad;
+	}
+
+	throw ArgumentException("Arg_MustBePadding");
+}
+
+bool Padding::Equals(const Padding* const s) const
+{
+	if (s == nullptr) return false;
+	return *this == *s;
 }
 
 Padding Padding::operator+(const Padding& p) noexcept

@@ -1,4 +1,5 @@
 #include "IntPtr.h"
+#include "Exceptions.h"
 
 IntPtr::IntPtr(int p)
 	:
@@ -26,14 +27,27 @@ IntPtr::~IntPtr()
 
 }
 
-bool IntPtr::operator==(const IntPtr& p) const noexcept
+bool IntPtr::operator==(const IntPtr& p) const
 {
 	return m_Ptr == p.m_Ptr;
 }
 
-bool IntPtr::Equals(const IntPtr& p) const noexcept
+bool IntPtr::Equals(const Object* const obj) const
 {
-	return m_Ptr == p.m_Ptr;
+	if (obj == nullptr) return false;
+
+	if (const auto pad = dynamic_cast<const IntPtr*>(obj))
+	{
+		return *this == *pad;
+	}
+
+	throw ArgumentException("Arg_MustBeIntPtr");
+}
+
+bool IntPtr::Equals(const IntPtr* const p) const
+{
+	if (p == nullptr) return false;
+	return *this == *p;
 }
 
 // Remove compile warnings regarding pointer conversions

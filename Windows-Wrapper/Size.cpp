@@ -1,5 +1,6 @@
 #include "Size.h"
 #include "Point.h"
+#include "Exceptions.h"
 
 #include <cassert>
 
@@ -20,19 +21,27 @@ Size::Size(Point p)
 
 }
 
-bool Size::operator==(const Size& s) const noexcept
+bool Size::operator==(const Size& s) const
 {
 	return (Width == s.Width && Height == s.Height);
 }
 
-bool Size::Equals(const Size& s) const noexcept
+bool Size::Equals(const Object* const s) const
 {
-	if (Width == s.Width && Height == s.Height)
+	if (s == nullptr) return false;
+
+	if (const auto sz = dynamic_cast<const Size*>(s))
 	{
-		return true;
+		return *this == *sz;
 	}
 
-	return false;
+	throw ArgumentException("Arg_MustBeSize");
+}
+
+bool Size::Equals(const Size* const s) const
+{
+	if (s == nullptr) return false;
+	return *this == *s;
 }
 
 const bool Size::IsEmpty() const noexcept
@@ -129,19 +138,27 @@ SizeF::SizeF(PointF p)
 
 }
 
-bool SizeF::operator==(const SizeF& s) const noexcept
+bool SizeF::operator==(const SizeF& s) const
 {
 	return (Width == s.Width && Height == s.Height);
 }
 
-bool SizeF::Equals(const SizeF& s) const noexcept
+bool SizeF::Equals(const Object* const s) const
 {
-	if (Width == s.Width && Height == s.Height)
+	if (s == nullptr) return false;
+
+	if (const auto sz = dynamic_cast<const SizeF*>(s))
 	{
-		return true;
+		return *this == *sz;
 	}
 
-	return false;
+	throw ArgumentException("Arg_MustBeSizeF");
+}
+
+bool SizeF::Equals(const SizeF* const s) const
+{
+	if (s == nullptr) return false;
+	return *this == *s;
 }
 
 const bool SizeF::IsEmpty() const noexcept

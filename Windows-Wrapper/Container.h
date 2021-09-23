@@ -1,9 +1,11 @@
 #pragma once
 
 #include "IContainer.h"
-#include "IComponent.h"
 
 #include <algorithm>
+
+class ISite;
+class IComponent;
 
 class Container : public IContainer
 {

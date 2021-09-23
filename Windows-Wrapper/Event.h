@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Object.h"
 #include "IEvent.h"
 
 #include <functional>
@@ -8,7 +7,7 @@
 class Component;
 
 template<typename TArgs>
-class Event : public IEvent, public Object
+class Event : public IEvent
 {
 private:
 

@@ -1,4 +1,5 @@
 #include "ArgumentException.h"
+#include <sstream>
 
 ArgumentException::ArgumentException(int line, const char* file) noexcept
 	:

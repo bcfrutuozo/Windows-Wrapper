@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Object.h"
+#include "CommonObject.h"
 #include "IComponent.h"
 #include "EventDispatcher.h"
 
-class Component : public Object, public IComponent
+class Component : public IComponent
 {
 	friend class WinAPI;
 	friend class Control;

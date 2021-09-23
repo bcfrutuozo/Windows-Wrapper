@@ -1,6 +1,6 @@
 #include "ArgumentOutOfRangeException.h"
 
-
+#include <sstream>
 
 ArgumentOutOfRangeException::ArgumentOutOfRangeException(int line, const char* file) noexcept
 	:

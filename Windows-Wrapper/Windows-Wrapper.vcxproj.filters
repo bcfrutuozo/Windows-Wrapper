@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Object.cpp" />
     <ClCompile Include="Control.cpp" />
     <ClCompile Include="dxerr.cpp" />
     <ClCompile Include="DXGIInfoManager.cpp" />
@@ -9,10 +8,7 @@
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="Mathlib.cpp" />
     <ClCompile Include="Mouse.cpp" />
-    <ClCompile Include="Point.cpp" />
-    <ClCompile Include="Size.cpp" />
     <ClCompile Include="Timer.cpp" />
-    <ClCompile Include="Type.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="WinMain.cpp" />
     <ClCompile Include="Menu.cpp">
@@ -53,7 +49,6 @@
     <ClCompile Include="MessageMapper.cpp" />
     <ClCompile Include="TextBox.cpp" />
     <ClCompile Include="WinAPI.cpp" />
-    <ClCompile Include="Padding.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="ProgressBar.cpp" />
     <ClCompile Include="TestUserApplication.cpp" />
@@ -78,21 +73,57 @@
     <ClCompile Include="VerticalScrollBar.cpp" />
     <ClCompile Include="HorizontalScrollBar.cpp" />
     <ClCompile Include="WindowClass.cpp" />
-    <ClCompile Include="ArgumentException.cpp" />
-    <ClCompile Include="ArgumentNullException.cpp" />
-    <ClCompile Include="ArgumentOutOfRangeException.cpp" />
-    <ClCompile Include="InvalidOperationException.cpp" />
-    <ClCompile Include="NotImplementedException.cpp" />
-    <ClCompile Include="NotSupportedException.cpp" />
-    <ClCompile Include="SystemException.cpp" />
-    <ClCompile Include="Exception.cpp" />
-    <ClCompile Include="IntPtr.cpp" />
-    <ClCompile Include="ControlException.cpp" />
+    <ClCompile Include="ArgumentException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="ArgumentNullException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="ArgumentOutOfRangeException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="ControlException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="InvalidOperationException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="NotImplementedException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="NotSupportedException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="Exception.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="IntPtr.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
+    <ClCompile Include="Type.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
+    <ClCompile Include="Object.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
+    <ClCompile Include="Color.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
+    <ClCompile Include="Point.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
+    <ClCompile Include="Size.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
+    <ClCompile Include="Padding.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RealTimeApplication.h" />
-    <ClInclude Include="Object.h" />
-    <ClInclude Include="Color.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="Control.h" />
     <ClInclude Include="dxerr.h" />
@@ -101,11 +132,7 @@
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Mathlib.h" />
     <ClInclude Include="Mouse.h" />
-    <ClInclude Include="Point.h" />
-    <ClInclude Include="Size.h" />
     <ClInclude Include="Timer.h" />
-    <ClInclude Include="Type.h" />
-    <ClInclude Include="uuid.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="IHandle.h">
       <Filter>Interfaces</Filter>
@@ -158,9 +185,6 @@
     <ClInclude Include="MenuEntryIconItem.h">
       <Filter>Menu</Filter>
     </ClInclude>
-    <ClInclude Include="IActivable.h">
-      <Filter>Interfaces</Filter>
-    </ClInclude>
     <ClInclude Include="Button.h" />
     <ClInclude Include="WinAPI.h" />
     <ClInclude Include="KeyEventHandler.h">
@@ -200,7 +224,6 @@
     </ClInclude>
     <ClInclude Include="Keys.h" />
     <ClInclude Include="MouseButtons.h" />
-    <ClInclude Include="Padding.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="ProgressBar.h" />
     <ClInclude Include="TestUserApplication.h" />
@@ -228,11 +251,7 @@
     <ClInclude Include="EventDispatcher.h">
       <Filter>Events</Filter>
     </ClInclude>
-    <ClInclude Include="Collection.h" />
     <ClInclude Include="IEnumerator.h">
-      <Filter>Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="ICollection.h">
       <Filter>Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="IEnumerable.h">
@@ -243,9 +262,6 @@
     <ClInclude Include="FlatButtonAppearance.h" />
     <ClInclude Include="MenuStrip.h" />
     <ClInclude Include="ListControl.h" />
-    <ClInclude Include="IList.h">
-      <Filter>Interfaces</Filter>
-    </ClInclude>
     <ClInclude Include="ConvertEventArgs.h">
       <Filter>Events</Filter>
     </ClInclude>
@@ -264,25 +280,86 @@
     <ClInclude Include="VerticalScrollBar.h" />
     <ClInclude Include="HorizontalScrollBar.h" />
     <ClInclude Include="WindowClass.h" />
-    <ClInclude Include="ArgumentNullException.h" />
-    <ClInclude Include="ArgumentOutOfRangeException.h" />
-    <ClInclude Include="DateTime.h" />
-    <ClInclude Include="Decimal.h" />
-    <ClInclude Include="Double.h" />
-    <ClInclude Include="Exceptions.h" />
-    <ClInclude Include="ControlException.h" />
-    <ClInclude Include="ArgumentException.h" />
-    <ClInclude Include="IComparable.h" />
-    <ClInclude Include="IConvertible.h" />
-    <ClInclude Include="IFormatProvider.h" />
-    <ClInclude Include="InvalidOperationException.h" />
-    <ClInclude Include="NotImplementedException.h" />
-    <ClInclude Include="NotSupportedException.h" />
-    <ClInclude Include="SystemException.h" />
-    <ClInclude Include="Exception.h" />
-    <ClInclude Include="IntPtr.h" />
     <ClInclude Include="TypeCode.h" />
-    <ClInclude Include="ValueType.h" />
+    <ClInclude Include="CommonObject.h" />
+    <ClInclude Include="ArgumentException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="ArgumentNullException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="ArgumentOutOfRangeException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="ControlException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="InvalidOperationException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="NotImplementedException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="NotSupportedException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Exception.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Exceptions.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Guid.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="IntPtr.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="IConvertible.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Type.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Object.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="ValueType.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Int32.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="IFormatProvider.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IComparable.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Collection.h">
+      <Filter>Data Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="IList.h">
+      <Filter>Data Structures\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="ICollection.h">
+      <Filter>Data Structures\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Color.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Point.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Size.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Padding.h">
+      <Filter>Types</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interfaces">
@@ -299,6 +376,12 @@
     </Filter>
     <Filter Include="Data Structures\Interfaces">
       <UniqueIdentifier>{c6fc4e61-1c7b-41ed-8540-d33500d2d738}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Exceptions">
+      <UniqueIdentifier>{6f1d37e5-9c69-4839-8349-e691f6183d5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Types">
+      <UniqueIdentifier>{479a7048-42b5-4d27-832b-e8f61663b546}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

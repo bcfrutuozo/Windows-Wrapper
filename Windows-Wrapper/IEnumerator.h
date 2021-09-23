@@ -3,7 +3,7 @@
 #include "Object.h"
 
 template<typename T>
-class IEnumerator
+class IEnumerator : public Object
 {
 public:
 

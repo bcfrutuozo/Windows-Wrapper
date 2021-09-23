@@ -1,6 +1,8 @@
 #pragma once
 
-class IDisposable
+#include "Object.h"
+
+class IDisposable : public Object
 {
 public:
 

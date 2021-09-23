@@ -42,14 +42,8 @@
 //#define NOTAPE
 #endif
 
-// Globalize IntPtr.h struct
-#include "IntPtr.h"
-
 // Globalize Enums inclusion
 #include "Enums.h"
-
-// Utility functions inclusion
-#include "Utilities.h"
 
 #pragma warning(disable:4265)
 #include <wrl.h>
@@ -62,7 +56,11 @@
 using namespace Microsoft::WRL;
 using namespace DirectX;
 using namespace DirectX::PackedVector;
-static const XMFLOAT4X4 IDENTITYMATRIX = XMFLOAT4X4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+
+static const XMFLOAT4X4 IDENTITYMATRIX = XMFLOAT4X4(1, 0, 0, 0,
+													0, 1, 0, 0, 
+													0, 0, 1, 0, 
+													0, 0, 0, 1);
 
 
 //#define HIDWORD(dw, hw) LOWORD(dw) | (hw << 16)
@@ -77,5 +75,8 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 #pragma comment(lib, "comctl32.lib")
 
+#include <string>
+#include <sstream>
+#include <iomanip>
 #include <Windows.h>
 #include <Commctrl.h>

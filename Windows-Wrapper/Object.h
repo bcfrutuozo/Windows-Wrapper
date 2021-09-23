@@ -1,32 +1,20 @@
 #pragma once
 
-#include "Type.h"
-#include "uuid.h"
+#include "Common.h"
 
-#include <string>
-
+class Type;
 class ListItem;
 
-class Object : public IEquatable<Object>
+class Object
 {
-private:
-
-	uuids::uuid m_UUID;
-
 public:
 
-	Object() noexcept;
-	Object(const Object&) = default;			// Copy constructor
-	Object(Object&&) = default;					// Move constructor
-	Object& operator=(const Object&) = default;	// Copy assignment constructor
-	Object& operator=(Object&&) = default;		// Move assignment constructor
-	virtual ~Object() = default;				// Destructor
+	constexpr Object() = default;
 
-	virtual bool operator==(const Object& b) const noexcept override;
-	virtual bool Equals(const Object& b) const noexcept override;
-
-	bool static Equals(const Object& lhs, const Object& rhs) noexcept;
-	inline const std::string& GetHashCode() const noexcept;
+	virtual bool operator==(const Object& b) const;
+	virtual bool Equals(const Object* const b) const;
+	bool static Equals(const Object* const lhs, const Object* const rhs);
+	inline const int GetHashCode() const noexcept;
 	inline const Type GetType() const noexcept;
 	const bool ReferenceEquals(const Object& b) const noexcept;
 	inline virtual const std::string ToString() const noexcept;

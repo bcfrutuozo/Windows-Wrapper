@@ -1,5 +1,6 @@
 #include "Container.h"
 #include "Site.h"
+#include "IComponent.h"
 #include "Utilities.h"
 
 void Container::Remove(IComponent* component, bool preserveSite)

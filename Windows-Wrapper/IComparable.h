@@ -1,10 +1,12 @@
 #pragma once
 
+#include "Object.h"
+
 template<typename T>
-class IComparable
+class IComparable : public Object
 {
 public:
 
-	virtual int CompareTo(Object* const b) const = 0;
-	virtual int CompareTo(const T& b) const noexcept = 0;
+	virtual int CompareTo(const Object* const b) const = 0;
+	virtual int CompareTo(const T* const b) const = 0;
 };
