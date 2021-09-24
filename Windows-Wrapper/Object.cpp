@@ -10,7 +10,7 @@ inline bool Object::Equals(const Object* const b) const
 	return *this == *b;
 }
 
-inline int Object::GetHashCode() const noexcept
+inline int Object::GetHashCode() const
 {
 	auto guid = uuid_system_generator{}();
 

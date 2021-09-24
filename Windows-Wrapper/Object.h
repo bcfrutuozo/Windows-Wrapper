@@ -23,7 +23,7 @@ public:
 	}
 
 	virtual bool Equals(const Object* const b) const;
-	inline virtual int GetHashCode() const noexcept;
+	inline virtual int GetHashCode() const;
 	inline const Type GetType() const noexcept;
 	inline virtual const std::string ToString() const noexcept;
 	virtual ListItem ToListItem() const noexcept;

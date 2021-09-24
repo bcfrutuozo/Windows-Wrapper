@@ -74,6 +74,7 @@ struct Color : public IEquatable<Color>
 	static constexpr Color Window() { return Color(255, 255, 255, 255); }
 	static constexpr Color WindowText() { return Color(0, 0, 0, 255); }
 
+	int GetHashCode() const override;
 	inline bool Equals(const Object* const c) const override;
 	inline bool Equals(const Color* const c) const override;
 	inline bool operator==(const Color& c) const;

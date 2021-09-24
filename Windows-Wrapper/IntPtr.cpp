@@ -26,7 +26,7 @@ int IntPtr::CompareTo(const IntPtr* const b) const
 	return 0;
 }
 
-int IntPtr::GetHashCode() const noexcept
+int IntPtr::GetHashCode() const
 {
 	return static_cast<int>(m_Ptr);
 }

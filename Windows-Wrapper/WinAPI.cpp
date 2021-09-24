@@ -3,6 +3,10 @@
 #include "WinAPI.h"
 #include "Application.h"
 
+// Includes for ::_TrackMouseEvent function
+#pragma comment(lib, "comctl32.lib")
+#include <Commctrl.h>
+
 unsigned int WinAPI::m_CurrentIndex = 1;
 IntPtr WinAPI::m_OpenedControl = nullptr;
 

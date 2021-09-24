@@ -127,6 +127,18 @@
     <ClCompile Include="Boolean.cpp">
       <Filter>Types</Filter>
     </ClCompile>
+    <ClCompile Include="StringWrapper.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
+    <ClCompile Include="Char.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
+    <ClCompile Include="Byte.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
+    <ClCompile Include="Int16.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RealTimeApplication.h" />
@@ -333,9 +345,6 @@
     <ClInclude Include="Object.h">
       <Filter>Types</Filter>
     </ClInclude>
-    <ClInclude Include="ValueTypeTraits.h">
-      <Filter>Types</Filter>
-    </ClInclude>
     <ClInclude Include="Int32.h">
       <Filter>Types</Filter>
     </ClInclude>
@@ -367,6 +376,27 @@
       <Filter>Types</Filter>
     </ClInclude>
     <ClInclude Include="Boolean.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="StringWrapper.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Convert.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="TypesInclude.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Char.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Byte.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Primitives.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Int16.h">
       <Filter>Types</Filter>
     </ClInclude>
   </ItemGroup>

@@ -104,7 +104,7 @@ public:
 #endif
 	}
 
-	int GetHashCode() const noexcept override;
+	int GetHashCode() const override;
 	int CompareTo(const Object* const obj) const override;
 	int CompareTo(const IntPtr* const b) const override;
 	bool Equals(const Object* const obj) const override;

@@ -5,7 +5,9 @@
 #include "TypeCode.h"
 
 class Boolean;
+class Int16;
 class Int32;
+class String;
 
 class IConvertible : public Object
 {
@@ -17,7 +19,7 @@ public:
 //	virtual Char ToChar(IFormatProvider* provider) const = 0;
 //	virtual SByte ToSByte(IFormatProvider* provider) const = 0;
 //	virtual Byte ToByte(IFormatProvider* provider) const = 0;
-//	virtual Int16 ToInt16(IFormatProvider* provider) const = 0;
+	virtual Int16 ToInt16(IFormatProvider* provider) const = 0;
 //	virtual UInt16 ToUInt16(IFormatProvider* provider) const = 0;
 	virtual Int32 ToInt32(IFormatProvider* provider) const = 0;
 //	virtual UInt32 ToUInt32(IFormatProvider* provider) const = 0;

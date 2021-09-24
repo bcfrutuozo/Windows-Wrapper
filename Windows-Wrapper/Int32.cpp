@@ -1,8 +1,57 @@
 #include "Int32.h"
+#include "Int16.h"
 #include "Boolean.h"
 #include "Exceptions.h"
 
-inline int Int32::GetHashCode() const noexcept
+// Int32::Int32(const Char& value) noexcept
+// :
+//	Primitive(value.Get())
+//{
+//
+//}
+// Int32::Int32(const SByte& value) noexcept
+// :
+//Primitive(value.Get())
+//{
+//
+//}
+// Int32::Int32(const Byte& value) noexcept
+// :
+//Primitive(value.Get())
+//{
+//
+//}
+// Int32::Int32(const Int16& value) noexcept
+//:
+//Primitive(value.Get())
+//{
+//
+//}
+//Int32::Int32(const Int64& value) noexcept
+// :
+//Primitive(value.Get())
+//{
+//
+//}
+//Int32::Int32(const Single& value) noexcept
+// :
+//Primitive(value.Get())
+//{
+//
+//}
+//Int32::Int32(const Double& value) noexcept
+//:
+//Primitive(value.Get())
+//{
+//
+//}
+
+//Int32 Int32::operator+(Boolean const& other) const noexcept
+//{
+//	return Boolean(m_value + other.Get());
+//}
+
+inline int Int32::GetHashCode() const
 {
 	return m_value;
 }
@@ -36,8 +85,8 @@ int Int32::CompareTo(const Int32* const value) const
 {
 	if (value == nullptr) return 1;
 
-	if (m_value < *value) return -1;
-	if (m_value > *value) return 1;
+	if (m_value < value->Get()) return -1;
+	if (m_value > value->Get()) return 1;
 
 	return 0;
 }
@@ -70,6 +119,11 @@ Boolean Int32::ToBoolean(IFormatProvider* provider) const
 {
 	//TODO:: CONVERT INT32 TO BOOLEAN
 	return false;
+}
+
+Int16 Int32::ToInt16(IFormatProvider* provider) const
+{
+	return 0;
 }
 
 Int32 Int32::ToInt32(IFormatProvider* provider) const

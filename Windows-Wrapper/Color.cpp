@@ -21,6 +21,13 @@ void Color::SetA(uint8_t value)
 	*this = Color(GetR(), GetG(), GetB(), value);
 }
 
+int Color::GetHashCode() const
+{
+	int tmp;
+	std::memcpy(&tmp, &rgba, sizeof(tmp));
+	return tmp;
+}
+
 inline bool Color::Equals(const Object* const c) const
 {
 	if (c == nullptr) return c;
