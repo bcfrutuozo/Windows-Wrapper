@@ -304,6 +304,7 @@ public:
 	//OVERRIDE OBJECT TO STRING inline const std::string ToString() const noexcept;
 	//inline String ToString() const noexcept override;
 	Boolean ToBoolean(IFormatProvider* provider) const override;
+	Char ToChar(IFormatProvider* provider) const override;
 	Int16 ToInt16(IFormatProvider* provider) const override;
 	Int32 ToInt32(IFormatProvider* provider) const override;
 
@@ -312,6 +313,7 @@ public:
 	static constexpr Int32 MinValue() { return Int32(static_cast<int>(0x80000000)); }
 };
 
+// Operators for operations with fundamental types as first parameters
 template<typename T, typename = std::enable_if_t<std::is_fundamental<T>::value>>
 constexpr Int32 operator+(T const& lhs, Int32 const& rhs) noexcept
 {

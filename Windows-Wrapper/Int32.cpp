@@ -1,6 +1,7 @@
 #include "Int32.h"
-#include "Int16.h"
 #include "Boolean.h"
+#include "Char.h"
+#include "Int16.h"
 #include "Exceptions.h"
 
 inline int Int32::GetHashCode() const
@@ -22,7 +23,7 @@ int Int32::CompareTo(const Object* const obj) const
 		return 0;
 	}
 
-	if (const auto value = (int32_t*)(obj))
+	if (const auto value = (int*)(obj))
 	{
 		if (m_value < *value) return -1;
 		if (m_value > *value) return 1;
@@ -52,7 +53,7 @@ bool Int32::Equals(const Object* const obj) const
 		return Get() == value->Get();
 	}
 
-	if (const auto value = (int32_t*)(obj))
+	if (const auto value = (int*)(obj))
 	{
 		return Get() == *value;
 	}
@@ -71,6 +72,11 @@ Boolean Int32::ToBoolean(IFormatProvider* provider) const
 {
 	//TODO:: CONVERT INT32 TO BOOLEAN
 	return false;
+}
+
+Char Int32::ToChar(IFormatProvider* provider) const
+{
+	return Char();
 }
 
 Int16 Int32::ToInt16(IFormatProvider* provider) const

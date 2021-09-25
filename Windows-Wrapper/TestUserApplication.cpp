@@ -170,10 +170,10 @@ void TestUserApplication::Initialize()
     assert(bitxor_self.Get() == 5);
     //
     //// Implicit conversions
-    //constexpr Short schar2shortconv(SChar::from(12));
-    //static_assert(schar2shortconv.get() == 12, "A signed char was not converted to a short.");
-    //constexpr UShort uchar2ushortconv(UChar::from(12u));
-    //static_assert(uchar2ushortconv.get() == 12, "An unsigned char was not converted to an unsigned short.");
+    constexpr Int16 schar2shortconv(SByte::From(12));
+    static_assert(schar2shortconv.Get() == 12, "A signed char was not converted to a short.");
+    constexpr UInt16 uchar2ushortconv(Byte::From(12u));
+    static_assert(uchar2ushortconv.Get() == 12, "An unsigned char was not converted to an unsigned short.");
     //
     //constexpr Int schar2intconv(SChar::from(12));
     //static_assert(schar2intconv.get() == 12, "A signed char was not converted to an int.");

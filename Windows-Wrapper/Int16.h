@@ -306,6 +306,7 @@ public:
 	//OVERRIDE OBJECT TO STRING inline const std::string ToString() const noexcept;
 	//inline String ToString() const noexcept override;
 	Boolean ToBoolean(IFormatProvider* provider) const override;
+	Char ToChar(IFormatProvider* provider) const override;
 	Int16 ToInt16(IFormatProvider* provider) const override;
 	Int32 ToInt32(IFormatProvider* provider) const override;
 

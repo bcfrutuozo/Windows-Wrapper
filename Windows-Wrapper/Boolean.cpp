@@ -1,6 +1,7 @@
 #include "Boolean.h"
-#include "Int32.h"
+#include "Char.h"
 #include "Int16.h"
+#include "Int32.h"
 #include "Exceptions.h"
 
 inline int Boolean::GetHashCode() const
@@ -49,7 +50,7 @@ bool Boolean::Equals(const Object* const obj) const
 		return Get() == value->Get();
 	}
 
-	if (const auto value = (int32_t*)(obj))
+	if (const auto value = (bool*)(obj))
 	{
 		return Get() == *value;
 	}
@@ -67,6 +68,11 @@ bool Boolean::Equals(const Boolean* const b) const
 Boolean Boolean::ToBoolean(IFormatProvider* provider) const
 {
 	return Boolean(m_value);
+}
+
+Char Boolean::ToChar(IFormatProvider* provider) const
+{
+	return Char();
 }
 
 Int16 Boolean::ToInt16(IFormatProvider* provider) const
