@@ -3,54 +3,6 @@
 #include "Boolean.h"
 #include "Exceptions.h"
 
-// Int32::Int32(const Char& value) noexcept
-// :
-//	Primitive(value.Get())
-//{
-//
-//}
-// Int32::Int32(const SByte& value) noexcept
-// :
-//Primitive(value.Get())
-//{
-//
-//}
-// Int32::Int32(const Byte& value) noexcept
-// :
-//Primitive(value.Get())
-//{
-//
-//}
-// Int32::Int32(const Int16& value) noexcept
-//:
-//Primitive(value.Get())
-//{
-//
-//}
-//Int32::Int32(const Int64& value) noexcept
-// :
-//Primitive(value.Get())
-//{
-//
-//}
-//Int32::Int32(const Single& value) noexcept
-// :
-//Primitive(value.Get())
-//{
-//
-//}
-//Int32::Int32(const Double& value) noexcept
-//:
-//Primitive(value.Get())
-//{
-//
-//}
-
-//Int32 Int32::operator+(Boolean const& other) const noexcept
-//{
-//	return Boolean(m_value + other.Get());
-//}
-
 inline int Int32::GetHashCode() const
 {
 	return m_value;

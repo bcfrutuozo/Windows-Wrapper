@@ -20,7 +20,7 @@ void TestUserApplication::Initialize()
 {    
     auto e = std::to_string((int)sizeof(Object));
     printf_s(e.c_str());
-    //static_assert(sizeof(Int32) == sizeof(int), "The wrapper has overhead.");
+
     //
     //// Verify the underlying type is exposed by the value_type member.
     static_assert(std::is_same<int, typename Int32::value_type >::value, "Value type not exposed.");
@@ -262,9 +262,9 @@ void TestUserApplication::Initialize()
     //static_assert(double2float.get() == 12, "A double was not converted explicitly to a float.");
     //
     //// Binary Operators
-    //static_assert((Int(1) + 1).get() == 2, "Binary + failed.");
-    //static_assert((1 + Int(1)).get() == 2, "Binary + failed.");
-    //static_assert((Int(1) + Int(1)).get() == 2, "Binary + failed.");
+    static_assert((Int32(1) + 1).Get() == 2, "Binary + failed.");
+    static_assert((1 + Int32(1)).Get() == 2, "Binary + failed.");
+    static_assert((Int32(1) + Int32(1)).Get() == 2, "Binary + failed.");
     //
     //static_assert((Int(2) - 1).get() == 1, "Binary - failed.");
     //static_assert((2 - Int(1)).get() == 1, "Binary - failed.");
@@ -388,38 +388,38 @@ void TestUserApplication::Initialize()
 
 
 
-	//Window* window = new Window("Teste", 1000, 1000);
-	//window->GetMouse().EnableRaw();
-	//window->GetKeyboard().DisableAutorepeat();
+	Window* window = new Window("Teste", 1000, 1000);
+	window->GetMouse().EnableRaw();
+	window->GetKeyboard().DisableAutorepeat();
 	//
-	//auto lb = window->AddListBox(260, 240, 450, 50);
+	auto lb = window->AddListBox(260, 240, 450, 50);
 	//
-	//auto list = new ListItemCollection(lb);
-	//for (size_t i = 0; i < 1000; ++i)
-	//{
-	//	std::ostringstream oss;
-	//	oss << "Item: " << i;
-	//	list->Add(new ListItem(i, oss.str()));
-	//}
-	//lb->SetDataSource(list);
-	//auto f = lb->GetFont();
-	//f.SetStyle(FontStyle::Italic);
-	//f.SetSize(14);
-	//lb->SetFont(f);
-	//lb->SetBorderStyle(BorderStyle::Fixed3D);
-	////lb->EnableMultiColumn();
-	//lb->SetColumnWidth(180);
+	auto list = new ListItemCollection(lb);
+	for (size_t i = 0; i < 1000; ++i)
+	{
+		std::ostringstream oss;
+		oss << "Item: " << i;
+		list->Add(new ListItem(i, oss.str()));
+	}
+	lb->SetDataSource(list);
+	auto f = lb->GetFont();
+	f.SetStyle(FontStyle::Italic);
+	f.SetSize(14);
+	lb->SetFont(f);
+	lb->SetBorderStyle(BorderStyle::Fixed3D);
+	//lb->EnableMultiColumn();
+	lb->SetColumnWidth(180);
 	//
-	//auto cb = window->AddComboBox("Start Text", 260, 450, 450);
-	//// Double list to check for memory leak during DataSource rebinding
-	//auto list2 = new ListItemCollection(lb);
-	//for (size_t i = 0; i < 5; ++i)
-	//{
-	//	std::ostringstream oss;
-	//	oss << "Item: " << i;
-	//	list2->Add(new ListItem(i, oss.str()));
-	//}
-	//cb->SetDataSource(list2);
+	auto cb = window->AddComboBox("Start Text", 260, 450, 450);
+	// Double list to check for memory leak during DataSource rebinding
+	auto list2 = new ListItemCollection(lb);
+	for (size_t i = 0; i < 5; ++i)
+	{
+		std::ostringstream oss;
+		oss << "Item: " << i;
+		list2->Add(new ListItem(i, oss.str()));
+	}
+	cb->SetDataSource(list2);
 	//
 	////auto t1 = window->AddComboBox("ComboBox", 300, 120, 120);
 	////window2->AddButton("Teste", 250, 250, 125, 125);
