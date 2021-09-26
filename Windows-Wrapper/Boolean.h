@@ -11,15 +11,18 @@ class Boolean final : public Primitive<bool>, public IComparable<Boolean>, publi
 public:
 
 	constexpr Boolean() noexcept : Primitive() {}
-	constexpr Boolean(const bool& value) noexcept : Primitive(value) { }
-	constexpr Boolean(const Boolean& value) noexcept : Primitive(value.Get()) {	}
+	
+	template<typename U, typename = std::enable_if_t<std::is_fundamental<U>::value>>
+	constexpr Boolean(const U& value) noexcept : Primitive(value) {}
+	
+	template<typename U>
+	constexpr Boolean(const Primitive<U>& value) noexcept : Primitive(value) { }
+
+	constexpr Boolean(const Boolean& value) noexcept : Primitive(value) { }
 
 	Boolean(Boolean&&) = default;
 	Boolean& operator=(Boolean const&) = default;
 	Boolean& operator=(Boolean&&) = default;
-
-	template<typename U, typename = std::enable_if_t<is_conversion<U, bool>::value>>
-	constexpr static Boolean From(U const& other) noexcept { return Boolean(U(other)); }
 
 	constexpr Boolean const& operator+() const noexcept { return *this; }
 	constexpr bool operator!() const noexcept { return !m_value; }
@@ -217,58 +220,60 @@ public:
 
 	// Operators with Primitives<U> type
 	template<typename U>
-	constexpr Boolean operator+(Primitive<U> const& other) const noexcept { return Boolean(other.Get() + m_value); }
+	constexpr Boolean operator+(Primitive<U> const& other) const noexcept { return Boolean(m_value + other.Get()); }
 
 	template<typename U>
-	constexpr Boolean operator-(Primitive<U> const& other) const noexcept { return Boolean(other.Get() - m_value); }
+	constexpr Boolean operator-(Primitive<U> const& other) const noexcept { return Boolean(m_value - other.Get()); }
 
 	template<typename U>
-	constexpr Boolean operator*(Primitive<U> const& other) const noexcept { return Boolean(other.Get() * m_value); }
+	constexpr Boolean operator*(Primitive<U> const& other) const noexcept { return Boolean(m_value * other.Get()); }
 
 	template<typename U>
-	constexpr Boolean operator/(Primitive<U> const& other) const noexcept { return Boolean(other.Get() / m_value); }
+	constexpr Boolean operator/(Primitive<U> const& other) const noexcept { return Boolean(m_value / other.Get()); }
 
 	template<typename U>
-	constexpr Boolean operator%(Primitive<U> const& other) const noexcept { return Boolean(other.Get() % m_value); }
+	constexpr Boolean operator%(Primitive<U> const& other) const noexcept { return Boolean(m_value % other.Get()); }
 
 	template<typename U>
-	constexpr Boolean operator&(Primitive<U> const& other) const noexcept { return Boolean(other.Get() & m_value); }
+	constexpr Boolean operator&(Primitive<U> const& other) const noexcept { return Boolean(m_value & other.Get()); }
 
 	template<typename U>
-	constexpr Boolean operator|(Primitive<U> const& other) const noexcept { return Boolean(other.Get() | m_value); }
+	constexpr Boolean operator|(Primitive<U> const& other) const noexcept { return Boolean(m_value | other.Get()); }
 
 	template<typename U>
-	constexpr Boolean operator^(Primitive<U> const& other) const noexcept { return Boolean(other.Get() ^ m_value); }
+	constexpr Boolean operator^(Primitive<U> const& other) const noexcept { return Boolean(m_value ^ other.Get()); }
 
 	template<typename U>
-	constexpr Boolean operator<<(Primitive<U> const& other) const noexcept { return Boolean(other.Get() << m_value); }
+	constexpr Boolean operator<<(Primitive<U> const& other) const noexcept { return Boolean(m_value << other.Get()); }
 
 	template<typename U>
-	constexpr Boolean operator>>(Primitive<U> const& other) const noexcept { return Boolean(other.Get() >> m_value); }
+	constexpr Boolean operator>>(Primitive<U> const& other) const noexcept { return Boolean(m_value >> other.Get()); }
 
 	template<typename U>
-	constexpr Boolean operator==(Primitive<U> const& other) const noexcept { return Boolean(other.Get() == m_value); }
+	constexpr Boolean operator==(Primitive<U> const& other) const noexcept { return Boolean(m_value == other.Get()); }
 
 	template<typename U>
-	constexpr Boolean operator!=(Primitive<U> const& other) const noexcept { return Boolean(other.Get() = !m_value); }
+	constexpr Boolean operator!=(Primitive<U> const& other) const noexcept { return Boolean(m_value != other.Get()); }
 
 	template<typename U>
-	constexpr Boolean operator<(Primitive<U> const& other) const noexcept { return Boolean(other.Get() < m_value); }
+	constexpr Boolean operator<(Primitive<U> const& other) const noexcept { return Boolean(m_value < other.Get()); }
 
 	template<typename U>
-	constexpr Boolean operator<=(Primitive<U> const& other) const noexcept { return Boolean(other.Get() <= m_value); }
+	constexpr Boolean operator<=(Primitive<U> const& other) const noexcept { return Boolean(m_value <= other.Get()); }
 
 	template<typename U>
-	constexpr Boolean operator>(Primitive<U> const& other) const noexcept { return Boolean(other.Get() > m_value); }
+	constexpr Boolean operator>(Primitive<U> const& other) const noexcept { return Boolean(m_value > other.Get()); }
 
 	template<typename U>
-	constexpr Boolean operator>=(Primitive<U> const& other) const noexcept { return Boolean(other.Get() >= m_value); }
+	constexpr Boolean operator>=(Primitive<U> const& other) const noexcept { return Boolean(m_value >= other.Get()); }
 
 	// Output/input stream operator
 	friend std::istream& operator>>(std::istream& lhs, Boolean& const rhs) { return lhs >> rhs.m_value; }
 	friend std::ostream& operator<<(std::ostream& lhs, Boolean& const rhs) { return lhs << rhs.m_value; }
 
 	// Logical AND/OR operators (Boolean exclusive)
+	constexpr bool operator&&(bool const& other) noexcept { return m_value && other; }
+	constexpr bool operator||(bool const& other) noexcept { return m_value || other; }
 	constexpr bool operator&&(Boolean const& other) noexcept { return m_value && other.Get(); }
 	constexpr bool operator||(Boolean const& other) noexcept { return m_value || other.Get(); }
 
@@ -283,7 +288,9 @@ public:
 	//inline String ToString() const noexcept override;
 	Boolean ToBoolean(IFormatProvider* provider) const override;
 	Char ToChar(IFormatProvider* provider) const override;
+	Byte ToByte(IFormatProvider* provider) const override;
 	Int16 ToInt16(IFormatProvider* provider) const override;
+	UInt16 ToUInt16(IFormatProvider* provider) const override;
 	Int32 ToInt32(IFormatProvider* provider) const override;
 
 	// Exposed expressions
@@ -307,7 +314,7 @@ constexpr Boolean operator-(T const& lhs, Boolean const& rhs) noexcept
 template<typename T, typename = std::enable_if_t<std::is_fundamental<T>::value>>
 constexpr Boolean operator*(T const& lhs, Boolean const& rhs) noexcept
 {
-	return Boolean(lhs - rhs.Get());
+	return Boolean(lhs * rhs.Get());
 }
 
 template<typename T, typename = std::enable_if_t<std::is_fundamental<T>::value>>
@@ -364,26 +371,26 @@ constexpr bool operator!=(T const& lhs, Boolean const& rhs) noexcept
 	return lhs != rhs.Get();
 }
 
-template<typename T, typename = std::enable_if_t<std::is_fundamental<T>::value>>
-constexpr bool operator<(T const& lhs, Boolean const& rhs) noexcept
+template<typename T>
+constexpr bool operator<(T const& lhs, Primitive<T> const& rhs) noexcept
 {
 	return lhs < rhs.Get();
 }
 
-template<typename T, typename = std::enable_if_t<std::is_fundamental<T>::value>>
-constexpr bool operator<=(T const& lhs, Boolean const& rhs) noexcept
+template<typename T>
+constexpr bool operator<=(T const& lhs, Primitive<T> const& rhs) noexcept
 {
 	return lhs < rhs.Get();
 }
 
-template<typename T, typename = std::enable_if_t<std::is_fundamental<T>::value>>
-constexpr bool operator>(T const& lhs, Boolean const& rhs) noexcept
+template<typename T>
+constexpr bool operator>(T const& lhs, Primitive<T> const& rhs) noexcept
 {
 	return lhs > rhs.Get();
 }
 
-template<typename T, typename = std::enable_if_t<std::is_fundamental<T>::value>>
-constexpr bool operator>=(T const& lhs, Boolean const& rhs) noexcept
+template<typename T>
+constexpr bool operator>=(T const& lhs, Primitive<T> const& rhs) noexcept
 {
 	return lhs >= rhs.Get();
 }

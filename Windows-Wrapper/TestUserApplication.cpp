@@ -4,7 +4,9 @@
 #include "ListBox.h"
 #include "Color.h"
 #include "Boolean.h"
+#include "Byte.h"
 #include "Int16.h"
+#include "UInt16.h"
 #include "Int32.h"
 
 #include "Event.h"
@@ -170,15 +172,16 @@ void TestUserApplication::Initialize()
     assert(bitxor_self.Get() == 5);
     //
     //// Implicit conversions
-    constexpr Int16 schar2shortconv(SByte::From(12));
-    static_assert(schar2shortconv.Get() == 12, "A signed char was not converted to a short.");
+    //constexpr Int16 schar2shortconv(SByte::From(12));
+   // static_assert(schar2shortconv.Get() == 12, "A signed char was not converted to a short.");
     constexpr UInt16 uchar2ushortconv(Byte::From(12u));
     static_assert(uchar2ushortconv.Get() == 12, "An unsigned char was not converted to an unsigned short.");
     //
     //constexpr Int schar2intconv(SChar::from(12));
     //static_assert(schar2intconv.get() == 12, "A signed char was not converted to an int.");
-    //constexpr Int short2intconv(Short::from(12));
-    //static_assert(short2intconv.get() == 12, "A signed short was not converted to an int.");
+    ;
+    constexpr Int32 short2intconv(Byte::From(12));
+    static_assert(short2intconv.Get() == 12, "A signed short was not converted to an int.");
     //
     //constexpr UInt uchar2uintconv(UChar::from(12u));
     //static_assert(uchar2uintconv.get() == 12, "An unsigned char was not converted to an unsigned int.");
@@ -266,73 +269,73 @@ void TestUserApplication::Initialize()
     static_assert((1 + Int32(1)).Get() == 2, "Binary + failed.");
     static_assert((Int32(1) + Int32(1)).Get() == 2, "Binary + failed.");
     //
-    //static_assert((Int(2) - 1).get() == 1, "Binary - failed.");
-    //static_assert((2 - Int(1)).get() == 1, "Binary - failed.");
-    //static_assert((Int(2) - Int(1)).get() == 1, "Binary - failed.");
+    static_assert((Int32(2) - 1).Get() == 1, "Binary - failed.");
+    static_assert((2 - Int32(1)).Get() == 1, "Binary - failed.");
+    static_assert((Int32(2) - Int32(1)).Get() == 1, "Binary - failed.");
     //
-    //static_assert((Int(2) * 3).get() == 6, "Binary * failed.");
-    //static_assert((2 * Int(3)).get() == 6, "Binary * failed.");
-    //static_assert((Int(2) * Int(3)).get() == 6, "Binary * failed.");
+    static_assert((Int32(2) * 3).Get() == 6, "Binary * failed.");
+    static_assert((2 * Int32(3)).Get() == 6, "Binary * failed.");
+    static_assert((Int32(2) * Int32(3)).Get() == 6, "Binary * failed.");
     //
-    //static_assert((Int(6) / 3).get() == 2, "Binary / failed.");
-    //static_assert((6 / Int(3)).get() == 2, "Binary / failed.");
-    //static_assert((Int(6) / Int(3)).get() == 2, "Binary / failed.");
+    static_assert((Int32(6) / 3).Get() == 2, "Binary / failed.");
+    static_assert((6 / Int32(3)).Get() == 2, "Binary / failed.");
+    static_assert((Int32(6) / Int32(3)).Get() == 2, "Binary / failed.");
     //
-    //static_assert((Int(6) % 5).get() == 1, "Binary % failed.");
-    //static_assert((6 % Int(5)).get() == 1, "Binary % failed.");
-    //static_assert((Int(6) % Int(5)).get() == 1, "Binary % failed.");
+    static_assert((Int32(6) % 5).Get() == 1, "Binary % failed.");
+    static_assert((6 % Int32(5)).Get() == 1, "Binary % failed.");
+    static_assert((Int32(6) % Int32(5)).Get() == 1, "Binary % failed.");
     //
-    //static_assert((Int(5) & 3).get() == 1, "Binary & failed.");
-    //static_assert((5 & Int(3)).get() == 1, "Binary & failed.");
-    //static_assert((Int(5) & Int(3)).get() == 1, "Binary & failed.");
+    static_assert((Int32(5) & 3).Get() == 1, "Binary & failed.");
+    static_assert((5 & Int32(3)).Get() == 1, "Binary & failed.");
+    static_assert((Int32(5) & Int32(3)).Get() == 1, "Binary & failed.");
     //
-    //static_assert((Int(5) | 2).get() == 7, "Binary | failed.");
-    //static_assert((5 | Int(2)).get() == 7, "Binary | failed.");
-    //static_assert((Int(5) | Int(2)).get() == 7, "Binary | failed.");
+    static_assert((Int32(5) | 2).Get() == 7, "Binary | failed.");
+    static_assert((5 | Int32(2)).Get() == 7, "Binary | failed.");
+    static_assert((Int32(5) | Int32(2)).Get() == 7, "Binary | failed.");
     //
-    //static_assert((Int(7) ^ 2).get() == 5, "Binary ^ failed.");
-    //static_assert((7 ^ Int(2)).get() == 5, "Binary ^ failed.");
-    //static_assert((Int(7) ^ Int(2)).get() == 5, "Binary ^ failed.");
+    static_assert((Int32(7) ^ 2).Get() == 5, "Binary ^ failed.");
+    static_assert((7 ^ Int32(2)).Get() == 5, "Binary ^ failed.");
+    static_assert((Int32(7) ^ Int32(2)).Get() == 5, "Binary ^ failed.");
     //
-    //static_assert((Int(2) << 1).get() == 4, "Binary << failed.");
-    //static_assert((2 << Int(1)).get() == 4, "Binary << failed.");
-    //static_assert((Int(2) << Int(1)).get() == 4, "Binary << failed.");
+    static_assert((Int32(2) << 1).Get() == 4, "Binary << failed.");
+    static_assert((2 << Int32(1)).Get() == 4, "Binary << failed.");
+    static_assert((Int32(2) << Int32(1)).Get() == 4, "Binary << failed.");
     //
-    //static_assert((Int(4) >> 1).get() == 2, "Binary >> failed.");
-    //static_assert((4 >> Int(1)).get() == 2, "Binary >> failed.");
-    //static_assert((Int(4) >> Int(1)).get() == 2, "Binary >> failed.");
+    static_assert((Int32(4) >> 1).Get() == 2, "Binary >> failed.");
+    static_assert((4 >> Int32(1)).Get() == 2, "Binary >> failed.");
+    static_assert((Int32(4) >> Int32(1)).Get() == 2, "Binary >> failed.");
     //
-    //static_assert(!(Boolean(true) && false), "Binary && failed.");
-    //static_assert(!(true && Boolean(false)), "Binary && failed.");
-    //static_assert(!(Boolean(true) && Boolean(false)), "Binary && failed.");
+    static_assert(!(Boolean(true) && false), "Binary && failed.");
+    static_assert(!(true && Boolean(false)), "Binary && failed.");
+    static_assert(!(Boolean(true) && Boolean(false)), "Binary && failed.");
     //
-    //static_assert((Boolean(true) || false), "Binary || failed.");
-    //static_assert((true || Boolean(false)), "Binary || failed.");
-    //static_assert((Boolean(true) || Boolean(false)), "Binary || failed.");
+    static_assert((Boolean(true) || false), "Binary || failed.");
+    static_assert((true || Boolean(false)), "Binary || failed.");
+    static_assert((Boolean(true) || Boolean(false)), "Binary || failed.");
     //
-    //static_assert(Int(1) == 1, "Binary == failed.");
-    //static_assert(1 == Int(1), "Binary == failed.");
-    //static_assert(Int(1) == Int(1), "Binary == failed.");
+    static_assert(Int32(1) == 1, "Binary == failed.");
+    static_assert(1 == Int32(1), "Binary == failed.");
+    static_assert(Int32(1) == Int32(1), "Binary == failed.");
     //
-    //static_assert(Int(1) != 2, "Binary != failed.");
-    //static_assert(1 != Int(2), "Binary != failed.");
-    //static_assert(Int(1) != Int(2), "Binary != failed.");
+    static_assert(Int32(1) != 2, "Binary != failed.");
+    static_assert(1 != Int32(2), "Binary != failed.");
+    static_assert(Int32(1) != Int32(2), "Binary != failed.");
     //
-    //static_assert(Int(1) < 2, "Binary < failed.");
-    //static_assert(1 < Int(2), "Binary < failed.");
-    //static_assert(Int(1) < Int(2), "Binary < failed.");
+    static_assert(Int32(1) < 2, "Binary < failed.");
+    static_assert(1 < Int32(2), "Binary < failed.");
+    static_assert(Int32(1) < Int32(2), "Binary < failed.");
     //
-    //static_assert(Int(1) <= 2, "Binary <= failed.");
-    //static_assert(1 <= Int(2), "Binary <= failed.");
-    //static_assert(Int(1) <= Int(2), "Binary <= failed.");
+    static_assert(Int32(1) <= 2, "Binary <= failed.");
+    static_assert(1 <= Int32(2), "Binary <= failed.");
+    static_assert(Int32(1) <= Int32(2), "Binary <= failed.");
     //
-    //static_assert(Int(3) > 2, "Binary > failed.");
-    //static_assert(3 > Int(2), "Binary > failed.");
-    //static_assert(Int(3) > Int(2), "Binary > failed.");
+    static_assert(Int32(3) > 2, "Binary > failed.");
+    static_assert(3 > Int32(2), "Binary > failed.");
+    static_assert(Int32(3) > Int32(2), "Binary > failed.");
     //
-    //static_assert(Int(3) >= 2, "Binary >= failed.");
-    //static_assert(3 >= Int(2), "Binary >= failed.");
-    //static_assert(Int(3) >= Int(2), "Binary >= failed.");
+    static_assert(Int32(3) >= 2, "Binary >= failed.");
+    static_assert(3 >= Int32(2), "Binary >= failed.");
+    static_assert(Int32(3) >= Int32(2), "Binary >= failed.");
     //
     //// Test iostreams
     //Int cinned;

@@ -1,7 +1,9 @@
 #include "Int32.h"
 #include "Boolean.h"
+#include "Byte.h"
 #include "Char.h"
 #include "Int16.h"
+#include "UInt16.h"
 #include "Exceptions.h"
 
 inline int Int32::GetHashCode() const
@@ -79,9 +81,19 @@ Char Int32::ToChar(IFormatProvider* provider) const
 	return Char();
 }
 
+Byte Int32::ToByte(IFormatProvider* provider) const
+{
+	return Byte();
+}
+
 Int16 Int32::ToInt16(IFormatProvider* provider) const
 {
 	return 0;
+}
+
+UInt16 Int32::ToUInt16(IFormatProvider* provider) const
+{
+	return UInt16();
 }
 
 Int32 Int32::ToInt32(IFormatProvider* provider) const

@@ -4,7 +4,7 @@
 
 #include <iosfwd>
 
-template<typename T, typename = std::enable_if_t< std::is_arithmetic<T>::value >>
+template<typename T, typename = std::enable_if_t< std::is_arithmetic<T>::value>>
 class Primitive
 {
 protected:
@@ -15,23 +15,17 @@ public:
     using value_type = T;
 
     constexpr Primitive() noexcept : m_value() {}
-    constexpr Primitive(const bool& value) noexcept : m_value(value) {}
-    constexpr Primitive(const char& value) noexcept : m_value(value) {}
-    constexpr Primitive(const signed char& value) noexcept : m_value(value) {}
-    constexpr Primitive(const unsigned char& value) noexcept : m_value(value) {}
-    constexpr Primitive(const short& value) noexcept : m_value(value) {}
-    constexpr Primitive(const int& value) noexcept : m_value(value) {}
-    constexpr Primitive(const unsigned int& value) noexcept : m_value(value) {}
-    constexpr Primitive(const long& value) noexcept : m_value(value) {}
-    constexpr Primitive(const long long& value) noexcept : m_value(value) {}
-    constexpr Primitive(const float& value) noexcept : m_value(value) {}
-    constexpr Primitive(const double& value) noexcept : m_value(value) {}
-    constexpr Primitive(const long double& value) noexcept : m_value(value) {}
 
-    template<typename U, typename = std::enable_if_t< is_promotion<U, T>::value >>
+    template<typename U, typename = std::enable_if_t<std::is_fundamental<U>::value>>
+    constexpr Primitive(const U& value) noexcept : m_value(value) {}
+
+    template<typename U>
     constexpr Primitive(Primitive<U> const& other) noexcept : m_value(other.Get()) {}
 
     constexpr T const& Get() const noexcept { return m_value; }
+
+    template<typename U, typename = std::enable_if_t<std::is_fundamental<U>::value>>
+    constexpr static Primitive From(U const& other) noexcept { return Primitive(U(other)); }
 
     constexpr explicit operator bool() const noexcept { return static_cast<bool>(m_value); }
     constexpr explicit operator char() const noexcept { return static_cast<char>(m_value); }

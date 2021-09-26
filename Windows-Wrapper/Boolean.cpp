@@ -1,6 +1,8 @@
 #include "Boolean.h"
 #include "Char.h"
+#include "Byte.h"
 #include "Int16.h"
+#include "UInt16.h"
 #include "Int32.h"
 #include "Exceptions.h"
 
@@ -75,9 +77,19 @@ Char Boolean::ToChar(IFormatProvider* provider) const
 	return Char();
 }
 
+Byte Boolean::ToByte(IFormatProvider* provider) const
+{
+	return Byte();
+}
+
 Int16 Boolean::ToInt16(IFormatProvider* provider) const
 {
 	return 0;
+}
+
+UInt16 Boolean::ToUInt16(IFormatProvider* provider) const
+{
+	return UInt16();
 }
 
 Int32 Boolean::ToInt32(IFormatProvider* provider) const

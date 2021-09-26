@@ -5,8 +5,10 @@
 #include "TypeCode.h"
 
 class Boolean;
+class Byte;
 class Char;
 class Int16;
+class UInt16;
 class Int32;
 class String;
 
@@ -19,9 +21,9 @@ public:
 	virtual Boolean ToBoolean(IFormatProvider* provider) const = 0;
 	virtual Char ToChar(IFormatProvider* provider) const = 0;
 //	virtual SByte ToSByte(IFormatProvider* provider) const = 0;
-//	virtual Byte ToByte(IFormatProvider* provider) const = 0;
+	virtual Byte ToByte(IFormatProvider* provider) const = 0;
 	virtual Int16 ToInt16(IFormatProvider* provider) const = 0;
-//	virtual UInt16 ToUInt16(IFormatProvider* provider) const = 0;
+	virtual UInt16 ToUInt16(IFormatProvider* provider) const = 0;
 	virtual Int32 ToInt32(IFormatProvider* provider) const = 0;
 //	virtual UInt32 ToUInt32(IFormatProvider* provider) const = 0;
 //	virtual Int64 ToInt64(IFormatProvider* provider) const = 0;

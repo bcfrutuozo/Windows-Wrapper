@@ -1,6 +1,8 @@
 #include "Char.h"
-#include "Int16.h"
 #include "Boolean.h"
+#include "Byte.h"
+#include "Int16.h"
+#include "UInt16.h"
 #include "StringWrapper.h"
 #include "Exceptions.h"
 
@@ -88,9 +90,19 @@ Char Char::ToChar(IFormatProvider* provider) const
 	return Char();
 }
 
+Byte Char::ToByte(IFormatProvider* provider) const
+{
+	return Byte();
+}
+
 Int16 Char::ToInt16(IFormatProvider* provider) const
 {
 	return 0;
+}
+
+UInt16 Char::ToUInt16(IFormatProvider* provider) const
+{
+	return UInt16();
 }
 
 Int32 Char::ToInt32(IFormatProvider* provider) const

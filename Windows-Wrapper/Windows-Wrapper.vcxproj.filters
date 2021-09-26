@@ -139,6 +139,9 @@
     <ClCompile Include="Int16.cpp">
       <Filter>Types</Filter>
     </ClCompile>
+    <ClCompile Include="UInt16.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RealTimeApplication.h" />
@@ -397,6 +400,9 @@
       <Filter>Types</Filter>
     </ClInclude>
     <ClInclude Include="Int16.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="UInt16.h">
       <Filter>Types</Filter>
     </ClInclude>
   </ItemGroup>

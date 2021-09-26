@@ -213,6 +213,7 @@
     <ClCompile Include="TextBox.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Type.cpp" />
+    <ClCompile Include="UInt16.cpp" />
     <ClCompile Include="Utilities.cpp" />
     <ClCompile Include="VerticalScrollBar.cpp" />
     <ClCompile Include="WinAPI.cpp" />
@@ -302,6 +303,7 @@
     <ClInclude Include="TestUserApplication.h" />
     <ClInclude Include="TypeCode.h" />
     <ClInclude Include="TypesInclude.h" />
+    <ClInclude Include="UInt16.h" />
     <ClInclude Include="Utilities.h" />
     <ClInclude Include="VerticalScrollBar.h" />
     <ClInclude Include="WinAPI.h" />

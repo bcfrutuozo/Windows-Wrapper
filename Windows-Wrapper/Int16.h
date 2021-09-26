@@ -7,20 +7,23 @@
 
 class Boolean;
 
-class Int16 : public Primitive<short>, public IComparable<Int16>, public IConvertible, public IEquatable<Int16>
+class Int16 final: public Primitive<short>, public IComparable<Int16>, public IConvertible, public IEquatable<Int16>
 {
 public:
 
 	constexpr Int16() noexcept : Primitive() {}
-	constexpr Int16(const short& value) noexcept : Primitive(value) { }
+	
+	template<typename U, typename = std::enable_if_t<std::is_fundamental<U>::value>>
+	constexpr Int16(const U& value) noexcept : Primitive(value) {}
+	
+	template<typename U>
+	constexpr Int16(const Primitive<U>& value) noexcept : Primitive(value) { }
+
 	constexpr Int16(const Int16& value) noexcept : Primitive(value) { }
 
 	Int16(Int16&&) = default;
 	Int16& operator=(Int16 const&) = default;
 	Int16& operator=(Int16&&) = default;
-
-	template<typename U, typename = std::enable_if_t<is_conversion<U, short>::value>>
-	constexpr static Int16 From(U const& other) noexcept { return Int16(U(other)); }
 
 	constexpr Int16 const& operator+() const noexcept { return *this; }
 	constexpr Int16 operator-() const noexcept { return Int16(-m_value); }
@@ -196,7 +199,7 @@ public:
 
 	// Operators with fundamental types
 	template<typename U, typename = std::enable_if_t<std::is_fundamental<U>::value>>
-	constexpr Int16 operator+(U const& other) noexcept { return Int16(other + m_value); }
+	constexpr Int16 operator+(U const& other) noexcept { return Int16(m_value + other); }
 
 	template<typename U, typename = std::enable_if_t<std::is_fundamental<U>::value>>
 	constexpr Int16 operator-(U const& other) noexcept { return Int16(m_value - other); }
@@ -245,52 +248,52 @@ public:
 
 	// Operators with Primitives<U> type
 	template<typename U>
-	constexpr Int16 operator+(Primitive<U> const& other) const noexcept { return Int16(other.Get() + m_value); }
+	constexpr Int16 operator+(Primitive<U> const& other) const noexcept { return Int16(m_value + other.Get()); }
 
 	template<typename U>
-	constexpr Int16 operator-(Primitive<U> const& other) const noexcept { return Int16(other.Get() - m_value); }
+	constexpr Int16 operator-(Primitive<U> const& other) const noexcept { return Int16(m_value - other.Get()); }
 
 	template<typename U>
-	constexpr Int16 operator*(Primitive<U> const& other) const noexcept { return Int16(other.Get() * m_value); }
+	constexpr Int16 operator*(Primitive<U> const& other) const noexcept { return Int16(m_value * other.Get()); }
 
 	template<typename U>
-	constexpr Int16 operator/(Primitive<U> const& other) const noexcept { return Int16(other.Get() / m_value); }
+	constexpr Int16 operator/(Primitive<U> const& other) const noexcept { return Int16(m_value / other.Get()); }
 
 	template<typename U>
-	constexpr Int16 operator%(Primitive<U> const& other) const noexcept { return Int16(other.Get() % m_value); }
+	constexpr Int16 operator%(Primitive<U> const& other) const noexcept { return Int16(m_value % other.Get()); }
 
 	template<typename U>
-	constexpr Int16 operator&(Primitive<U> const& other) const noexcept { return Int16(other.Get() & m_value); }
+	constexpr Int16 operator&(Primitive<U> const& other) const noexcept { return Int16(m_value & other.Get()); }
 
 	template<typename U>
-	constexpr Int16 operator|(Primitive<U> const& other) const noexcept { return Int16(other.Get() | m_value); }
+	constexpr Int16 operator|(Primitive<U> const& other) const noexcept { return Int16(m_value | other.Get()); }
 
 	template<typename U>
-	constexpr Int16 operator^(Primitive<U> const& other) const noexcept { return Int16(other.Get() ^ m_value); }
+	constexpr Int16 operator^(Primitive<U> const& other) const noexcept { return Int16(m_value ^ other.Get()); }
 
 	template<typename U>
-	constexpr Int16 operator<<(Primitive<U> const& other) const noexcept { return Int16(other.Get() << m_value); }
+	constexpr Int16 operator<<(Primitive<U> const& other) const noexcept { return Int16(m_value << other.Get()); }
 
 	template<typename U>
-	constexpr Int16 operator>>(Primitive<U> const& other) const noexcept { return Int16(other.Get() >> m_value); }
+	constexpr Int16 operator>>(Primitive<U> const& other) const noexcept { return Int16(m_value >> other.Get()); }
 
 	template<typename U>
-	constexpr Int16 operator==(Primitive<U> const& other) const noexcept { return Int16(other.Get() == m_value); }
+	constexpr Int16 operator==(Primitive<U> const& other) const noexcept { return Int16(m_value == other.Get()); }
 
 	template<typename U>
-	constexpr Int16 operator!=(Primitive<U> const& other) const noexcept { return Int16(other.Get() = !m_value); }
+	constexpr Int16 operator!=(Primitive<U> const& other) const noexcept { return Int16(m_value != other.Get()); }
 
 	template<typename U>
-	constexpr Int16 operator<(Primitive<U> const& other) const noexcept { return Int16(other.Get() < m_value); }
+	constexpr Int16 operator<(Primitive<U> const& other) const noexcept { return Int16(m_value < other.Get()); }
 
 	template<typename U>
-	constexpr Int16 operator<=(Primitive<U> const& other) const noexcept { return Int16(other.Get() <= m_value); }
+	constexpr Int16 operator<=(Primitive<U> const& other) const noexcept { return Int16(m_value <= other.Get()); }
 
 	template<typename U>
-	constexpr Int16 operator>(Primitive<U> const& other) const noexcept { return Int16(other.Get() > m_value); }
+	constexpr Int16 operator>(Primitive<U> const& other) const noexcept { return Int16(m_value > other.Get()); }
 
 	template<typename U>
-	constexpr Int16 operator>=(Primitive<U> const& other) const noexcept { return Int16(other.Get() >= m_value); }
+	constexpr Int16 operator>=(Primitive<U> const& other) const noexcept { return Int16(m_value >= other.Get()); }
 
 	// Output/input stream operator
 	friend std::istream& operator>>(std::istream& lhs, Int16& const rhs) { return lhs >> rhs.m_value; }
@@ -307,7 +310,9 @@ public:
 	//inline String ToString() const noexcept override;
 	Boolean ToBoolean(IFormatProvider* provider) const override;
 	Char ToChar(IFormatProvider* provider) const override;
+	Byte ToByte(IFormatProvider* provider) const override;
 	Int16 ToInt16(IFormatProvider* provider) const override;
+	UInt16 ToUInt16(IFormatProvider* provider) const override;
 	Int32 ToInt32(IFormatProvider* provider) const override;
 
 	// Exposed expressions
@@ -331,7 +336,7 @@ constexpr Int16 operator-(T const& lhs, Int16 const& rhs) noexcept
 template<typename T, typename = std::enable_if_t<std::is_fundamental<T>::value>>
 constexpr Int16 operator*(T const& lhs, Int16 const& rhs) noexcept
 {
-	return Int16(lhs - rhs.Get());
+	return Int16(lhs * rhs.Get());
 }
 
 template<typename T, typename = std::enable_if_t<std::is_fundamental<T>::value>>
@@ -388,26 +393,26 @@ constexpr bool operator!=(T const& lhs, Int16 const& rhs) noexcept
 	return lhs != rhs.Get();
 }
 
-template<typename T, typename = std::enable_if_t<std::is_fundamental<T>::value>>
-constexpr bool operator<(T const& lhs, Int16 const& rhs) noexcept
-{
-	return lhs < rhs.Get();
-}
-
-template<typename T, typename = std::enable_if_t<std::is_fundamental<T>::value>>
-constexpr bool operator<=(T const& lhs, Int16 const& rhs) noexcept
-{
-	return lhs < rhs.Get();
-}
-
-template<typename T, typename = std::enable_if_t<std::is_fundamental<T>::value>>
-constexpr bool operator>(T const& lhs, Int16 const& rhs) noexcept
-{
-	return lhs > rhs.Get();
-}
-
-template<typename T, typename = std::enable_if_t<std::is_fundamental<T>::value>>
-constexpr bool operator>=(T const& lhs, Int16 const& rhs) noexcept
-{
-	return lhs >= rhs.Get();
-}
+//template<typename T, typename = std::enable_if_t<std::is_fundamental<T>::value>>
+//constexpr bool operator<(T const& lhs, Int16 const& rhs) noexcept
+//{
+//	return lhs < rhs.Get();
+//}
+//
+//template<typename T, typename = std::enable_if_t<std::is_fundamental<T>::value>>
+//constexpr bool operator<=(T const& lhs, Int16 const& rhs) noexcept
+//{
+//	return lhs < rhs.Get();
+//}
+//
+//template<typename T, typename = std::enable_if_t<std::is_fundamental<T>::value>>
+//constexpr bool operator>(T const& lhs, Int16 const& rhs) noexcept
+//{
+//	return lhs > rhs.Get();
+//}
+//
+//template<typename T, typename = std::enable_if_t<std::is_fundamental<T>::value>>
+//constexpr bool operator>=(T const& lhs, Int16 const& rhs) noexcept
+//{
+//	return lhs >= rhs.Get();
+//}
