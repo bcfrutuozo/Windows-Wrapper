@@ -7,15 +7,15 @@
 
 class Boolean;
 
-class Int16 final: public Primitive<short>, public IComparable<Int16>, public IConvertible, public IEquatable<Int16>
+class Int16 final : public Primitive<short>, public IComparable<Int16>, public IConvertible, public IEquatable<Int16>
 {
 public:
 
 	constexpr Int16() noexcept : Primitive() {}
-	
+
 	template<typename U, typename = std::enable_if_t<std::is_fundamental<U>::value>>
 	constexpr Int16(const U& value) noexcept : Primitive(value) {}
-	
+
 	template<typename U>
 	constexpr Int16(const Primitive<U>& value) noexcept : Primitive(value) { }
 
@@ -296,8 +296,8 @@ public:
 	constexpr Int16 operator>=(Primitive<U> const& other) const noexcept { return Int16(m_value >= other.Get()); }
 
 	// Output/input stream operator
-	friend std::istream& operator>>(std::istream& lhs, Int16& const rhs) { return lhs >> rhs.m_value; }
-	friend std::ostream& operator<<(std::ostream& lhs, Int16& const rhs) { return lhs << rhs.m_value; }
+	friend std::istream& operator>>(std::istream& lhs, Int16& rhs) { return lhs >> rhs.m_value; }
+	friend std::ostream& operator<<(std::ostream& lhs, const Int16& rhs) { return lhs << rhs.m_value; }
 
 	// Interfaces and virtual functions implementation
 	inline constexpr TypeCode GetTypeCode() const noexcept override { return TypeCode::Int16; };

@@ -294,8 +294,8 @@ public:
 	constexpr Int32 operator>=(Primitive<U> const& other) const noexcept { return Int32(m_value >= other.Get()); }
 
 	// Output/input stream operator
-	friend std::istream& operator>>(std::istream& lhs, Int32& const rhs) { return lhs >> rhs.m_value; }
-	friend std::ostream& operator<<(std::ostream& lhs, Int32& const rhs) { return lhs << rhs.m_value; }
+	friend std::istream& operator>>(std::istream& lhs, Int32& rhs) { return lhs >> rhs.m_value; }
+	friend std::ostream& operator<<(std::ostream& lhs, const Int32& rhs) { return lhs << rhs.Get(); }
 
 	// Interfaces and virtual functions implementation
 	inline constexpr TypeCode GetTypeCode() const noexcept override { return TypeCode::Int32; };

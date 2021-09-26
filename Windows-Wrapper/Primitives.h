@@ -22,7 +22,7 @@ public:
     template<typename U>
     constexpr Primitive(Primitive<U> const& other) noexcept : m_value(other.Get()) {}
 
-    constexpr T const& Get() const noexcept { return m_value; }
+    constexpr inline T const& Get() const noexcept { return m_value; }
 
     template<typename U, typename = std::enable_if_t<std::is_fundamental<U>::value>>
     constexpr static Primitive From(U const& other) noexcept { return Primitive(U(other)); }

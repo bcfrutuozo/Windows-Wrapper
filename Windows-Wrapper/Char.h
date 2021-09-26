@@ -101,7 +101,7 @@ private:
 public:
 
 	constexpr Char() noexcept : Primitive() {}
-	
+
 	template<typename U, typename = std::enable_if_t<std::is_fundamental<U>::value>>
 	constexpr Char(const U& value) noexcept : Primitive(value) {}
 	
@@ -383,8 +383,8 @@ public:
 	constexpr Char operator>=(Primitive<U> const& other) const noexcept { return Char(m_value >= other.Get()); }
 
 	// Output/input stream operator
-	friend std::istream& operator>>(std::istream & lhs, Char& const rhs) { return lhs >> rhs.m_value; }
-	friend std::ostream& operator<<(std::ostream & lhs, Char& const rhs) { return lhs << rhs.m_value; }
+	friend std::istream& operator>>(std::istream & lhs, Char& rhs) { return lhs >> rhs.m_value; }
+	friend std::ostream& operator<<(std::ostream & lhs, const Char& rhs) { return lhs << rhs.m_value; }
 
 	// Interfaces and virtual functions implementation
 	inline constexpr TypeCode GetTypeCode() const noexcept override { return TypeCode::Char; }

@@ -296,8 +296,8 @@ public:
 	constexpr Byte operator>=(Primitive<U> const& other) const noexcept { return Byte(m_value >= other.Get()); }
 
 	// Output/input stream operator
-	friend std::istream& operator>>(std::istream& lhs, Byte& const rhs) { return lhs >> rhs.m_value; }
-	friend std::ostream& operator<<(std::ostream& lhs, Byte& const rhs) { return lhs << rhs.m_value; }
+	friend std::istream& operator>>(std::istream& lhs, Byte& rhs) { return lhs >> rhs.m_value; }
+	friend std::ostream& operator<<(std::ostream& lhs, const Byte& rhs) { return lhs << rhs.m_value; }
 
 	// Interfaces and virtual functions implementation
 	inline constexpr TypeCode GetTypeCode() const noexcept override { return TypeCode::Byte; };

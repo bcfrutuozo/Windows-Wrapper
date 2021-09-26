@@ -8,6 +8,7 @@
 #include "Int16.h"
 #include "UInt16.h"
 #include "Int32.h"
+#include "Char.h"
 
 #include "Event.h"
 #include "Timer.h"
@@ -15,14 +16,11 @@
 void TestClick(Object* sender, EventArgs* e)
 {
 	Button* b = (Button*)sender;
-	b->Dispose();
+    printf_s("AOOO CRICOUU");
 }
 
 void TestUserApplication::Initialize()
-{    
-    auto e = std::to_string((int)sizeof(Object));
-    printf_s(e.c_str());
-
+{   
     //
     //// Verify the underlying type is exposed by the value_type member.
     static_assert(std::is_same<int, typename Int32::value_type >::value, "Value type not exposed.");
@@ -338,23 +336,23 @@ void TestUserApplication::Initialize()
     static_assert(Int32(3) >= Int32(2), "Binary >= failed.");
     //
     //// Test iostreams
-    //Int cinned;
-    //std::istringstream input("123");
-    //input >> cinned;
-    //assert(cinned == 123);
+    Int32 cinned;
+    std::istringstream input("123");
+    input >> cinned;
+    assert(cinned == 123);
     //
-    //constexpr Int couted(123);
-    //std::ostringstream output;
-    //output << couted;
-    //assert(output.str() == "123");
+    constexpr Int32 couted(123);
+    std::ostringstream output;
+    output << couted;
+    assert(output.str() == "123");
     //
     //// Test promotions
-    //constexpr Int expanded = Short::from(123);
-    //static_assert(expanded.get() == 123, "Could not convert from short to int.");
+    constexpr Int32 expanded = Byte::From(123);
+    static_assert(expanded.Get() == 123, "Could not convert from short to int.");
     //
-    //Int expand_into;
-    //expand_into = Short::from(100);
-    //assert(expand_into == 100);
+    Int32 expand_into;
+    expand_into = Byte::From(100);
+    assert(expand_into == 100);
     //
     //// Test demotions
     //static_assert(SChar::from(12).get() == 12, "Could not create a signed char from an int.");
@@ -365,8 +363,8 @@ void TestUserApplication::Initialize()
     //SChar tester = SChar::from(100);
     //tester = SChar::from(500);
     //
-    //constexpr Char character = 'a';
-    //static_assert(character.get() == 'a', "Could not read a character.");
+    constexpr Char character = 'a';
+    static_assert(character.Get() == 'a', "Could not read a character.");
 
 
 
@@ -477,73 +475,72 @@ void TestUserApplication::Initialize()
 	//////menu1.OnClickSet(&TestClick);
 	//////menu2.OnClickSet(&TestClick);
 	////
-	////button1 = &window->AddButton("Abc", 200, 80, 50, 100);
-	////button1->OnClickSet(&TestClick);
-	////button1->OnMouseEnterSet([](Object* sender, EventArgs* e)
-	////	{
-	////		printf_s("Teste Mouseenter Button1");
-	////	}
-	////);
-	////button1->OnMouseLeaveSet([](Object* sender, EventArgs* e)
-	////	{
-	////		printf_s("Teste Mouseleave Button1");
-	////	}
-	////);
-	////
-	////button2 = &window->AddButton("XYZ", 100, 40, 200, 200);
-	////button2->OnClickSet([](Object* sender, EventArgs* e)
-	////	{
-	////		Button* b = (Button*)sender;
-	////		b->Dispose();
-	////	}
-	////);
-	////button2->Font.SetStyle(FontStyle::Strikeout);
-	////
-	////txtBox1 = &window->AddTextBox("TextBox", 400, 20, 400);
-	////txtBox1->BorderStyle = BorderStyle::None;
-	////txtBox1->OnKeyPressSet([](Object* sender, KeyPressEventArgs* e)
-	////	{
-	////		TextBox* t = (TextBox*)sender;
-	////		if (e->KeyChar == 'p')
-	////		{
-	////			t->Dispose();
-	////		}
-	////		//if (e->KeyChar == 'q')
-	////		//{
-	////	//		e->Handled = true;
-	////	//		return;
-	////		//}
-	////	}
-	////);
-	////
-	//txtBox2 = window->AddTextBox("TextBox2", 400, 20, 460);
-	//txtBox2->BorderStyle = BorderStyle::FixedSingle;
-	//txtBox2->OnKeyPressSet([](Object* sender, KeyPressEventArgs* e)
-	//	{
-	//		TextBox* t = (TextBox*)sender;
-	//		if (e->KeyChar == 'p')
-	//		{
-	//			t->Dispose();
-	//		}
-	//	}
-	//);
-	////
-	////txtBox3 = &window->AddTextBox("TextBox3", 400, 20, 560);
-	////txtBox3->BorderStyle = BorderStyle::Fixed3D;
-	////txtBox3->OnKeyPressSet([](Object* sender, KeyPressEventArgs* e)
-	////	{
-	////		TextBox* t = (TextBox*)sender;
-	////		if (e->KeyChar == 'p')
-	////		{
-	////			t->Dispose();
-	////		}
-	////		//if (e->KeyChar == 'q')
-	////		//{
-	////	//		e->Handled = true;
-	////	//		return;
-	////		//}
-	////	}
-	////);
-	////
-	////progressBar = &window->AddProgressBar("abc", 300, 50, 400, 20);
+    button1 = window->AddButton("Abc", 200, 80, 50, 100);
+    button1->OnClickSet(&TestClick);
+    button1->OnMouseEnterSet([](Object* sender, EventArgs* e)
+    	{
+    		printf_s("Teste Mouseenter Button1");
+    	}
+    );
+    button1->OnMouseLeaveSet([](Object* sender, EventArgs* e)
+    	{
+    		printf_s("Teste Mouseleave Button1");
+    	}
+    );
+    
+    button2 = window->AddButton("XYZ", 100, 40, 200, 200);
+    button2->OnClickSet([](Object* sender, EventArgs* e)
+    	{
+    		Button* b = (Button*)sender;
+            printf_s("Button2 clicked");
+    	}
+    );
+    
+    txtBox1 = window->AddTextBox("TextBox", 400, 20, 400);
+    txtBox1->BorderStyle = BorderStyle::None;
+    txtBox1->OnKeyPressSet([](Object* sender, KeyPressEventArgs* e)
+    	{
+    		TextBox* t = (TextBox*)sender;
+    		if (e->KeyChar == 'p')
+    		{
+                printf_s("printing P");
+    		}
+    		//if (e->KeyChar == 'q')
+    		//{
+    	//		e->Handled = true;
+    	//		return;
+    		//}
+    	}
+    );
+    
+    txtBox2 = window->AddTextBox("TextBox2", 400, 20, 460);
+    txtBox2->BorderStyle = BorderStyle::FixedSingle;
+    txtBox2->OnKeyPressSet([](Object* sender, KeyPressEventArgs* e)
+        {
+            TextBox* t = (TextBox*)sender;
+            if (e->KeyChar == 'z')
+            {
+                printf_s("printing Z");
+            }
+        });
+    
+    
+    txtBox3 = window->AddTextBox("TextBox3", 400, 20, 560);
+    txtBox3->BorderStyle = BorderStyle::Fixed3D;
+    txtBox3->OnKeyPressSet([](Object* sender, KeyPressEventArgs* e)
+    	{
+    		TextBox* t = (TextBox*)sender;
+    		if (e->KeyChar == 'A')
+    		{
+                printf_s("printing A");
+    		}
+    		//if (e->KeyChar == 'q')
+    		//{
+    	//		e->Handled = true;
+    	//		return;
+    		//}
+    	}
+    );
+    
+    progressBar = window->AddProgressBar("abc", 300, 50, 50, 20);
 }

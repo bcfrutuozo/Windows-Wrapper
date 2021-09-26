@@ -296,8 +296,8 @@ public:
 	constexpr UInt16 operator>=(Primitive<U> const& other) const noexcept { return UInt16(m_value >= other.Get()); }
 
 	// Output/input stream operator
-	friend std::istream& operator>>(std::istream& lhs, UInt16& const rhs) { return lhs >> rhs.m_value; }
-	friend std::ostream& operator<<(std::ostream& lhs, UInt16& const rhs) { return lhs << rhs.m_value; }
+	friend std::istream& operator>>(std::istream& lhs, UInt16& rhs) { return lhs >> rhs.m_value; }
+	friend std::ostream& operator<<(std::ostream& lhs, const UInt16& rhs) { return lhs << rhs.m_value; }
 
 	// Interfaces and virtual functions implementation
 	inline constexpr TypeCode GetTypeCode() const noexcept override { return TypeCode::UInt16; };
