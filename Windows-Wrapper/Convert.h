@@ -2,5 +2,7 @@
 
 class Convert
 {
+public:
+
 
 };

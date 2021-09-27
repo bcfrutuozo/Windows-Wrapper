@@ -1,12 +1,19 @@
 #include "Char.h"
 #include "Boolean.h"
+#include "SByte.h"
 #include "Byte.h"
 #include "Int16.h"
 #include "UInt16.h"
+#include "Int32.h"
+#include "UInt32.h"
+#include "Int64.h"
+#include "UInt64.h"
+#include "Single.h"
+#include "Double.h"
 #include "StringWrapper.h"
 #include "Exceptions.h"
 
-Boolean Char::IsWhiteSpaceLatin1(char ch) noexcept
+Boolean Char::IsWhiteSpaceLatin1(Char ch) noexcept
 {
 	// There are characters which belong to UnicodeCategory.Control but are considered as white spaces.
 	// We use code point comparisons for these characters here as a temporary fix.
@@ -90,6 +97,11 @@ Char Char::ToChar(IFormatProvider* provider) const
 	return Char();
 }
 
+SByte Char::ToSByte(IFormatProvider* provider) const
+{
+	return SByte();
+}
+
 Byte Char::ToByte(IFormatProvider* provider) const
 {
 	return Byte();
@@ -108,6 +120,31 @@ UInt16 Char::ToUInt16(IFormatProvider* provider) const
 Int32 Char::ToInt32(IFormatProvider* provider) const
 {
 	return 0;
+}
+
+UInt32 Char::ToUInt32(IFormatProvider* provider) const
+{
+	return UInt32();
+}
+
+Int64 Char::ToInt64(IFormatProvider* provider) const
+{
+	return Int64();
+}
+
+UInt64 Char::ToUInt64(IFormatProvider* provider) const
+{
+	return UInt64();
+}
+
+Single Char::ToSingle(IFormatProvider* provider) const
+{
+	return Single();
+}
+
+Double Char::ToDouble(IFormatProvider* provider) const
+{
+	return Double();
 }
 
 //String Char::ToString(Char const& ch) noexcept

@@ -11,10 +11,10 @@ class Boolean final : public Primitive<bool>, public IComparable<Boolean>, publi
 public:
 
 	constexpr Boolean() noexcept : Primitive() {}
-	
+
 	template<typename U, typename = std::enable_if_t<std::is_fundamental<U>::value>>
 	constexpr Boolean(const U& value) noexcept : Primitive(value) {}
-	
+
 	template<typename U>
 	constexpr Boolean(const Primitive<U>& value) noexcept : Primitive(value) { }
 
@@ -102,70 +102,70 @@ public:
 	template<typename U>
 	constexpr Boolean& operator+=(Primitive<U> const& other) noexcept
 	{
-		m_value += other.m_value;
+		m_value += other.Get();
 		return *this;
 	}
 
 	template<typename U>
 	constexpr Boolean& operator-=(Primitive<U> const& other) noexcept
 	{
-		m_value -= other.m_value;
+		m_value -= other.Get();
 		return *this;
 	}
 
 	template<typename U>
 	constexpr Boolean& operator*=(Primitive<U> const& other) noexcept
 	{
-		m_value *= other.m_value;
+		m_value *= other.Get();
 		return *this;
 	}
 
 	template<typename U>
 	constexpr Boolean& operator/=(Primitive<U> const& other) noexcept
 	{
-		m_value /= other.m_value;
+		m_value /= other.Get();
 		return *this;
 	}
 
 	template<typename U, typename = std::enable_if_t<std::is_integral<bool>::value&& std::is_integral<U>::value>>
 	constexpr Boolean& operator%=(Primitive<U> const& other) noexcept
 	{
-		m_value %= other.m_value;
+		m_value %= other.Get();
 		return *this;
 	}
 
 	template<typename U, typename = std::enable_if_t<std::is_integral<bool>::value&& std::is_integral<U>::value>>
 	constexpr Boolean& operator<<=(Primitive<U> const& other) noexcept
 	{
-		m_value <<= other.m_value;
+		m_value <<= other.Get();
 		return *this;
 	}
 
 	template<typename U, typename = std::enable_if_t<std::is_integral<bool>::value&& std::is_integral<U>::value>>
 	constexpr Boolean& operator>>=(Primitive<U> const& other) noexcept
 	{
-		m_value >>= other.m_value;
+		m_value >>= other.Get();
 		return *this;
 	}
 
 	template<typename U, typename = std::enable_if_t<std::is_integral<bool>::value&& std::is_integral<U>::value>>
 	constexpr Boolean& operator&=(Primitive<U> const& other) noexcept
 	{
-		m_value &= other.m_value;
+		m_value &= other.Get();
 		return *this;
 	}
 
 	template<typename U, typename = std::enable_if_t<std::is_integral<bool>::value&& std::is_integral<U>::value>>
 	constexpr Boolean& operator|=(Primitive<U> const& other) noexcept
 	{
-		m_value |= other.m_value;
+		m_value |= other.Get();
 		return *this;
 	}
 
 	template<typename U, typename = std::enable_if_t<std::is_integral<bool>::value&& std::is_integral<U>::value>>
 	constexpr Boolean& operator^=(Primitive<U> const& other) noexcept
 	{
-		m_value ^= other.m_value;
+		m_value ^= other.Get();
 		return *this;
 	}
 
@@ -220,56 +220,56 @@ public:
 
 	// Operators with Primitives<U> type
 	template<typename U>
-	constexpr Boolean operator+(Primitive<U> const& other) const noexcept { return Boolean(m_value + other.m_value); }
+	constexpr Boolean operator+(Primitive<U> const& other) const noexcept { return Boolean(m_value + other.Get()); }
 
 	template<typename U>
-	constexpr Boolean operator-(Primitive<U> const& other) const noexcept { return Boolean(m_value - other.m_value); }
+	constexpr Boolean operator-(Primitive<U> const& other) const noexcept { return Boolean(m_value - other.Get()); }
 
 	template<typename U>
-	constexpr Boolean operator*(Primitive<U> const& other) const noexcept { return Boolean(m_value * other.m_value); }
+	constexpr Boolean operator*(Primitive<U> const& other) const noexcept { return Boolean(m_value * other.Get()); }
 
 	template<typename U>
-	constexpr Boolean operator/(Primitive<U> const& other) const noexcept { return Boolean(m_value / other.m_value); }
+	constexpr Boolean operator/(Primitive<U> const& other) const noexcept { return Boolean(m_value / other.Get()); }
 
 	template<typename U>
-	constexpr Boolean operator%(Primitive<U> const& other) const noexcept { return Boolean(m_value % other.m_value); }
+	constexpr Boolean operator%(Primitive<U> const& other) const noexcept { return Boolean(m_value % other.Get()); }
 
 	template<typename U>
-	constexpr Boolean operator&(Primitive<U> const& other) const noexcept { return Boolean(m_value & other.m_value); }
+	constexpr Boolean operator&(Primitive<U> const& other) const noexcept { return Boolean(m_value & other.Get()); }
 
 	template<typename U>
-	constexpr Boolean operator|(Primitive<U> const& other) const noexcept { return Boolean(m_value | other.m_value); }
+	constexpr Boolean operator|(Primitive<U> const& other) const noexcept { return Boolean(m_value | other.Get()); }
 
 	template<typename U>
-	constexpr Boolean operator^(Primitive<U> const& other) const noexcept { return Boolean(m_value ^ other.m_value); }
+	constexpr Boolean operator^(Primitive<U> const& other) const noexcept { return Boolean(m_value ^ other.Get()); }
 
 	template<typename U>
-	constexpr Boolean operator<<(Primitive<U> const& other) const noexcept { return Boolean(m_value << other.m_value); }
+	constexpr Boolean operator<<(Primitive<U> const& other) const noexcept { return Boolean(m_value << other.Get()); }
 
 	template<typename U>
-	constexpr Boolean operator>>(Primitive<U> const& other) const noexcept { return Boolean(m_value >> other.m_value); }
+	constexpr Boolean operator>>(Primitive<U> const& other) const noexcept { return Boolean(m_value >> other.Get()); }
 
 	template<typename U>
-	constexpr Boolean operator==(Primitive<U> const& other) const noexcept { return Boolean(m_value == other.m_value); }
+	constexpr bool operator==(Primitive<U> const& other) const noexcept { return m_value == other.Get(); }
 
 	template<typename U>
-	constexpr Boolean operator!=(Primitive<U> const& other) const noexcept { return Boolean(m_value != other.m_value); }
+	constexpr bool operator!=(Primitive<U> const& other) const noexcept { return m_value != other.Get(); }
 
 	template<typename U>
-	constexpr Boolean operator<(Primitive<U> const& other) const noexcept { return Boolean(m_value < other.m_value); }
+	constexpr bool operator<(Primitive<U> const& other) const noexcept { return m_value < other.Get(); }
 
 	template<typename U>
-	constexpr Boolean operator<=(Primitive<U> const& other) const noexcept { return Boolean(m_value <= other.m_value); }
+	constexpr bool operator<=(Primitive<U> const& other) const noexcept { return m_value <= other.Get(); }
 
 	template<typename U>
-	constexpr Boolean operator>(Primitive<U> const& other) const noexcept { return Boolean(m_value > other.m_value); }
+	constexpr bool operator>(Primitive<U> const& other) const noexcept { return m_value > other.Get(); }
 
 	template<typename U>
-	constexpr Boolean operator>=(Primitive<U> const& other) const noexcept { return Boolean(m_value >= other.m_value); }
+	constexpr bool operator>=(Primitive<U> const& other) const noexcept { return m_value >= other.Get(); }
 
 	// Output/input stream operator
 	friend std::istream& operator>>(std::istream& lhs, Boolean& rhs) { return lhs >> rhs.m_value; }
-	friend std::ostream& operator<<(std::ostream& lhs, const Boolean&rhs) { return lhs << rhs.m_value; }
+	friend std::ostream& operator<<(std::ostream& lhs, const Boolean& rhs) { return lhs << rhs.m_value; }
 
 	// Logical AND/OR operators (Boolean exclusive)
 	constexpr bool operator&&(bool const& other) noexcept { return m_value && other; }
@@ -288,10 +288,16 @@ public:
 	//inline String ToString() const noexcept override;
 	Boolean ToBoolean(IFormatProvider* provider) const override;
 	Char ToChar(IFormatProvider* provider) const override;
+	SByte ToSByte(IFormatProvider* provider) const override;
 	Byte ToByte(IFormatProvider* provider) const override;
 	Int16 ToInt16(IFormatProvider* provider) const override;
 	UInt16 ToUInt16(IFormatProvider* provider) const override;
 	Int32 ToInt32(IFormatProvider* provider) const override;
+	UInt32 ToUInt32(IFormatProvider* provider) const override;
+	Int64 ToInt64(IFormatProvider* provider) const override;
+	UInt64 ToUInt64(IFormatProvider* provider) const override;
+	Single ToSingle(IFormatProvider* provider) const override;
+	Double ToDouble(IFormatProvider* provider) const override;
 
 	// Exposed expressions
 	static constexpr Int32 True() { return 1; }

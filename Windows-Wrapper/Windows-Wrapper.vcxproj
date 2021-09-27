@@ -160,11 +160,13 @@
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="Container.cpp" />
     <ClCompile Include="ControlException.cpp" />
+    <ClCompile Include="Double.cpp" />
     <ClCompile Include="EventDispatcher.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="HorizontalScrollBar.cpp" />
     <ClCompile Include="Int16.cpp" />
     <ClCompile Include="Int32.cpp" />
+    <ClCompile Include="Int64.cpp" />
     <ClCompile Include="InvalidOperationException.cpp" />
     <ClCompile Include="Label.cpp" />
     <ClCompile Include="ListBox.cpp" />
@@ -174,8 +176,10 @@
     <ClCompile Include="MenuStrip.cpp" />
     <ClCompile Include="NotImplementedException.cpp" />
     <ClCompile Include="NotSupportedException.cpp" />
+    <ClCompile Include="SByte.cpp" />
     <ClCompile Include="ScrollableControl.cpp" />
     <ClCompile Include="ScrollBar.cpp" />
+    <ClCompile Include="Single.cpp" />
     <ClCompile Include="Site.cpp" />
     <ClCompile Include="StringWrapper.cpp" />
     <ClCompile Include="SystemException.cpp" />
@@ -214,6 +218,8 @@
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Type.cpp" />
     <ClCompile Include="UInt16.cpp" />
+    <ClCompile Include="UInt32.cpp" />
+    <ClCompile Include="UInt64.cpp" />
     <ClCompile Include="Utilities.cpp" />
     <ClCompile Include="VerticalScrollBar.cpp" />
     <ClCompile Include="WinAPI.cpp" />
@@ -233,6 +239,7 @@
     <ClInclude Include="ComboBox.h" />
     <ClInclude Include="CommonObject.h" />
     <ClInclude Include="Convert.h" />
+    <ClInclude Include="Double.h" />
     <ClInclude Include="Exceptions.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Container.h" />
@@ -257,6 +264,7 @@
     <ClInclude Include="IList.h" />
     <ClInclude Include="Int16.h" />
     <ClInclude Include="Int32.h" />
+    <ClInclude Include="Int64.h" />
     <ClInclude Include="InvalidOperationException.h" />
     <ClInclude Include="ISite.h" />
     <ClInclude Include="Keys.h" />
@@ -271,8 +279,10 @@
     <ClInclude Include="NotImplementedException.h" />
     <ClInclude Include="NotSupportedException.h" />
     <ClInclude Include="Primitives.h" />
+    <ClInclude Include="SByte.h" />
     <ClInclude Include="ScrollableControl.h" />
     <ClInclude Include="ScrollBar.h" />
+    <ClInclude Include="Single.h" />
     <ClInclude Include="Site.h" />
     <ClInclude Include="StringWrapper.h" />
     <ClInclude Include="SystemException.h" />
@@ -304,6 +314,8 @@
     <ClInclude Include="TypeCode.h" />
     <ClInclude Include="TypesInclude.h" />
     <ClInclude Include="UInt16.h" />
+    <ClInclude Include="UInt32.h" />
+    <ClInclude Include="UInt64.h" />
     <ClInclude Include="Utilities.h" />
     <ClInclude Include="VerticalScrollBar.h" />
     <ClInclude Include="WinAPI.h" />

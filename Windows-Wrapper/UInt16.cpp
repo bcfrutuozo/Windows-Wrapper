@@ -1,9 +1,15 @@
 #include "UInt16.h"
 #include "Boolean.h"
+#include "SByte.h"
 #include "Byte.h"
 #include "Char.h"
 #include "Int16.h"
 #include "Int32.h"
+#include "UInt32.h"
+#include "Int64.h"
+#include "UInt64.h"
+#include "Single.h"
+#include "Double.h"
 #include "Exceptions.h"
 
 inline int UInt16::GetHashCode() const
@@ -81,6 +87,11 @@ Char UInt16::ToChar(IFormatProvider* provider) const
 	return Char();
 }
 
+SByte UInt16::ToSByte(IFormatProvider* provider) const
+{
+	return SByte();
+}
+
 Byte UInt16::ToByte(IFormatProvider* provider) const
 {
 	return Byte();
@@ -99,4 +110,29 @@ UInt16 UInt16::ToUInt16(IFormatProvider* provider) const
 Int32 UInt16::ToInt32(IFormatProvider* provider) const
 {
 	return 0;
+}
+
+UInt32 UInt16::ToUInt32(IFormatProvider* provider) const
+{
+	return UInt32();
+}
+
+Int64 UInt16::ToInt64(IFormatProvider* provider) const
+{
+	return Int64();
+}
+
+UInt64 UInt16::ToUInt64(IFormatProvider* provider) const
+{
+	return UInt64();
+}
+
+Single UInt16::ToSingle(IFormatProvider* provider) const
+{
+	return Single();
+}
+
+Double UInt16::ToDouble(IFormatProvider* provider) const
+{
+	return Double();
 }

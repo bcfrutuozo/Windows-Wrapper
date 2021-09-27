@@ -1,9 +1,15 @@
 #include "Boolean.h"
 #include "Char.h"
+#include "SByte.h"
 #include "Byte.h"
 #include "Int16.h"
 #include "UInt16.h"
 #include "Int32.h"
+#include "UInt32.h"
+#include "Int64.h"
+#include "UInt64.h"
+#include "Single.h"
+#include "Double.h"
 #include "Exceptions.h"
 
 inline int Boolean::GetHashCode() const
@@ -77,6 +83,11 @@ Char Boolean::ToChar(IFormatProvider* provider) const
 	return Char();
 }
 
+SByte Boolean::ToSByte(IFormatProvider* provider) const
+{
+	return SByte();
+}
+
 Byte Boolean::ToByte(IFormatProvider* provider) const
 {
 	return Byte();
@@ -96,4 +107,29 @@ Int32 Boolean::ToInt32(IFormatProvider* provider) const
 {
 	// CONVERT BOOL TO INT32
 	return 0;
+}
+
+UInt32 Boolean::ToUInt32(IFormatProvider* provider) const
+{
+	return UInt32();
+}
+
+Int64 Boolean::ToInt64(IFormatProvider* provider) const
+{
+	return Int64();
+}
+
+UInt64 Boolean::ToUInt64(IFormatProvider* provider) const
+{
+	return UInt64();
+}
+
+Single Boolean::ToSingle(IFormatProvider* provider) const
+{
+	return Single();
+}
+
+Double Boolean::ToDouble(IFormatProvider* provider) const
+{
+	return Double();
 }

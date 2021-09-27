@@ -48,10 +48,10 @@ class Char final: public Primitive<char>, public IComparable<Char>, public IConv
 private:
 
 	// Returns true for all characters below or equal U+00ff, which is ASCII + Latin-1 Supplement.
-	static constexpr bool IsLatin1(char ch) noexcept { return (ch <= '\x00ff'); }
+	static constexpr bool IsLatin1(Char ch) noexcept { return (ch <= '\x00ff'); }
 
 	// Returns true for all characters below or equal U+007f, which is ASCII.
-	static constexpr bool IsASCII(char ch) noexcept { return (ch <= '\x007f'); }
+	static constexpr bool IsASCII(Char ch) noexcept { return (ch <= '\x007f'); }
 
 	// Unicode category values from Unicode U+0000 ~ U+00FF. Storing them in Byte[] array to save space.
 	static constexpr byte CategoryForLatin1[256] = 
@@ -90,13 +90,13 @@ private:
 		(byte)UnicodeCategory::LowercaseLetter, (byte)UnicodeCategory::LowercaseLetter, (byte)UnicodeCategory::LowercaseLetter, (byte)UnicodeCategory::LowercaseLetter, (byte)UnicodeCategory::LowercaseLetter, (byte)UnicodeCategory::LowercaseLetter, (byte)UnicodeCategory::LowercaseLetter, (byte)UnicodeCategory::LowercaseLetter,    // 00F8 - 00FF
 	};
 
-	static constexpr UnicodeCategory GetLatin1UnicodeCategory(char ch)
+	static constexpr UnicodeCategory GetLatin1UnicodeCategory(Char ch)
 	{
 		assert(IsLatin1(ch), "Char.GetLatin1UnicodeCategory(): ch should be <= 007f");
 		return static_cast<UnicodeCategory>((CategoryForLatin1[static_cast<int>(ch)]));
 	}
 
-	static Boolean IsWhiteSpaceLatin1(char ch) noexcept;
+	static Boolean IsWhiteSpaceLatin1(Char ch) noexcept;
 
 public:
 
@@ -365,22 +365,22 @@ public:
 	constexpr Char operator>>(Primitive<U> const& other) const noexcept { return Char(m_value >> other.Get()); }
 
 	template<typename U>
-	constexpr Char operator==(Primitive<U> const& other) const noexcept { return Char(m_value == other.Get()); }
+	constexpr bool operator==(Primitive<U> const& other) const noexcept { return m_value == other.Get(); }
 
 	template<typename U>
-	constexpr Char operator!=(Primitive<U> const& other) const noexcept { return Char(m_value != other.Get()); }
+	constexpr bool operator!=(Primitive<U> const& other) const noexcept { return m_value != other.Get(); }
 
 	template<typename U>
-	constexpr Char operator<(Primitive<U> const& other) const noexcept { return Char(m_value < other.Get()); }
+	constexpr bool operator<(Primitive<U> const& other) const noexcept { return m_value < other.Get(); }
 
 	template<typename U>
-	constexpr Char operator<=(Primitive<U> const& other) const noexcept { return Char(m_value <= other.Get()); }
+	constexpr bool operator<=(Primitive<U> const& other) const noexcept { return m_value <= other.Get(); }
 
 	template<typename U>
-	constexpr Char operator>(Primitive<U> const& other) const noexcept { return Char(m_value > other.Get()); }
+	constexpr bool operator>(Primitive<U> const& other) const noexcept { return m_value > other.Get(); }
 
 	template<typename U>
-	constexpr Char operator>=(Primitive<U> const& other) const noexcept { return Char(m_value >= other.Get()); }
+	constexpr bool operator>=(Primitive<U> const& other) const noexcept { return m_value >= other.Get(); }
 
 	// Output/input stream operator
 	friend std::istream& operator>>(std::istream & lhs, Char& rhs) { return lhs >> rhs.m_value; }
@@ -397,10 +397,16 @@ public:
 	//inline String ToString() const noexcept override;
 	Boolean ToBoolean(IFormatProvider* provider) const override;
 	Char ToChar(IFormatProvider* provider) const override;
+	SByte ToSByte(IFormatProvider* provider) const override;
 	Byte ToByte(IFormatProvider* provider) const override;
 	Int16 ToInt16(IFormatProvider* provider) const override;
 	UInt16 ToUInt16(IFormatProvider* provider) const override;
 	Int32 ToInt32(IFormatProvider* provider) const override;
+	UInt32 ToUInt32(IFormatProvider* provider) const override;
+	Int64 ToInt64(IFormatProvider* provider) const override;
+	UInt64 ToUInt64(IFormatProvider* provider) const override;
+	Single ToSingle(IFormatProvider* provider) const override;
+	Double ToDouble(IFormatProvider* provider) const override;
 
 	//static String ToString(Char const& ch) noexcept;
 	//static Char Parse(String const& s);
@@ -495,27 +501,3 @@ constexpr bool operator!=(T const& lhs, Char const& rhs) noexcept
 {
 	return lhs != rhs.Get();
 }
-
-//template<typename T, std::is_fundamental<T>::value>
-//constexpr bool operator<(T const& lhs, Char const& rhs) noexcept
-//{
-//	return lhs < rhs.Get();
-//}
-
-//template<typename T, std::is_fundamental<T>::value>
-//constexpr bool operator<=(T const& lhs, Char const& rhs) noexcept
-//{
-//	return lhs < rhs.Get();
-//}
-//
-//template<typename T, std::is_fundamental<T>::value>
-//constexpr bool operator>(T const& lhs, Char const& rhs) noexcept
-//{
-//	return lhs > rhs.Get();
-//}
-//
-//template<typename T, std::is_fundamental<T>::value>
-//constexpr bool operator>=(T const& lhs, Char const& rhs) noexcept
-//{
-//	return lhs >= rhs.Get();
-//}

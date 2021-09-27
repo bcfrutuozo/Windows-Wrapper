@@ -8,7 +8,13 @@
 #include "Int16.h"
 #include "UInt16.h"
 #include "Int32.h"
+#include "SByte.h"
 #include "Char.h"
+#include "UInt32.h"
+#include "Int64.h"
+#include "UInt64.h"
+#include "Single.h"
+#include "Double.h"
 
 #include "Event.h"
 #include "Timer.h"
@@ -164,103 +170,86 @@ void TestUserApplication::Initialize()
     Int32 bitxor(7);
     bitxor ^= 2;
     assert(bitxor.Get() == 5);
-    
+
     Int32 bitxor_self(7);
     bitxor_self ^= 2;
     assert(bitxor_self.Get() == 5);
     //
     //// Implicit conversions
-    //constexpr Int16 schar2shortconv(SByte::From(12));
-   // static_assert(schar2shortconv.Get() == 12, "A signed char was not converted to a short.");
+    constexpr Int16 schar2shortconv(SByte::From(12));
+    static_assert(schar2shortconv.Get() == 12, "A signed char was not converted to a short.");
     constexpr UInt16 uchar2ushortconv(Byte::From(12u));
     static_assert(uchar2ushortconv.Get() == 12, "An unsigned char was not converted to an unsigned short.");
     //
-    //constexpr Int schar2intconv(SChar::from(12));
-    //static_assert(schar2intconv.get() == 12, "A signed char was not converted to an int.");
+    constexpr Int32 schar2intconv(SByte::From(12));
+    static_assert(schar2intconv.Get() == 12, "A signed char was not converted to an int.");
     ;
     constexpr Int32 short2intconv(Byte::From(12));
     static_assert(short2intconv.Get() == 12, "A signed short was not converted to an int.");
     //
-    //constexpr UInt uchar2uintconv(UChar::from(12u));
-    //static_assert(uchar2uintconv.get() == 12, "An unsigned char was not converted to an unsigned int.");
-    //constexpr UInt ushort2uintconv(UShort::from(12u));
-    //static_assert(ushort2uintconv.get() == 12, "An unsigned short was not converted to an unsigned int.");
+    constexpr UInt32 uchar2uintconv(Byte::From(12u));
+    static_assert(uchar2uintconv.Get() == 12, "An unsigned char was not converted to an unsigned int.");
+    constexpr UInt32 ushort2uintconv(UInt16::From(12u));
+    static_assert(ushort2uintconv.Get() == 12, "An unsigned short was not converted to an unsigned int.");
     //
-    //constexpr Long schar2longconv(SChar::from(12));
-    //static_assert(schar2longconv.get() == 12, "A signed char was not converted to a long.");
-    //constexpr Long short2longconv(Short::from(12));
-    //static_assert(short2longconv.get() == 12, "A signed short was not converted to a long.");
-    //constexpr Long int2longconv(Int(12));
-    //static_assert(int2longconv.get() == 12, "A signed int was not converted to a long.");
+    constexpr Int64 schar2longconv(SByte::From(12));
+    static_assert(schar2longconv.Get() == 12, "A signed char was not converted to a long.");
+    constexpr Int64 short2longconv(Int16::From(12));
+    static_assert(short2longconv.Get() == 12, "A signed short was not converted to a long.");
+    constexpr Int64 int2longconv(Int32(12));
+    static_assert(int2longconv.Get() == 12, "A signed int was not converted to a long.");
     //
-    //constexpr ULong uchar2ulongconv(UChar::from(12u));
-    //static_assert(uchar2ulongconv.get() == 12, "An unsigned char was not converted to an unsigned long.");
-    //constexpr ULong ushort2ulongconv(UShort::from(12u));
-    //static_assert(ushort2ulongconv.get() == 12, "An unsigned short was not converted to an unsigned long.");
-    //constexpr ULong uint2ulongconv(UInt(12u));
-    //static_assert(uint2ulongconv.get() == 12, "An unsigned int was not converted to an unsigned long.");
+    constexpr UInt64 uchar2ulongconv(Byte::From(12u));
+    static_assert(uchar2ulongconv.Get() == 12, "An unsigned char was not converted to an unsigned long.");
+    constexpr UInt64 ushort2ulongconv(UInt32::From(12u));
+    static_assert(ushort2ulongconv.Get() == 12, "An unsigned short was not converted to an unsigned long.");
+    constexpr UInt64 uint2ulongconv(UInt32(12u));
+    static_assert(uint2ulongconv.Get() == 12, "An unsigned int was not converted to an unsigned long.");
     //
-    //constexpr Long_Long schar2longlongconv(SChar::from(12));
-    //static_assert(schar2longlongconv.get() == 12, "A signed char was not converted to a long long.");
-    //constexpr Long_Long short2longlongconv(Short::from(12));
-    //static_assert(short2longlongconv.get() == 12, "A signed short was not converted to a long long.");
-    //constexpr Long_Long int2longlongconv(Int(12));
-    //static_assert(int2longlongconv.get() == 12, "A signed int was not converted to a long long.");
-    //constexpr Long_Long long2longlongconv(Long(12));
-    //static_assert(long2longlongconv.get() == 12, "A signed long was not converted to a long long.");
     //
-    //constexpr ULong_Long uchar2ulonglongconv(UChar::from(12u));
-    //static_assert(uchar2ulonglongconv.get() == 12, "An unsigned char was not converted to an unsigned long long.");
-    //constexpr ULong_Long ushort2ulonglongconv(UShort::from(12u));
-    //static_assert(ushort2ulonglongconv.get() == 12, "An unsigned short was not converted to an unsigned long long.");
-    //constexpr ULong_Long uint2ulonglongconv(UInt(12u));
-    //static_assert(uint2ulonglongconv.get() == 12, "An unsigned int was not converted to an unsigned long long.");
-    //constexpr ULong_Long ulong2ulonglongconv(ULong(12u));
-    //static_assert(ulong2ulonglongconv.get() == 12, "An unsigned long was not converted to an unsigned long long.");
+    constexpr Single schar2doubleconv(SByte::From(-12));
+    static_assert(schar2doubleconv.Get() == -12.0, "A signed char was not converted to a double.");
+    constexpr Single uchar2doubleconv(Byte::From(12u));
+    static_assert(uchar2doubleconv.Get() == 12.0, "An unsigned char was not converted to a double.");
+    constexpr Single short2doubleconv(Int16::From(-12));
+    static_assert(short2doubleconv.Get() == -12.0, "A signed short was not converted to a double.");
+    constexpr Single ushort2doubleconv(UInt16::From(12u));
+    static_assert(ushort2doubleconv.Get() == 12.0, "An unsigned short was not converted to a double.");
+    constexpr Single int2doubleconv(Int32(-12));
+    static_assert(int2doubleconv.Get() == -12.0, "A signed int was not converted to a double.");
+    constexpr Single uint2doubleconv(UInt32(12u));
+    static_assert(uint2doubleconv.Get() == 12.0, "An unsigned int was not converted to a double.");
+    constexpr Single long2doubleconv(Int64(-12));
+    static_assert(long2doubleconv.Get() == -12.0, "A signed long was not converted to a double.");
+    constexpr Single ulong2doubleconv(UInt64(12u));
+    static_assert(ulong2doubleconv.Get() == 12.0, "An unsigned long was not converted to a double.");
+    constexpr Single float2doubleconv(Double(-12.0f));
+    static_assert(float2doubleconv.Get() == -12.0, "A signed long was not converted to a double.");
     //
-    //constexpr Double schar2doubleconv(SChar::from(-12));
-    //static_assert(schar2doubleconv.get() == -12.0, "A signed char was not converted to a double.");
-    //constexpr Double uchar2doubleconv(UChar::from(12u));
-    //static_assert(uchar2doubleconv.get() == 12.0, "An unsigned char was not converted to a double.");
-    //constexpr Double short2doubleconv(Short::from(-12));
-    //static_assert(short2doubleconv.get() == -12.0, "A signed short was not converted to a double.");
-    //constexpr Double ushort2doubleconv(UShort::from(12u));
-    //static_assert(ushort2doubleconv.get() == 12.0, "An unsigned short was not converted to a double.");
-    //constexpr Double int2doubleconv(Int(-12));
-    //static_assert(int2doubleconv.get() == -12.0, "A signed int was not converted to a double.");
-    //constexpr Double uint2doubleconv(UInt(12u));
-    //static_assert(uint2doubleconv.get() == 12.0, "An unsigned int was not converted to a double.");
-    //constexpr Double long2doubleconv(Long(-12));
-    //static_assert(long2doubleconv.get() == -12.0, "A signed long was not converted to a double.");
-    //constexpr Double ulong2doubleconv(ULong(12u));
-    //static_assert(ulong2doubleconv.get() == 12.0, "An unsigned long was not converted to a double.");
-    //constexpr Double float2doubleconv(Float(-12.0f));
-    //static_assert(float2doubleconv.get() == -12.0, "A signed long was not converted to a double.");
-    //
-    //constexpr Long_Double schar2longdoubleconv(SChar::from(-12));
-    //static_assert(schar2longdoubleconv.get() == -12.0, "A signed char was not converted to a long double.");
-    //constexpr Long_Double uchar2longdoubleconv(UChar::from(12u));
-    //static_assert(uchar2longdoubleconv.get() == 12.0, "An unsigned char was not converted to a long double.");
-    //constexpr Long_Double short2longdoubleconv(Short::from(-12));
-    //static_assert(short2longdoubleconv.get() == -12.0, "A signed short was not converted to a long double.");
-    //constexpr Long_Double ushort2longdoubleconv(UShort::from(12u));
-    //static_assert(ushort2longdoubleconv.get() == 12.0, "An unsigned short was not converted to a long double.");
-    //constexpr Long_Double int2longdoubleconv(Int(-12));
-    //static_assert(int2longdoubleconv.get() == -12.0, "A signed int was not converted to a long double.");
-    //constexpr Long_Double uint2longdoubleconv(UInt(12u));
-    //static_assert(uint2longdoubleconv.get() == 12.0, "An unsigned signed int was not converted to a long double.");
-    //constexpr Long_Double long2longdoubleconv(Long(-12));
-    //static_assert(long2longdoubleconv.get() == -12.0, "A signed long was not converted to a long double.");
-    //constexpr Long_Double ulong2longdoubleconv(ULong(12u));
-    //static_assert(ulong2longdoubleconv.get() == 12.0, "An unsigned signed long was not converted to a long double.");
-    //constexpr Long_Double float2longdoubleconv(Float(-12.0f));
-    //static_assert(float2longdoubleconv.get() == -12.0, "A float was not converted to a long double.");
-    //constexpr Long_Double double2longdoubleconv(Double(-12));
-    //static_assert(double2longdoubleconv.get() == -12.0, "A double was not converted to a long double.");
+    constexpr Double schar2longdoubleconv(SByte::From(-12));
+    static_assert(schar2longdoubleconv.Get() == -12.0, "A signed char was not converted to a long double.");
+    constexpr Double uchar2longdoubleconv(Byte::From(12u));
+    static_assert(uchar2longdoubleconv.Get() == 12.0, "An unsigned char was not converted to a long double.");
+    constexpr Double short2longdoubleconv(Int16::From(-12));
+    static_assert(short2longdoubleconv.Get() == -12.0, "A signed short was not converted to a long double.");
+    constexpr Double ushort2longdoubleconv(UInt16::From(12u));
+    static_assert(ushort2longdoubleconv.Get() == 12.0, "An unsigned short was not converted to a long double.");
+    constexpr Double int2longdoubleconv(Int32(-12));
+    static_assert(int2longdoubleconv.Get() == -12.0, "A signed int was not converted to a long double.");
+    constexpr Double uint2longdoubleconv(UInt32(12u));
+    static_assert(uint2longdoubleconv.Get() == 12.0, "An unsigned signed int was not converted to a long double.");
+    constexpr Double long2longdoubleconv(Int64(-12));
+    static_assert(long2longdoubleconv.Get() == -12.0, "A signed long was not converted to a long double.");
+    constexpr Double ulong2longdoubleconv(UInt64(12u));
+    static_assert(ulong2longdoubleconv.Get() == 12.0, "An unsigned signed long was not converted to a long double.");
+    constexpr Double float2longdoubleconv(Double(-12.0f));
+    static_assert(float2longdoubleconv.Get() == -12.0, "A float was not converted to a long double.");
+    constexpr Double double2longdoubleconv(Single(-12));
+    static_assert(double2longdoubleconv.Get() == -12.0, "A double was not converted to a long double.");
     //
     //// Explicit conversions
-    //constexpr Float double2float = static_cast<Float>(Double(12));
-    //static_assert(double2float.get() == 12, "A double was not converted explicitly to a float.");
+    constexpr Single double2float = static_cast<Single>(Double(12));
+    static_assert(double2float.Get() == 12, "A double was not converted explicitly to a float.");
     //
     //// Binary Operators
     static_assert((Int32(1) + 1).Get() == 2, "Binary + failed.");
@@ -355,13 +344,13 @@ void TestUserApplication::Initialize()
     assert(expand_into == 100);
     //
     //// Test demotions
-    //static_assert(SChar::from(12).get() == 12, "Could not create a signed char from an int.");
-    //static_assert(UChar::from(12u).get() == 12, "Could not create an unsigned char from an unsigned int.");
-    //static_assert(Short::from(12).get() == 12, "Could not create a short from an int.");
-    //static_assert(UShort::from(12u).get() == 12, "Could not create an unsigned short from an unsigned int.");
+    static_assert(SByte::From(12).Get() == 12, "Could not create a signed char from an int.");
+    static_assert(Byte::From(12u).Get() == 12, "Could not create an unsigned char from an unsigned int.");
+    static_assert(Int16::From(12).Get() == 12, "Could not create a short from an int.");
+    static_assert(UInt16::From(12u).Get() == 12, "Could not create an unsigned short from an unsigned int.");
     //
-    //SChar tester = SChar::from(100);
-    //tester = SChar::from(500);
+    SByte tester = SByte::From(100);
+    tester = SByte::From(500);
     //
     constexpr Char character = 'a';
     static_assert(character.Get() == 'a', "Could not read a character.");

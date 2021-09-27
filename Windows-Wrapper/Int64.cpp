@@ -1,3 +1,4 @@
+#include "Int64.h"
 #include "Int32.h"
 #include "Boolean.h"
 #include "SByte.h"
@@ -6,22 +7,21 @@
 #include "Int16.h"
 #include "UInt16.h"
 #include "UInt32.h"
-#include "Int64.h"
 #include "UInt64.h"
 #include "Single.h"
 #include "Double.h"
 #include "Exceptions.h"
 
-inline int Int32::GetHashCode() const
+inline int Int64::GetHashCode() const
 {
 	return m_value;
 }
 
-int Int32::CompareTo(const Object* const obj) const
+int Int64::CompareTo(const Object* const obj) const
 {
 	if (obj == nullptr) return 1;
 
-	if (const auto value = dynamic_cast<const Int32*>(obj))
+	if (const auto value = dynamic_cast<const Int64*>(obj))
 	{
 		int i = value->Get();
 
@@ -31,7 +31,7 @@ int Int32::CompareTo(const Object* const obj) const
 		return 0;
 	}
 
-	if (const auto value = (int*)(obj))
+	if (const auto value = (long long*)(obj))
 	{
 		if (m_value < *value) return -1;
 		if (m_value > *value) return 1;
@@ -42,7 +42,7 @@ int Int32::CompareTo(const Object* const obj) const
 	throw ArgumentException("Arg_MustBeInt32");
 }
 
-int Int32::CompareTo(const Int32* const value) const
+int Int64::CompareTo(const Int64* const value) const
 {
 	if (value == nullptr) return 1;
 
@@ -52,16 +52,16 @@ int Int32::CompareTo(const Int32* const value) const
 	return 0;
 }
 
-bool Int32::Equals(const Object* const obj) const
+bool Int64::Equals(const Object* const obj) const
 {
 	if (obj == nullptr) return false;
 
-	if (const auto value = dynamic_cast<const Int32*>(obj))
+	if (const auto value = dynamic_cast<const Int64*>(obj))
 	{
 		return Get() == value->Get();
 	}
 
-	if (const auto value = (int*)(obj))
+	if (const auto value = (long long*)(obj))
 	{
 		return Get() == *value;
 	}
@@ -69,70 +69,71 @@ bool Int32::Equals(const Object* const obj) const
 	return false;
 }
 
-bool Int32::Equals(const Int32* const b) const
+bool Int64::Equals(const Int64* const b) const
 {
 	if (b == nullptr) return false;
 
 	return Get() == b->Get();
 }
 
-Boolean Int32::ToBoolean(IFormatProvider* provider) const
+Boolean Int64::ToBoolean(IFormatProvider* provider) const
 {
 	//TODO:: CONVERT INT32 TO BOOLEAN
 	return false;
 }
 
-Char Int32::ToChar(IFormatProvider* provider) const
+Char Int64::ToChar(IFormatProvider* provider) const
 {
 	return Char();
 }
 
-SByte Int32::ToSByte(IFormatProvider* provider) const
+SByte Int64::ToSByte(IFormatProvider* provider) const
 {
 	return SByte();
 }
 
-Byte Int32::ToByte(IFormatProvider* provider) const
+Byte Int64::ToByte(IFormatProvider* provider) const
 {
 	return Byte();
 }
 
-Int16 Int32::ToInt16(IFormatProvider* provider) const
+Int16 Int64::ToInt16(IFormatProvider* provider) const
 {
 	return 0;
 }
 
-UInt16 Int32::ToUInt16(IFormatProvider* provider) const
+UInt16 Int64::ToUInt16(IFormatProvider* provider) const
 {
 	return UInt16();
 }
 
-Int32 Int32::ToInt32(IFormatProvider* provider) const
+Int32 Int64::ToInt32(IFormatProvider* provider) const
 {
 	return *this;
 }
 
-UInt32 Int32::ToUInt32(IFormatProvider* provider) const
+UInt32 Int64::ToUInt32(IFormatProvider* provider) const
 {
 	return UInt32();
 }
 
-Int64 Int32::ToInt64(IFormatProvider* provider) const
+
+Int64 Int64::ToInt64(IFormatProvider* provider) const
 {
 	return Int64();
 }
 
-UInt64 Int32::ToUInt64(IFormatProvider* provider) const
+UInt64 Int64::ToUInt64(IFormatProvider* provider) const
 {
 	return UInt64();
 }
 
-Single Int32::ToSingle(IFormatProvider* provider) const
+Single Int64::ToSingle(IFormatProvider* provider) const
 {
 	return Single();
 }
 
-Double Int32::ToDouble(IFormatProvider* provider) const
+Double Int64::ToDouble(IFormatProvider* provider) const
 {
 	return Double();
 }

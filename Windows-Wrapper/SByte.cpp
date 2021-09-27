@@ -1,7 +1,7 @@
-#include "Byte.h"
+#include "SByte.h"
 #include "Boolean.h"
 #include "Char.h"
-#include "SByte.h"
+#include "Byte.h"
 #include "Int16.h"
 #include "UInt16.h"
 #include "Int32.h"
@@ -12,16 +12,16 @@
 #include "Double.h"
 #include "Exceptions.h"
 
-inline int Byte::GetHashCode() const
+inline int SByte::GetHashCode() const
 {
 	return m_value;
 }
 
-int Byte::CompareTo(const Object* const obj) const
+int SByte::CompareTo(const Object* const obj) const
 {
 	if (obj == nullptr) return 1;
 
-	if (const auto value = dynamic_cast<const Byte*>(obj))
+	if (const auto value = dynamic_cast<const SByte*>(obj))
 	{
 		int i = value->Get();
 
@@ -39,10 +39,10 @@ int Byte::CompareTo(const Object* const obj) const
 		return 0;
 	}
 
-	throw ArgumentException("Arg_MustBeByte");
+	throw ArgumentException("Arg_MustBeSByte");
 }
 
-int Byte::CompareTo(const Byte* const value) const
+int SByte::CompareTo(const SByte* const value) const
 {
 	if (value == nullptr) return 1;
 
@@ -52,11 +52,11 @@ int Byte::CompareTo(const Byte* const value) const
 	return 0;
 }
 
-bool Byte::Equals(const Object* const obj) const
+bool SByte::Equals(const Object* const obj) const
 {
 	if (obj == nullptr) return false;
 
-	if (const auto value = dynamic_cast<const Byte*>(obj))
+	if (const auto value = dynamic_cast<const SByte*>(obj))
 	{
 		return Get() == value->Get();
 	}
@@ -69,70 +69,70 @@ bool Byte::Equals(const Object* const obj) const
 	return false;
 }
 
-bool Byte::Equals(const Byte* const b) const
+bool SByte::Equals(const SByte* const b) const
 {
 	if (b == nullptr) return false;
 
 	return Get() == b->Get();
 }
 
-Boolean Byte::ToBoolean(IFormatProvider* provider) const
+Boolean SByte::ToBoolean(IFormatProvider* provider) const
 {
 	//TODO:: CONVERT INT32 TO BOOLEAN
 	return false;
 }
 
-Char Byte::ToChar(IFormatProvider* provider) const
+Char SByte::ToChar(IFormatProvider* provider) const
 {
 	return Char();
 }
 
-SByte Byte::ToSByte(IFormatProvider* provider) const
+SByte SByte::ToSByte(IFormatProvider* provider) const
 {
 	return SByte();
 }
 
-Byte Byte::ToByte(IFormatProvider* provider) const
+Byte SByte::ToByte(IFormatProvider* provider) const
 {
 	return Byte();
 }
 
-Int16 Byte::ToInt16(IFormatProvider* provider) const
+Int16 SByte::ToInt16(IFormatProvider* provider) const
 {
 	return 0;
 }
 
-UInt16 Byte::ToUInt16(IFormatProvider* provider) const
+UInt16 SByte::ToUInt16(IFormatProvider* provider) const
 {
 	return UInt16();
 }
 
-Int32 Byte::ToInt32(IFormatProvider* provider) const
+Int32 SByte::ToInt32(IFormatProvider* provider) const
 {
 	return 0;
 }
 
-UInt32 Byte::ToUInt32(IFormatProvider* provider) const
+UInt32 SByte::ToUInt32(IFormatProvider* provider) const
 {
 	return UInt32();
 }
 
-Int64 Byte::ToInt64(IFormatProvider* provider) const
+Int64 SByte::ToInt64(IFormatProvider* provider) const
 {
 	return Int64();
 }
 
-UInt64 Byte::ToUInt64(IFormatProvider* provider) const
+UInt64 SByte::ToUInt64(IFormatProvider* provider) const
 {
 	return UInt64();
 }
 
-Single Byte::ToSingle(IFormatProvider* provider) const
+Single SByte::ToSingle(IFormatProvider* provider) const
 {
 	return Single();
 }
 
-Double Byte::ToDouble(IFormatProvider* provider) const
+Double SByte::ToDouble(IFormatProvider* provider) const
 {
 	return Double();
 }
