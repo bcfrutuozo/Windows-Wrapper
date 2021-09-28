@@ -314,7 +314,7 @@ public:
 		return index;
 	}
 
-	void Insert(int index, T* item) override
+	void Insert(size_t index, T* item) override
 	{
 		if (index < 0 || index >= this->Count)
 		{
@@ -352,7 +352,7 @@ public:
 		return m_ReadOnly;
 	}
 
-	bool RemoveAt(int index) override
+	bool RemoveAt(size_t index) override
 	{
 		if (index >= this->Count)
 		{
@@ -360,12 +360,17 @@ public:
 		}
 
 		int i = 0;
+		bool ret = false;
+
 		for (auto it = begin(); it != end(); ++it, ++i)
 		{
 			if (index == i)
 			{
-				return Remove(*it);
+				ret = Remove(*it);
+				break;
 			}
 		}
+
+		return ret;
 	}
 };

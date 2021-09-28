@@ -34,7 +34,7 @@ inline const std::string Object::ToString() const noexcept
 	return GetType().ToString();
 }
 
-ListItem Object::ToListItem() const noexcept
+ListItem Object::ToListItem() const
 {
 	throw NotImplementedException("ToListItem is not implemented in default Object class.");
 }

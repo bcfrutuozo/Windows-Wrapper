@@ -121,6 +121,9 @@
     <ClCompile Include="Padding.cpp">
       <Filter>Types</Filter>
     </ClCompile>
+    <ClCompile Include="SHA1.cpp">
+      <Filter>Security</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RealTimeApplication.h" />
@@ -351,6 +354,9 @@
     <ClInclude Include="Convert.h">
       <Filter>Types</Filter>
     </ClInclude>
+    <ClInclude Include="SHA1.h">
+      <Filter>Security</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interfaces">
@@ -373,6 +379,9 @@
     </Filter>
     <Filter Include="Types">
       <UniqueIdentifier>{479a7048-42b5-4d27-832b-e8f61663b546}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Security">
+      <UniqueIdentifier>{2405503e-fd44-440f-833d-487a3653a71e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

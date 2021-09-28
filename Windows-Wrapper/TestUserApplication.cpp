@@ -9,8 +9,9 @@
 
 void TestClick(Object* sender, EventArgs* e)
 {
-	Button* b = (Button*)sender;
-    printf_s("AOOO CRICOUU");
+	std::ostringstream ossin;
+	ossin << sender->ToString() << std::endl << e->ToString() << std::endl << "Clicked!" << std::endl << std::endl;
+	printf_s(ossin.str().c_str());
 }
 
 void TestUserApplication::Initialize()
@@ -105,11 +106,17 @@ void TestUserApplication::Initialize()
     button1->OnClickSet(&TestClick);
     button1->OnMouseEnterSet([](Object* sender, EventArgs* e)
     	{
+			std::ostringstream ossin;
+			ossin << sender->ToString() << std::endl << e->ToString() << std::endl << std::endl;
+			printf_s(ossin.str().c_str());
     		printf_s("Teste Mouseenter Button1");
     	}
     );
     button1->OnMouseLeaveSet([](Object* sender, EventArgs* e)
     	{
+			std::ostringstream ossin;
+			ossin << sender->ToString() << std::endl << e->ToString() << std::endl << std::endl;
+			printf_s(ossin.str().c_str());
     		printf_s("Teste Mouseleave Button1");
     	}
     );
@@ -117,7 +124,9 @@ void TestUserApplication::Initialize()
     button2 = window->AddButton("XYZ", 100, 40, 200, 200);
     button2->OnClickSet([](Object* sender, EventArgs* e)
     	{
-    		Button* b = (Button*)sender;
+			std::ostringstream ossin;
+			ossin << sender->ToString() << std::endl << e->ToString() << std::endl << std::endl;
+			printf_s(ossin.str().c_str());
             printf_s("Button2 clicked");
     	}
     );
@@ -126,7 +135,9 @@ void TestUserApplication::Initialize()
     txtBox1->BorderStyle = BorderStyle::None;
     txtBox1->OnKeyPressSet([](Object* sender, KeyPressEventArgs* e)
     	{
-    		TextBox* t = (TextBox*)sender;
+			std::ostringstream ossin;
+			ossin << sender->ToString() << std::endl << e->ToString() << std::endl << std::endl;
+			printf_s(ossin.str().c_str());
     		if (e->KeyChar == 'p')
     		{
                 printf_s("printing P");
@@ -143,7 +154,9 @@ void TestUserApplication::Initialize()
     txtBox2->BorderStyle = BorderStyle::FixedSingle;
     txtBox2->OnKeyPressSet([](Object* sender, KeyPressEventArgs* e)
         {
-            TextBox* t = (TextBox*)sender;
+			std::ostringstream ossin;
+			ossin << sender->ToString() << std::endl << e->ToString() << std::endl << std::endl;
+			printf_s(ossin.str().c_str());
             if (e->KeyChar == 'z')
             {
                 printf_s("printing Z");
@@ -155,7 +168,9 @@ void TestUserApplication::Initialize()
     txtBox3->BorderStyle = BorderStyle::Fixed3D;
     txtBox3->OnKeyPressSet([](Object* sender, KeyPressEventArgs* e)
     	{
-    		TextBox* t = (TextBox*)sender;
+			std::ostringstream ossin;
+			ossin << sender->ToString() << std::endl << e->ToString() << std::endl << std::endl;
+			printf_s(ossin.str().c_str());
     		if (e->KeyChar == 'A')
     		{
                 printf_s("printing A");

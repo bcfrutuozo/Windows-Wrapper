@@ -171,6 +171,7 @@
     <ClCompile Include="NotSupportedException.cpp" />
     <ClCompile Include="ScrollableControl.cpp" />
     <ClCompile Include="ScrollBar.cpp" />
+    <ClCompile Include="SHA1.cpp" />
     <ClCompile Include="Site.cpp" />
     <ClCompile Include="SystemException.cpp" />
     <ClCompile Include="TestRealTimeApplication.cpp" />
@@ -258,6 +259,7 @@
     <ClInclude Include="NotSupportedException.h" />
     <ClInclude Include="ScrollableControl.h" />
     <ClInclude Include="ScrollBar.h" />
+    <ClInclude Include="SHA1.h" />
     <ClInclude Include="Site.h" />
     <ClInclude Include="SystemException.h" />
     <ClInclude Include="TestRealTimeApplication.h" />
