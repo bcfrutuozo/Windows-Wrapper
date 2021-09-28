@@ -4,7 +4,7 @@
 #include "IEnumerator.h"
 
 template<typename T>
-class Enumerator : public IEnumerator<T>, public Object
+class Enumerator : public IEnumerator<T>
 {
 	friend class Iterator;
 	friend class ConstIterator;
@@ -53,7 +53,7 @@ public:
 		Index = src.Index;
 	}
 
-	~Enumerator()
+	virtual ~Enumerator()
 	{
 		if (Begin != nullptr)
 		{

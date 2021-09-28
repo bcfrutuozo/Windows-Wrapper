@@ -11,10 +11,9 @@ public:
 
 	constexpr Object() = default;
 
-	constexpr bool operator==(const Object& b) const noexcept { return *this == b; }
 	constexpr bool ReferenceEquals(const Object& b) const noexcept { return std::addressof(*this) == std::addressof(b); }
 
-	bool constexpr static Equals(const Object* const lhs, const Object* const rhs)
+	constexpr static bool Equals(const Object* const lhs, const Object* const rhs)
 	{
 		if (lhs == nullptr && rhs == nullptr) return true;
 		if (lhs == nullptr || rhs == nullptr) return false;

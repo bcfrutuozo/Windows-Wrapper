@@ -6,7 +6,7 @@
 #include <string>
 #include <typeinfo>
 
-class Type : public Object, public IEquatable<Type>
+class Type : public IEquatable<Type>
 {
 	friend class Object;
 

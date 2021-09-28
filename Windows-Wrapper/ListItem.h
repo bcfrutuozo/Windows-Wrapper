@@ -13,4 +13,5 @@ public:
 
 	ListItem(uint32_t id, const std::string& value);
 	ListItem(const ListItem& src);
+	virtual ~ListItem() = default;
 };

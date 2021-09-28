@@ -2,7 +2,6 @@
 
 #include "IEquatable.h"
 #include "IComparable.h"
-#include "IConvertible.h"
 
 struct IntPtr : public IComparable<IntPtr>, public IEquatable<IntPtr>
 {

@@ -14,6 +14,8 @@ protected:
 
 public:
 
+	virtual ~IContainer() = default;
+
 	virtual void Add(IComponent* const component) = 0;
 	virtual void Add(IComponent* const component, const std::string& name) = 0;
 	const std::vector<IComponent*>& GetComponents() { return Components; }

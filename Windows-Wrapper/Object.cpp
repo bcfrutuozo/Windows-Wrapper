@@ -7,7 +7,7 @@
 inline bool Object::Equals(const Object* const b) const
 {
 	if (b == nullptr) return false;
-	return *this == *b;
+	return ReferenceEquals(*b);
 }
 
 inline int Object::GetHashCode() const

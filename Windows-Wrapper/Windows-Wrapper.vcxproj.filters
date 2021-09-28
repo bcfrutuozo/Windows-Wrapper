@@ -121,45 +121,6 @@
     <ClCompile Include="Padding.cpp">
       <Filter>Types</Filter>
     </ClCompile>
-    <ClCompile Include="StringWrapper.cpp">
-      <Filter>Types</Filter>
-    </ClCompile>
-    <ClCompile Include="Boolean.cpp">
-      <Filter>Types\Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="Byte.cpp">
-      <Filter>Types\Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="Char.cpp">
-      <Filter>Types\Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="Int16.cpp">
-      <Filter>Types\Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="Int32.cpp">
-      <Filter>Types\Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="Int64.cpp">
-      <Filter>Types\Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="SByte.cpp">
-      <Filter>Types\Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="UInt16.cpp">
-      <Filter>Types\Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="UInt32.cpp">
-      <Filter>Types\Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="UInt64.cpp">
-      <Filter>Types\Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="Single.cpp">
-      <Filter>Types\Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="Double.cpp">
-      <Filter>Types\Primitives</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RealTimeApplication.h" />
@@ -357,17 +318,11 @@
     <ClInclude Include="IntPtr.h">
       <Filter>Types</Filter>
     </ClInclude>
-    <ClInclude Include="IConvertible.h">
-      <Filter>Interfaces</Filter>
-    </ClInclude>
     <ClInclude Include="Type.h">
       <Filter>Types</Filter>
     </ClInclude>
     <ClInclude Include="Object.h">
       <Filter>Types</Filter>
-    </ClInclude>
-    <ClInclude Include="IFormatProvider.h">
-      <Filter>Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="IComparable.h">
       <Filter>Interfaces</Filter>
@@ -393,53 +348,8 @@
     <ClInclude Include="Padding.h">
       <Filter>Types</Filter>
     </ClInclude>
-    <ClInclude Include="StringWrapper.h">
-      <Filter>Types</Filter>
-    </ClInclude>
     <ClInclude Include="Convert.h">
       <Filter>Types</Filter>
-    </ClInclude>
-    <ClInclude Include="TypesInclude.h">
-      <Filter>Types</Filter>
-    </ClInclude>
-    <ClInclude Include="Primitives.h">
-      <Filter>Types</Filter>
-    </ClInclude>
-    <ClInclude Include="Boolean.h">
-      <Filter>Types\Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="Byte.h">
-      <Filter>Types\Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="Char.h">
-      <Filter>Types\Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="Int16.h">
-      <Filter>Types\Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="Int32.h">
-      <Filter>Types\Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="Int64.h">
-      <Filter>Types\Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="SByte.h">
-      <Filter>Types\Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="UInt16.h">
-      <Filter>Types\Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="UInt32.h">
-      <Filter>Types\Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="UInt64.h">
-      <Filter>Types\Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="Single.h">
-      <Filter>Types\Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="Double.h">
-      <Filter>Types\Primitives</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -463,9 +373,6 @@
     </Filter>
     <Filter Include="Types">
       <UniqueIdentifier>{479a7048-42b5-4d27-832b-e8f61663b546}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Types\Primitives">
-      <UniqueIdentifier>{820beaa8-c0c1-4c3b-bb6e-2161e729f5f2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
