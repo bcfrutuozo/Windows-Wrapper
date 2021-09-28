@@ -1,7 +1,7 @@
 #include "ListControl.h"
 #include "ComboBox.h"
 
-int ListControl::OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept
+int ListControl::OnEraseBackground_Impl(HWND hwnd, HDC hdc)
 {
 	return 1;	// To avoid flickering
 }
@@ -35,7 +35,6 @@ ListControl::ListControl(Control* parent, const std::string& name, int width, in
 
 ListControl::~ListControl()
 {
-	if (Items != nullptr) { delete Items; Items = nullptr; }
 	if (OnDataSourceChanged != nullptr) { delete OnDataSourceChanged; OnDataSourceChanged = nullptr; }
 	if (OnDisplayMemberChanged != nullptr) { delete OnDisplayMemberChanged; OnDisplayMemberChanged = nullptr; }
 	if (OnFormat != nullptr) { delete OnFormat; OnFormat = nullptr; }
@@ -139,24 +138,20 @@ void ListControl::DisableSelection() noexcept
 	m_AllowSelection = false;
 }
 
-ListItemCollection* const ListControl::GetDataSource() const noexcept
+const ListItemCollection& const ListControl::GetDataSource() const noexcept
 {
 	return Items;
 }
 
-void ListControl::SetDataSource(ListItemCollection* const dataSource) noexcept
+void ListControl::SetDataSource(const ListItemCollection& dataSource)
 {
-	if (dataSource != nullptr && dataSource->GetCount() > 32767)
+	if (dataSource.size() > 32767)
 	{
 		throw std::logic_error("Maximum ListBox items allowed is 32767");
 	}
 
 	// Destroy the old DataSource to avoid memory leak
-	if (Items != nullptr)
-	{
-		delete Items;
-		Items = nullptr;
-	}
+	Items.clear();
 
 	SetSelectedIndex(-1);
 

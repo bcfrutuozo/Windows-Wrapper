@@ -92,7 +92,10 @@ void Window::Initialize()
 
 Window::~Window()
 {
-	DestroyWindow(static_cast<HWND>(Handle.ToPointer()));
+	if (DestroyWindow(static_cast<HWND>(Handle.ToPointer())) == 0)
+	{
+		throw CTL_LAST_EXCEPT();
+	}
 }
 
 void Window::ClearMenuStrip() noexcept
@@ -193,7 +196,11 @@ void Window::SetText(const std::string& title)
 		}
 
 		Text = title;
-		RedrawWindow(static_cast<HWND>(Handle.ToPointer()), NULL, NULL, RDW_INVALIDATE | RDW_ERASE);
+
+		if (RedrawWindow(static_cast<HWND>(Handle.ToPointer()), NULL, NULL, RDW_INVALIDATE | RDW_ERASE) == 0)
+		{
+			throw CTL_LAST_EXCEPT();
+		}
 	}
 }
 

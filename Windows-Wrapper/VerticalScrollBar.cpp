@@ -1,7 +1,7 @@
 #include "VerticalScrollBar.h"
 #include "ScrollableControl.h"
 
-void VerticalScrollBar::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy) noexcept
+void VerticalScrollBar::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy)
 {
 	if (ShowScrollBar(hwnd, SB_VERT, true) == 0)
 	{
@@ -22,7 +22,7 @@ void VerticalScrollBar::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int c
 	WinAPI::OnSize_Impl(hwnd, state, cx, cy);
 }
 
-void VerticalScrollBar::OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int code, int pos) noexcept
+void VerticalScrollBar::OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int code, int pos)
 {
 	int nPos;
 	int nOldPos;

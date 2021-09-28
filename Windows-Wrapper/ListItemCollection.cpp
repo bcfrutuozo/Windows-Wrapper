@@ -3,28 +3,38 @@
 
 ListItemCollection::ListItemCollection(ListControl* owner)
 	:
-	Collection(owner)
+	Owner(owner)
 {
 
 }
 
 ListItemCollection::ListItemCollection(ListControl* owner, ListItemCollection& value)
 	:
-	Collection(owner)
+	Owner(owner)
 {
 	for (const auto& item : value)
 	{
-		Add(item);
+		push_back(item);
 	}
 }
 
-ListItemCollection::ListItemCollection(ListControl* owner, ListItem* value[])
+ListItemCollection::ListItemCollection(ListControl* owner, ListItem value[])
 	:
-	Collection(owner)
+	Owner(owner)
 {
 	while (value != nullptr)
 	{
-		Add(*value);
+		push_back(*value);
 		++value;
 	}
+}
+
+ListItemCollection::~ListItemCollection()
+{
+
+}
+
+ListControl* ListItemCollection::GetOwner() const noexcept
+{
+	return Owner;
 }

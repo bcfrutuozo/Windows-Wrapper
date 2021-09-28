@@ -10,8 +10,8 @@ class VerticalScrollBar : public ScrollBar
 
 private:
 
-	void OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy) noexcept override;
-	void OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int code, int pos) noexcept override;
+	void OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy) override;
+	void OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int code, int pos) override;
 
 public:
 

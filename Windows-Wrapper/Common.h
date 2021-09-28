@@ -8,6 +8,12 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 
+#include <vector>
+#include <list>
+#include <map>
+#include <memory>
+#include <functional>
+
 #pragma warning(disable:4265)
 #include <wrl.h>
 #pragma warning(default:4265)

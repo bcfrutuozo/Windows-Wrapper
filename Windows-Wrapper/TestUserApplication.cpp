@@ -19,15 +19,14 @@ void TestUserApplication::Initialize()
 	Window* window = new Window("Teste", 1000, 1000);
 	window->GetMouse().EnableRaw();
 	window->GetKeyboard().DisableAutorepeat();
-	//
+	
 	auto lb = window->AddListBox(260, 240, 450, 50);
-	//
-	auto list = new ListItemCollection(lb);
+	auto list = ListItemCollection(lb);
 	for (size_t i = 0; i < 1000; ++i)
 	{
 		std::ostringstream oss;
 		oss << "Item: " << i;
-		list->Add(new ListItem(i, oss.str()));
+		list.push_back(ListItem(i, oss.str()));
 	}
 	lb->SetDataSource(list);
 	auto f = lb->GetFont();
@@ -37,71 +36,18 @@ void TestUserApplication::Initialize()
 	lb->SetBorderStyle(BorderStyle::Fixed3D);
 	//lb->EnableMultiColumn();
 	lb->SetColumnWidth(180);
-	//
+	
 	auto cb = window->AddComboBox("Start Text", 260, 450, 450);
-	// Double list to check for memory leak during DataSource rebinding
-	auto list2 = new ListItemCollection(lb);
+
+	auto list2 = ListItemCollection(lb);
 	for (size_t i = 0; i < 5; ++i)
 	{
 		std::ostringstream oss;
 		oss << "Item: " << i;
-		list2->Add(new ListItem(i, oss.str()));
+		list2.push_back(ListItem(i, oss.str()));
 	}
 	cb->SetDataSource(list2);
-	//
-	////auto t1 = window->AddComboBox("ComboBox", 300, 120, 120);
-	////window2->AddButton("Teste", 250, 250, 125, 125);
-	//
-	////ToolStrip& p = window->AddToolStrip();
-	////ToolStrip& j = window->AddToolStrip();
-	////p.SetBackgroundColor(Color::Black());
-	////j.SetBackgroundColor(Color::Blue());
-	////auto l = window->AddLabel("abcdef", 300, 100);
-	////auto f = l->GetFont();
-	////f.SetSize(16);
-	////f.SetStyle(FontStyle::Bold);
-	////f.SetStyle(FontStyle::Strikeout);
-	////l->SetBorderStyle(BorderStyle::None);
-	////l->SetFont(f);
-	////
-	//button1 = window->AddButton("Abc", 200, 80, 50, 100);
-	//button1->OnClickSet([](Object* sender, EventArgs* e)
-	//	{
-	//		printf_s("Button1 Click Test");
-	//	}
-	//);
-	//
-	//txtBox1 = window->AddTextBox("TextBox", 400, 20, 400);
-	//
-	//////auto& mb = window->GetMenuStrip();
-	//////auto& item1 = mb.AddItem("Arquivo");
-	//////auto& item2 = mb.AddItem("Arquivo2");
-	//////auto& menu1 = mb.AddMenu("Submenu");
-	//////menu1.AddItem("Submenu-Item1").OnClickSet(&TestClick);
-	//////menu1.AddCheckItem("Check-test01", true).OnClickSet(&TestClick);
-	//////menu1.AddCheckItem("Check-test02", false).OnClickSet(&TestClick);
-	//////menu1.AddSeparator();
-	//////menu1.AddItemWithIcon("Submenu-Item2", "images\\1.bmp").OnClickSet(&TestClick);
-	//////menu1.AddSeparator();
-	//////auto& menu2 = menu1.AddMenu("Submenu-Item3");
-	//////menu2.AddItemWithIcon("Submenu2-Item1", "images\\2.bmp").OnClickSet(&TestClick);
-	//////menu2.AddSeparator();
-	//////menu2.AddRadioItem("Radio1", true).OnClickSet(&TestClick);
-	//////menu2.AddRadioItem("Radio2", true).OnClickSet(&TestClick);
-	//////menu2.AddRadioItem("Radio3", false).OnClickSet(&TestClick);
-	//////menu2.AddRadioItem("Radio4", true).OnClickSet(&TestClick);
-	//////menu2.AddSeparator();
-	//////menu2.AddRadioItem("Radio1", false).OnClickSet(&TestClick);
-	//////menu2.AddRadioItem("Radio2", true).OnClickSet(&TestClick);
-	//////menu1.AddItem("Submenu-Item4").OnClickSet(&TestClick);
-	//////menu1.AddItem("Submenu-Item5").OnClickSet(&TestClick);
-	//////window->UpdateMenuStrip();
-	////
-	//////item1.OnClickSet(&TestClick);
-	//////item2.OnClickSet(&TestClick);
-	//////menu1.OnClickSet(&TestClick);
-	//////menu2.OnClickSet(&TestClick);
-	////
+    
     button1 = window->AddButton("Abc", 200, 80, 50, 100);
     button1->OnClickSet(&TestClick);
     button1->OnMouseEnterSet([](Object* sender, EventArgs* e)
@@ -142,11 +88,6 @@ void TestUserApplication::Initialize()
     		{
                 printf_s("printing P");
     		}
-    		//if (e->KeyChar == 'q')
-    		//{
-    	//		e->Handled = true;
-    	//		return;
-    		//}
     	}
     );
     
@@ -175,11 +116,6 @@ void TestUserApplication::Initialize()
     		{
                 printf_s("printing A");
     		}
-    		//if (e->KeyChar == 'q')
-    		//{
-    	//		e->Handled = true;
-    	//		return;
-    		//}
     	}
     );
     

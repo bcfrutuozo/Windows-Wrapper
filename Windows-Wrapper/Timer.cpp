@@ -3,7 +3,7 @@
 
 Timer::Timer() noexcept
 	:
-m_Last(std::chrono::steady_clock::now())
+	m_Last(std::chrono::steady_clock::now())
 {
 
 }

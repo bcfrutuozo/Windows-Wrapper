@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Common.h"
-#include "Collection.h"
 #include "Window.h"
 
 class Application
@@ -14,16 +12,9 @@ private:
 	static void AddWindow(Window* window);
 	static bool RemoveWindow(Window* window);
 
-public:
-
-	class WindowCollection final : public Collection<Window>
-	{
-
-	};
-
 protected:
 
-	static WindowCollection Windows;
+	static std::list<Window*>* Windows;
 
 	Application() = default;
 	Application(const Application&) = delete;				// Copy constructor

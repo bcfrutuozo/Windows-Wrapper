@@ -1,12 +1,12 @@
 #include "Button.h"
 #include "ControlException.h"
 
-int Button::OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept
+int Button::OnEraseBackground_Impl(HWND hwnd, HDC hdc)
 {
 	return 1;	// To avoid flickering
 }
 
-void Button::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept
+void Button::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags)
 {
 	switch (vk)
 	{
@@ -21,7 +21,7 @@ void Button::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned in
 	Control::OnKeyDown_Impl(hwnd, vk, cRepeat, flags);
 }
 
-void Button::OnKeyUp_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept
+void Button::OnKeyUp_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags)
 {
 	switch (vk)
 	{
@@ -37,7 +37,7 @@ void Button::OnKeyUp_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int 
 	Control::OnKeyUp_Impl(hwnd, vk, cRepeat, flags);
 }
 
-void Button::OnPaint_Impl(HWND hwnd) noexcept
+void Button::OnPaint_Impl(HWND hwnd)
 {
 	PAINTSTRUCT ps;
 	BeginPaint(hwnd, &ps);

@@ -19,11 +19,11 @@ private:
 		size_t m_RowNumber;
 		size_t m_MouseOverIndex;
 
-		void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept override;
-		void OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept override;
-		void OnMouseLeftUp_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept override;
-		void OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept override;
-		void OnPaint_Impl(HWND hwnd) noexcept override;
+		void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) override;
+		void OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) override;
+		void OnMouseLeftUp_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) override;
+		void OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) override;
+		void OnPaint_Impl(HWND hwnd) override;
 
 		ComboBoxChildNativeWindow(Control* parent, ComboBox* comboBox, int width, int height, int x, int y);
 		virtual ~ComboBoxChildNativeWindow();
@@ -37,8 +37,8 @@ private:
 	ComboBoxChildNativeWindow* m_ChildWindow;
 	FlatStyle m_FlatStyle;
 
-	void OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept override;
-	void OnPaint_Impl(HWND hwnd) noexcept override;
+	void OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) override;
+	void OnPaint_Impl(HWND hwnd) override;
 
 	ComboBox(Control* parent, const std::string& name, int width, int x, int y);
 
@@ -46,6 +46,6 @@ public:
 
 	virtual ~ComboBox();
 
-	void SetSelectedIndex(int index) noexcept override;
+	void SetSelectedIndex(int index) override;
 	void SetSelectedValue(const ListItem& item) override;
 };

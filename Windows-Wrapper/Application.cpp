@@ -1,19 +1,24 @@
 #include "Application.h"
 #include "WinAPI.h"
-#include "Window.h"
+#include "Utilities.h"
 
-Application::WindowCollection Application::Windows;
+std::list<Window*>* Application::Windows = new std::list<Window*>();
 
 void Application::AddWindow(Window* window)
 {
-	Windows.Add(window);
+	Windows->push_back(window);
 }
 
 bool Application::RemoveWindow(Window* window)
 {
-	if (Windows.Contains(window) && window->IsDisposing())
+	if (std::contains(*Windows, window) && window->IsDisposing())
 	{
-		return Windows.Remove(window);
+		if (Windows->remove(window))
+		{
+			delete window;
+			window = nullptr;
+			return true;
+		}
 	}
 
 	return false;
@@ -21,14 +26,26 @@ bool Application::RemoveWindow(Window* window)
 
 void Application::TryCloseApplication() noexcept
 {
-	if (Windows.IsEmpty())
+	if (Windows->size() == 0)
 	{
+		delete Windows;
+		Windows = nullptr;
 		PostQuitMessage(0);
-	}	
+	}
 }
 
 void Application::Exit() noexcept
 {
-	Windows.Clear();
+	for (auto window : *Windows)
+	{
+		// Call dispose here because it wasn't called on the close window event
+		window->Dispose();
+		RemoveWindow(window);
+		delete window;
+		window = nullptr;
+	}
+
+	delete Windows;
+	Windows = nullptr;
 	PostQuitMessage(0);
 }

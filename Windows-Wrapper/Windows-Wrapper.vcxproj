@@ -220,7 +220,6 @@
     <ClInclude Include="ArgumentOutOfRangeException.h" />
     <ClInclude Include="CancelEventArgs.h" />
     <ClInclude Include="CancelEventHandler.h" />
-    <ClInclude Include="Collection.h" />
     <ClInclude Include="ComboBox.h" />
     <ClInclude Include="CommonObject.h" />
     <ClInclude Include="Convert.h" />
@@ -235,7 +234,6 @@
     <ClInclude Include="Font.h" />
     <ClInclude Include="ArgumentException.h" />
     <ClInclude Include="HorizontalScrollBar.h" />
-    <ClInclude Include="ICollection.h" />
     <ClInclude Include="IComparable.h" />
     <ClInclude Include="IComponent.h" />
     <ClInclude Include="IContainer.h" />
@@ -243,7 +241,6 @@
     <ClInclude Include="IEnumerable.h" />
     <ClInclude Include="IEnumerator.h" />
     <ClInclude Include="IEvent.h" />
-    <ClInclude Include="IList.h" />
     <ClInclude Include="InvalidOperationException.h" />
     <ClInclude Include="ISite.h" />
     <ClInclude Include="Keys.h" />
@@ -287,7 +284,6 @@
     <ClInclude Include="IHandle.h" />
     <ClInclude Include="IntPtr.h" />
     <ClInclude Include="TestUserApplication.h" />
-    <ClInclude Include="TypeCode.h" />
     <ClInclude Include="Utilities.h" />
     <ClInclude Include="VerticalScrollBar.h" />
     <ClInclude Include="WinAPI.h" />

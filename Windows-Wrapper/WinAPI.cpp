@@ -76,11 +76,6 @@ void WinAPI::OnClosed_Impl(HWND hwnd)
 
 void WinAPI::OnCreate_Impl(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
 {
-	HDC hdc = GetDC(hwnd);
-
-	// Free the device context. 
-	ReleaseDC(hwnd, hdc);
-
 	Dispatch("OnCreate", &ArgsDefault);
 }
 

@@ -1,12 +1,12 @@
 #include "ScrollBar.h"
 #include "ScrollableControl.h"
 
-int ScrollBar::OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept
+int ScrollBar::OnEraseBackground_Impl(HWND hwnd, HDC hdc)
 {
 	return 1;
 }
 
-void ScrollBar::OnPaint_Impl(HWND hwnd) noexcept
+void ScrollBar::OnPaint_Impl(HWND hwnd)
 {
 	PAINTSTRUCT ps;
 	BeginPaint(hwnd, &ps);

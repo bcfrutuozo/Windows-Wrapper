@@ -118,7 +118,7 @@ void TestRealTimeApplication::Process(float dt)
 	//const float t = m_Timer.Peek();
 	std::ostringstream oss;
 	oss << "Timer elapsed: " << std::setprecision(1) << std::fixed << dt << "s";
-	Windows[0]->SetText(oss.str().c_str());
+	Windows->front()->SetText(oss.str().c_str());
 
 	// renderGraph.Execute(window.Gfx());
 

@@ -1,6 +1,6 @@
 #include "ComboBox.h"
 
-void ComboBox::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
+void ComboBox::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags)
 {
 	RECT rect;
 
@@ -13,7 +13,7 @@ void ComboBox::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFla
 	m_OpenedControl = m_ChildWindow->Handle;
 }
 
-void ComboBox::OnPaint_Impl(HWND hwnd) noexcept
+void ComboBox::OnPaint_Impl(HWND hwnd)
 {
 	PAINTSTRUCT ps;
 	RECT rect;
@@ -87,7 +87,7 @@ ComboBox::ComboBox(Control* parent, const std::string& name, int width, int x, i
 {
 	// The ComboBox list MUST be inserted on the PARENT. Othewise it will be set in an invalid rectangle of the ComboBox
 	m_ChildWindow = new ComboBoxChildNativeWindow(parent, this, m_Size.Width, 120, m_Location.X, m_Location.Y + m_Size.Height + 5);
-	Controls.Add(m_ChildWindow);
+	Controls.push_back(m_ChildWindow);
 }
 
 ComboBox::~ComboBox()
@@ -95,15 +95,15 @@ ComboBox::~ComboBox()
 
 }
 
-void ComboBox::ComboBoxChildNativeWindow::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept
+void ComboBox::ComboBoxChildNativeWindow::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags)
 {
 }
 
-void ComboBox::ComboBoxChildNativeWindow::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
+void ComboBox::ComboBoxChildNativeWindow::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags)
 {
 }
 
-void ComboBox::ComboBoxChildNativeWindow::OnMouseLeftUp_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
+void ComboBox::ComboBoxChildNativeWindow::OnMouseLeftUp_Impl(HWND hwnd, int x, int y, unsigned int keyFlags)
 {
 	if (m_OpenedControl == Handle)
 	{
@@ -116,7 +116,7 @@ void ComboBox::ComboBoxChildNativeWindow::OnMouseLeftUp_Impl(HWND hwnd, int x, i
 	WinAPI::OnMouseLeftUp_Impl(hwnd, x, y, keyFlags);
 }
 
-void ComboBox::ComboBoxChildNativeWindow::OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
+void ComboBox::ComboBoxChildNativeWindow::OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags)
 {
 	size_t i = 0;
 	size_t oldMouseOver = m_MouseOverIndex;
@@ -143,7 +143,7 @@ void ComboBox::ComboBoxChildNativeWindow::OnMouseMove_Impl(HWND hwnd, int x, int
 	}
 }
 
-void ComboBox::ComboBoxChildNativeWindow::OnPaint_Impl(HWND hwnd) noexcept
+void ComboBox::ComboBoxChildNativeWindow::OnPaint_Impl(HWND hwnd)
 {
 	if (IsShown())
 	{
@@ -396,9 +396,7 @@ void ComboBox::ComboBoxChildNativeWindow::Draw(HWND hwnd, HDC& hdc)
 		DrawText(hdcMem, Text.c_str(), static_cast<int>((*dataSource)[i]->Value.length()), &cr, DT_LEFT | DT_VCENTER | DT_CALCRECT);
 	}*/
 
-	if (dataSource != nullptr)
-	{
-		for (size_t i = 0; i < dataSource->GetCount(); ++i)
+		for (size_t i = 0; i < dataSource.size(); ++i)
 		{
 			RECT cr;
 			CopyRect(&cr, drawableArea);
@@ -430,11 +428,10 @@ void ComboBox::ComboBoxChildNativeWindow::Draw(HWND hwnd, HDC& hdc)
 					SetTextColor(hdcMem, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
 				}
 
-				DrawText(hdcMem, (*dataSource)[i]->Value.c_str(), -1, &cr, DT_LEFT | DT_VCENTER);
-				DrawText(hdcMem, Text.c_str(), static_cast<int>((*dataSource)[i]->Value.length()), &cr, DT_LEFT | DT_VCENTER | DT_CALCRECT);
+				DrawText(hdcMem, dataSource[i].Value.c_str(), -1, &cr, DT_LEFT | DT_VCENTER);
+				DrawText(hdcMem, Text.c_str(), static_cast<int>(dataSource[i].Value.length()), &cr, DT_LEFT | DT_VCENTER | DT_CALCRECT);
 			}
 		}
-	}
 
 	// Perform the bit-block transfer between the memory Device Context which has the next bitmap
 	// with the current image to avoid flickering
@@ -485,11 +482,7 @@ void ComboBox::ComboBoxChildNativeWindow::CalculateParameters(HWND hwnd, HDC& hd
 
 	const auto& dataSource = m_ComboBox->GetDataSource();
 
-	int itemsNumber = 0;
-	if (dataSource != nullptr)
-	{
-		itemsNumber = dataSource->GetCount();
-	}
+	auto itemsNumber = dataSource.size();
 
 	// This block will only be executed once after resize
 	m_RowPosition.clear();
@@ -560,7 +553,7 @@ size_t ComboBox::ComboBoxChildNativeWindow::GetMouseOverIndex() const noexcept
 	return m_MouseOverIndex;
 }
 
-void ComboBox::SetSelectedIndex(int index) noexcept
+void ComboBox::SetSelectedIndex(int index)
 {
 	m_SelectedIndex = index;
 
@@ -570,7 +563,7 @@ void ComboBox::SetSelectedIndex(int index) noexcept
 	}
 	else
 	{
-		m_SelectedValue = (*Items)[m_SelectedIndex]->Value;
+		m_SelectedValue = Items[m_SelectedIndex].Value;
 	}
 
 	Update();
@@ -580,10 +573,9 @@ void ComboBox::SetSelectedValue(const ListItem& item)
 {
 	bool err = true;
 
-	for (size_t i = 0; i < Items->GetCount(); ++i)
+	for (size_t i = 0; i < Items.size(); ++i)
 	{
-		const auto& it = (*Items)[i];
-		if (it->Id == item.Id && it->Value == item.Value)
+		if (Items[i].Id == item.Id && Items[i].Value == item.Value)
 		{
 			SetSelectedIndex(i);
 			err = false;

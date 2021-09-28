@@ -24,9 +24,9 @@ protected:
 	int m_SelectedIndex;
 	std::string m_SelectedValue;
 	bool m_IsRebinding;
-	ListItemCollection* Items;
+	ListItemCollection Items;
 
-	int OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept override;
+	int OnEraseBackground_Impl(HWND hwnd, HDC hdc) override;
 
 	ListControl(Control* parent, const std::string& name, int width, int x, int y);
 	ListControl(Control* parent, const std::string& name, int width, int height, int x, int y);
@@ -47,10 +47,10 @@ public:
 	bool IsSelectionAllowed();
 	void EnableSelection() noexcept;
 	void DisableSelection() noexcept;
-	ListItemCollection* const GetDataSource() const noexcept;
-	void SetDataSource(ListItemCollection* const dataSource) noexcept;
+	const ListItemCollection& GetDataSource() const noexcept;
+	void SetDataSource(const ListItemCollection& dataSource);
 	virtual int GetSelectedIndex() const noexcept;
-	virtual void SetSelectedIndex(int index) noexcept = 0;
+	virtual void SetSelectedIndex(int index) = 0;
 	std::string GetSelectedValue() const noexcept;
 	virtual void SetSelectedValue(const ListItem& item) = 0;
 	bool IsRebinding() const noexcept;

@@ -15,9 +15,9 @@
 #include "CancelEventArgs.h"
 #include "OnClosedEventArgs.h"
 #include "OnClosingEventArgs.h"
-#include "Collection.h"
 #include "ControlException.h"
 
+#include <list>
 #include <memory>
 #include <functional>
 
@@ -41,11 +41,11 @@ private:
 
 	bool m_IsVisible;
 
-	void OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept override;
-	void OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept override;
-	void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept override;
-	void OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept override;
-	void OnNextDialogControl_Impl(HWND hwnd, HWND hwndSetFocus, bool fNext) noexcept override;
+	void OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) override;
+	void OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) override;
+	void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) override;
+	void OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) override;
+	void OnNextDialogControl_Impl(HWND hwnd, HWND hwndSetFocus, bool fNext) override;
 
 	EventHandler* OnActivate;
 	EventHandler* OnClick;
@@ -89,7 +89,7 @@ protected:
 	T* Create(Args... a)
 	{
 		T* item = new T(a...);
-		Controls.Add(item);
+		Controls.push_back(item);
 		return item;
 	}
 
@@ -105,14 +105,7 @@ protected:
 
 public:
 
-	class ControlCollection : public Collection<Control>
-	{
-	public:
-
-		ControlCollection(Control* owner);
-	};
-
-	ControlCollection Controls;
+	std::list<Control*> Controls;
 
 	virtual ~Control();																		// Destructor
 

@@ -8,7 +8,7 @@ void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 	{
 	case VK_DOWN:
 	{
-		if (m_SelectedIndex < GetDataSource()->GetCount() - 1)
+		if (m_SelectedIndex < GetDataSource().size() - 1)
 		{
 			auto drawableArea = GetDrawableArea();
 
@@ -128,7 +128,7 @@ void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 			break;
 		}
 
-		if (m_SelectedIndex < GetDataSource()->GetCount() - m_RowNumber)
+		if (m_SelectedIndex < GetDataSource().size() - m_RowNumber)
 		{
 			auto drawableArea = GetDrawableArea();
 			m_SelectedIndex += m_RowNumber;
@@ -218,11 +218,7 @@ void ListBox::CalculateListBoxParameters(HWND hwnd, HDC& hdc)
 
 	const auto& dataSource = GetDataSource();
 
-	int itemsNumber = 0;
-	if (dataSource != nullptr)
-	{
-		itemsNumber = dataSource->GetCount();
-	}
+	auto itemsNumber = dataSource.size();
 
 	if (m_IsRebinding)
 	{
@@ -567,49 +563,46 @@ void ListBox::Draw(HWND hwnd, HDC& hdc)
 		DrawText(hdcMem, Text.c_str(), static_cast<int>((*dataSource)[i]->Value.length()), &cr, DT_LEFT | DT_VCENTER | DT_CALCRECT);
 	}*/
 
-	if (dataSource != nullptr)
+	for (auto [i, r, c] = std::tuple{ 0, 0, 0 }; i < dataSource.size(); ++i, ++r)
 	{
-		for (auto [i, r, c] = std::tuple{ 0, 0, 0 }; i < dataSource->GetCount(); ++i, ++r)
+		RECT cr;
+		CopyRect(&cr, drawableArea);
+
+		cr.top = drawableArea->top - (GetItemHeight() * VerticalScrollBar.GetScrolling()) + (GetItemHeight() * r);
+		cr.bottom = (cr.top + GetItemHeight());
+		cr.left = drawableArea->left - (HorizontalScrollBar.GetScrolling() * GetItemWidth()) + (GetItemWidth() * c);
+		cr.right = cr.left + GetItemWidth() - m_Margin.Right;
+
+		if (r == m_RowNumber - 1)
 		{
-			RECT cr;
-			CopyRect(&cr, drawableArea);
+			r = -1;
+			++c;
+		}
 
-			cr.top = drawableArea->top - (GetItemHeight() * VerticalScrollBar.GetScrolling()) + (GetItemHeight() * r);
-			cr.bottom = (cr.top + GetItemHeight());
-			cr.left = drawableArea->left - (HorizontalScrollBar.GetScrolling() * GetItemWidth()) + (GetItemWidth() * c);
-			cr.right = cr.left + GetItemWidth() - m_Margin.Right;
+		m_RowPosition[i] = cr;
 
-			if (r == m_RowNumber - 1)
+		if (cr.left >= drawableArea->left &&
+			cr.top >= drawableArea->top &&
+			cr.right <= drawableArea->right &&
+			cr.bottom <= drawableArea->bottom)
+		{
+			if (m_SelectedIndex == i)
 			{
-				r = -1;
-				++c;
+				SetBkColor(hdcMem, RGB(0, 120, 215));
+				SetTextColor(hdcMem, RGB(255, 255, 255));
+				HBRUSH brush = CreateSolidBrush(RGB(0, 120, 215));
+				FillRect(hdcMem, &cr, brush);
+				SelectObject(hdcMem, brush);
+				DeleteObject(brush);
+			}
+			else
+			{
+				SetBkColor(hdcMem, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+				SetTextColor(hdcMem, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
 			}
 
-			m_RowPosition[i] = cr;
-
-			if (cr.left >= drawableArea->left &&
-				cr.top >= drawableArea->top &&
-				cr.right <= drawableArea->right &&
-				cr.bottom <= drawableArea->bottom)
-			{
-				if (m_SelectedIndex == i)
-				{
-					SetBkColor(hdcMem, RGB(0, 120, 215));
-					SetTextColor(hdcMem, RGB(255, 255, 255));
-					HBRUSH brush = CreateSolidBrush(RGB(0, 120, 215));
-					FillRect(hdcMem, &cr, brush);
-					SelectObject(hdcMem, brush);
-					DeleteObject(brush);
-				}
-				else
-				{
-					SetBkColor(hdcMem, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-					SetTextColor(hdcMem, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-				}
-
-				DrawText(hdcMem, (*dataSource)[i]->Value.c_str(), -1, &cr, DT_LEFT | DT_VCENTER);
-				DrawText(hdcMem, Text.c_str(), static_cast<int>((*dataSource)[i]->Value.length()), &cr, DT_LEFT | DT_VCENTER | DT_CALCRECT);
-			}
+			DrawText(hdcMem, dataSource[i].Value.c_str(), -1, &cr, DT_LEFT | DT_VCENTER);
+			DrawText(hdcMem, Text.c_str(), static_cast<int>(dataSource[i].Value.length()), &cr, DT_LEFT | DT_VCENTER | DT_CALCRECT);
 		}
 	}
 
@@ -657,7 +650,7 @@ ListBox::~ListBox()
 
 }
 
-void ListBox::SetSelectedIndex(int index) noexcept
+void ListBox::SetSelectedIndex(int index) 
 {
 	switch (m_SelectionMode)
 	{
@@ -672,7 +665,7 @@ void ListBox::SetSelectedIndex(int index) noexcept
 		}
 		else
 		{
-			m_SelectedValue = (*Items)[m_SelectedIndex]->Value;
+			m_SelectedValue = Items[m_SelectedIndex].Value;
 		}
 		break;
 	}
@@ -687,13 +680,11 @@ void ListBox::SetSelectedIndex(int index) noexcept
 		else
 		{
 			auto entry = m_SelectedIndices[index];
-			if (entry != nullptr)
-			{
-				// Select this item while keeping any previously selected items selected.
-				/*m_SelectedIndices[index] = (&(*Items)[index]->Id);
-				m_SelectedItems[index] = (*Items)[index];*/
-				Dispatch("OnSelectedIndexChanged", &ArgsDefault);
-			}
+			// Select this item while keeping any previously selected items selected.
+			/*m_SelectedIndices[index] = (&(*Items)[index]->Id);
+			m_SelectedItems[index] = (*Items)[index];*/
+			Dispatch("OnSelectedIndexChanged", &ArgsDefault);
+
 		}
 	}
 	}
@@ -705,10 +696,9 @@ void ListBox::SetSelectedValue(const ListItem& item)
 {
 	bool err = true;
 
-	for (size_t i = 0; i < Items->GetCount(); ++i)
+	for (size_t i = 0; i < Items.size(); ++i)
 	{
-		const auto& it = (*Items)[i];
-		if (it->Id == item.Id && it->Value == item.Value)
+		if (Items[i].Id == item.Id && Items[i].Value == item.Value)
 		{
 			SetSelectedIndex(i);
 			err = false;
@@ -792,7 +782,7 @@ void ListBox::SetSelectionMode(SelectionMode mode) noexcept
 	m_SelectionMode = mode;
 }
 
-void ListBox::SelectAll() noexcept
+void ListBox::SelectAll()
 {
 	if (m_SelectionMode == SelectionMode::Single)
 	{
@@ -802,69 +792,9 @@ void ListBox::SelectAll() noexcept
 	// Clear the SelectedIndices before to add it already ordered
 	m_SelectedIndices.clear();
 
-	for (size_t i = 0; i < Items->GetCount(); ++i)
+	for (size_t i = 0; i < Items.size(); ++i)
 	{
 		/*m_SelectedIndices[i] = &(*Items)[i]->Id;
 		m_SelectedItems[i] = (*Items)[i];*/
-	}
-}
-
-ListBox::SelectedIndexCollection::SelectedIndexCollection(ListBox* owner)
-	:
-	Collection(owner)
-{
-}
-
-ListBox::SelectedObjectCollection::SelectedObjectCollection(ListBox* owner)
-	:
-	Collection(owner)
-{
-}
-
-void ListBox::SelectedObjectCollection::ClearSelected() noexcept
-{
-	for (const auto& i : *this)
-	{
-		//i->Selected = false;
-	}
-}
-
-bool ListBox::SelectedObjectCollection::GetSelected(int index)
-{
-	for (const auto& p : *this)
-	{
-		if (p->Id == index)
-		{
-			/*if (p->Selected)
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}*/
-		}
-	}
-
-	throw std::runtime_error("Invalid code block");
-}
-
-void ListBox::SelectedObjectCollection::SetSelected(int index, bool isSelected)
-{
-	for (const auto& p : *this)
-	{
-		if (p->Id == index)
-		{
-			if (isSelected)
-			{
-				//p->Selected = true;
-				break;
-			}
-			else
-			{
-				//p->Selected = false;
-				break;
-			}
-		}
 	}
 }

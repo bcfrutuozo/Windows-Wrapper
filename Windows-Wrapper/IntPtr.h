@@ -3,11 +3,11 @@
 #include "IEquatable.h"
 #include "IComparable.h"
 
-struct IntPtr : public IComparable<IntPtr>, public IEquatable<IntPtr>
+class IntPtr : public IComparable<IntPtr>, public IEquatable<IntPtr>
 {
 private:
 
-#ifdef _WIN64
+#if _WIN64
 	uint64_t m_Ptr;
 #else
 	uint32_t m_Ptr;
@@ -110,7 +110,7 @@ public:
 	bool Equals(const IntPtr* const p) const override;
 	//OVERRIDE OBJECT TO STRING inline virtual const std::string ToString() const noexcept;
 
-#ifdef _WIN64
+#if _WIN64
 	static constexpr IntPtr Zero() { return IntPtr(static_cast<uint64_t>(0UL)); }
 #else
 	static constexpr IntPtr Zero() { return IntPtr(static_cast<uint32_t>(0U)); }

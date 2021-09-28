@@ -113,7 +113,7 @@ private:
 	virtual void OnMouseWheel_Impl(HWND hwnd, int x, int y, int delta, unsigned int fwKeys);
 	virtual void OnNextDialogControl_Impl(HWND hwnd, HWND hwndSetFocus, bool fNext) = 0;
 	virtual int OnNotify_Impl(HWND hwnd, int xPos, int yPos, int zDelta, unsigned int fwKeys);
-	virtual void OnPaint_Impl(HWND hwnd) noexcept = 0;
+	virtual void OnPaint_Impl(HWND hwnd) = 0;
 	virtual void OnRawInput_Impl(HWND hWnd, unsigned int inputCode, HRAWINPUT hRawInput);
 	virtual int OnSetCursor_Impl(HWND hwnd, HWND hwndCursor, unsigned int codeHitTest, unsigned int msg);
 	virtual void OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy);

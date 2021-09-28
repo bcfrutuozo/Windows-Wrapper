@@ -1,7 +1,7 @@
 #include "HorizontalScrollBar.h"
 #include "ScrollableControl.h"
 
-void HorizontalScrollBar::OnHorizontalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int code, int pos) noexcept
+void HorizontalScrollBar::OnHorizontalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int code, int pos)
 {
 	int nPos;
 	int nOldPos;
@@ -44,7 +44,7 @@ void HorizontalScrollBar::OnHorizontalScrolling_Impl(HWND hwnd, HWND hwndCtl, un
 	WinAPI::OnHorizontalScrolling_Impl(hwnd, hwndCtl, code, pos);
 }
 
-void HorizontalScrollBar::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy) noexcept
+void HorizontalScrollBar::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy)
 {
 	if (ShowScrollBar(hwnd, SB_HORZ, true) == 0)
 	{

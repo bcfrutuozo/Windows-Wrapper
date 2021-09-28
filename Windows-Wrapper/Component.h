@@ -30,7 +30,7 @@ protected:
 public:
 
 	Component();
-	~Component();
+	virtual ~Component();
 
 	bool IsDisposed() const noexcept;
 	bool IsDisposing() const noexcept;

@@ -13,28 +13,6 @@ class ListBox : public ListControl
 
 private:
 
-	class SelectedIndexCollection : Collection<int>
-	{
-		friend class ListBox;
-
-	public:
-
-		SelectedIndexCollection(ListBox* owner);
-	};
-
-	class SelectedObjectCollection : Collection<ListItem>
-	{
-		friend class ListBox;
-
-	public:
-
-		SelectedObjectCollection(ListBox* owner);
-
-		void ClearSelected() noexcept;
-		bool GetSelected(int index);
-		void SetSelected(int index, bool isSelected);
-	};
-
 	bool m_IsMultiColumn;
 	bool m_IsHorizontalScrollVisible;
 	bool m_IsScrollAlwaysVisible;
@@ -48,7 +26,7 @@ private:
 	size_t m_RowNumber;
 	size_t m_ColumnNumber;
 	ListItem* m_SelectedItem;
-	std::vector<int*> m_SelectedIndices;
+	std::vector<int> m_SelectedIndices;
 	std::vector<ListItem*> m_SelectedItems;
 
 	void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept override;
@@ -65,7 +43,7 @@ public:
 
 	virtual ~ListBox();
 
-	void SetSelectedIndex(int index) noexcept override;
+	void SetSelectedIndex(int index) override;
 	void SetSelectedValue(const ListItem& item) override;
 
 	bool IsMultiColumn() const noexcept;
@@ -77,5 +55,5 @@ public:
 	void SetBorderStyle(BorderStyle style) noexcept;
 	SelectionMode GetSelectionMode() const noexcept;
 	void SetSelectionMode(SelectionMode mode) noexcept;
-	void SelectAll() noexcept;
+	void SelectAll();
 };

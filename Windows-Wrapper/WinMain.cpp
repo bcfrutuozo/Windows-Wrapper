@@ -1,6 +1,6 @@
 #include "TestUserApplication.h"
 #include "TestRealTimeApplication.h"
-#include "ControlException.h"
+#include "Exceptions.h"
 
 #ifdef _DEBUG
 #define _CRTDBG_MAP_ALLOC  

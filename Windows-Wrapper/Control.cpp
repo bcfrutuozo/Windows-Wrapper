@@ -9,7 +9,7 @@
 
 unsigned int Control::m_IncrementalTabIndex = 0;
 
-void Control::OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept
+void Control::OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus)
 {
 	/**************************************************************************************************/
 	/* Remarks
@@ -41,13 +41,13 @@ void Control::OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept
 	WinAPI::OnFocusEnter_Impl(hwnd, hwndOldFocus);
 }
 
-void Control::OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept
+void Control::OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus)
 {
 	m_IsTabSelected = false;
 	WinAPI::OnFocusLeave_Impl(hwnd, hwndNewFocus);
 }
 
-void Control::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept
+void Control::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags)
 {
 	switch (vk)
 	{
@@ -78,7 +78,7 @@ void Control::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 	WinAPI::OnKeyDown_Impl(hwnd, vk, cRepeat, flags);
 }
 
-void Control::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
+void Control::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags)
 {
 	if (m_OpenedControl != nullptr)
 	{
@@ -106,7 +106,7 @@ void Control::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlag
 	WinAPI::OnMouseLeftDown_Impl(hwnd, x, y, keyFlags);
 }
 
-void Control::OnNextDialogControl_Impl(HWND hwnd, HWND hwndSetFocus, bool fNext) noexcept
+void Control::OnNextDialogControl_Impl(HWND hwnd, HWND hwndSetFocus, bool fNext)
 {
 	if (fNext)
 	{
@@ -127,11 +127,16 @@ void Control::Dispose()
 {
 	Component::Dispose();
 
-	Controls.Clear();
-	if (Parent != nullptr)
+	for (auto c : Controls)
 	{
-		Parent->Controls.Remove(this);
+		if (c != nullptr)
+		{
+			c->Dispose();
+			delete c; c = nullptr;
+		}
 	}
+
+	Controls.clear();
 }
 
 Control::Control() noexcept
@@ -183,7 +188,6 @@ Control::Control(Control* parent, const std::string& text, int width, int height
 	m_TabIndex(m_IncrementalTabIndex++),
 	m_IsTabSelected(false),
 	m_MinSize(0u),
-	Controls(this),
 	OnActivate(nullptr),
 	OnClick(nullptr),
 	OnDeactivate(nullptr),
@@ -471,7 +475,7 @@ Control* Control::GetPreviousControl() noexcept
 
 bool Control::HasChildren() const noexcept
 {
-	return Controls.GetCount() > 0;
+	return Controls.size() > 0;
 }
 
 Control* Control::GetNextControl() noexcept
@@ -493,12 +497,6 @@ Control* Control::GetNextControl() noexcept
 	// Returning nullptr is extremely important, otherwise it will be a trash pointer and will launch an exception trying to process it
 	return nullptr;
 }
-
-// ControlCollection
-Control::ControlCollection::ControlCollection(Control* owner)
-	:
-	Collection(owner)
-{}
 
 Control* Control::GetByHandle(const IntPtr p) noexcept
 {
