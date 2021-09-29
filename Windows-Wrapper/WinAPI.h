@@ -84,24 +84,9 @@ private:
 	virtual void OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus);
 	virtual int OnGetDLGCode_Impl(HWND hwnd, LPMSG msg);
 	virtual void OnHorizontalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int code, int pos);
-
-	/* Sent when a menu is about to become active. It occurs when the user clicks an item on the menu bar or presses
-	a menu key. This allows the application to modify the menu before it is displayed. */
-	virtual void OnInitMenu_Impl(HWND hwnd, HMENU hMenu);
-
-	/* Sent when a drop-down menu or submenu is about to become active. This allows an application to modify the menu
-	before it is displayed, without changing the entire menu. */
-	virtual void OnInitMenuPopup_Impl(HWND hwnd, HMENU hMenu, unsigned int item, bool fSystemMenu);
 	virtual void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags);
 	virtual void OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat);
 	virtual void OnKeyUp_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags);
-
-	/* Sent when a menu is active and the user presses a key that does not correspond to any mnemonic or accelerator
-	key. This message is sent to the window that owns the menu. */
-	virtual int OnMenuChar_Impl(HWND hwnd, unsigned int ch, unsigned int flags, HMENU hmenu);
-
-	/* Sent to a menu's owner window when the user selects a menu item. */
-	virtual void OnMenuSelect_Impl(HWND hwnd, HMENU hmenu, int item, HMENU hmenuPopup, unsigned int flags);
 	virtual void OnMouseLeave_Impl(HWND hwnd);
 	virtual void OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags);
 	virtual void OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags);
@@ -123,7 +108,7 @@ private:
 protected:
 
 	WinAPI();
-	virtual ~WinAPI();
+	virtual ~WinAPI() noexcept(false);
 
 	// Static function which handle WinAPI messages to corresponding member function of the control
 	static LRESULT WINAPI HandleMessageSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);

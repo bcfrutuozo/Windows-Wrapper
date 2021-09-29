@@ -6,12 +6,12 @@ class TestUserApplication : public UserApplication<TestUserApplication>
 {
 private:
 
-	ProgressBar* progressBar;
-	Button* button1;
-	Button* button2;
-	TextBox* txtBox1;
-	TextBox* txtBox2;
-	TextBox* txtBox3;
+	ProgressBar* progressBar = nullptr;
+	Button* button1 = nullptr;
+	Button* button2 = nullptr;
+	TextBox* txtBox1 = nullptr;
+	TextBox* txtBox2 = nullptr;
+	TextBox* txtBox3 = nullptr;
 
 public:
 

@@ -3,10 +3,6 @@
 #include "Common.h"
 #include "dxerr.h"
 
-#include <vector>
-#include <dxgidebug.h>
-#include <string>
-
 class DXGIInfoManager
 {
 private:

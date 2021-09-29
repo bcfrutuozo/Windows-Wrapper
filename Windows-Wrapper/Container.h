@@ -2,8 +2,6 @@
 
 #include "IContainer.h"
 
-#include <algorithm>
-
 class ISite;
 class IComponent;
 

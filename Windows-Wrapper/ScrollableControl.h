@@ -14,9 +14,9 @@ private:
 
 	bool m_IsHorizontalScrollEnabled;
 	bool m_IsVerticalScrollEnabled;
-	size_t m_ItemWidth;
-	size_t m_ItemHeight;
-	size_t m_MinimumItemWidth;
+	int m_ItemWidth;
+	int m_ItemHeight;
+	int m_MinimumItemWidth;
 	RECT m_DrawableArea;
 
 protected:
@@ -24,7 +24,7 @@ protected:
 	HorizontalScrollBar HorizontalScrollBar;
 	VerticalScrollBar VerticalScrollBar;
 
-	void SetMinimumItemWidth(const size_t& weight) noexcept;
+	void SetMinimumItemWidth(const int& weight) noexcept;
 	LPRECT const GetDrawableArea() noexcept;
 	LPRECT const ResetDrawableArea() noexcept;
 
@@ -39,11 +39,11 @@ public:
 	bool IsVerticalScrollEnabled() const noexcept;
 	void EnableVerticalScroll() noexcept;
 	void DisableVerticalScroll() noexcept;
-	size_t GetItemWidth() const noexcept;
-	void SetItemWidth(const size_t& width);
-	size_t GetItemHeight() const noexcept;
-	void SetItemHeight(const size_t& height) noexcept;
-	size_t GetHorizontalPage() const noexcept;
-	size_t GetVerticalPage() const noexcept;
+	int GetItemWidth() const noexcept;
+	void SetItemWidth(const int& width);
+	int GetItemHeight() const noexcept;
+	void SetItemHeight(const int& height) noexcept;
+	int GetHorizontalPage() const noexcept;
+	int GetVerticalPage() const noexcept;
 };
 

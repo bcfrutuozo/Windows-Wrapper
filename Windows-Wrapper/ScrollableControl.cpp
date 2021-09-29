@@ -14,7 +14,7 @@ LPRECT const ScrollableControl::ResetDrawableArea() noexcept
 	return &m_DrawableArea;
 }
 
-void ScrollableControl::SetMinimumItemWidth(const size_t& weight) noexcept
+void ScrollableControl::SetMinimumItemWidth(const int& weight) noexcept
 {
 	m_MinimumItemWidth = weight;
 }
@@ -80,12 +80,12 @@ void ScrollableControl::DisableVerticalScroll() noexcept
 	}
 }
 
-size_t ScrollableControl::GetItemWidth() const noexcept
+int ScrollableControl::GetItemWidth() const noexcept
 {
 	return m_ItemWidth;
 }
 
-void ScrollableControl::SetItemWidth(const size_t& width)
+void ScrollableControl::SetItemWidth(const int& width)
 {
 	if (width < m_MinimumItemWidth)
 	{
@@ -95,22 +95,22 @@ void ScrollableControl::SetItemWidth(const size_t& width)
 	m_ItemWidth = width;
 }
 
-size_t ScrollableControl::GetItemHeight() const noexcept
+int ScrollableControl::GetItemHeight() const noexcept
 {
 	return m_ItemHeight;
 }
 
-void ScrollableControl::SetItemHeight(const size_t& height) noexcept
+void ScrollableControl::SetItemHeight(const int& height) noexcept
 {
 	m_ItemHeight = height;
 }
 
-size_t ScrollableControl::GetHorizontalPage() const noexcept
+int ScrollableControl::GetHorizontalPage() const noexcept
 {
 	return m_Size.Width / GetItemWidth();
 }
 
-size_t ScrollableControl::GetVerticalPage() const noexcept
+int ScrollableControl::GetVerticalPage() const noexcept
 {
 	return m_Size.Height / GetItemHeight();
 }

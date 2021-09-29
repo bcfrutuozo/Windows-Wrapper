@@ -23,7 +23,7 @@ private:
 	bool m_IsCaretVisible;
 	bool m_IsMultiline;
 	unsigned int m_MaximumLenght;
-	std::vector<size_t> m_CaretPosition;
+	std::vector<int> m_CaretPosition;
 
 	enum class DeleteInputType
 	{

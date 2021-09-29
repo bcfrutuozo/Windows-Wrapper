@@ -260,7 +260,6 @@
     <ClInclude Include="IEnumerable.h">
       <Filter>Interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="Enumerator.h" />
     <ClInclude Include="TestRealTimeApplication.h" />
     <ClInclude Include="FlatButtonAppearance.h" />
     <ClInclude Include="MenuStrip.h" />

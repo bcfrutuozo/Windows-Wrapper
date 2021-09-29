@@ -17,26 +17,6 @@ private:
 	ToolStripGripStyle m_GripStyle;
 	ToolStripRenderMode m_Renderer;
 
-	// Singleton manages registration/cleanup of window class
-	class ToolStripClass
-	{
-	private:
-
-		static constexpr const char* m_ClassName = "ToolStrip Class";
-		static ToolStripClass m_ToolStripClass;
-		HINSTANCE m_Instance;
-
-		ToolStripClass() noexcept;
-		~ToolStripClass() noexcept;
-		ToolStripClass(const ToolStripClass&) = delete;
-		ToolStripClass& operator=(const ToolStripClass&) = delete;
-
-	public:
-
-		static const char* GetName() noexcept;
-		static HINSTANCE GetInstance() noexcept;
-	};
-
 	void OnPaint_Impl(HWND hWnd) noexcept override;
 
 protected:

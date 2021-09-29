@@ -38,7 +38,6 @@ private:
 	static void ShowCursor() noexcept;
 
 	// Events implementations
-	void OnCommand_Impl(HWND hwnd, int id, HWND hwndCtl, unsigned int codeNotify) noexcept override;
 	void OnPaint_Impl(HWND hwnd) noexcept override;
 
 protected:
@@ -50,7 +49,7 @@ public:
 	Window(const std::string& name, int width, int height);
 	Window(const Window&) = default;
 	Window& operator=(const Window&) = default;
-	virtual ~Window();
+	virtual ~Window() noexcept(false) = default;
 
 	void OnClosedSet(const std::function<void(Object*, OnClosedEventArgs*)>& callback) noexcept;
 	void OnClosingSet(const std::function<void(Object*, OnClosingEventArgs*)>& callback) noexcept;

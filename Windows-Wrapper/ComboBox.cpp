@@ -2,7 +2,7 @@
 
 void ComboBox::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags)
 {
-	RECT rect;
+	RECT rect { 0 };
 
 	InflateRect(&rect, -GetSystemMetrics(SM_CXEDGE), -GetSystemMetrics(SM_CYEDGE));
 	rect.left = rect.right - GetSystemMetrics(SM_CXVSCROLL);
@@ -75,7 +75,7 @@ void ComboBox::OnPaint_Impl(HWND hwnd)
 
 
 	DrawText(ps.hdc, GetSelectedValue().c_str(), -1, &rect, DT_LEFT | DT_VCENTER);
-	DrawText(ps.hdc, GetSelectedValue().c_str(), GetSelectedValue().length(), &rect, DT_LEFT | DT_VCENTER | DT_CALCRECT);
+	DrawText(ps.hdc, GetSelectedValue().c_str(), static_cast<int>(GetSelectedValue().length()), &rect, DT_LEFT | DT_VCENTER | DT_CALCRECT);
 
 	EndPaint(hwnd, &ps);
 }
@@ -110,7 +110,7 @@ void ComboBox::ComboBoxChildNativeWindow::OnMouseLeftUp_Impl(HWND hwnd, int x, i
 		m_OpenedControl = nullptr;
 		Hide();
 
-		m_ComboBox->SetSelectedIndex(m_MouseOverIndex);
+		m_ComboBox->SetSelectedIndex(static_cast<int>(m_MouseOverIndex));
 	}
 
 	WinAPI::OnMouseLeftUp_Impl(hwnd, x, y, keyFlags);
@@ -401,7 +401,7 @@ void ComboBox::ComboBoxChildNativeWindow::Draw(HWND hwnd, HDC& hdc)
 			RECT cr;
 			CopyRect(&cr, drawableArea);
 
-			cr.top = drawableArea->top - (GetItemHeight() * VerticalScrollBar.GetScrolling()) + (GetItemHeight() * i);
+			cr.top = drawableArea->top - (GetItemHeight() * VerticalScrollBar.GetScrolling()) + (GetItemHeight() * static_cast<int>(i));
 			cr.bottom = (cr.top + GetItemHeight());
 			cr.left = drawableArea->left;
 			cr.right = cr.left + GetItemWidth() - m_Margin.Right;
@@ -482,7 +482,7 @@ void ComboBox::ComboBoxChildNativeWindow::CalculateParameters(HWND hwnd, HDC& hd
 
 	const auto& dataSource = m_ComboBox->GetDataSource();
 
-	auto itemsNumber = dataSource.size();
+	int itemsNumber = static_cast<int>(dataSource.size());
 
 	// This block will only be executed once after resize
 	m_RowPosition.clear();
@@ -494,10 +494,10 @@ void ComboBox::ComboBoxChildNativeWindow::CalculateParameters(HWND hwnd, HDC& hd
 	// Reset the amount of items in drawable area for recalculation
 	m_TotalItemsInDrawableArea = 0;
 
-	size_t newWidth = 0;
-	size_t newHeight = 0;
-	auto oldWidth = drawableArea->right - drawableArea->left;
-	auto oldHeight = drawableArea->bottom - drawableArea->top;
+	//int newWidth = 0;
+	int newHeight = 0;
+	//int oldWidth = static_cast<int>(drawableArea->right) - static_cast<int>(drawableArea->left);
+	int oldHeight = static_cast<int>(drawableArea->bottom) - static_cast<int>(drawableArea->top);
 
 	m_RowNumber = itemsNumber;
 
@@ -529,7 +529,7 @@ void ComboBox::ComboBoxChildNativeWindow::CalculateParameters(HWND hwnd, HDC& hd
 		VerticalScrollBar.Show();
 		Resize(m_Size.Width, newHeight + 1);
 
-		size_t max = 0;
+		int max = 0;
 		while (max < newHeight)
 		{
 			max += GetItemHeight();
@@ -573,11 +573,11 @@ void ComboBox::SetSelectedValue(const ListItem& item)
 {
 	bool err = true;
 
-	for (size_t i = 0; i < Items.size(); ++i)
+	for (auto i = 0; i < Items.size(); ++i)
 	{
 		if (Items[i].Id == item.Id && Items[i].Value == item.Value)
 		{
-			SetSelectedIndex(i);
+			SetSelectedIndex(static_cast<int>(i));
 			err = false;
 			break;
 		}

@@ -34,7 +34,7 @@ void Window::OnClosedSet(const std::function<void(Object*, OnClosedEventArgs*)>&
 void Window::Initialize()
 {
 	// Calculate window size based on desired client region
-	RECT r;
+	RECT r = { 0 };
 	r.left = 100;
 	r.right = m_Size.Width + r.left;
 	r.top = 100;
@@ -69,7 +69,7 @@ void Window::Initialize()
 	// AND YES AS WELL: WILL BE PROBABLY POORLY DONE :( 
 
 	// Register mouse raw input device
-	RAWINPUTDEVICE rid;
+	RAWINPUTDEVICE rid = { 0 };
 	rid.usUsagePage = 0x01; // Mouse page
 	rid.usUsage = 0x02; // Mouse page
 	rid.dwFlags = 0;
@@ -88,14 +88,6 @@ void Window::Initialize()
 	Application::AddWindow(this);
 	Show();	// Force call Show because all window starts as not visible
 	Update();
-}
-
-Window::~Window()
-{
-	if (DestroyWindow(static_cast<HWND>(Handle.ToPointer())) == 0)
-	{
-		throw CTL_LAST_EXCEPT();
-	}
 }
 
 void Window::ClearMenuStrip() noexcept
@@ -245,19 +237,6 @@ void Window::HideCursor() noexcept
 void Window::ShowCursor() noexcept
 {
 	while (::ShowCursor(TRUE) < 0);
-}
-
-void Window::OnCommand_Impl(HWND hwnd, int id, HWND hwndCtl, unsigned int codeNotify) noexcept
-{
-	//if (const auto& c = GetById(id))
-	//{
-	//	// Dispatch both OnClick for common task and OnMouseClick which receives the cursor information
-	//	c->Dispatch("OnClick", new EventArgs());
-	//	c->Dispatch("OnMouseClick", new MouseEventArgs(MouseButtons::Left, 1, 0, 0, 0));
-
-	//	// Force the update of the controls
-	//	c->Update();
-	//}
 }
 
 void Window::OnPaint_Impl(HWND hwnd) noexcept

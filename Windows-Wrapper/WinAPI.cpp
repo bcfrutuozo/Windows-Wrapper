@@ -140,16 +140,6 @@ void WinAPI::OnHorizontalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int co
 	Dispatch("OnHorizontalScroll", &ArgsDefault);
 }
 
-void WinAPI::OnInitMenu_Impl(HWND hwnd, HMENU hMenu)
-{
-
-}
-
-void WinAPI::OnInitMenuPopup_Impl(HWND hwnd, HMENU hMenu, unsigned int item, bool fSystemMenu)
-{
-
-}
-
 void WinAPI::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags)
 {
 	ArgsOnKeyDown = KeyEventArgs(static_cast<Keys>(vk));
@@ -168,25 +158,6 @@ void WinAPI::OnKeyUp_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int 
 	Dispatch("OnKeyUp", &ArgsOnKeyUp);
 }
 
-int WinAPI::OnMenuChar_Impl(HWND hwnd, unsigned int ch, unsigned int flags, HMENU hmenu)
-{
-	/*
-		MNC_CLOSE 1
-		Informs the system that it should close the active menu.
-		MNC_EXECUTE 2
-		Informs the system that it should choose the item specified in the low - order word of the return value.The owner window receives a WM_COMMAND message.
-		MNC_IGNORE 	0
-		Informs the system that it should discard the character the user pressed and create a short beep on the system speaker.
-		MNC_SELECT 	3
-		Informs the system that it should select the item specified in the low - order word of the return value.
-	*/
-	return 0;
-}
-
-void WinAPI::OnMenuSelect_Impl(HWND hwnd, HMENU hmenu, int item, HMENU hmenuPopup, unsigned int flags)
-{
-
-}
 
 void WinAPI::OnMouseLeave_Impl(HWND hwnd)
 {
@@ -221,7 +192,7 @@ void WinAPI::OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags)
 		Dispatch("OnMouseEnter", &ArgsDefault);
 	}
 
-	TRACKMOUSEEVENT tme;
+	TRACKMOUSEEVENT tme = { 0 };
 	tme.cbSize = sizeof(TRACKMOUSEEVENT); //Monitor mouse to leave
 	tme.dwFlags = TME_LEAVE;
 	tme.hwndTrack = hwnd;
@@ -364,9 +335,12 @@ WinAPI::WinAPI()
 
 }
 
-WinAPI::~WinAPI()
+WinAPI::~WinAPI() noexcept(false)
 {
-	DestroyWindow(static_cast<HWND>(Handle.ToPointer()));
+	if (DestroyWindow(static_cast<HWND>(Handle.ToPointer())) == 0)
+	{
+		throw CTL_LAST_EXCEPT();
+	}
 }
 
 // Static function which handle WinAPI messages to corresponding member function of the control
@@ -461,33 +435,6 @@ LRESULT WINAPI WinAPI::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
 		OnSize_Impl(hWnd, (unsigned int)wParam, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam));
 		break;
 	}
-	/********************** MENU MESSAGES ***********************/
-	case WM_INITMENU:
-	{
-		OnInitMenu_Impl(hWnd, (HMENU)wParam);
-		break;
-	}
-	case WM_INITMENUPOPUP:
-	{
-		OnInitMenuPopup_Impl(hWnd, (HMENU)wParam, (UINT)LOWORD(lParam), (BOOL)HIWORD(lParam));
-		break;
-	}
-	case WM_MENUSELECT:
-	{
-		OnMenuSelect_Impl(hWnd,
-			(HMENU)lParam,
-			(HIWORD(wParam) & MF_POPUP) ? 0L : (int)(LOWORD(wParam)),
-			(HIWORD(wParam) & MF_POPUP) ? GetSubMenu((HMENU)lParam, LOWORD(wParam)) : 0L,
-			(unsigned int)((short)HIWORD(wParam) == -1) ? 0xFFFFFFFF : HIWORD(wParam));
-		break;
-	}
-	case WM_MENUCHAR:
-	{
-		OnMenuChar_Impl(hWnd, (unsigned int)LOWORD(wParam), (unsigned int)HIWORD(wParam), (HMENU)lParam);
-		break;
-	}
-	/********************* END MENU MESSAGES ********************/
-
 	/******************** KEYBOARD MESSAGES *********************/
 	case WM_KEYDOWN:
 	case WM_SYSKEYDOWN:	// Syskey commands need to be handled to track ALT key (VK_MENU)

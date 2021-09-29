@@ -25,7 +25,7 @@ namespace Math
 
 	XMFLOAT3 GetCubicHermiteSplinePos(const XMFLOAT3& startPos, const XMFLOAT3& endPos, const XMFLOAT3& startTangent, const XMFLOAT3& endTangent, float atInterval)
 	{
-		float x, y, z, t; float r1 = 1.0f, r4 = 1.0f;
+		float x, y, z, t;
 
 		t = atInterval;
 		x = (2 * t * t * t - 3 * t * t + 1) * startPos.x + (-2 * t * t * t + 3 * t * t) * endPos.x + (t * t * t - 2 * t * t + t) * startTangent.x + (t * t * t - t * t) * endTangent.x;

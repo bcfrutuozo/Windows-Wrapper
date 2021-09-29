@@ -133,7 +133,6 @@ void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 			auto drawableArea = GetDrawableArea();
 			m_SelectedIndex += m_RowNumber;
 
-			int c = 0;
 
 			if (m_RowPosition[m_SelectedIndex].right > drawableArea->right && IsHorizontalScrollEnabled())
 			{
@@ -164,7 +163,7 @@ void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 
 void ListBox::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
 {
-	size_t i = 0;
+	int i = 0;
 
 	const auto drawableArea = GetDrawableArea();
 	if (y >= drawableArea->top && y <= drawableArea->bottom && x >= drawableArea->left && x <= drawableArea->right)
@@ -213,12 +212,12 @@ void ListBox::CalculateListBoxParameters(HWND hwnd, HDC& hdc)
 	drawableArea->right -= m_Margin.Right + bordersize;
 	drawableArea->bottom -= m_Margin.Bottom + bordersize;
 
-	SetItemWidth(m_IsMultiColumn ? m_ColumnWidth : drawableArea->right - drawableArea->left);
+	SetItemWidth(m_IsMultiColumn ? m_ColumnWidth : static_cast<int>(drawableArea->right - drawableArea->left));
 	SetItemHeight(m_SingleSize.cy);
 
 	const auto& dataSource = GetDataSource();
 
-	auto itemsNumber = dataSource.size();
+	int itemsNumber = static_cast<int>(dataSource.size());
 
 	if (m_IsRebinding)
 	{
@@ -246,10 +245,10 @@ void ListBox::CalculateListBoxParameters(HWND hwnd, HDC& hdc)
 	// Reset the amount of items in drawable area for recalculation
 	m_TotalItemsInDrawableArea = 0;
 
-	size_t newWidth = 0;
-	size_t newHeight = 0;
-	auto oldWidth = drawableArea->right - drawableArea->left;
-	auto oldHeight = drawableArea->bottom - drawableArea->top;
+	int newWidth = 0;
+	int newHeight = 0;
+	int oldWidth = static_cast<int>(drawableArea->right) - static_cast<int>(drawableArea->left);
+	int oldHeight = static_cast<int>(drawableArea->bottom) - static_cast<int>(drawableArea->top);
 
 	m_RowNumber = !m_IsMultiColumn ? itemsNumber : (oldHeight) / GetItemHeight();
 	m_ColumnNumber = !m_IsMultiColumn ? 1 : (oldWidth) / GetItemWidth();
@@ -306,7 +305,7 @@ void ListBox::CalculateListBoxParameters(HWND hwnd, HDC& hdc)
 				Resize(newWidth, newHeight);
 				HorizontalScrollBar.SetLocation(hLoc.X, hLoc.Y + (newHeight - oldHeight));
 				HorizontalScrollBar.Resize(hSize);
-				HorizontalScrollBar.SetMaximumValue(std::ceil(static_cast<float>(itemsNumber) / (m_RowNumber)));
+				HorizontalScrollBar.SetMaximumValue(static_cast<int>(std::ceil(static_cast<float>(itemsNumber) / (m_RowNumber))));
 				HorizontalScrollBar.Show();
 				HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_SIZE, MAKEWPARAM(0, 0), MAKELPARAM(m_TotalItemsInDrawableArea, 0));
 			}
@@ -563,19 +562,19 @@ void ListBox::Draw(HWND hwnd, HDC& hdc)
 		DrawText(hdcMem, Text.c_str(), static_cast<int>((*dataSource)[i]->Value.length()), &cr, DT_LEFT | DT_VCENTER | DT_CALCRECT);
 	}*/
 
-	for (auto [i, r, c] = std::tuple{ 0, 0, 0 }; i < dataSource.size(); ++i, ++r)
+	for (auto [i, rw, c] = std::tuple{ 0, 0, 0 }; i < dataSource.size(); ++i, ++rw)
 	{
 		RECT cr;
 		CopyRect(&cr, drawableArea);
 
-		cr.top = drawableArea->top - (GetItemHeight() * VerticalScrollBar.GetScrolling()) + (GetItemHeight() * r);
+		cr.top = drawableArea->top - (GetItemHeight() * VerticalScrollBar.GetScrolling()) + (GetItemHeight() * rw);
 		cr.bottom = (cr.top + GetItemHeight());
 		cr.left = drawableArea->left - (HorizontalScrollBar.GetScrolling() * GetItemWidth()) + (GetItemWidth() * c);
 		cr.right = cr.left + GetItemWidth() - m_Margin.Right;
 
-		if (r == m_RowNumber - 1)
+		if (rw == m_RowNumber - 1)
 		{
-			r = -1;
+			rw = -1;
 			++c;
 		}
 
@@ -640,7 +639,8 @@ ListBox::ListBox(Control* parent, int width, int height, int x, int y)
 	m_ColumnWidth(120),
 	m_ColumnNumber(1),
 	m_RowNumber(1),
-	m_IsFormatChanged(false)
+	m_IsFormatChanged(false),
+	m_SelectedItem(nullptr)
 {
 
 }
@@ -679,7 +679,7 @@ void ListBox::SetSelectedIndex(int index)
 		}
 		else
 		{
-			auto entry = m_SelectedIndices[index];
+			//auto entry = m_SelectedIndices[index];
 			// Select this item while keeping any previously selected items selected.
 			/*m_SelectedIndices[index] = (&(*Items)[index]->Id);
 			m_SelectedItems[index] = (*Items)[index];*/
@@ -700,7 +700,7 @@ void ListBox::SetSelectedValue(const ListItem& item)
 	{
 		if (Items[i].Id == item.Id && Items[i].Value == item.Value)
 		{
-			SetSelectedIndex(i);
+			SetSelectedIndex(static_cast<int>(i));
 			err = false;
 			break;
 		}
@@ -737,12 +737,12 @@ void ListBox::DisableMultiColumn() noexcept
 	}
 }
 
-size_t ListBox::GetColumnWidth() noexcept
+int ListBox::GetColumnWidth() noexcept
 {
 	return m_ColumnWidth;
 }
 
-void ListBox::SetColumnWidth(const size_t& width) noexcept
+void ListBox::SetColumnWidth(const int& width) noexcept
 {
 	if (m_IsMultiColumn)
 	{

@@ -98,6 +98,8 @@ void ProgressBar::OnPaint_Impl(HWND hwnd) noexcept
 	// with the current image to avoid flickering
 	BitBlt(ps.hdc, 0, 0, m_Size.Width, m_Size.Height, hdcMem, 0, 0, SRCCOPY);
 
+	SelectObject(hdcMem, hbmOld);
+	DeleteObject(hbmOld);
 	ReleaseDC(hwnd, hdcMem);
 	DeleteDC(hdcMem);
 	EndPaint(hwnd, &ps);
@@ -115,7 +117,7 @@ void ProgressBar::OnPaintMarquee_Thread(HWND hwnd) noexcept
 		HBITMAP hbmMem = CreateCompatibleBitmap(hdc, m_Size.Width, m_Size.Height);
 		HBITMAP hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
 
-		long long time = (m_Speed * 2.0f) * m_Speed;
+		int64_t time = static_cast<int64_t>((m_Speed * 2.0f) * m_Speed);
 		std::this_thread::sleep_for(std::chrono::microseconds(time));
 
 		RECT rt;

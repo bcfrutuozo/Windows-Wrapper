@@ -21,10 +21,10 @@ private:
 	DockStyle m_DockStyle;
 	BorderStyle m_BorderStyle;
 	std::vector<RECT> m_RowPosition;
-	size_t m_TotalItemsInDrawableArea;
-	size_t m_ColumnWidth;
-	size_t m_RowNumber;
-	size_t m_ColumnNumber;
+	int m_TotalItemsInDrawableArea;
+	int m_ColumnWidth;
+	int m_RowNumber;
+	int m_ColumnNumber;
 	ListItem* m_SelectedItem;
 	std::vector<int> m_SelectedIndices;
 	std::vector<ListItem*> m_SelectedItems;
@@ -49,8 +49,8 @@ public:
 	bool IsMultiColumn() const noexcept;
 	void EnableMultiColumn() noexcept;
 	void DisableMultiColumn() noexcept;
-	size_t GetColumnWidth() noexcept;
-	void SetColumnWidth(const size_t& width) noexcept;
+	int GetColumnWidth() noexcept;
+	void SetColumnWidth(const int& width) noexcept;
 	BorderStyle GetBorderStyle() const noexcept;
 	void SetBorderStyle(BorderStyle style) noexcept;
 	SelectionMode GetSelectionMode() const noexcept;

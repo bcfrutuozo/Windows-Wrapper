@@ -1,37 +1,5 @@
 #include "ToolStrip.h"
 
-// Singleton ButtonClass
-ToolStrip::ToolStripClass ToolStrip::ToolStripClass::m_ToolStripClass;
-
-// ToolStrip class declarations
-ToolStrip::ToolStripClass::ToolStripClass() noexcept
-	:
-	m_Instance(GetModuleHandle(nullptr))
-{
-	WNDCLASSEX wc = { 0 };
-	wc.cbSize = sizeof(wc);
-	wc.style = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;
-	wc.lpfnWndProc = HandleMessageSetup;
-	wc.hInstance = GetInstance();
-	wc.lpszClassName = GetName();
-	RegisterClassEx(&wc);
-}
-
-ToolStrip::ToolStripClass::~ToolStripClass()
-{
-	UnregisterClass(m_ClassName, GetInstance());
-}
-
-const char* ToolStrip::ToolStripClass::GetName() noexcept
-{
-	return m_ClassName;
-}
-
-HINSTANCE ToolStrip::ToolStripClass::GetInstance() noexcept
-{
-	return m_ToolStripClass.m_Instance;
-}
-
 void ToolStrip::OnPaint_Impl(HWND hWnd) noexcept
 {
 	PAINTSTRUCT ps;
@@ -79,7 +47,7 @@ void ToolStrip::Initialize()
 {
 	// Create window and get its handle
 	Handle = CreateWindow(
-		ToolStripClass::GetName(),																			// Class name
+		WindowClass::GetName(),																			// Class name
 		Text.c_str(),																						// Window title
 		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS,															// Style values
 		m_Location.X,																							// X position
@@ -87,8 +55,8 @@ void ToolStrip::Initialize()
 		m_Size.Width,																						// Width
 		m_Size.Height,																						// Height
 		static_cast<HWND>(Parent->Handle.ToPointer()),														// Parent handle
-		(HMENU)GetId(),						                												// Menu handle
-		ToolStripClass::GetInstance(),																		// Module instance handle
+		nullptr,						                												// Menu handle
+		WindowClass::GetInstance(),																		// Module instance handle
 		this																								// Pointer to the button instance to work along with HandleMessageSetup function.
 	);
 

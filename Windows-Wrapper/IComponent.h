@@ -13,7 +13,7 @@ protected:
 		m_Site(nullptr)
 	{	};
 
-	virtual ~IComponent() = default;
+	virtual ~IComponent() noexcept(false) = default;
 
 public:
 

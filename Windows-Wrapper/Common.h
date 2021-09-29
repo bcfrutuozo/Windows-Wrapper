@@ -8,11 +8,18 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 
+// Default C++ libraries
 #include <vector>
 #include <list>
 #include <map>
 #include <memory>
 #include <functional>
+#include <algorithm>
+#include <string>
+#include <typeinfo>
+
+// DirectX debug
+#include <dxgidebug.h>
 
 #pragma warning(disable:4265)
 #include <wrl.h>
@@ -34,8 +41,12 @@ static const XMFLOAT4X4 IDENTITYMATRIX = XMFLOAT4X4(1, 0, 0, 0,
 #define arraysize(a) (sizeof(a) / sizeof(a[0]))
 #define NOMINMAX
 #define ALIGN_16 void* operator new(size_t i) { return _mm_malloc(i, 16); } void operator delete(void* p) { _mm_free(p); }
+#define SafeDelete(p) { delete p; p == nullptr; }
 
 #include <string>
 #include <sstream>
 #include <iomanip>
 #include <Windows.h>
+
+// Project libraries
+#include "Mathlib.h"

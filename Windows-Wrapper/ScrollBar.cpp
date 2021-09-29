@@ -19,6 +19,8 @@ void ScrollBar::OnPaint_Impl(HWND hwnd)
 	FillRect(hdcMem, &ps.rcPaint, bgColor);
 	SelectObject(hdcMem, bgColor);
 	DeleteObject(bgColor);
+	SelectObject(hdcMem, hbmOld);
+	DeleteObject(hbmOld);
 
 	// Perform the bit-block transfer between the memory Device Context which has the next bitmap
 	// with the current image to avoid flickering
@@ -33,7 +35,7 @@ ScrollBar::ScrollBar(ScrollableControl* parent, int width, int height, int x, in
 	Scrolling(0),
 	MaximumValue(100)
 {
-	//Initialize();
+	// ScrollBar Initialize() is called from the control which handles it
 }
 
 ScrollBar::~ScrollBar()
@@ -63,12 +65,12 @@ void ScrollBar::Initialize()
 	}
 }
 
-size_t ScrollBar::GetScrolling() const noexcept
+int ScrollBar::GetScrolling() const noexcept
 {
 	return Scrolling;
 }
 
-void ScrollBar::SetMaximumValue(size_t maxValue) noexcept
+void ScrollBar::SetMaximumValue(int maxValue) noexcept
 {
 	MaximumValue = maxValue;
 }

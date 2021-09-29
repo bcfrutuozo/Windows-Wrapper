@@ -1,7 +1,5 @@
 ﻿#include "TextBox.h"
 
-#include <algorithm>
-
 int TextBox::OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept
 {
 	return 1;   // Returns 1 to avoid flickering

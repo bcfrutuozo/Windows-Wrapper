@@ -1,10 +1,6 @@
 #pragma once
 
-#include "Object.h"
 #include "IEquatable.h"
-
-#include <string>
-#include <typeinfo>
 
 class Type : public IEquatable<Type>
 {

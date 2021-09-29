@@ -96,5 +96,5 @@ private:
 	void OnWheelDown() noexcept;
 	void TrimBuffer() noexcept;
 	void TrimRawInputBuffer() noexcept;
-	void OnWheelDelta(int x, int y, int delta) noexcept;
+	void OnWheelDelta(int delta) noexcept;
 };

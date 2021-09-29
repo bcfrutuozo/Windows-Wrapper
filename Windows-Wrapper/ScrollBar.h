@@ -11,8 +11,8 @@ class ScrollBar : public Control
 protected:
 
 	ScrollableControl* Owner;
-	size_t Scrolling;
-	size_t MaximumValue;
+	int Scrolling;
+	int MaximumValue;
 
 	int OnEraseBackground_Impl(HWND hwnd, HDC hdc) override;
 	void OnPaint_Impl(HWND hwnd) override;
@@ -24,7 +24,7 @@ public:
 	virtual ~ScrollBar();
 
 	void Initialize() override;
-	size_t GetScrolling() const noexcept;
+	int GetScrolling() const noexcept;
 
-	void SetMaximumValue(size_t maxValue) noexcept;
+	void SetMaximumValue(int maxValue) noexcept;
 };

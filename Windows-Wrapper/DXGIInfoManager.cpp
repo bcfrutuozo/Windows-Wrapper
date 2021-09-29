@@ -31,7 +31,6 @@ DXGIInfoManager::DXGIInfoManager()
 		throw CTL_LAST_EXCEPT();
 	}
 
-	HRESULT hr;
 	//GFX_THROW_NOINFO(DxgiGetDebugInterface(__uuidof(IDXGIInfoQueue), &m_DXGIInfoQueue));
 }
 
@@ -49,7 +48,6 @@ std::vector<const char*> DXGIInfoManager::GetMessages() const
 
 	for (auto i = m_Next; i < end; i++)
 	{
-		HRESULT hr;
 		SIZE_T messageLength = 0;
 
 		// Ge the size of the message in bytes

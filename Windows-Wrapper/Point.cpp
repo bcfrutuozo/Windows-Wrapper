@@ -2,9 +2,6 @@
 #include "Size.h"
 #include "Exceptions.h"
 
-#define LOWORD(l)	((l) & 0xffff)
-#define HIWORD(l)   (((l) >> 16) & 0xffff)
-
 // Point
 Point::Point(int word)
 	:

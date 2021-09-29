@@ -32,8 +32,8 @@ class Control : public WinAPI
 private:
 
 	// Tabulation fields
-	unsigned int m_TabIndex;
-	static unsigned int m_IncrementalTabIndex;
+	int m_TabIndex;
+	static int m_IncrementalTabIndex;
 	std::string Name;
 
 	// Variable to check if control is tab selected
@@ -107,7 +107,7 @@ public:
 
 	std::list<Control*> Controls;
 
-	virtual ~Control();																		// Destructor
+	virtual ~Control() noexcept(false);																		// Destructor
 
 	void Dispose() override;
 
@@ -139,7 +139,7 @@ public:
 	void Resize(Size s) noexcept;
 	void Resize(int width, int height) noexcept;
 	Padding GetMargin() const noexcept;
-	Control* GetByTabIndex(const unsigned int& index) noexcept;
+	Control* GetByTabIndex(const int& index) noexcept;
 	Color GetForeColor() const noexcept;
 	void SetForeColor(const Color& color) noexcept;
 	Color GetBackgroundColor() const noexcept;
@@ -151,7 +151,7 @@ public:
 	Control* GetById(unsigned int id) noexcept;
 	Control* GetByHandle(const IntPtr p) noexcept;
 	int GetTabIndex() const noexcept;
-	void SetTabIndex(const unsigned int& index) noexcept;
+	void SetTabIndex(const int& index) noexcept;
 	Font GetFont() const noexcept;
 	void SetFont(Font font) noexcept;
 	Point GetLocation() const noexcept;

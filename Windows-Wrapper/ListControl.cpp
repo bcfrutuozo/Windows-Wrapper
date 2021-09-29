@@ -138,7 +138,7 @@ void ListControl::DisableSelection() noexcept
 	m_AllowSelection = false;
 }
 
-const ListItemCollection& const ListControl::GetDataSource() const noexcept
+const ListItemCollection& ListControl::GetDataSource() const noexcept
 {
 	return Items;
 }

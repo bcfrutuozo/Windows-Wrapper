@@ -31,6 +31,7 @@ void Component::Dispatch(const std::string& name, EventArgs* e)
 
 Component::Component()
 	:
+	Disposing(false),
 	Disposed(false),
 	Events(this)
 {

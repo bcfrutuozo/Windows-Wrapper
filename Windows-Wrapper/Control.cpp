@@ -7,7 +7,7 @@
 #include "CancelEventHandler.h"
 #include "Window.h"
 
-unsigned int Control::m_IncrementalTabIndex = 0;
+int Control::m_IncrementalTabIndex = 0;
 
 void Control::OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus)
 {
@@ -269,7 +269,7 @@ void Control::SetLocation(int x, int y) noexcept
 	SetWindowPos(static_cast<HWND>(Handle.ToPointer()), nullptr, m_Location.X, m_Location.Y, m_Size.Width, m_Size.Height, SWP_NOZORDER);
 }
 
-Control::~Control()
+Control::~Control() noexcept(false)
 {
 	if (OnActivate != nullptr) { delete OnActivate; OnActivate = nullptr; }
 	if (OnClick != nullptr) { delete OnClick; OnClick = nullptr; }
@@ -416,7 +416,7 @@ Padding Control::GetMargin() const noexcept
 	return m_Margin;
 }
 
-Control* Control::GetByTabIndex(const unsigned int& index) noexcept
+Control* Control::GetByTabIndex(const int& index) noexcept
 {
 	if (m_TabIndex == index)
 	{
@@ -543,7 +543,7 @@ int Control::GetTabIndex() const noexcept
 	return m_TabIndex;
 }
 
-void Control::SetTabIndex(const unsigned int& index) noexcept
+void Control::SetTabIndex(const int& index) noexcept
 {
 	// Don't let the user use a higher Tab Index than the number of current controls
 	if (index > m_IncrementalTabIndex)

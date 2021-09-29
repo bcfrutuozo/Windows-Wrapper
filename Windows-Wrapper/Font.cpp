@@ -1,4 +1,5 @@
 #include "Font.h"
+#include "Exceptions.h"
 
 int Font::PixelToPoint(int sizeInPixels) noexcept
 {
@@ -70,7 +71,7 @@ int Font::GetSizeInPixels() const noexcept
 	}
 	case GraphicsUnit::Pixel:
 	{
-		return m_Size;
+		break;
 	}
 	case GraphicsUnit::Point:
 	{
@@ -89,6 +90,8 @@ int Font::GetSizeInPixels() const noexcept
 		break;
 	}
 	}
+
+	return m_Size;	// TODO: IMPLEMENT IT
 }
 
 void Font::SetSize(const int& size) noexcept
