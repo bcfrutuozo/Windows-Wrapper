@@ -6,12 +6,12 @@ class ListItem : public Object
 {
 public:
 
-	uint64_t Id;
+	int Id;
 	std::string Value;
+	bool Tabulated;
 	bool Visible;
 	bool Selected;
 
-	ListItem(uint64_t id, const std::string& value);
-	ListItem(const ListItem& src);
+	ListItem(int id, const std::string& value);
 	virtual ~ListItem() = default;
 };

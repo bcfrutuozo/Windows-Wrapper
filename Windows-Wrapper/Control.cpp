@@ -436,6 +436,11 @@ Control* Control::GetByTabIndex(const int& index) noexcept
 	return nullptr;
 }
 
+bool Control::IsTabSelected() const noexcept
+{
+	return m_IsTabSelected;
+}
+
 void Control::SetForeColor(const Color& color) noexcept
 {
 	m_ForeColor = color;

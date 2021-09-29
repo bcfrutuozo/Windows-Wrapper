@@ -3,12 +3,12 @@
 
 int ListControl::OnEraseBackground_Impl(HWND hwnd, HDC hdc)
 {
-	RECT rc = { 0 };
+	/*RECT rc = { 0 };
 	GetClientRect(hwnd, &rc);
 	HBRUSH bgColor = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
 	FillRect(hdc, &rc, bgColor);
 	SelectObject(hdc, bgColor);
-	DeleteObject(bgColor);
+	DeleteObject(bgColor);*/
 
 	return 1;	// To avoid flickering
 }

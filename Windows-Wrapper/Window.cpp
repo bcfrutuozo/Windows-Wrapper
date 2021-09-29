@@ -3,8 +3,6 @@
 #include "OnClosingEventHandler.h"
 #include "Application.h"
 
-#include <sstream>
-
 Window::Window(const std::string& name, int width, int height)
 	:
 	Control(nullptr, name, width, height, 0, 0),

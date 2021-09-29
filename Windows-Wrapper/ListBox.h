@@ -26,6 +26,7 @@ private:
 	ListItem* m_SelectedItem;
 	std::vector<int> m_SelectedIndices;
 	std::vector<ListItem*> m_SelectedItems;
+	int m_Tabulation;
 
 	void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept override;
 	void OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept override;
@@ -54,4 +55,5 @@ public:
 	SelectionMode GetSelectionMode() const noexcept;
 	void SetSelectionMode(SelectionMode mode) noexcept;
 	void SelectAll();
+	void ClearSelected() noexcept;
 };

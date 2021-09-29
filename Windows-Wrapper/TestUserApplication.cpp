@@ -15,7 +15,7 @@ void TestUserApplication::Initialize()
 	
 	auto lb = window->AddListBox(260, 240, 450, 50);
     std::vector<ListItem> list;
-	for (size_t i = 0; i < 1000; ++i)
+	for (int i = 0; i < 1000; ++i)
 	{
 		std::ostringstream oss;
 		oss << "Item: " << i;
@@ -27,13 +27,13 @@ void TestUserApplication::Initialize()
 	f.SetSize(14);
 	lb->SetFont(f);
 	lb->SetBorderStyle(BorderStyle::Fixed3D);
-	//lb->EnableMultiColumn();
+	lb->EnableMultiColumn();
 	lb->SetColumnWidth(180);
 	
 	auto cb = window->AddComboBox("Start Text", 260, 450, 450);
 
     std::vector<ListItem> list2;
-	for (size_t i = 0; i < 5; ++i)
+	for (int i = 0; i < 5; ++i)
 	{
 		std::ostringstream oss;
 		oss << "Item: " << i;

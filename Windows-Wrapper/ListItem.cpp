@@ -1,20 +1,13 @@
 #include "ListItem.h"
 #include "ListControl.h"
 
-ListItem::ListItem(uint64_t id, const std::string& value)
+ListItem::ListItem(int id, const std::string& value)
 	:
 	Id(id),
 	Value(value),
 	Visible(true),
-	Selected(false)
+	Selected(false),
+	Tabulated(false)
 {
 
-}
-
-ListItem::ListItem(const ListItem& src)
-{
-	Id = src.Id;
-	Value = src.Value;
-	Visible = src.Visible;
-	Selected = src.Selected;
 }
