@@ -170,6 +170,17 @@ void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 				ClearSelected();
 				break;
 			}
+			case 'A':
+			{
+				if (0x8000 & GetKeyState(VK_CONTROL))
+				{
+					if (m_SelectionMode == SelectionMode::MultiSimple || m_SelectionMode == SelectionMode::MultiExtended)
+					{
+						SelectAll();
+					}
+				}
+				break;
+			}
 			}
 		}
 		
@@ -253,11 +264,11 @@ void ListBox::CalculateListBoxParameters(HWND hwnd, HDC& hdc)
 		{
 			m_RowPosition.resize(itemsNumber);
 
-			if (m_SelectionMode == SelectionMode::MultiSimple || m_SelectionMode == SelectionMode::MultiExtended)
+			/*if (m_SelectionMode == SelectionMode::MultiSimple || m_SelectionMode == SelectionMode::MultiExtended)
 			{
 				m_SelectedIndices.resize(itemsNumber);
 				m_SelectedItems.resize(itemsNumber);
-			}
+			}*/
 		}
 	}
 
@@ -611,21 +622,25 @@ void ListBox::Draw(HWND hwnd, HDC& hdc)
 			cr.right -= 1;
 			cr.bottom -= 1;
 
+			HBRUSH brush = 0;
+
 			if((m_SelectionMode == SelectionMode::Single && m_SelectedIndex == i) || 
 				(m_SelectionMode == SelectionMode::MultiSimple || m_SelectionMode == SelectionMode::MultiExtended) && std::find(m_SelectedIndices.begin(), m_SelectedIndices.end(), i) != m_SelectedIndices.end())
 			{
 				SetBkColor(hdcMem, RGB(0, 120, 215));
 				SetTextColor(hdcMem, RGB(255, 255, 255));
-				HBRUSH brush = CreateSolidBrush(RGB(0, 120, 215));
-				FillRect(hdcMem, &cr, brush);
-				SelectObject(hdcMem, brush);
-				DeleteObject(brush);
+				brush = CreateSolidBrush(RGB(0, 120, 215));
 			}
 			else
 			{
 				SetBkColor(hdcMem, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
 				SetTextColor(hdcMem, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
+				brush = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));				
 			}
+
+			FillRect(hdcMem, &cr, brush);
+			SelectObject(hdcMem, brush);
+			DeleteObject(brush);
 
 			DrawText(hdcMem, dataSource[i].Value.c_str(), -1, &cr, DT_LEFT | DT_VCENTER);
 			DrawText(hdcMem, Text.c_str(), static_cast<int>(dataSource[i].Value.length()), &cr, DT_LEFT | DT_VCENTER | DT_CALCRECT);
