@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Object.h"
-#include "Color.h"
+#include "CommonObject.h"
 
 class FlatButtonAppearance : public Object
 {

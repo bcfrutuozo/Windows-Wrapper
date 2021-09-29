@@ -1,8 +1,9 @@
 #pragma once
 
-#include "Window.h"
+#include "CommonObject.h"
+#include "Appheaders.h"
 
-class Application
+class Application : public Object
 {
 	friend class Window;
 	friend class WinAPI;

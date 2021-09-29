@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Control.h"
-#include "Enums.h"
 #include "Button.h"
 #include "ProgressBar.h"
 #include "TextBox.h"

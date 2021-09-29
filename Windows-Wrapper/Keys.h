@@ -781,12 +781,12 @@ enum class Keys
 	Alt = 262144
 };
 
-inline Keys operator&(Keys a, Keys b)
+constexpr inline Keys operator&(Keys a, Keys b)
 {
 	return static_cast<Keys>(static_cast<int>(a) | static_cast<int>(b));
 }
 
-inline Keys operator|(Keys a, Keys b)
+constexpr inline Keys operator|(Keys a, Keys b)
 {
 	return static_cast<Keys>(static_cast<int>(a) | static_cast<int>(b));
 }

@@ -2,8 +2,6 @@
 
 #include "SystemException.h"
 
-#include <string>
-
 class ArgumentException : public SystemException
 {
 private:

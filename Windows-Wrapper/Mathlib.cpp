@@ -136,7 +136,7 @@ namespace Math
 			if (u < 0)
 			{
 				float t = XMVectorGetX(XMVector3Dot(p - b, c - b) / XMVector3Dot(c - b, c - b));
-				t = saturate(t);
+				t = Saturate(t);
 				u = 0.0f;
 				v = 1.0f - t;
 				w = t;
@@ -144,7 +144,7 @@ namespace Math
 			else if (v < 0)
 			{
 				float t = XMVectorGetX(XMVector3Dot(p - c, a - c) / XMVector3Dot(a - c, a - c));
-				t = saturate(t);
+				t = Saturate(t);
 				u = t;
 				v = 0.0f;
 				w = 1.0f - t;
@@ -152,7 +152,7 @@ namespace Math
 			else if (w < 0)
 			{
 				float t = XMVectorGetX(XMVector3Dot(p - a, b - a) / XMVector3Dot(b - a, b - a));
-				t = saturate(t);
+				t = Saturate(t);
 				u = 1.0f - t;
 				v = t;
 				w = 0.0f;
@@ -421,7 +421,7 @@ namespace Math
 			XMFLOAT4(0.0019531250f, 0.4828532236f, 0.2432000000f, 0.6064139942f),
 		};
 
-		return HALTON[index % arraysize(HALTON)];
+		return HALTON[index % ArraySize(HALTON)];
 	}
 
 	uint32_t CompressNormal(const XMFLOAT3& normal)
@@ -438,9 +438,9 @@ namespace Math
 	{
 		uint32_t retval = 0;
 
-		retval |= (uint32_t)((uint8_t)(saturate(color.x) * 255.0f) << 0);
-		retval |= (uint32_t)((uint8_t)(saturate(color.y) * 255.0f) << 8);
-		retval |= (uint32_t)((uint8_t)(saturate(color.z) * 255.0f) << 16);
+		retval |= (uint32_t)((uint8_t)(Saturate(color.x) * 255.0f) << 0);
+		retval |= (uint32_t)((uint8_t)(Saturate(color.y) * 255.0f) << 8);
+		retval |= (uint32_t)((uint8_t)(Saturate(color.z) * 255.0f) << 16);
 
 		return retval;
 	}
@@ -448,10 +448,10 @@ namespace Math
 	{
 		uint32_t retval = 0;
 
-		retval |= (uint32_t)((uint8_t)(saturate(color.x) * 255.0f) << 0);
-		retval |= (uint32_t)((uint8_t)(saturate(color.y) * 255.0f) << 8);
-		retval |= (uint32_t)((uint8_t)(saturate(color.z) * 255.0f) << 16);
-		retval |= (uint32_t)((uint8_t)(saturate(color.w) * 255.0f) << 24);
+		retval |= (uint32_t)((uint8_t)(Saturate(color.x) * 255.0f) << 0);
+		retval |= (uint32_t)((uint8_t)(Saturate(color.y) * 255.0f) << 8);
+		retval |= (uint32_t)((uint8_t)(Saturate(color.z) * 255.0f) << 16);
+		retval |= (uint32_t)((uint8_t)(Saturate(color.w) * 255.0f) << 24);
 
 		return retval;
 	}

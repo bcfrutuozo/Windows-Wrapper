@@ -14,4 +14,3 @@ public:
 	void Process(float dt) override;
 	void Initialize() override;
 };
-

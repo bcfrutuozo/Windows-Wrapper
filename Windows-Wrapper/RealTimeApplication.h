@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Application.h"
-#include "Timer.h"
 
 constexpr auto SPEEDFACTOR = 1.0f;
 

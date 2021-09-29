@@ -3,6 +3,13 @@
 
 int ListControl::OnEraseBackground_Impl(HWND hwnd, HDC hdc)
 {
+	RECT rc = { 0 };
+	GetClientRect(hwnd, &rc);
+	HBRUSH bgColor = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+	FillRect(hdc, &rc, bgColor);
+	SelectObject(hdc, bgColor);
+	DeleteObject(bgColor);
+
 	return 1;	// To avoid flickering
 }
 
@@ -17,7 +24,6 @@ ListControl::ListControl(Control* parent, const std::string& name, int width, in
 	:
 	ScrollableControl(parent, name, width, height, x, y),	// Default control size without font is 9
 	m_AllowSelection(true),
-	Items(nullptr),
 	OnDataSourceChanged(nullptr),
 	OnDisplayMemberChanged(nullptr),
 	OnFormat(nullptr),
@@ -138,16 +144,16 @@ void ListControl::DisableSelection() noexcept
 	m_AllowSelection = false;
 }
 
-const ListItemCollection& ListControl::GetDataSource() const noexcept
+const std::vector<ListItem>& ListControl::GetDataSource() const noexcept
 {
 	return Items;
 }
 
-void ListControl::SetDataSource(const ListItemCollection& dataSource)
+void ListControl::SetDataSource(const std::vector<ListItem>& dataSource)
 {
 	if (dataSource.size() > 32767)
 	{
-		throw std::logic_error("Maximum ListBox items allowed is 32767");
+		throw ArgumentException("Maximum ListBox items allowed is 32767");
 	}
 
 	// Destroy the old DataSource to avoid memory leak

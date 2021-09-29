@@ -20,7 +20,7 @@ int Font::PointToPixel(int sizeInPoints) noexcept
 	return std::abs(fntSize);
 }
 
-Font::Font(const std::string& name, const int& size, bool isBold, bool isItalic, bool isUnderline, bool isStrikeout, GraphicsUnit unit)
+Font::Font(const std::string& name, int size, bool isBold, bool isItalic, bool isUnderline, bool isStrikeout, GraphicsUnit unit)
 	:
 	m_IsBold(isBold),
 	m_IsItalic(isItalic),

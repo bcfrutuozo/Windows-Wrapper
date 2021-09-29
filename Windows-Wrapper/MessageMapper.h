@@ -1,10 +1,8 @@
 #pragma once
 
-#include "Common.h"
+#include "CommonObject.h"
 
-#include <unordered_map>
-
-class MessageMapper
+class MessageMapper : public Object
 {
 private:
 
@@ -13,5 +11,7 @@ private:
 public:
 
 	MessageMapper() noexcept;
+	virtual ~MessageMapper() = default;
+
 	std::string operator() (DWORD message, LPARAM lParam, WPARAM wParam) const noexcept;
 };

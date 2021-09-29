@@ -17,6 +17,21 @@
 #include <algorithm>
 #include <string>
 #include <typeinfo>
+#include <queue>
+#include <span>
+#include <optional>
+#include <bitset>
+#include <unordered_map>
+#include <thread>
+#include <array>
+#include <iterator>
+#include <random>
+#include <span>
+#include <chrono>
+#include <exception>
+#include <sstream>
+#include <iomanip>
+#include <Windows.h>
 
 // DirectX debug
 #include <dxgidebug.h>
@@ -33,20 +48,14 @@ using namespace Microsoft::WRL;
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 
-static const XMFLOAT4X4 IDENTITYMATRIX = XMFLOAT4X4(1, 0, 0, 0,
-													0, 1, 0, 0, 
-													0, 0, 1, 0, 
-													0, 0, 0, 1);
-
-#define arraysize(a) (sizeof(a) / sizeof(a[0]))
 #define NOMINMAX
-#define ALIGN_16 void* operator new(size_t i) { return _mm_malloc(i, 16); } void operator delete(void* p) { _mm_free(p); }
+
+#define Align16 void* operator new(size_t i) { return _mm_malloc(i, 16); } void operator delete(void* p) { _mm_free(p); }
+#define ArraySize(a) (sizeof(a) / sizeof(a[0]))
 #define SafeDelete(p) { delete p; p == nullptr; }
 
-#include <string>
-#include <sstream>
-#include <iomanip>
-#include <Windows.h>
 
 // Project libraries
+#include "Enums.h"
 #include "Mathlib.h"
+#include "Utilities.h"

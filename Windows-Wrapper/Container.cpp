@@ -22,7 +22,7 @@ void Container::Remove(IComponent* component, bool preserveSite)
 		component->m_Site = nullptr;
 	}
 
-	for (int i = 0; i < SiteCount; ++i)
+	for (size_t i = 0; i < SiteCount; ++i)
 	{
 		if (m_Sites[i] == site)
 		{
@@ -61,7 +61,7 @@ void Container::ValidateName(IComponent* component, const std::string& name)
 
 	if (name.empty())
 	{
-		for (int i = 0; i < (std::min)(SiteCount, m_Sites.size()); ++i)
+		for (size_t i = 0; i < (std::min)(SiteCount, m_Sites.size()); ++i)
 		{
 			ISite* s = m_Sites[i];
 			if (s != nullptr &&

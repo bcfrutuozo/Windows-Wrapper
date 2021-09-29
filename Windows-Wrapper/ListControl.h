@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ScrollableControl.h"
-#include "ListItemCollection.h"
+#include "ListItem.h"
 #include "ListControlConvertEventHandler.h"
 
 class ListControl : public ScrollableControl
@@ -21,10 +21,11 @@ private:
 
 protected:
 
+	int m_BorderSize;
 	int m_SelectedIndex;
 	std::string m_SelectedValue;
 	bool m_IsRebinding;
-	ListItemCollection Items;
+	std::vector<ListItem> Items;
 
 	int OnEraseBackground_Impl(HWND hwnd, HDC hdc) override;
 
@@ -47,8 +48,8 @@ public:
 	bool IsSelectionAllowed();
 	void EnableSelection() noexcept;
 	void DisableSelection() noexcept;
-	const ListItemCollection& GetDataSource() const noexcept;
-	void SetDataSource(const ListItemCollection& dataSource);
+	const std::vector<ListItem>& GetDataSource() const noexcept;
+	void SetDataSource(const std::vector<ListItem>& dataSource);
 	virtual int GetSelectedIndex() const noexcept;
 	virtual void SetSelectedIndex(int index) = 0;
 	std::string GetSelectedValue() const noexcept;

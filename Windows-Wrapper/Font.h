@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Object.h"
-#include "Enums.h"
+#include "CommonObject.h"
 
 class Font : public Object
 {
@@ -22,7 +21,7 @@ public:
 
 	static constexpr unsigned int DefaultHeight() { return 9; }
 
-	Font(const std::string& name, const int& size, bool isBold, bool isItalic, bool isUnderline, bool isStrikeout, GraphicsUnit unit);
+	Font(const std::string& name, int size, bool isBold, bool isItalic, bool isUnderline, bool isStrikeout, GraphicsUnit unit);
 	virtual ~Font() = default;
 
 	bool IsBold() const noexcept;

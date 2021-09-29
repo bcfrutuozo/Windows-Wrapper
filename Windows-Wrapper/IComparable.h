@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Object.h"
+#include "CommonObject.h"
 
 template<typename T>
 class IComparable : public Object

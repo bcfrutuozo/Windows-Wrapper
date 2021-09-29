@@ -1,9 +1,6 @@
 #pragma once
 
 #include "Control.h"
-#include "Enums.h"
-
-#include <thread>
 
 class ProgressBar final: public Control
 {

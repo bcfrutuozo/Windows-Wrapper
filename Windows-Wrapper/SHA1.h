@@ -1,9 +1,8 @@
 #pragma once
 
-#include <stdint.h>
-#include <iostream>
+#include "CommonObject.h"
 
-class SHA1
+class SHA1 : public Object
 {
 public:
 

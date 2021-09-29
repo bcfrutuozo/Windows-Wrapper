@@ -2,8 +2,6 @@
 
 #include "ListControl.h"
 
-#include <vector>
-
 class ComboBox;
 
 class ListBox : public ListControl

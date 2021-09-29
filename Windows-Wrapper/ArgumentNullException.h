@@ -2,8 +2,6 @@
 
 #include "ArgumentException.h"
 
-#include <string>
-
 class ArgumentNullException : public ArgumentException
 {
 public:

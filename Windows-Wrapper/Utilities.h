@@ -1,7 +1,6 @@
 #pragma once
 
-#include <string>
-#include <algorithm>
+#include "Common.h"
 
 namespace Utilities
 {
@@ -13,9 +12,8 @@ namespace Utilities
 
 namespace std
 {
-	template<class _container,
-		class _Ty> inline
-		bool contains(_container _C, const _Ty& _Val)
+	template<class _container, class _Ty>
+	inline bool contains(_container _C, const _Ty& _Val)
 	{
 		return std::find(_C.begin(), _C.end(), _Val) != _C.end();
 	}

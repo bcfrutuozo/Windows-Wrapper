@@ -10,14 +10,8 @@
 #include "ToolStrip.h"
 #include "OnClosedEventArgs.h"
 #include "OnClosingEventArgs.h"
-#include "Color.h"
 #include "Keyboard.h"
 #include "Mouse.h"
-
-#include <memory>
-#include <vector>
-#include <optional>
-#include <string>
 
 class Window final : public Control
 {

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "CommonObject.h"
 #include "IComponent.h"
 #include "EventDispatcher.h"
 

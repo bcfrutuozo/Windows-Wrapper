@@ -1,6 +1,7 @@
 #pragma once
 
 #include "WinAPI.h"
+#include "Window.h"
 #include "Application.h"
 
 // Includes for ::_TrackMouseEvent function

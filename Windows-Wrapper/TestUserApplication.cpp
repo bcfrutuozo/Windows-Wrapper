@@ -1,11 +1,4 @@
 #include "TestUserApplication.h"
-#include "KeyEventArgs.h"
-#include "ToolStrip.h"
-#include "ListBox.h"
-#include "Color.h"
-
-#include "Event.h"
-#include "Timer.h"
 
 void TestClick(Object* sender, EventArgs* e)
 {
@@ -21,7 +14,7 @@ void TestUserApplication::Initialize()
 	window->GetKeyboard().DisableAutorepeat();
 	
 	auto lb = window->AddListBox(260, 240, 450, 50);
-	auto list = ListItemCollection(lb);
+    std::vector<ListItem> list;
 	for (size_t i = 0; i < 1000; ++i)
 	{
 		std::ostringstream oss;
@@ -39,7 +32,7 @@ void TestUserApplication::Initialize()
 	
 	auto cb = window->AddComboBox("Start Text", 260, 450, 450);
 
-	auto list2 = ListItemCollection(lb);
+    std::vector<ListItem> list2;
 	for (size_t i = 0; i < 5; ++i)
 	{
 		std::ostringstream oss;

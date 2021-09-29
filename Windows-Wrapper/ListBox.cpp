@@ -8,7 +8,7 @@ void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 	{
 	case VK_DOWN:
 	{
-		if (m_SelectedIndex < GetDataSource().size() - 1)
+		if (m_SelectedIndex < static_cast<int>(GetDataSource().size()) - 1)
 		{
 			auto drawableArea = GetDrawableArea();
 
@@ -128,7 +128,7 @@ void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 			break;
 		}
 
-		if (m_SelectedIndex < GetDataSource().size() - m_RowNumber)
+		if (m_SelectedIndex < static_cast<int>(GetDataSource().size()) - m_RowNumber)
 		{
 			auto drawableArea = GetDrawableArea();
 			m_SelectedIndex += m_RowNumber;
@@ -197,20 +197,20 @@ void ListBox::CalculateListBoxParameters(HWND hwnd, HDC& hdc)
 	GetTextExtentPoint32(hdc, verifier, 2, &m_SingleSize);
 	SetMinimumItemWidth(m_SingleSize.cx);
 
-	int bordersize = 0;
+	m_BorderSize = 0;
 	switch (m_BorderStyle)
 	{
-	case BorderStyle::FixedSingle: bordersize = 1; break;
-	case BorderStyle::Fixed3D: bordersize = 2; break;
+	case BorderStyle::FixedSingle: m_BorderSize = 1; break;
+	case BorderStyle::Fixed3D: m_BorderSize = 2; break;
 	default: break;
 	}
 
 	// Drawable block inside ListBox
 	auto drawableArea = ResetDrawableArea();
-	drawableArea->left += m_Margin.Left + bordersize;
-	drawableArea->top += m_Margin.Top + bordersize;
-	drawableArea->right -= m_Margin.Right + bordersize;
-	drawableArea->bottom -= m_Margin.Bottom + bordersize;
+	drawableArea->left += m_Margin.Left + m_BorderSize;
+	drawableArea->top += m_Margin.Top + m_BorderSize;
+	drawableArea->right -= m_Margin.Right + m_BorderSize;
+	drawableArea->bottom -= m_Margin.Bottom + m_BorderSize;
 
 	SetItemWidth(m_IsMultiColumn ? m_ColumnWidth : static_cast<int>(drawableArea->right - drawableArea->left));
 	SetItemHeight(m_SingleSize.cy);
@@ -230,7 +230,7 @@ void ListBox::CalculateListBoxParameters(HWND hwnd, HDC& hdc)
 			m_SelectedItems.clear();
 		}
 
-		if (m_RowPosition.size() < itemsNumber)
+		if (static_cast<int>(m_RowPosition.size()) < itemsNumber)
 		{
 			m_RowPosition.resize(itemsNumber);
 
@@ -278,14 +278,14 @@ void ListBox::CalculateListBoxParameters(HWND hwnd, HDC& hdc)
 
 			// Recalculate drawable area to check if HorizontalScrollBar is needed
 
-			drawableArea->right = newWidth + m_Margin.Left + (bordersize * 2);
-			drawableArea->bottom = newHeight + m_Margin.Top + (bordersize * 2);
+			drawableArea->right = newWidth + m_Margin.Left + (m_BorderSize * 2);
+			drawableArea->bottom = newHeight + m_Margin.Top + (m_BorderSize * 2);
 
 			if (m_RowNumber * m_ColumnNumber > itemsNumber)
 			{
 				HorizontalScrollBar.SetMaximumValue(0);
 				HorizontalScrollBar.Hide();
-				newWidth += m_Margin.Left + m_Margin.Right + (bordersize * 2);
+				newWidth += m_Margin.Left + m_Margin.Right + (m_BorderSize * 2);
 				oldHeight = m_Size.Width;
 				m_Size.Width = newWidth;
 				Resize(newWidth, m_Size.Height);
@@ -295,10 +295,10 @@ void ListBox::CalculateListBoxParameters(HWND hwnd, HDC& hdc)
 				auto hLoc = HorizontalScrollBar.GetLocation();
 				auto hSize = HorizontalScrollBar.GetSize();
 				hSize.Width += (newWidth - oldWidth);
-				newWidth += m_Margin.Left + m_Margin.Right + (bordersize * 2);
+				newWidth += m_Margin.Left + m_Margin.Right + (m_BorderSize * 2);
 				oldWidth = m_Size.Width;
 
-				newHeight += m_Margin.Top + m_Margin.Bottom + (bordersize * 2) + hSize.Height;
+				newHeight += m_Margin.Top + m_Margin.Bottom + (m_BorderSize * 2) + hSize.Height;
 				oldHeight = m_Size.Height;
 				m_Size.Height = newHeight;
 				m_Size.Width = newWidth;
@@ -330,8 +330,8 @@ void ListBox::CalculateListBoxParameters(HWND hwnd, HDC& hdc)
 			// Recalculate the new item width size
 			SetItemWidth(m_IsMultiColumn ? m_ColumnWidth : drawableArea->right - drawableArea->left);
 
-			drawableArea->bottom = newHeight + m_Margin.Top + (bordersize * 2);
-			newHeight += m_Margin.Top + m_Margin.Bottom + (bordersize * 2);
+			drawableArea->bottom = newHeight + m_Margin.Top + (m_BorderSize * 2);
+			newHeight += m_Margin.Top + m_Margin.Bottom + (m_BorderSize * 2);
 			int oldHeightY = m_Size.Height;
 			m_Size.Height = newHeight;
 			auto vSize = VerticalScrollBar.GetSize();
@@ -341,7 +341,7 @@ void ListBox::CalculateListBoxParameters(HWND hwnd, HDC& hdc)
 			VerticalScrollBar.Show();
 			Resize(m_Size.Width, newHeight + 1);
 
-			size_t max = 0;
+			int max = 0;
 			while (max < newHeight)
 			{
 				max += GetItemHeight();
@@ -386,30 +386,18 @@ void ListBox::Draw(HWND hwnd, HDC& hdc)
 	HBITMAP hbmOld;
 
 	auto drawableArea = GetDrawableArea();
-	bool drawFullWindow = false;
 	if (m_IsRebinding || m_IsFormatChanged)
 	{
 		CalculateListBoxParameters(hwnd, hdc);
-		hdcMem = CreateCompatibleDC(hdc);
-		hbmMem = CreateCompatibleBitmap(hdc, m_Size.Width, m_Size.Height);
-		hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
-		drawFullWindow = true;
-	}
-	else
-	{
-		hdcMem = CreateCompatibleDC(hdc);
-		hbmMem = CreateCompatibleBitmap(hdc, drawableArea->right - drawableArea->left, drawableArea->bottom - drawableArea->top + m_Margin.Bottom);
-		hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
 	}
 
+	hdcMem = CreateCompatibleDC(hdc);
+	hbmMem = CreateCompatibleBitmap(hdc, m_Size.Width, m_Size.Height);
+	hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
 	SelectObject(hdcMem, hFont);
 
 	RECT r;
 	GetClientRect(hwnd, &r);
-	HBRUSH bgColor = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-	FillRect(hdcMem, &r, bgColor);
-	SelectObject(hdcMem, bgColor);
-	DeleteObject(bgColor);
 
 	switch (m_BorderStyle)
 	{
@@ -562,7 +550,7 @@ void ListBox::Draw(HWND hwnd, HDC& hdc)
 		DrawText(hdcMem, Text.c_str(), static_cast<int>((*dataSource)[i]->Value.length()), &cr, DT_LEFT | DT_VCENTER | DT_CALCRECT);
 	}*/
 
-	for (auto [i, rw, c] = std::tuple{ 0, 0, 0 }; i < dataSource.size(); ++i, ++rw)
+	for (auto [i, rw, c] = std::tuple{ 0, 0, 0 }; i < static_cast<int>(dataSource.size()); ++i, ++rw)
 	{
 		RECT cr;
 		CopyRect(&cr, drawableArea);
@@ -607,14 +595,7 @@ void ListBox::Draw(HWND hwnd, HDC& hdc)
 
 	// Perform the bit-block transfer between the memory Device Context which has the next bitmap
 	// with the current image to avoid flickering
-	if (drawFullWindow)
-	{
-		BitBlt(hdc, 0, 0, m_Size.Width, m_Size.Height, hdcMem, 0, 0, SRCCOPY);
-	}
-	else
-	{
-		BitBlt(hdc, 0, 0, drawableArea->right - drawableArea->left, drawableArea->bottom - drawableArea->top + m_Margin.Bottom, hdcMem, 0, 0, SRCCOPY);
-	}
+	BitBlt(hdc, 0, 0, m_Size.Width, m_Size.Height, hdcMem, 0, 0, SRCCOPY);
 
 	SelectObject(hdcMem, hbmOld);
 	DeleteObject(hbmOld);
@@ -650,7 +631,7 @@ ListBox::~ListBox()
 
 }
 
-void ListBox::SetSelectedIndex(int index) 
+void ListBox::SetSelectedIndex(int index)
 {
 	switch (m_SelectionMode)
 	{

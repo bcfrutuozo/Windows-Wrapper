@@ -3,6 +3,11 @@
 
 int ScrollBar::OnEraseBackground_Impl(HWND hwnd, HDC hdc)
 {
+	RECT rc = { 0 };
+	GetClientRect(hwnd, &rc);
+	HBRUSH bgColor = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+	FillRect(hdc, &rc, bgColor);
+	SelectObject(hdc, bgColor);
 	return 1;
 }
 
@@ -10,21 +15,6 @@ void ScrollBar::OnPaint_Impl(HWND hwnd)
 {
 	PAINTSTRUCT ps;
 	BeginPaint(hwnd, &ps);
-
-	HDC hdcMem = CreateCompatibleDC(ps.hdc);
-	HBITMAP hbmMem = CreateCompatibleBitmap(ps.hdc, m_Size.Width, m_Size.Height);
-	HBITMAP hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
-
-	HBRUSH bgColor = CreateSolidBrush(RGB(Parent->GetBackgroundColor().GetR(), Parent->GetBackgroundColor().GetG(), Parent->GetBackgroundColor().GetB()));
-	FillRect(hdcMem, &ps.rcPaint, bgColor);
-	SelectObject(hdcMem, bgColor);
-	DeleteObject(bgColor);
-	SelectObject(hdcMem, hbmOld);
-	DeleteObject(hbmOld);
-
-	// Perform the bit-block transfer between the memory Device Context which has the next bitmap
-	// with the current image to avoid flickering
-	BitBlt(ps.hdc, 0, 0, m_Size.Width, m_Size.Height, hdcMem, 0, 0, SRCCOPY);
 	EndPaint(hwnd, &ps);
 }
 

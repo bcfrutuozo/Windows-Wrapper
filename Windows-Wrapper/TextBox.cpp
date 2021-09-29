@@ -419,7 +419,7 @@ void TextBox::CalculateCaret(HWND hwnd, const HDC& hdc) noexcept
 		m_CaretPosition.resize(Text.length() + 1, 0ul);
 	}
 
-	for (int i = 0; i <= Text.length(); ++i)
+	for (int i = 0; i <= static_cast<int>(Text.length()); ++i)
 	{
 		if (i > 0)
 		{
@@ -518,13 +518,13 @@ void TextBox::PrintDebug() const noexcept
 {
 	std::ostringstream oss;
 	oss << "Cursor: ";
-	for (int i = 0; i < m_CursorIndex; ++i) oss << "   ";
+	for (int i = 0; i < static_cast<int>(m_CursorIndex); ++i) oss << "   ";
 	oss << " | " << std::endl;
 	oss << "Select: ";
-	for (int i = 0; i < m_SelectIndex; ++i) oss << "   ";
+	for (int i = 0; i < static_cast<int>(m_SelectIndex); ++i) oss << "   ";
 	oss << " | " << std::endl;
 	oss << "  Text: ";
-	for (int i = 0; i < Text.size(); ++i) oss << " " << Text[i] << " ";
+	for (int i = 0; i < static_cast<int>(Text.size()); ++i) oss << " " << Text[i] << " ";
 	oss << "\\0" << std::endl;
 	printf_s(oss.str().c_str());
 }

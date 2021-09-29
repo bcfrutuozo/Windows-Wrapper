@@ -1,5 +1,4 @@
 #include "TestRealTimeApplication.h"
-#include "Window.h"
 
 void TestRealTimeApplication::HandleInput(float dt)
 {

@@ -20,3 +20,13 @@ enum class MouseButtons
 	// The second XButton(XBUTTON2) on Microsoft IntelliMouse Explorer was pressed.
 	XButton2 = 16777216
 };
+
+constexpr inline MouseButtons operator&(MouseButtons a, MouseButtons b)
+{
+	return static_cast<MouseButtons>(static_cast<int>(a) | static_cast<int>(b));
+}
+
+constexpr inline MouseButtons operator|(MouseButtons a, MouseButtons b)
+{
+	return static_cast<MouseButtons>(static_cast<int>(a) | static_cast<int>(b));
+}

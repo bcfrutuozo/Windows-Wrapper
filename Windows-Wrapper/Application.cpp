@@ -1,6 +1,5 @@
 #include "Application.h"
-#include "WinAPI.h"
-#include "Utilities.h"
+#include "Window.h"
 
 std::list<Window*>* Application::Windows = new std::list<Window*>();
 

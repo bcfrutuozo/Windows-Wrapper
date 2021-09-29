@@ -212,7 +212,7 @@ void Mouse::TrimRawInputBuffer() noexcept
 	}
 }
 
-void Mouse::OnWheelDelta(const int delta) noexcept
+void Mouse::OnWheelDelta(int delta) noexcept
 {
 	m_WheelDeltaCarry += delta;
 

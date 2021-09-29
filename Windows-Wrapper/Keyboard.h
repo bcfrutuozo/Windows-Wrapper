@@ -1,10 +1,8 @@
 #pragma once
 
-#include <queue>
-#include <optional>
-#include <bitset>
+#include "CommonObject.h"
 
-class Keyboard
+class Keyboard : public Object
 {
 	friend class Window;
 
@@ -39,6 +37,7 @@ public:
 	Keyboard() = default;
 	Keyboard(const Keyboard&) = delete;
 	Keyboard& operator=(const Keyboard&) = delete;
+	virtual ~Keyboard() = default;
 
 	// Key event handling
 	bool IsKeyPressed(unsigned char keyCode) const noexcept;
@@ -59,8 +58,8 @@ public:
 
 private:
 
-	static constexpr unsigned int m_NumberOfKeys = 256u;
-	static constexpr unsigned int m_BufferSize = 16u;
+	static constexpr uint32_t m_NumberOfKeys = 256u;
+	static constexpr uint32_t m_BufferSize = 16u;
 	bool m_IsAutoRepeatEnabled = false;
 	std::bitset<m_NumberOfKeys> m_KeyStates;
 	std::queue<Event> m_KeyBuffer;

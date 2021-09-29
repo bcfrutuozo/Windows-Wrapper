@@ -2,12 +2,14 @@
 
 #include "Common.h"
 
-#include <algorithm>
+#define Saturate(x) (std::min)((std::max)(x, 0.0f), 1.0f)	// std::min and std::max between brackets to avoid default minmax macro call
 
-#define saturate(x) (std::min)((std::max)(x, 0.0f), 1.0f)	// std::min and std::max between brackets to avoid default minmax macro call
-
-constexpr float PI = 3.14159265f;
-constexpr double PI_D = 3.1415926535897932;
+static constexpr float PI = 3.14159265f;
+static constexpr double PI_D = 3.1415926535897932;
+static constexpr XMFLOAT4X4 IdentityMatrix = XMFLOAT4X4(1, 0, 0, 0,
+														0, 1, 0, 0,
+														0, 0, 1, 0,
+														0, 0, 0, 1);
 
 namespace Math
 {
@@ -22,6 +24,15 @@ namespace Math
 	inline float Length(const XMFLOAT3& v)
 	{
 		return sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
+	}
+
+	inline float InverseSquareRoot(float x) noexcept
+	{
+		// The infamous algorithm from Quake III Arena
+		static_assert(std::numeric_limits<float>::is_iec559); // (enable only on IEEE 754)
+
+		float const y = std::bit_cast<float>(0x5f3759df - (std::bit_cast<std::uint32_t>(x) >> 1));
+		return y * (1.5f - (x * 0.5f * y * y));
 	}
 
 	inline float Distance(const XMVECTOR& v1, const XMVECTOR& v2)
@@ -324,7 +335,7 @@ namespace Math
 }
 
 template<typename T>
-constexpr auto Square(const T& x) noexcept
+constexpr auto Square(T x) noexcept
 {
 	return x * x;
 }
@@ -348,7 +359,7 @@ T WrapAngle(T theta) noexcept
 }
 
 template<typename T>
-constexpr T Interpolate(const T& source, const T& destination, float alpha) noexcept
+constexpr T Interpolate(T source, T destination, float alpha) noexcept
 {
 	return source + (destination - source) * alpha;
 }

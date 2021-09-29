@@ -2,7 +2,7 @@
 
 void ComboBox::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags)
 {
-	RECT rect { 0 };
+	RECT rect{ 0 };
 
 	InflateRect(&rect, -GetSystemMetrics(SM_CXEDGE), -GetSystemMetrics(SM_CYEDGE));
 	rect.left = rect.right - GetSystemMetrics(SM_CXVSCROLL);
@@ -352,86 +352,42 @@ void ComboBox::ComboBoxChildNativeWindow::Draw(HWND hwnd, HDC& hdc)
 
 	const auto& dataSource = m_ComboBox->GetDataSource();
 
-	/* Logic to draw only visible entries. However, it's much harder to track the selected index
-	because it position cannot be tracked to be handled.
-	for (auto [i, r, c, a] =
-		std::tuple{
-		IsMultiColumn() ? HorizontalScrollBar.GetScrolling() * m_RowNumber : VerticalScrollBar.GetScrolling() * m_ColumnNumber,
-		0,
-		0,
-		0 };
-		a < m_RowNumber * m_ColumnNumber;
-		++i, ++r, ++a)
+	for (size_t i = 0; i < dataSource.size(); ++i)
 	{
-		if (i >= dataSource->GetCount())
-		{
-			break;
-		}
 		RECT cr;
 		CopyRect(&cr, drawableArea);
-		cr.top = drawableArea->top + (GetItemHeight() * r);
+
+		cr.top = drawableArea->top - (GetItemHeight() * VerticalScrollBar.GetScrolling()) + (GetItemHeight() * static_cast<int>(i));
 		cr.bottom = (cr.top + GetItemHeight());
-		cr.left = drawableArea->left + (GetItemWidth() * c);
+		cr.left = drawableArea->left;
 		cr.right = cr.left + GetItemWidth() - m_Margin.Right;
-		if (r == m_RowNumber - 1)
-		{
-			r = -1;
-			++c;
-		}
-		if (m_SelectedIndex == i)
-		{
-			SetBkColor(hdcMem, RGB(0, 120, 215));
-			SetTextColor(hdcMem, RGB(255, 255, 255));
-			HBRUSH brush = CreateSolidBrush(RGB(0, 120, 215));
-			FillRect(hdcMem, &cr, brush);
-			SelectObject(hdcMem, brush);
-			DeleteObject(brush);
-		}
-		else
-		{
-			SetBkColor(hdcMem, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-			SetTextColor(hdcMem, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-		}
-		DrawText(hdcMem, (*dataSource)[i]->Value.c_str(), -1, &cr, DT_LEFT | DT_VCENTER);
-		DrawText(hdcMem, Text.c_str(), static_cast<int>((*dataSource)[i]->Value.length()), &cr, DT_LEFT | DT_VCENTER | DT_CALCRECT);
-	}*/
 
-		for (size_t i = 0; i < dataSource.size(); ++i)
+		m_RowPosition[i] = cr;
+
+		if (cr.left >= drawableArea->left &&
+			cr.top >= drawableArea->top &&
+			cr.right <= drawableArea->right &&
+			cr.bottom <= drawableArea->bottom)
 		{
-			RECT cr;
-			CopyRect(&cr, drawableArea);
-
-			cr.top = drawableArea->top - (GetItemHeight() * VerticalScrollBar.GetScrolling()) + (GetItemHeight() * static_cast<int>(i));
-			cr.bottom = (cr.top + GetItemHeight());
-			cr.left = drawableArea->left;
-			cr.right = cr.left + GetItemWidth() - m_Margin.Right;
-
-			m_RowPosition[i] = cr;
-
-			if (cr.left >= drawableArea->left &&
-				cr.top >= drawableArea->top &&
-				cr.right <= drawableArea->right &&
-				cr.bottom <= drawableArea->bottom)
+			if (GetMouseOverIndex() == i)
 			{
-				if (GetMouseOverIndex() == i)
-				{
-					SetBkColor(hdcMem, RGB(0, 120, 215));
-					SetTextColor(hdcMem, RGB(255, 255, 255));
-					HBRUSH brush = CreateSolidBrush(RGB(0, 120, 215));
-					FillRect(hdcMem, &cr, brush);
-					SelectObject(hdcMem, brush);
-					DeleteObject(brush);
-				}
-				else
-				{
-					SetBkColor(hdcMem, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-					SetTextColor(hdcMem, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-				}
-
-				DrawText(hdcMem, dataSource[i].Value.c_str(), -1, &cr, DT_LEFT | DT_VCENTER);
-				DrawText(hdcMem, Text.c_str(), static_cast<int>(dataSource[i].Value.length()), &cr, DT_LEFT | DT_VCENTER | DT_CALCRECT);
+				SetBkColor(hdcMem, RGB(0, 120, 215));
+				SetTextColor(hdcMem, RGB(255, 255, 255));
+				HBRUSH brush = CreateSolidBrush(RGB(0, 120, 215));
+				FillRect(hdcMem, &cr, brush);
+				SelectObject(hdcMem, brush);
+				DeleteObject(brush);
 			}
+			else
+			{
+				SetBkColor(hdcMem, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+				SetTextColor(hdcMem, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
+			}
+
+			DrawText(hdcMem, dataSource[i].Value.c_str(), -1, &cr, DT_LEFT | DT_VCENTER);
+			DrawText(hdcMem, Text.c_str(), static_cast<int>(dataSource[i].Value.length()), &cr, DT_LEFT | DT_VCENTER | DT_CALCRECT);
 		}
+	}
 
 	// Perform the bit-block transfer between the memory Device Context which has the next bitmap
 	// with the current image to avoid flickering
@@ -462,20 +418,14 @@ void ComboBox::ComboBoxChildNativeWindow::CalculateParameters(HWND hwnd, HDC& hd
 	GetTextExtentPoint32(hdc, verifier, 2, &m_SingleSize);
 	SetMinimumItemWidth(m_SingleSize.cx);
 
-	int bordersize = 0;
-	/*switch (m_BorderStyle)
-	{
-	case BorderStyle::FixedSingle: bordersize = 1; break;
-	case BorderStyle::Fixed3D: bordersize = 2; break;
-	default: break;
-	}*/
+	int borderSize = 1;
 
 	// Drawable block inside ListBox
 	auto drawableArea = ResetDrawableArea();
-	drawableArea->left += m_Margin.Left + bordersize;
-	drawableArea->top += m_Margin.Top + bordersize;
-	drawableArea->right -= m_Margin.Right + bordersize;
-	drawableArea->bottom -= m_Margin.Bottom + bordersize;
+	drawableArea->left += m_Margin.Left + borderSize;
+	drawableArea->top += m_Margin.Top + borderSize;
+	drawableArea->right -= m_Margin.Right + borderSize;
+	drawableArea->bottom -= m_Margin.Bottom + borderSize;
 
 	SetItemWidth(drawableArea->right - drawableArea->left);
 	SetItemHeight(m_SingleSize.cy);
@@ -486,7 +436,7 @@ void ComboBox::ComboBoxChildNativeWindow::CalculateParameters(HWND hwnd, HDC& hd
 
 	// This block will only be executed once after resize
 	m_RowPosition.clear();
-	if (m_RowPosition.size() < itemsNumber)
+	if (m_RowPosition.size() < static_cast<size_t>(itemsNumber))
 	{
 		m_RowPosition.resize(itemsNumber);
 	}
@@ -518,8 +468,8 @@ void ComboBox::ComboBoxChildNativeWindow::CalculateParameters(HWND hwnd, HDC& hd
 		// Recalculate the new item width size
 		SetItemWidth(drawableArea->right - drawableArea->left);
 
-		drawableArea->bottom = newHeight + m_Margin.Top + (bordersize * 2);
-		newHeight += m_Margin.Top + m_Margin.Bottom + (bordersize * 2);
+		drawableArea->bottom = newHeight + m_Margin.Top + (borderSize * 2);
+		newHeight += m_Margin.Top + m_Margin.Bottom + (borderSize * 2);
 		int oldHeightY = m_Size.Height;
 		m_Size.Height = newHeight;
 		auto vSize = VerticalScrollBar.GetSize();
@@ -573,7 +523,7 @@ void ComboBox::SetSelectedValue(const ListItem& item)
 {
 	bool err = true;
 
-	for (auto i = 0; i < Items.size(); ++i)
+	for (size_t i = 0; i < Items.size(); ++i)
 	{
 		if (Items[i].Id == item.Id && Items[i].Value == item.Value)
 		{

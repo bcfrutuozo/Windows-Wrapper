@@ -2,28 +2,11 @@
 
 #include "SHA1.h"
 
-#include <cstring>
-#include <string>
-#include <sstream>
-#include <iomanip>
-#include <array>
-#include <string_view>
-#include <iterator>
-#include <random>
-#include <memory>
-#include <functional>
-#include <type_traits>
-#include <assert.h>
-#include <span>
-
-#include <objbase.h>
-
 template<typename TChar>
 constexpr bool is_char_type_v = std::_Is_any_of_v<std::remove_cv_t<TChar>,
 	char, wchar_t>;
 template<typename T>
 struct is_char_type : std::bool_constant <is_char_type_v<T>> {};
-
 
 template <typename TChar, typename = std::enable_if<is_char_type<TChar>::value>>
 constexpr inline unsigned char HexToChar(TChar const ch)
@@ -123,7 +106,7 @@ enum class uuid_version
 	name_based_sha1 = 5   // The name-based version specified in RFS 4122 with SHA1 hashing
 };
 
-struct Guid
+struct Guid : public Object
 {
 	struct uuid_const_iterator
 	{

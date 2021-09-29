@@ -1,9 +1,8 @@
 #pragma once
 
-#include <queue>
-#include <optional>
+#include "CommonObject.h"
 
-class Mouse
+class Mouse : public Object
 {
 	friend class Window;
 
@@ -55,6 +54,8 @@ public:
 	Mouse() = default;
 	Mouse(const Mouse&) = delete;
 	Mouse& operator=(const Mouse&) = delete;
+	virtual ~Mouse() = default;
+
 	std::pair<int, int> GetPos() const noexcept;
 	const std::optional<RawDelta> ReadRawDelta() noexcept;
 	int GetPosX() const noexcept;

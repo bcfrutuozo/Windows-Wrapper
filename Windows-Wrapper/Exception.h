@@ -2,9 +2,6 @@
 
 #include "CommonObject.h"
 
-#include <exception>
-#include <string>
-
 class Exception : public Object, public std::exception
 {
 private:

@@ -95,6 +95,7 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalOptions>/wd4100 %(AdditionalOptions)</AdditionalOptions>
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -127,6 +128,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalOptions>/wd4100 %(AdditionalOptions)</AdditionalOptions>
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -167,7 +169,6 @@
     <ClCompile Include="ListBox.cpp" />
     <ClCompile Include="ListControl.cpp" />
     <ClCompile Include="ListItem.cpp" />
-    <ClCompile Include="ListItemCollection.cpp" />
     <ClCompile Include="MenuStrip.cpp" />
     <ClCompile Include="NotImplementedException.cpp" />
     <ClCompile Include="NotSupportedException.cpp" />
@@ -224,7 +225,7 @@
     <ClInclude Include="CancelEventHandler.h" />
     <ClInclude Include="ComboBox.h" />
     <ClInclude Include="CommonObject.h" />
-    <ClInclude Include="Convert.h" />
+    <ClInclude Include="Appheaders.h" />
     <ClInclude Include="Exceptions.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Container.h" />
@@ -251,7 +252,6 @@
     <ClInclude Include="ListControlConvertEventArgs.h" />
     <ClInclude Include="ListControlConvertEventHandler.h" />
     <ClInclude Include="ListItem.h" />
-    <ClInclude Include="ListItemCollection.h" />
     <ClInclude Include="MenuStrip.h" />
     <ClInclude Include="NotImplementedException.h" />
     <ClInclude Include="NotSupportedException.h" />

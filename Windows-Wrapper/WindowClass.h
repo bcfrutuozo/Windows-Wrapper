@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Common.h"
+#include "CommonObject.h"
 
 // Singleton manages registration/cleanup of window class
-class WindowClass
+class WindowClass : public Object
 {
 private:
 
