@@ -1,5 +1,6 @@
 #include "WindowClass.h"
 #include "WinAPI.h"
+#include "Color.h"
 
 // Singleton WndClass
 WindowClass WindowClass::m_WindowClass;

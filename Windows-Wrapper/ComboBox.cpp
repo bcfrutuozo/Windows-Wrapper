@@ -83,7 +83,7 @@ void ComboBox::OnPaint_Impl(HWND hwnd)
 ComboBox::ComboBox(Control* parent, const std::string& name, int width, int x, int y)
 	:
 	ListControl(parent, name, width, 0, x, y),	// Default control size without font is 9
-	m_FlatStyle(FlatStyle::Standard)
+	m_FlatStyle(FlatStyle::Standard_Windows10)
 {
 	// The ComboBox list MUST be inserted on the PARENT. Othewise it will be set in an invalid rectangle of the ComboBox
 	m_ChildWindow = new ComboBoxChildNativeWindow(parent, this, m_Size.Width, 120, m_Location.X, m_Location.Y + m_Size.Height + 5);

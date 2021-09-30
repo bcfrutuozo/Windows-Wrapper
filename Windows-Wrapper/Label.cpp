@@ -97,7 +97,7 @@ void Label::OnPaint_Impl(HWND hwnd) noexcept
 	{
 	case FlatStyle::Flat: break;
 	case FlatStyle::Popup: break;
-	case FlatStyle::Standard: break;
+	case FlatStyle::Standard_Windows10: break;
 	case FlatStyle::System: m_Margin = 1; break; // FlatStyle is forced to left
 	}
 
@@ -135,7 +135,7 @@ Label::Label(Control* parent, const std::string& text, int x, int y)
 	:
 	Control(parent, text, 0, 0, x, y),
 	m_BorderStyle(BorderStyle::None),
-	m_FlatStyle(FlatStyle::Standard)
+	m_FlatStyle(FlatStyle::Standard_Windows10)
 {
 	Initialize();
 }
