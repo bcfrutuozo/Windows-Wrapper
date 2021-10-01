@@ -116,7 +116,7 @@ void ProgressBar::OnPaintMarquee_Thread(HWND hwnd) noexcept
 		HBITMAP hbmMem = CreateCompatibleBitmap(hdc, m_Size.Width, m_Size.Height);
 		HBITMAP hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
 
-		int64_t time = static_cast<int64_t>((m_Speed * 2.0f) * m_Speed);
+		int64_t time = static_cast<int64_t>((static_cast<float>(m_Speed) * 2.0f) * static_cast<float>(m_Speed));
 		std::this_thread::sleep_for(std::chrono::microseconds(time));
 
 		RECT rt;

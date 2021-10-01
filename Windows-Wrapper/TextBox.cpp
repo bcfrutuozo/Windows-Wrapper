@@ -470,7 +470,7 @@ void TextBox::OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat) noexcept
 	}
 
 	// Skip key input if TAB (Switch tabbing) or Backspace (Remove last character) is pressed
-	if (c == VK_TAB || c == VK_BACK)
+	if (c == VK_TAB || c == VK_BACK || c == VK_ESCAPE)
 	{
 		return;
 	}

@@ -6,7 +6,9 @@ Exception::Exception(int line, const char* file) noexcept
 	:
 	m_Line(line),
 	m_File(file),
-	m_HasHRResult(false)
+	m_HasHRResult(false),
+	m_InnerException(nullptr),
+	m_HR(0)
 {}
 
 Exception::Exception(int line, const char* file, HRESULT hr) noexcept
@@ -14,7 +16,8 @@ Exception::Exception(int line, const char* file, HRESULT hr) noexcept
 	m_Line(line),
 	m_File(file),
 	m_HR(hr),
-	m_HasHRResult(true)
+	m_HasHRResult(true),
+	m_InnerException(nullptr)
 { }
 
 Exception::Exception(int line, const char* file, HRESULT hr, const std::string & message) noexcept
@@ -23,7 +26,8 @@ Exception::Exception(int line, const char* file, HRESULT hr, const std::string &
 	m_File(file),
 	m_HR(hr),
 	m_HasHRResult(true),
-	m_Message(message)
+	m_Message(message),
+	m_InnerException(nullptr)
 {
 }
 
@@ -32,7 +36,9 @@ Exception::Exception(int line, const char* file, const std::string& message) noe
 	m_Line(line),
 	m_File(file),
 	m_HasHRResult(false),
-	m_Message(message)
+	m_Message(message),
+	m_InnerException(nullptr),
+	m_HR(0)
 {
 }
 
@@ -53,7 +59,8 @@ Exception::Exception(int line, const char* file, const std::string& message, Exc
 	m_File(file),
 	m_HasHRResult(false),
 	m_Message(message),
-	m_InnerException(innerException)
+	m_InnerException(innerException),
+	m_HR(0)
 {
 }
 

@@ -613,9 +613,36 @@ void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 				}
 				break;
 			}
+			case VK_NEXT:
+			{
+				if (IsHorizontalScrollEnabled())
+				{
+					HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_PAGERIGHT, 0), 0);
+				}
+
+				if (IsVerticalScrollEnabled())
+				{
+					HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_PAGEDOWN, 0), 0);
+				}
+
+				break;
+			}
+			case VK_PRIOR:
+			{
+				if (IsHorizontalScrollEnabled())
+				{
+					HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_PAGELEFT, 0), 0);
+				}
+
+				if (IsVerticalScrollEnabled())
+				{
+					HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_PAGEUP, 0), 0);
+				}
+
+				break;
+			}
 			}
 		}
-		
 	}
 
 	Update();

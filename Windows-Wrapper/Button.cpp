@@ -7,64 +7,20 @@ void Button::DrawBorder(HDC& hdc, RECT& rc)
 	// NEED TO DRAW FLAT, POPUP AND SYSTEM STYLES
 	switch (m_FlatStyle)
 	{
-	case FlatStyle::Flat:
-	{
-		break;
-	}
-	case FlatStyle::Popup:
-	{
-		break;
-	}
-	case FlatStyle::Standard_Windows10:	// Standard button MouseOver and Clicking effects are pre-defineds. User can only change the background color
-	{
-		if (IsClicking())		// m_IsTabSelected ALWAYS true when Clicking
+		case FlatStyle::Flat:
 		{
-			// Draw outer border
-			HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(0, 84, 153));
-			HGDIOBJ old_pen = SelectObject(hdc, pen);
-			Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-
-			// Move inside rectangle for inner board
-			rc.left += 1;
-			rc.top += 1;
-			rc.right -= 1;
-			rc.bottom -= 1;
-
-			// Draw dot for tabbed click and mouseover
-			SetBkMode(hdc, OPAQUE);
-			pen = CreatePen(PS_DOT, 0, RGB(0, 0, 0));
-			old_pen = SelectObject(hdc, pen);
-			SetBkColor(hdc, RGB(204, 228, 247));
-			Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-
-			rc.left += 1;
-			rc.top += 1;
-			rc.right -= 1;
-			rc.bottom -= 1;
-
-			//// Draw inner board
-			pen = CreatePen(PS_INSIDEFRAME, 2, RGB(204, 228, 247));
-			old_pen = SelectObject(hdc, pen);
-			Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-
-			// Move even more for background
-			rc.left += 1;
-			rc.top += 1;
-			rc.right -= 1;
-			rc.bottom -= 1;
-
-			//Clean up
-			SelectObject(hdc, old_pen);
-			DeleteObject(old_pen);
-			SelectObject(hdc, pen);
-			DeleteObject(pen);
+			break;
 		}
-		else if (IsMouseOver())
+		case FlatStyle::Popup:
 		{
-			if (m_IsTabSelected)
+			break;
+		}
+		case FlatStyle::Standard_Windows10:	// Standard button MouseOver and Clicking effects are pre-defineds. User can only change the background color
+		{
+			if (IsClicking())		// m_IsTabSelected ALWAYS true when Clicking
 			{
 				// Draw outer border
-				HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(0, 120, 215));
+				HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(0, 84, 153));
 				HGDIOBJ old_pen = SelectObject(hdc, pen);
 				Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
 
@@ -78,7 +34,7 @@ void Button::DrawBorder(HDC& hdc, RECT& rc)
 				SetBkMode(hdc, OPAQUE);
 				pen = CreatePen(PS_DOT, 0, RGB(0, 0, 0));
 				old_pen = SelectObject(hdc, pen);
-				SetBkColor(hdc, RGB(229, 241, 251));
+				SetBkColor(hdc, RGB(204, 228, 247));
 				Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
 
 				rc.left += 1;
@@ -87,7 +43,7 @@ void Button::DrawBorder(HDC& hdc, RECT& rc)
 				rc.bottom -= 1;
 
 				//// Draw inner board
-				pen = CreatePen(PS_INSIDEFRAME, 2, RGB(229, 241, 251));
+				pen = CreatePen(PS_INSIDEFRAME, 2, RGB(204, 228, 247));
 				old_pen = SelectObject(hdc, pen);
 				Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
 
@@ -102,170 +58,167 @@ void Button::DrawBorder(HDC& hdc, RECT& rc)
 				DeleteObject(old_pen);
 				SelectObject(hdc, pen);
 				DeleteObject(pen);
+			}
+			else if (IsMouseOver())
+			{
+				if (m_IsTabSelected)
+				{
+					// Draw outer border
+					HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(0, 120, 215));
+					HGDIOBJ old_pen = SelectObject(hdc, pen);
+					Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+
+					// Move inside rectangle for inner board
+					rc.left += 1;
+					rc.top += 1;
+					rc.right -= 1;
+					rc.bottom -= 1;
+
+					// Draw dot for tabbed click and mouseover
+					SetBkMode(hdc, OPAQUE);
+					pen = CreatePen(PS_DOT, 0, RGB(0, 0, 0));
+					old_pen = SelectObject(hdc, pen);
+					SetBkColor(hdc, RGB(229, 241, 251));
+					Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+
+					rc.left += 1;
+					rc.top += 1;
+					rc.right -= 1;
+					rc.bottom -= 1;
+
+					//// Draw inner board
+					pen = CreatePen(PS_INSIDEFRAME, 2, RGB(229, 241, 251));
+					old_pen = SelectObject(hdc, pen);
+					Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+
+					// Move even more for background
+					rc.left += 1;
+					rc.top += 1;
+					rc.right -= 1;
+					rc.bottom -= 1;
+
+					//Clean up
+					SelectObject(hdc, old_pen);
+					DeleteObject(old_pen);
+					SelectObject(hdc, pen);
+					DeleteObject(pen);
+				}
+				else
+				{
+					// Draw outer border
+					HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(0, 120, 215));
+					HGDIOBJ old_pen = SelectObject(hdc, pen);
+					Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+
+					// Move inside rectangle for inner board
+					rc.left += 1;
+					rc.top += 1;
+					rc.right -= 1;
+					rc.bottom -= 1;
+
+					// Draw inner board
+					pen = CreatePen(PS_INSIDEFRAME, 2, RGB(229, 241, 251));
+					old_pen = SelectObject(hdc, pen);
+					Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+
+					// Move even more for background
+					rc.left += 2;
+					rc.top += 2;
+					rc.right -= 2;
+					rc.bottom -= 2;
+
+					//Clean up
+					SelectObject(hdc, old_pen);
+					DeleteObject(old_pen);
+					SelectObject(hdc, pen);
+					DeleteObject(pen);
+				}
 			}
 			else
 			{
-				// Draw outer border
-				HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(0, 120, 215));
-				HGDIOBJ old_pen = SelectObject(hdc, pen);
-				Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+				if (m_IsTabSelected)
+				{
+					// Draw outer border
+					HPEN pen = CreatePen(PS_INSIDEFRAME, 2, RGB(0, 120, 215));
+					HGDIOBJ old_pen = SelectObject(hdc, pen);
+					Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
 
-				// Move inside rectangle for inner board
-				rc.left += 1;
-				rc.top += 1;
-				rc.right -= 1;
-				rc.bottom -= 1;
+					// Move inside rectangle for inner board
+					rc.left += 1;
+					rc.top += 1;
+					rc.right -= 1;
+					rc.bottom -= 1;
 
-				// Draw inner board
-				pen = CreatePen(PS_INSIDEFRAME, 2, RGB(229, 241, 251));
-				old_pen = SelectObject(hdc, pen);
-				Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+					// Draw dot for tabbed click and mouseover
+					SetBkMode(hdc, OPAQUE);
+					pen = CreatePen(PS_DOT, 0, RGB(0, 0, 0));
+					old_pen = SelectObject(hdc, pen);
+					SetBkColor(hdc, RGB(0, 120, 215));
+					Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
 
-				// Move even more for background
-				rc.left += 2;
-				rc.top += 2;
-				rc.right -= 2;
-				rc.bottom -= 2;
+					// Move inside rectangle for inner board
+					rc.left += 1;
+					rc.top += 1;
+					rc.right -= 1;
+					rc.bottom -= 1;
 
-				//Clean up
-				SelectObject(hdc, old_pen);
-				DeleteObject(old_pen);
-				SelectObject(hdc, pen);
-				DeleteObject(pen);
+					// Draw dot for tabbed click and mouseover
+					pen = CreatePen(PS_INSIDEFRAME, 0, RGB(225, 225, 225));
+					old_pen = SelectObject(hdc, pen);
+					Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+
+					// Move even more for background
+					rc.left += 1;
+					rc.top += 1;
+					rc.right -= 1;
+					rc.bottom -= 1;
+
+					//Clean up
+					SelectObject(hdc, old_pen);
+					DeleteObject(old_pen);
+					SelectObject(hdc, pen);
+					DeleteObject(pen);
+				}
+				else
+				{
+					// Draw outer border
+					HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(173, 173, 173));
+					HGDIOBJ old_pen = SelectObject(hdc, pen);
+					Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+
+					// Move inside rectangle for inner board
+					rc.left += 1;
+					rc.top += 1;
+					rc.right -= 1;
+					rc.bottom -= 1;
+
+					// Draw inner board
+					pen = CreatePen(PS_INSIDEFRAME, 2, RGB(225, 225, 225));
+					old_pen = SelectObject(hdc, pen);
+					Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+
+					// Move even more for background
+					rc.left += 2;
+					rc.top += 2;
+					rc.right -= 2;
+					rc.bottom -= 2;
+
+					//Clean up
+					SelectObject(hdc, old_pen);
+					DeleteObject(old_pen);
+					SelectObject(hdc, pen);
+					DeleteObject(pen);
+				}
 			}
+
+			break;
 		}
-		else
+		case FlatStyle::Standard_Windows11:
 		{
-			if (m_IsTabSelected)
+			if (IsClicking())		// m_IsTabSelected ALWAYS true when Clicking
 			{
 				// Draw outer border
-				HPEN pen = CreatePen(PS_INSIDEFRAME, 2, RGB(0, 120, 215));
-				HGDIOBJ old_pen = SelectObject(hdc, pen);
-				Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-
-				// Move inside rectangle for inner board
-				rc.left += 1;
-				rc.top += 1;
-				rc.right -= 1;
-				rc.bottom -= 1;
-
-				// Draw dot for tabbed click and mouseover
-				SetBkMode(hdc, OPAQUE);
-				pen = CreatePen(PS_DOT, 0, RGB(0, 0, 0));
-				old_pen = SelectObject(hdc, pen);
-				SetBkColor(hdc, RGB(0, 120, 215));
-				Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-
-				// Move inside rectangle for inner board
-				rc.left += 1;
-				rc.top += 1;
-				rc.right -= 1;
-				rc.bottom -= 1;
-
-				// Draw dot for tabbed click and mouseover
-				pen = CreatePen(PS_INSIDEFRAME, 0, RGB(225, 225, 225));
-				old_pen = SelectObject(hdc, pen);
-				Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-
-				// Move even more for background
-				rc.left += 1;
-				rc.top += 1;
-				rc.right -= 1;
-				rc.bottom -= 1;
-
-				//Clean up
-				SelectObject(hdc, old_pen);
-				DeleteObject(old_pen);
-				SelectObject(hdc, pen);
-				DeleteObject(pen);
-			}
-			else
-			{
-				// Draw outer border
-				HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(173, 173, 173));
-				HGDIOBJ old_pen = SelectObject(hdc, pen);
-				Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-
-				// Move inside rectangle for inner board
-				rc.left += 1;
-				rc.top += 1;
-				rc.right -= 1;
-				rc.bottom -= 1;
-
-				// Draw inner board
-				pen = CreatePen(PS_INSIDEFRAME, 2, RGB(225, 225, 225));
-				old_pen = SelectObject(hdc, pen);
-				Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-
-				// Move even more for background
-				rc.left += 2;
-				rc.top += 2;
-				rc.right -= 2;
-				rc.bottom -= 2;
-
-				//Clean up
-				SelectObject(hdc, old_pen);
-				DeleteObject(old_pen);
-				SelectObject(hdc, pen);
-				DeleteObject(pen);
-			}
-		}
-
-		break;
-	}
-	case FlatStyle::Standard_Windows11:
-	{
-		if (IsClicking())		// m_IsTabSelected ALWAYS true when Clicking
-		{
-			// Draw outer border
-			HPEN pen = CreatePen(PS_INSIDEFRAME, 2, RGB(0, 84, 153));
-			HGDIOBJ old_pen = SelectObject(hdc, pen);
-			//Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-			RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 15, 15);
-
-			// Move inside rectangle for inner board
-			rc.left += 1;
-			rc.top += 1;
-			rc.right -= 1;
-			rc.bottom -= 1;
-
-			// Draw dot for tabbed click and mouseover
-			SetBkMode(hdc, OPAQUE);
-			pen = CreatePen(PS_DOT, 0, RGB(0, 0, 0));
-			old_pen = SelectObject(hdc, pen);
-			SetBkColor(hdc, RGB(204, 228, 247));
-			Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-			//RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 25, 25);
-
-			rc.left += 1;
-			rc.top += 1;
-			rc.right -= 1;
-			rc.bottom -= 1;
-
-			//// Draw inner board
-			//pen = CreatePen(PS_INSIDEFRAME, 2, RGB(204, 228, 247));
-			//old_pen = SelectObject(hdc, pen);
-			////Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-			//RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 25, 25);
-
-			// Move even more for background
-			rc.left += 1;
-			rc.top += 1;
-			rc.right -= 1;
-			rc.bottom -= 1;
-
-			//Clean up
-			SelectObject(hdc, old_pen);
-			DeleteObject(old_pen);
-			SelectObject(hdc, pen);
-			DeleteObject(pen);
-		}
-		else if (IsMouseOver())
-		{
-			if (m_IsTabSelected)
-			{
-				// Draw outer border
-				HPEN pen = CreatePen(PS_INSIDEFRAME, 2, RGB(0, 120, 215));
+				HPEN pen = CreatePen(PS_INSIDEFRAME, 2, RGB(0, 84, 153));
 				HGDIOBJ old_pen = SelectObject(hdc, pen);
 				//Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
 				RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 15, 15);
@@ -280,9 +233,9 @@ void Button::DrawBorder(HDC& hdc, RECT& rc)
 				SetBkMode(hdc, OPAQUE);
 				pen = CreatePen(PS_DOT, 0, RGB(0, 0, 0));
 				old_pen = SelectObject(hdc, pen);
-				SetBkColor(hdc, RGB(229, 241, 251));
-				//Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-				RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 15, 15);
+				SetBkColor(hdc, RGB(204, 228, 247));
+				Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+				//RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 25, 25);
 
 				rc.left += 1;
 				rc.top += 1;
@@ -290,7 +243,7 @@ void Button::DrawBorder(HDC& hdc, RECT& rc)
 				rc.bottom -= 1;
 
 				//// Draw inner board
-				//pen = CreatePen(PS_INSIDEFRAME, 2, RGB(229, 241, 251));
+				//pen = CreatePen(PS_INSIDEFRAME, 2, RGB(204, 228, 247));
 				//old_pen = SelectObject(hdc, pen);
 				////Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
 				//RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 25, 25);
@@ -306,128 +259,175 @@ void Button::DrawBorder(HDC& hdc, RECT& rc)
 				DeleteObject(old_pen);
 				SelectObject(hdc, pen);
 				DeleteObject(pen);
+			}
+			else if (IsMouseOver())
+			{
+				if (m_IsTabSelected)
+				{
+					// Draw outer border
+					HPEN pen = CreatePen(PS_INSIDEFRAME, 2, RGB(0, 120, 215));
+					HGDIOBJ old_pen = SelectObject(hdc, pen);
+					//Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+					RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 15, 15);
+
+					// Move inside rectangle for inner board
+					rc.left += 1;
+					rc.top += 1;
+					rc.right -= 1;
+					rc.bottom -= 1;
+
+					// Draw dot for tabbed click and mouseover
+					SetBkMode(hdc, OPAQUE);
+					pen = CreatePen(PS_DOT, 0, RGB(0, 0, 0));
+					old_pen = SelectObject(hdc, pen);
+					SetBkColor(hdc, RGB(229, 241, 251));
+					//Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+					RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 15, 15);
+
+					rc.left += 1;
+					rc.top += 1;
+					rc.right -= 1;
+					rc.bottom -= 1;
+
+					//// Draw inner board
+					//pen = CreatePen(PS_INSIDEFRAME, 2, RGB(229, 241, 251));
+					//old_pen = SelectObject(hdc, pen);
+					////Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+					//RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 25, 25);
+
+					// Move even more for background
+					rc.left += 1;
+					rc.top += 1;
+					rc.right -= 1;
+					rc.bottom -= 1;
+
+					//Clean up
+					SelectObject(hdc, old_pen);
+					DeleteObject(old_pen);
+					SelectObject(hdc, pen);
+					DeleteObject(pen);
+				}
+				else
+				{
+					// Draw outer border
+					HPEN pen = CreatePen(PS_INSIDEFRAME, 2, RGB(0, 120, 215));
+					HGDIOBJ old_pen = SelectObject(hdc, pen);
+					//Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+					RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 15, 15);
+
+					// Move inside rectangle for inner board
+					rc.left += 1;
+					rc.top += 1;
+					rc.right -= 1;
+					rc.bottom -= 1;
+
+					// Draw inner board
+					//pen = CreatePen(PS_INSIDEFRAME, 2, RGB(229, 241, 251));
+					//old_pen = SelectObject(hdc, pen);
+					////Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+					//RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 25, 25);
+
+					// Move even more for background
+					rc.left += 2;
+					rc.top += 2;
+					rc.right -= 2;
+					rc.bottom -= 2;
+
+					//Clean up
+					SelectObject(hdc, old_pen);
+					DeleteObject(old_pen);
+					SelectObject(hdc, pen);
+					DeleteObject(pen);
+				}
 			}
 			else
 			{
-				// Draw outer border
-				HPEN pen = CreatePen(PS_INSIDEFRAME, 2, RGB(0, 120, 215));
-				HGDIOBJ old_pen = SelectObject(hdc, pen);
-				//Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-				RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 15, 15);
+				if (m_IsTabSelected)
+				{
+					// Draw outer border
+					HPEN pen = CreatePen(PS_INSIDEFRAME, 2, RGB(0, 120, 215));
+					HGDIOBJ old_pen = SelectObject(hdc, pen);
+					//Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+					RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 15, 15);
 
-				// Move inside rectangle for inner board
-				rc.left += 1;
-				rc.top += 1;
-				rc.right -= 1;
-				rc.bottom -= 1;
+					// Move inside rectangle for inner board
+					rc.left += 1;
+					rc.top += 1;
+					rc.right -= 1;
+					rc.bottom -= 1;
 
-				// Draw inner board
-				//pen = CreatePen(PS_INSIDEFRAME, 2, RGB(229, 241, 251));
-				//old_pen = SelectObject(hdc, pen);
-				////Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-				//RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 25, 25);
+					// Draw dot for tabbed click and mouseover
+					SetBkMode(hdc, OPAQUE);
+					pen = CreatePen(PS_DOT, 0, RGB(0, 0, 0));
+					old_pen = SelectObject(hdc, pen);
+					SetBkColor(hdc, RGB(0, 120, 215));
+					//Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+					RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 15, 15);
 
-				// Move even more for background
-				rc.left += 2;
-				rc.top += 2;
-				rc.right -= 2;
-				rc.bottom -= 2;
+					// Move inside rectangle for inner board
+					rc.left += 1;
+					rc.top += 1;
+					rc.right -= 1;
+					rc.bottom -= 1;
 
-				//Clean up
-				SelectObject(hdc, old_pen);
-				DeleteObject(old_pen);
-				SelectObject(hdc, pen);
-				DeleteObject(pen);
+					// Draw dot for tabbed click and mouseover
+					//pen = CreatePen(PS_INSIDEFRAME, 0, RGB(225, 225, 225));
+					//old_pen = SelectObject(hdc, pen);
+					////Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+					//RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 25, 25);
+
+					// Move even more for background
+					rc.left += 1;
+					rc.top += 1;
+					rc.right -= 1;
+					rc.bottom -= 1;
+
+					//Clean up
+					SelectObject(hdc, old_pen);
+					DeleteObject(old_pen);
+					SelectObject(hdc, pen);
+					DeleteObject(pen);
+				}
+				else
+				{
+					SetBkMode(hdc, TRANSPARENT);
+					// Draw outer border
+					HPEN pen = CreatePen(PS_INSIDEFRAME, 2, RGB(173, 173, 173));
+					HGDIOBJ old_pen = SelectObject(hdc, pen);
+					//Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+					RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 15, 15);
+
+					// Move inside rectangle for inner board
+					rc.left += 1;
+					rc.top += 1;
+					rc.right -= 1;
+					rc.bottom -= 1;
+
+					// Draw inner board
+					//pen = CreatePen(PS_INSIDEFRAME, 2, RGB(225, 225, 225));
+					//old_pen = SelectObject(hdc, pen);
+					////Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+					//RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 25, 25);
+
+					// Move even more for background
+					rc.left += 2;
+					rc.top += 2;
+					rc.right -= 2;
+					rc.bottom -= 2;
+
+					//Clean up
+					SelectObject(hdc, old_pen);
+					DeleteObject(old_pen);
+					SelectObject(hdc, pen);
+					DeleteObject(pen);
+				}
 			}
+			break;
 		}
-		else
+		case FlatStyle::System:
 		{
-			if (m_IsTabSelected)
-			{
-				// Draw outer border
-				HPEN pen = CreatePen(PS_INSIDEFRAME, 2, RGB(0, 120, 215));
-				HGDIOBJ old_pen = SelectObject(hdc, pen);
-				//Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-				RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 15, 15);
-
-				// Move inside rectangle for inner board
-				rc.left += 1;
-				rc.top += 1;
-				rc.right -= 1;
-				rc.bottom -= 1;
-
-				// Draw dot for tabbed click and mouseover
-				SetBkMode(hdc, OPAQUE);
-				pen = CreatePen(PS_DOT, 0, RGB(0, 0, 0));
-				old_pen = SelectObject(hdc, pen);
-				SetBkColor(hdc, RGB(0, 120, 215));
-				//Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-				RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 15, 15);
-
-				// Move inside rectangle for inner board
-				rc.left += 1;
-				rc.top += 1;
-				rc.right -= 1;
-				rc.bottom -= 1;
-
-				// Draw dot for tabbed click and mouseover
-				//pen = CreatePen(PS_INSIDEFRAME, 0, RGB(225, 225, 225));
-				//old_pen = SelectObject(hdc, pen);
-				////Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-				//RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 25, 25);
-
-				// Move even more for background
-				rc.left += 1;
-				rc.top += 1;
-				rc.right -= 1;
-				rc.bottom -= 1;
-
-				//Clean up
-				SelectObject(hdc, old_pen);
-				DeleteObject(old_pen);
-				SelectObject(hdc, pen);
-				DeleteObject(pen);
-			}
-			else
-			{
-				SetBkMode(hdc, TRANSPARENT);
-				// Draw outer border
-				HPEN pen = CreatePen(PS_INSIDEFRAME, 2, RGB(173, 173, 173));
-				HGDIOBJ old_pen = SelectObject(hdc, pen);
-				//Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-				RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 15, 15);
-
-				// Move inside rectangle for inner board
-				rc.left += 1;
-				rc.top += 1;
-				rc.right -= 1;
-				rc.bottom -= 1;
-
-				// Draw inner board
-				//pen = CreatePen(PS_INSIDEFRAME, 2, RGB(225, 225, 225));
-				//old_pen = SelectObject(hdc, pen);
-				////Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-				//RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 25, 25);
-
-				// Move even more for background
-				rc.left += 2;
-				rc.top += 2;
-				rc.right -= 2;
-				rc.bottom -= 2;
-
-				//Clean up
-				SelectObject(hdc, old_pen);
-				DeleteObject(old_pen);
-				SelectObject(hdc, pen);
-				DeleteObject(pen);
-			}
+			break;
 		}
-		break;
-	}
-	case FlatStyle::System:
-	{
-		break;
-	}
 	}
 }
 
@@ -435,7 +435,7 @@ void Button::Draw(const Graphics& graphics, Drawing::Rectangle rectangle)
 {
 	auto hwnd = static_cast<HWND>(Handle.ToPointer());
 	auto hdc = static_cast<HDC>(graphics.GetHDC().ToPointer());
-	
+
 	SetBkMode(hdc, OPAQUE);
 	RECT rc;
 	GetClientRect(hwnd, &rc);
@@ -481,12 +481,12 @@ void Button::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned in
 {
 	switch (vk)
 	{
-	case VK_RETURN:
-	{
-		SetClickingState(true);
-		Update();
-		break;
-	}
+		case VK_RETURN:
+		{
+			SetClickingState(true);
+			Update();
+			break;
+		}
 	}
 
 	Control::OnKeyDown_Impl(hwnd, vk, cRepeat, flags);
@@ -496,13 +496,13 @@ void Button::OnKeyUp_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int 
 {
 	switch (vk)
 	{
-	case VK_RETURN:
-	{
-		Dispatch("OnClick", &ArgsDefault);
-		SetClickingState(false);
-		Update();
-		break;
-	}
+		case VK_RETURN:
+		{
+			Dispatch("OnClick", &ArgsDefault);
+			SetClickingState(false);
+			Update();
+			break;
+		}
 	}
 
 	Control::OnKeyUp_Impl(hwnd, vk, cRepeat, flags);

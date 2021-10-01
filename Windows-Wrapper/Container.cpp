@@ -82,6 +82,8 @@ void Container::RemoveWithoutUnsiting(IComponent* component)
 }
 
 Container::Container()
+	:
+	SiteCount(0)
 {
 	m_Sites.reserve(4);
 }
@@ -93,7 +95,7 @@ Container::~Container()
 
 void Container::Add(IComponent* const component)
 {
-	Add(component, nullptr);
+	Add(component, "");
 }
 
 void Container::Add(IComponent* const component, const std::string& name)

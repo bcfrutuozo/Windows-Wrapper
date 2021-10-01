@@ -28,26 +28,24 @@ int CALLBACK WinMain(
 	_CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);
 #endif
 
-	int ret = 0;
-
 	try
 	{
 		SetProcessDPIAware();
-		ret = TestUserApplication::Run();
+		TestUserApplication::Run();
 	}
 	catch (const ControlException& e)
 	{
-		ret = -1;
+		return -1;
 		MessageBox(nullptr, e.what(), "Standard Exception", MB_OK | MB_ICONEXCLAMATION);
 	}
 	catch (const std::exception& e)
 	{
-		ret = -1;
+		return -1;
 		MessageBox(nullptr, e.what(), "Standard Exception", MB_OK | MB_ICONEXCLAMATION);
 	}
 	catch (...)
 	{
-		ret = -1;
+		return -1;
 		MessageBox(nullptr, "No details available", "Unknown Exception", MB_OK | MB_ICONEXCLAMATION);
 	}
 
@@ -63,5 +61,5 @@ int CALLBACK WinMain(
 	while (!_kbhit());
 #endif
 
-	return ret;
+	return 0;
 }

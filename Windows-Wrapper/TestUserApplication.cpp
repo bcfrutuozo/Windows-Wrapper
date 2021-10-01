@@ -25,7 +25,7 @@ void TestUserApplication::Initialize()
 	lb->SetDataSource(list);
 	lb->SetBorderStyle(BorderStyle::Fixed3D);
 	lb->EnableMultiColumn();
-	lb->SetColumnWidth(180);
+	//lb->SetColumnWidth(180);
 	
 	auto cb = window->AddComboBox("Start Text", 260, 450, 450);
 

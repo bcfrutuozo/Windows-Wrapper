@@ -38,7 +38,6 @@
     <ClCompile Include="MenuEntryIconItem.cpp">
       <Filter>Menu</Filter>
     </ClCompile>
-    <ClCompile Include="Font.cpp" />
     <ClCompile Include="TestUserApplication.cpp" />
     <ClCompile Include="EventDispatcher.cpp">
       <Filter>Events</Filter>
@@ -198,6 +197,9 @@
     <ClCompile Include="RectangleF.cpp">
       <Filter>Types</Filter>
     </ClCompile>
+    <ClCompile Include="Font.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dxerr.h" />
@@ -284,7 +286,6 @@
     <ClInclude Include="CancelEventHandler.h">
       <Filter>Events</Filter>
     </ClInclude>
-    <ClInclude Include="Font.h" />
     <ClInclude Include="TestUserApplication.h" />
     <ClInclude Include="IDisposable.h">
       <Filter>Interfaces</Filter>
@@ -516,6 +517,9 @@
     </ClInclude>
     <ClInclude Include="PaintEventHandler.h">
       <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Font.h">
+      <Filter>Types</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
