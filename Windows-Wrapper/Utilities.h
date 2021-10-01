@@ -1,6 +1,10 @@
 #pragma once
 
 #include "Common.h"
+#include "Point.h"
+#include "Size.h"
+#include "PointF.h"
+#include "SizeF.h"
 
 namespace Utilities
 {
@@ -18,3 +22,42 @@ namespace std
 		return std::find(_C.begin(), _C.end(), _Val) != _C.end();
 	}
 };
+
+constexpr Point operator+(Point const& lhs, Size const& rhs) noexcept
+{
+	return Point(lhs.X + rhs.Width, lhs.Y + rhs.Height); 
+}
+
+constexpr Point operator-(Point const& lhs, Size const& rhs) noexcept
+{ 
+	return Point(lhs.X - rhs.Width, lhs.Y - rhs.Height); 
+}
+
+constexpr PointF operator+(PointF const& lhs, Size  const& rhs) noexcept 
+{
+	return PointF(lhs.X + rhs.Width, lhs.Y + rhs.Height); }
+
+constexpr PointF operator+(PointF const& lhs, SizeF const& rhs) noexcept 
+{
+	return PointF(lhs.X + rhs.Width, lhs.Y + rhs.Height); 
+}
+
+constexpr PointF operator-(PointF const& lhs, Size  const& rhs) noexcept
+{
+	return PointF(lhs.X - rhs.Width, lhs.Y - rhs.Height); 
+}
+
+constexpr PointF operator-(PointF const& lhs, SizeF const& rhs) noexcept 
+{
+	return PointF(lhs.X - rhs.Width, lhs.Y - rhs.Height);
+}
+
+constexpr SizeF operator*(Size const& lhs, SizeF const& rhs) noexcept 
+{
+	return SizeF(lhs.Width * rhs.Width, lhs.Height * rhs.Height);
+}
+
+constexpr SizeF operator*(Size const& lhs, float const& rhs) noexcept 
+{ 
+	return SizeF(lhs.Width * rhs, lhs.Height * rhs); 
+}

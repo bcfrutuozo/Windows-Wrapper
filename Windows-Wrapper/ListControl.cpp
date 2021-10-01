@@ -3,13 +3,6 @@
 
 int ListControl::OnEraseBackground_Impl(HWND hwnd, HDC hdc)
 {
-	/*RECT rc = { 0 };
-	GetClientRect(hwnd, &rc);
-	HBRUSH bgColor = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-	FillRect(hdc, &rc, bgColor);
-	SelectObject(hdc, bgColor);
-	DeleteObject(bgColor);*/
-
 	return 1;	// To avoid flickering
 }
 
@@ -121,12 +114,11 @@ void ListControl::Initialize()
 		throw CTL_LAST_EXCEPT();
 	}
 
-	// Set default TextBox margin to 3 pixels
-	m_BackgroundColor = Color::Window();
-
-	// Initialize scrollbars after control creation
+	// Initialize scrollbars after control creation and hide it as default
 	HorizontalScrollBar.Initialize();
+	HorizontalScrollBar.Hide();
 	VerticalScrollBar.Initialize();
+	VerticalScrollBar.Hide();
 }
 
 bool ListControl::IsSelectionAllowed()

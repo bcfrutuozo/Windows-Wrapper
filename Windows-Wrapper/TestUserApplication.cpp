@@ -7,6 +7,11 @@ void TestClick(Object* sender, EventArgs* e)
 	printf_s(ossin.str().c_str());
 }
 
+void TestPaint(Object* sender, PaintEventArgs* e)
+{
+    auto x = e->Rectangle;
+}
+
 void TestUserApplication::Initialize()
 {   
 	Window* window = new Window("Teste", 1000, 1000);
@@ -60,6 +65,7 @@ void TestUserApplication::Initialize()
     		printf_s("Teste Mouseleave Button1");
     	}
     );
+    button1->OnPaintSet(&TestPaint);
     
     button2 = window->AddButton("XYZ", 100, 40, 200, 200);
     button2->OnClickSet([](Object* sender, EventArgs* e)

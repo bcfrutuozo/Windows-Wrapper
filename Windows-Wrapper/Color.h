@@ -4,20 +4,26 @@
 
 struct Color : public IEquatable<Color>
 {
+private:
+
 	uint32_t rgba = 0;
+
+public:
 
 	constexpr Color(uint32_t rgba) noexcept : rgba(rgba) {}
 	constexpr Color(uint8_t r = 0, uint8_t g = 0, uint8_t b = 0, uint8_t a = 255) noexcept : rgba((r << 0) | (g << 8) | (b << 16) | (a << 24)) {}
+
+	inline constexpr bool operator==(const Color& c) const { return rgba == c.rgba; }
 
 	constexpr uint8_t GetR() const { return (rgba >> 0) & 0xFF; }
 	constexpr uint8_t GetG() const { return (rgba >> 8) & 0xFF; }
 	constexpr uint8_t GetB() const { return (rgba >> 16) & 0xFF; }
 	constexpr uint8_t GetA() const { return (rgba >> 24) & 0xFF; }
 
-	void SetR(uint8_t value);
-	void SetG(uint8_t value);
-	void SetB(uint8_t value);
-	void SetA(uint8_t value);
+	void SetR(uint8_t value) noexcept;
+	void SetG(uint8_t value) noexcept;
+	void SetB(uint8_t value) noexcept;
+	void SetA(uint8_t value) noexcept;
 
 	constexpr XMFLOAT3 ToFloat3() const
 	{
@@ -31,7 +37,12 @@ struct Color : public IEquatable<Color>
 
 	constexpr uint32_t ToRGB() const
 	{
-		return (rgba << 0 | rgba << 8 | rgba << 16);
+		return rgba & 0x00FFFFFF;
+	}
+
+	constexpr uint32_t ToRGBA() const
+	{
+		return rgba;
 	}
 
 	constexpr operator XMFLOAT3() const { return ToFloat3(); }
@@ -66,14 +77,16 @@ struct Color : public IEquatable<Color>
 
 	// Windows defaul control color
 	static constexpr Color Border() { return Color(173, 173, 173, 255); }
-	static constexpr Color Control() { return Color(250, 250, 250, 255); }
+	static constexpr Color ControlBackground() { return Color(255, 255, 255, 255); }
 	static constexpr Color Default() { return Color(212, 208, 200, 255); }
-	static constexpr Color Selection() { return Color(0, 120, 215, 255); }
-	static constexpr Color Window() { return Color(255, 255, 255, 255); }
-	static constexpr Color WindowText() { return Color(0, 0, 0, 255); }
+	static constexpr Color SelectionBackground() { return Color(0, 120, 215, 255); }
+	static constexpr Color SelectionForeground() { return Color(255, 255, 255, 255); }
+	static constexpr Color WindowBackground() { return Color(247, 247, 247, 255); }
+	static constexpr Color Foreground() { return Color(0, 0, 0, 255); }
+	static constexpr Color DisabledControlBackground() { return Color(247, 247, 247, 255); }
+	static constexpr Color DisabledForeground() { return Color(82, 86, 82, 255); }
 
 	int GetHashCode() const override;
 	inline bool Equals(const Object* const c) const override;
 	inline bool Equals(const Color* const c) const override;
-	inline bool operator==(const Color& c) const;
 };

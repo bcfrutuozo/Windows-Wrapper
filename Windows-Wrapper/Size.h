@@ -2,9 +2,8 @@
 
 #include "IEquatable.h"
 
-struct SizeF;
 struct Point;
-struct PointF;
+struct SizeF;
 
 struct Size : public IEquatable<Size>
 {
@@ -13,51 +12,29 @@ public:
 	int Width;
 	int Height;
 
-	Size(int width, int height);
+	constexpr Size(int width, int height) : Width(width), Height(height) { }
 	Size(Point p);
 
-	inline bool operator==(const Size& s) const;
+	constexpr Size operator+(Size s) noexcept { return Size(Width + s.Width, Height + s.Height); }
+	constexpr Size operator-(Size s) noexcept { return Size(Width - s.Width, Height - s.Height); }
+	constexpr Size operator*(Size s) noexcept { return Size(Width * s.Width, Height * s.Height); }
+	constexpr bool operator==(Size s) const { return (Width == s.Width && Height == s.Height); }
+	constexpr Size operator/(int i) { return Size(Width / i, Height / i); }
+	constexpr Size operator*(int i) noexcept { return Size(Width * i, Height * i); }
+	constexpr Size operator/(float f) { return Size(static_cast<int>(static_cast<float>(Width) / f), static_cast<int>(static_cast<float>(Height) / f)); }
+
+	constexpr bool IsEmpty() const noexcept { return (Width == 0 && Height == 0); }
+
+	inline Size CeilingF(SizeF s) noexcept;
+	inline Size RoundF(SizeF s) noexcept;
+	inline Size Truncate(SizeF s) noexcept;
+
+	static constexpr Size Add(Size lhs, Size rhs) noexcept { return Size(lhs.Width + rhs.Width, lhs.Height + rhs.Height); }
+	static constexpr Size Subtract(Size lhs, Size rhs) noexcept { return Size(lhs.Width - rhs.Width, lhs.Height - rhs.Height); }
+	
+	int GetHashCode() const noexcept override;
 	inline bool Equals(const Object* const obj) const override;
 	inline bool Equals(const Size* const s) const override;
 
-	const bool IsEmpty() const noexcept;
-	inline static Size Add(Size lhs, Size rhs) noexcept;
-	inline static Size CeilingF(SizeF s) noexcept;
-	inline static Size RoundF(SizeF s) noexcept;
-	inline static Size Subtract(Size lhs, Size rhs) noexcept;
-	inline static Size Truncate(SizeF s) noexcept;
-	inline Size operator+(Size rhs) noexcept;
-	inline Size operator/(int i);
-	inline Size operator/(float f);
-	inline Size operator*(int i) noexcept;
-	inline SizeF operator*(float f) noexcept;
-	inline Size operator*(Size s) noexcept;
-	inline SizeF operator*(SizeF s) noexcept;
-	inline Size operator-(Size s) noexcept;
-};
-
-struct SizeF : public IEquatable<SizeF>
-{
-public:
-
-	float Width;
-	float Height;
-
-	SizeF(float width, float height);
-	SizeF(PointF p);
-
-	inline bool operator==(const SizeF& s) const;
-	inline bool Equals(const Object* const obj) const override;
-	inline bool Equals(const SizeF* const s) const override;
-
-	const bool IsEmpty() const noexcept;
-	inline static SizeF Add(SizeF lhs, SizeF rhs) noexcept;
-	inline static SizeF Subtract(SizeF lhs, SizeF rhs) noexcept;
-	inline PointF ToPointF() noexcept;
-	inline Size ToSize() noexcept;
-	inline SizeF operator+(SizeF rhs) noexcept;
-	inline SizeF operator/(float f) noexcept;
-	inline SizeF operator*(float f) noexcept;
-	inline SizeF operator*(SizeF f) noexcept;
-	inline SizeF operator-(SizeF s) noexcept;
+	static constexpr Size Empty() { return Size(0, 0); }
 };

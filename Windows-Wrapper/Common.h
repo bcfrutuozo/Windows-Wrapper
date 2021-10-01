@@ -54,8 +54,6 @@ using namespace DirectX::PackedVector;
 #define ArraySize(a) (sizeof(a) / sizeof(a[0]))
 #define SafeDelete(p) { delete p; p == nullptr; }
 
-
 // Project libraries
 #include "Enums.h"
 #include "Mathlib.h"
-#include "Utilities.h"

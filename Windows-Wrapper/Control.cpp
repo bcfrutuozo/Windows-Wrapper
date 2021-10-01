@@ -181,8 +181,8 @@ Control::Control(Control* parent, const std::string& text, int width, int height
 	Text(text),
 	m_Size(width, height),
 	m_Location(x, y),
-	m_BackgroundColor(Color::Control()),
-	m_ForeColor(Color::WindowText()),
+	m_BackgroundColor(Color::ControlBackground()),
+	m_ForeColor(Color::Foreground()),
 	m_Padding(0),
 	m_Margin(3, 3, 3, 3),	// Default margin for controls
 	m_TabIndex(m_IncrementalTabIndex++),
@@ -207,7 +207,7 @@ Control::Control(Control* parent, const std::string& text, int width, int height
 	OnMouseUp(nullptr),
 	OnMouseWheel(nullptr),
 	OnVisibleChanged(nullptr),
-	m_IsVisible(false)
+	m_IsVisible(true)
 {
 	if (m_Size.Height == 0 || m_Size.Width == 0)
 	{
@@ -257,6 +257,12 @@ void Control::Show()
 	}
 }
 
+Graphics Control::CreateGraphics() const noexcept
+{
+	void* windowp = Handle.ToPointer();
+	return Graphics(static_cast<HWND>(windowp), GetDC(static_cast<HWND>(windowp)));
+}
+
 void Control::SetLocation(Point p) noexcept
 {
 	m_Location = p;
@@ -289,6 +295,7 @@ Control::~Control() noexcept(false)
 	if (OnMouseRightDoubleClick != nullptr) { delete OnMouseRightDoubleClick; OnMouseRightDoubleClick = nullptr; }
 	if (OnMouseUp != nullptr) { delete OnMouseUp; OnMouseUp = nullptr; }
 	if (OnMouseWheel != nullptr) { delete OnMouseWheel; OnMouseWheel = nullptr; }
+	if (OnPaint != nullptr) { delete OnPaint; OnPaint = nullptr; }
 	if (OnVisibleChanged != nullptr) { delete OnVisibleChanged; OnVisibleChanged = nullptr; }
 }
 
@@ -398,6 +405,12 @@ void Control::OnMouseWheelSet(const std::function<void(Object*, MouseEventArgs*)
 {
 	OnMouseWheel = new MouseEventHandler("OnMouseWheel", callback);
 	Events.Register(OnMouseWheel);
+}
+
+void Control::OnPaintSet(const std::function<void(Object*, PaintEventArgs*)>& callback) noexcept
+{
+	OnPaint = new PaintEventHandler("OnPaint", callback);
+	Events.Register(OnPaint);
 }
 
 void Control::OnVisibleChangedSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept
@@ -633,11 +646,17 @@ void Control::Resize(int width, int height) noexcept
 
 Color Control::GetForeColor() const noexcept
 {
+	if (!IsEnabled()) return Color::DisabledForeground();
 	return m_ForeColor;
 }
 
 Color Control::GetBackgroundColor() const noexcept
 {
+	if (m_BackgroundColor == Color::ControlBackground() && !IsEnabled())
+	{
+		return Color::DisabledControlBackground();
+	}
+
 	return m_BackgroundColor;
 }
 

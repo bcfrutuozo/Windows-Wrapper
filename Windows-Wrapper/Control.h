@@ -2,20 +2,22 @@
 
 #include "WinAPI.h"
 #include "Color.h"
-#include "Point.h"
-#include "Size.h"
+#include "Utilities.h"
 #include "Padding.h"
 #include "EventHandler.h"
 #include "KeyEventHandler.h"
 #include "KeyPressEventHandler.h"
 #include "MouseEventHandler.h"
+#include "PaintEventHandler.h"
 #include "KeyEventArgs.h"
 #include "MouseEventArgs.h"
 #include "KeyPressEventArgs.h"
 #include "CancelEventArgs.h"
 #include "OnClosedEventArgs.h"
 #include "OnClosingEventArgs.h"
+#include "PaintEventArgs.h"
 #include "ControlException.h"
+#include "Graphics.h"
 
 #include <list>
 #include <memory>
@@ -65,6 +67,7 @@ private:
 	MouseEventHandler* OnMouseRightDoubleClick;
 	MouseEventHandler* OnMouseUp;
 	MouseEventHandler* OnMouseWheel;
+	PaintEventHandler* OnPaint;
 	EventHandler* OnVisibleChanged;
 
 protected:
@@ -129,6 +132,7 @@ public:
 	void OnMouseRightDoubleClickSet(const std::function<void(Object*, MouseEventArgs*)>& callback) noexcept;
 	void OnMouseUpSet(const std::function<void(Object*, MouseEventArgs*)>& callback) noexcept;
 	void OnMouseWheelSet(const std::function<void(Object*, MouseEventArgs*)>& callback) noexcept;
+	void OnPaintSet(const std::function<void(Object*, PaintEventArgs*)>& callback) noexcept;
 	void OnVisibleChangedSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept;
 
 	bool HasChildren() const noexcept;
@@ -161,4 +165,5 @@ public:
 	bool IsShown() const noexcept;
 	virtual void Hide();
 	virtual void Show();
+	Graphics CreateGraphics() const noexcept;
 };

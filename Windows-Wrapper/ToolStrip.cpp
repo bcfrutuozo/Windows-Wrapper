@@ -67,8 +67,6 @@ void ToolStrip::Initialize()
 
 	// Set default TextBox margin to 3 pixels
 	m_Margin = 3;
-	m_BackgroundColor = Color::Control();
-	m_ForeColor = Color::WindowText();
 }
 
 DockStyle ToolStrip::GetDockStyle() const noexcept

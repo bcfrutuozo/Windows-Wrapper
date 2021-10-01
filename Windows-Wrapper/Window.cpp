@@ -46,7 +46,7 @@ void Window::Initialize()
 	Handle = CreateWindow(
 		WindowClass::GetName(),																								// Class name
 		Text.c_str(),																										// Window title
-		WS_OVERLAPPEDWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU | WS_CLIPCHILDREN,					// Style values
+		WS_OVERLAPPEDWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU | WS_CLIPCHILDREN | WS_VISIBLE,		// Style values
 		CW_USEDEFAULT,																										// X position
 		CW_USEDEFAULT,																										// Y position
 		(r.right - r.left),																									// Width
@@ -80,11 +80,10 @@ void Window::Initialize()
 	//SetParent(static_cast<HWND>(Handle.ToPointer()), static_cast<HWND>(Parent->Handle.ToPointer()));
 
 	// Force window redraw to set Background color
-	m_BackgroundColor = Color::Control();
+	m_BackgroundColor = Color::WindowBackground();
 
 	// Add window the the application windows container
 	Application::AddWindow(this);
-	Show();	// Force call Show because all window starts as not visible
 	Update();
 }
 
@@ -263,7 +262,7 @@ void Window::OnPaint_Impl(HWND hwnd) noexcept
 
 	SendMessage(hwnd, WM_SETFONT, (WPARAM)hFont, TRUE);
 
-	HBRUSH bgColor = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
+	HBRUSH bgColor = CreateSolidBrush(GetBackgroundColor().ToRGB());
 	FillRect(ps.hdc, &ps.rcPaint, bgColor);
 	SelectObject(ps.hdc, bgColor);
 	DeleteObject(bgColor);

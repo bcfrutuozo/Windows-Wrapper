@@ -271,7 +271,7 @@ void ProgressBar::Initialize()
 	}
 
 	m_BackgroundColor = Color(75, 154, 255);
-	m_ForeColor = Color::WindowText();
+	m_ForeColor = Color::Foreground();
 }
 
 int ProgressBar::GetValue() const noexcept

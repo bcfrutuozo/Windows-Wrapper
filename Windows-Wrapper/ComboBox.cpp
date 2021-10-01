@@ -190,7 +190,7 @@ void ComboBox::ComboBoxChildNativeWindow::Initialize()
 	}
 
 	// Set default TextBox margin to 3 pixels
-	m_BackgroundColor = Color::Window();
+	m_BackgroundColor = Color::WindowBackground();
 
 	// Initialize scrollbars after control creation
 	HorizontalScrollBar.Initialize();

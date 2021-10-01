@@ -3,7 +3,9 @@
 #include "ArgumentException.h"
 #include "ArgumentNullException.h"
 #include "ArgumentOutOfRangeException.h"
+#include "ArithmeticException.h"
 #include "ControlException.h"
+#include "DivideByZeroException.h"
 #include "Exception.h"
 #include "InvalidOperationException.h"
 #include "NotImplementedException.h"
@@ -41,6 +43,15 @@ ArgumentNullException(const std::string& message, const std::string& param)
 #define ArgumentOutOfRangeException(...) ArgumentOutOfRangeException(__LINE__, __FILE__, ##__VA_ARGS__)
 
 /**************************************************************************************************************************************
+ArithmeticException macro translations:
+
+ArithmeticException()
+ArithmeticException(const std::string& message)
+ArithmeticException(const std::string& message, Exception* const innerException)
+**************************************************************************************************************************************/
+#define ArithmeticException(...) ArithmeticException(__LINE__, __FILE__, ##__VA_ARGS__)
+
+/**************************************************************************************************************************************
 ControlException macro translations:
 
 ControlException()
@@ -49,6 +60,15 @@ ControlException(HRESULT hr, const std::string& message)
 **************************************************************************************************************************************/
 #define ControlException(...) ControlException(__LINE__, __FILE__, ##__VA_ARGS__)
 #define CTL_LAST_EXCEPT() ControlException(GetLastError())
+
+/**************************************************************************************************************************************
+DivideByZeroException macro translations:
+
+DivideByZeroException()
+DivideByZeroException(const std::string& message)
+DivideByZeroException(const std::string& message, Exception* const innerException)
+**************************************************************************************************************************************/
+#define DivideByZeroException(...) DivideByZeroException(__LINE__, __FILE__, ##__VA_ARGS__)
 
 /**************************************************************************************************************************************
 Exception macro translations:

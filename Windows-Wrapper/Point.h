@@ -1,11 +1,9 @@
-
 #pragma once
 
 #include "IEquatable.h"
 
 struct PointF;
 struct Size;
-struct SizeF;
 
 struct Point : public IEquatable<Point>
 {
@@ -14,46 +12,30 @@ public:
 	int X;
 	int Y;
 
-	Point(int word);
-	Point(int x, int y);
+	constexpr Point(int word) : X(LOWORD(word)), Y(HIWORD(word)) { }
+	constexpr Point(int x, int y) : X(x), Y(y) { }
 	Point(Size size);
 
-	inline bool operator==(const Point& p) const;
+	constexpr Point operator+(Point p) { return Point(X + p.X, Y + p.Y); }
+	constexpr Point operator-(Point p) { return Point(X - p.X, Y - p.Y); }
+	constexpr bool operator==(Point p) const { return (X == p.X && Y == p.Y); }
+
+	constexpr bool IsEmpty() const noexcept { return (X == 0 && Y == 0); }
+
+	inline Point Add(Point p, Size s) noexcept;
+	inline Point CeilingF(PointF p) noexcept;
+	inline Point Offset(int x, int y) noexcept;
+	inline Point Offset(Point p) noexcept;
+	inline Point RoundF(PointF p) noexcept;
+	inline Point Subtract(Point p, Size s) noexcept;
+	inline Point Truncate(PointF p) noexcept;
+
+	static constexpr Point Add(Point lhs, Point rhs) noexcept { return Point(lhs.X + rhs.X, lhs.Y + rhs.Y); }
+	static constexpr Point Subtract(Point lhs, Point rhs) noexcept { return Point(lhs.X - rhs.X, lhs.Y - rhs.Y); }
+
+	int GetHashCode() const noexcept override;
 	inline bool Equals(const Object* const obj) const override;
 	inline bool Equals(const Point* const p) const override;
 
-	const bool IsEmpty() const noexcept;
-	inline static Point Add(Point p, Size s) noexcept;
-	inline static Point CeilingF(PointF p) noexcept;
-	inline Point Offset(int x, int y) noexcept;
-	inline Point Offset(Point p) noexcept;
-	inline static Point RoundF(PointF p) noexcept;
-	inline static Point Subtract(Point p, Size s) noexcept;
-	inline static Point Truncate(PointF p) noexcept;
-	inline Point operator+(Size s) noexcept;
-	inline Point operator-(Size s) noexcept;
-};
-
-struct PointF : public IEquatable<PointF>
-{
-public:
-
-	float X;
-	float Y;
-
-	PointF(float x, float y);
-
-	inline bool operator==(const PointF& p) const;
-	inline bool Equals(const Object* obj) const override;
-	inline bool Equals(const PointF* const p) const override;
-
-	const bool IsEmpty() const noexcept;
-	inline static PointF Add(Point p, Size s) noexcept;
-	inline static PointF Add(Point p, SizeF s) noexcept;
-	inline static PointF Subtract(PointF p, Size s) noexcept;
-	inline static PointF Subtract(PointF p, SizeF s) noexcept;
-	inline PointF operator+(Size s) noexcept;
-	inline PointF operator+(SizeF s) noexcept;
-	inline PointF operator-(Size s) noexcept;
-	inline PointF operator-(SizeF s) noexcept;
+	static constexpr Point Empty() { return Point(0, 0); }
 };

@@ -627,15 +627,17 @@ void ListBox::Draw(HWND hwnd, HDC& hdc)
 			if((m_SelectionMode == SelectionMode::Single && m_SelectedIndex == i) || 
 				(m_SelectionMode == SelectionMode::MultiSimple || m_SelectionMode == SelectionMode::MultiExtended) && std::find(m_SelectedIndices.begin(), m_SelectedIndices.end(), i) != m_SelectedIndices.end())
 			{
-				SetBkColor(hdcMem, RGB(0, 120, 215));
-				SetTextColor(hdcMem, RGB(255, 255, 255));
-				brush = CreateSolidBrush(RGB(0, 120, 215));
+				auto clr = Color::SelectionBackground().ToRGB();
+				SetBkColor(hdcMem, clr);
+				SetTextColor(hdcMem, Color::SelectionForeground().ToRGB());
+				brush = CreateSolidBrush(clr);
 			}
 			else
 			{
-				SetBkColor(hdcMem, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-				SetTextColor(hdcMem, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-				brush = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));				
+				auto clr = GetBackgroundColor().ToRGB();
+				SetBkColor(hdcMem, clr);
+				SetTextColor(hdcMem, GetForeColor().ToRGB());
+				brush = CreateSolidBrush(clr);
 			}
 
 			FillRect(hdcMem, &cr, brush);

@@ -920,7 +920,6 @@ void TextBox::Initialize()
 	}
 
 	// Set default TextBox margin to 3 pixels
-	m_BackgroundColor = Color::Window();
 	m_Size = CalculateSizeByFont();
 }
 

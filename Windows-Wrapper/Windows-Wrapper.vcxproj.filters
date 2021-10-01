@@ -3,7 +3,7 @@
   <ItemGroup>
     <ClCompile Include="dxerr.cpp" />
     <ClCompile Include="DXGIInfoManager.cpp" />
-    <ClCompile Include="Graphics.cpp" />
+    <ClCompile Include="Graphics3d.cpp" />
     <ClCompile Include="WinMain.cpp" />
     <ClCompile Include="Menu.cpp">
       <Filter>Menu</Filter>
@@ -177,11 +177,32 @@
     <ClCompile Include="Timer.cpp">
       <Filter>Helpers</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
+    <ClCompile Include="ArithmeticException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="DivideByZeroException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="PointF.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
+    <ClCompile Include="SizeF.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
+    <ClCompile Include="Rectangle.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
+    <ClCompile Include="RectangleF.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dxerr.h" />
     <ClInclude Include="DXGIInfoManager.h" />
-    <ClInclude Include="Graphics.h" />
+    <ClInclude Include="Graphics3d.h" />
     <ClInclude Include="IHandle.h">
       <Filter>Interfaces</Filter>
     </ClInclude>
@@ -465,6 +486,36 @@
     </ClInclude>
     <ClInclude Include="Appheaders.h">
       <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="IDeviceContext.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="PaintEventArgs.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Rectangle.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="ArithmeticException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="DivideByZeroException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="PointF.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="SizeF.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="RectangleF.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="PaintEventHandler.h">
+      <Filter>Events</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
