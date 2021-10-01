@@ -146,11 +146,6 @@ Control::Control() noexcept
 
 }
 
-Font Control::GetFont() const noexcept
-{
-	return m_Font;
-}
-
 Control::Control(Control* parent, const std::string& text) noexcept
 	:
 	Control(parent, text, 0, 0, 0, 0)
@@ -165,8 +160,7 @@ void Control::SetFont(Font font) noexcept
 		c->SetFont(font);
 	}
 
-	m_Font = font;
-	Update();
+	WinAPI::SetFont(font);
 }
 
 void Control::SetText(const std::string& text) noexcept
@@ -176,13 +170,9 @@ void Control::SetText(const std::string& text) noexcept
 
 Control::Control(Control* parent, const std::string& text, int width, int height, int x, int y) noexcept
 	:
-	m_Font("Segoe", 9, false, false, false, false, GraphicsUnit::Point),		// Default application font for controls
+	WinAPI(width, height, x, y),
 	Parent(parent),
 	Text(text),
-	m_Size(width, height),
-	m_Location(x, y),
-	m_BackgroundColor(Color::ControlBackground()),
-	m_ForeColor(Color::Foreground()),
 	m_Padding(0),
 	m_Margin(3, 3, 3, 3),	// Default margin for controls
 	m_TabIndex(m_IncrementalTabIndex++),
@@ -207,7 +197,7 @@ Control::Control(Control* parent, const std::string& text, int width, int height
 	OnMouseUp(nullptr),
 	OnMouseWheel(nullptr),
 	OnVisibleChanged(nullptr),
-	m_IsVisible(true)
+	OnPaint(nullptr)
 {
 	if (m_Size.Height == 0 || m_Size.Width == 0)
 	{
@@ -227,52 +217,6 @@ Control::Control(const std::string& text, int width, int height, int x, int y) n
 	Control(nullptr, text, width, height, x, y)
 {
 
-}
-
-bool Control::IsShown() const noexcept
-{
-	return m_IsVisible;
-}
-
-Point Control::GetLocation() const noexcept
-{
-	return m_Location;
-}
-
-void Control::Hide()
-{
-	if (IsShown())
-	{
-		m_IsVisible = false;
-		ShowWindow(static_cast<HWND>(Handle.ToPointer()), SW_HIDE);
-	}
-}
-
-void Control::Show()
-{
-	if (!IsShown())
-	{
-		m_IsVisible = true;
-		ShowWindow(static_cast<HWND>(Handle.ToPointer()), SW_SHOWDEFAULT);
-	}
-}
-
-Graphics Control::CreateGraphics() const noexcept
-{
-	void* windowp = Handle.ToPointer();
-	return Graphics(static_cast<HWND>(windowp), GetDC(static_cast<HWND>(windowp)));
-}
-
-void Control::SetLocation(Point p) noexcept
-{
-	m_Location = p;
-	SetWindowPos(static_cast<HWND>(Handle.ToPointer()), nullptr, m_Location.X, m_Location.Y, m_Size.Width, m_Size.Height, SWP_NOZORDER);
-}
-
-void Control::SetLocation(int x, int y) noexcept
-{
-	m_Location = Point(x, y);
-	SetWindowPos(static_cast<HWND>(Handle.ToPointer()), nullptr, m_Location.X, m_Location.Y, m_Size.Width, m_Size.Height, SWP_NOZORDER);
 }
 
 Control::~Control() noexcept(false)
@@ -419,11 +363,6 @@ void Control::OnVisibleChangedSet(const std::function<void(Object*, EventArgs*)>
 	Events.Register(OnVisibleChanged);
 }
 
-Size Control::GetSize() const noexcept
-{
-	return m_Size;
-}
-
 Padding Control::GetMargin() const noexcept
 {
 	return m_Margin;
@@ -452,18 +391,6 @@ Control* Control::GetByTabIndex(const int& index) noexcept
 bool Control::IsTabSelected() const noexcept
 {
 	return m_IsTabSelected;
-}
-
-void Control::SetForeColor(const Color& color) noexcept
-{
-	m_ForeColor = color;
-	Update();
-}
-
-void Control::SetBackgroundColor(const Color& color) noexcept
-{
-	m_BackgroundColor = color;
-	Update();
 }
 
 const std::string& Control::GetText() const noexcept
@@ -619,7 +546,7 @@ Size Control::CalculateSizeByFont() noexcept
 
 bool Control::IsEnabled() const noexcept
 {
-	if (!m_Enabled)
+	if (!WinAPI::IsEnabled())
 	{
 		return false;
 	}
@@ -630,34 +557,6 @@ bool Control::IsEnabled() const noexcept
 	}
 
 	return true;
-}
-
-void Control::Resize(Size s) noexcept
-{
-	m_Size = s;
-	SetWindowPos(static_cast<HWND>(Handle.ToPointer()), nullptr, m_Location.X, m_Location.Y, m_Size.Width, m_Size.Height, SWP_NOZORDER);
-}
-
-void Control::Resize(int width, int height) noexcept
-{
-	m_Size = Size(width, height);
-	SetWindowPos(static_cast<HWND>(Handle.ToPointer()), nullptr, m_Location.X, m_Location.Y, m_Size.Width, m_Size.Height, SWP_NOZORDER);
-}
-
-Color Control::GetForeColor() const noexcept
-{
-	if (!IsEnabled()) return Color::DisabledForeground();
-	return m_ForeColor;
-}
-
-Color Control::GetBackgroundColor() const noexcept
-{
-	if (m_BackgroundColor == Color::ControlBackground() && !IsEnabled())
-	{
-		return Color::DisabledControlBackground();
-	}
-
-	return m_BackgroundColor;
 }
 
 Window* Control::GetWindow() noexcept

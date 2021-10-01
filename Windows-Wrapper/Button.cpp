@@ -431,6 +431,47 @@ void Button::DrawBorder(HDC& hdc, RECT& rc)
 	}
 }
 
+void Button::Draw(const Graphics& graphics, Drawing::Rectangle rectangle)
+{
+	auto hwnd = static_cast<HWND>(Handle.ToPointer());
+	auto hdc = static_cast<HDC>(graphics.GetHDC().ToPointer());
+	
+	SetBkMode(hdc, OPAQUE);
+	RECT rc;
+	GetClientRect(hwnd, &rc);
+
+	HDC hdcMem = CreateCompatibleDC(hdc);
+	HBITMAP hbmMem = CreateCompatibleBitmap(hdc, m_Size.Width, m_Size.Height);
+	HBITMAP hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
+
+	// Select current font
+	auto hFont = Fonts->find(m_Font.ToString());
+	SelectObject(hdcMem, hFont->second);
+
+	// Draw background inside before drawing borders to round rectangle
+	HBRUSH background = CreateSolidBrush(GetBackgroundColor().ToRGB());
+	FillRect(hdcMem, &rc, background);
+	SelectObject(hdcMem, background);
+	DeleteObject(background);
+
+	DrawBorder(hdcMem, rc);
+
+	SetBkMode(hdcMem, TRANSPARENT);
+	SetTextColor(hdcMem, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
+	DrawText(hdcMem, GetText().c_str(), -1, &rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+
+	// Perform the bit-block transfer between the memory Device Context which has the next bitmap
+	// with the current image to avoid flickering
+	BitBlt(hdc, 0, 0, m_Size.Width, m_Size.Height, hdcMem, 0, 0, SRCCOPY);
+
+	SelectObject(hdc, hbmMem);
+	DeleteObject(hbmMem);
+	SelectObject(hdcMem, hbmOld);
+	DeleteObject(hbmOld);
+	ReleaseDC(hwnd, hdcMem);
+	DeleteDC(hdcMem);
+}
+
 int Button::OnEraseBackground_Impl(HWND hwnd, HDC hdc)
 {
 	return 1;	// To avoid flickering
@@ -465,66 +506,6 @@ void Button::OnKeyUp_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int 
 	}
 
 	Control::OnKeyUp_Impl(hwnd, vk, cRepeat, flags);
-}
-
-void Button::OnPaint_Impl(HWND hwnd)
-{
-	PAINTSTRUCT ps;
-	BeginPaint(hwnd, &ps);
-	SetBkMode(ps.hdc, OPAQUE);
-	RECT rc;
-	GetClientRect(hwnd, &rc);
-
-	HDC hdcMem = CreateCompatibleDC(ps.hdc);
-	HBITMAP hbmMem = CreateCompatibleBitmap(ps.hdc, m_Size.Width, m_Size.Height);
-	HBITMAP hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
-
-	// Draw background inside before drawing borders to round rectangle
-	HBRUSH background = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-	FillRect(hdcMem, &rc, background);
-	SelectObject(hdcMem, background);
-	DeleteObject(background);
-
-	DrawBorder(hdcMem, rc);
-
-	SetBkMode(hdcMem, TRANSPARENT);
-	SetTextColor(hdcMem, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-	HFONT hFont = CreateFont(m_Font.GetSizeInPixels(),
-		0,
-		0, 
-		0, 
-		m_Font.IsBold() ? FW_BOLD : FW_NORMAL, 
-		m_Font.IsItalic(), 
-		m_Font.IsUnderline(), 
-		m_Font.IsStrikeOut(), 
-		ANSI_CHARSET,
-		OUT_TT_PRECIS, 
-		CLIP_DEFAULT_PRECIS, 
-		DEFAULT_QUALITY,
-		DEFAULT_PITCH | FF_DONTCARE, 
-		m_Font.GetName().c_str());
-
-	SelectObject(hdcMem, hFont);
-	DrawText(hdcMem, GetText().c_str(), -1, &rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-	DeleteObject(hFont);
-
-	// Perform the bit-block transfer between the memory Device Context which has the next bitmap
-	// with the current image to avoid flickering
-	BitBlt(ps.hdc, 0, 0, m_Size.Width, m_Size.Height, hdcMem, 0, 0, SRCCOPY);
-
-	// NEED TO IMPLEMENT A LARGE GRAPHICS CLASS TO HANDLE EVENTARGS TO THE USER.
-	// IT'S PROBABLY GOING TO BE ONE OF THE LAST STEPS
-	//Dispatch("OnPaint", new PaintEventArgs());
-
-	SelectObject(ps.hdc, hbmMem);
-	DeleteObject(hbmMem);
-	SelectObject(hdcMem, hbmOld);
-	DeleteObject(hbmOld);
-	ReleaseDC(hwnd, hdcMem);
-	DeleteDC(hdcMem);
-	auto p = PaintEventArgs(CreateGraphics(), Drawing::Rectangle(m_Location, m_Size));
-	Dispatch("OnPaint", &p);
-	EndPaint(hwnd, &ps);
 }
 
 Button::Button(Control* parent, const std::string& name, int width, int height, int x, int y)

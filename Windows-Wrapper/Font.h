@@ -13,6 +13,8 @@ private:
 	std::string m_Name;
 	int m_Size;
 	GraphicsUnit m_Unit;
+	byte m_GdiCharSet;
+	bool m_GdiVerticalFont;
 
 	static int PixelToPoint(int sizeInPixels) noexcept;
 	static int PointToPixel(int sizeInPoints) noexcept;
@@ -35,5 +37,6 @@ public:
 	GraphicsUnit GetUnit() const noexcept;
 	void SetUnit(GraphicsUnit unit) noexcept;
 	void SetStyle(FontStyle style) noexcept;
+	const std::string ToString() const noexcept override;
 };
 

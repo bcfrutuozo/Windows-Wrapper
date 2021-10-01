@@ -1,6 +1,10 @@
 #include "VerticalScrollBar.h"
 #include "ScrollableControl.h"
 
+void VerticalScrollBar::Draw(const Graphics& graphics, Drawing::Rectangle rectangle)
+{
+}
+
 void VerticalScrollBar::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy)
 {
 	if (ShowScrollBar(hwnd, SB_VERT, true) == 0)
@@ -10,7 +14,7 @@ void VerticalScrollBar::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int c
 
 	if (IsShown())
 	{
-		SCROLLINFO si;
+		SCROLLINFO si = { 0 };
 		si.cbSize = sizeof(SCROLLINFO);
 		si.fMask = SIF_PAGE | SIF_RANGE;
 		si.nMin = 0;
@@ -26,7 +30,7 @@ void VerticalScrollBar::OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsign
 {
 	int nPos;
 	int nOldPos;
-	SCROLLINFO si;
+	SCROLLINFO si = { 0 };
 
 	si.cbSize = sizeof(SCROLLINFO);
 	si.fMask = SIF_RANGE | SIF_PAGE | SIF_POS | SIF_TRACKPOS;

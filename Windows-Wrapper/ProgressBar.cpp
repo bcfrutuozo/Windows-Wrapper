@@ -1,24 +1,20 @@
 #include "ProgressBar.h"
 
-int ProgressBar::OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept
+void ProgressBar::Draw(const Graphics& graphics, Drawing::Rectangle rectangle)
 {
-	return 1;	// Reduce control flickering
-}
+	auto hwnd = static_cast<HWND>(Handle.ToPointer());
+	auto hdc = static_cast<HDC>(graphics.GetHDC().ToPointer());
 
-void ProgressBar::OnPaint_Impl(HWND hwnd) noexcept
-{
 	// Process default paint only when thread is not running
 	if (m_IsRunning)
 	{
 		return;
 	}
 
-	PAINTSTRUCT ps;
 	RECT rt;
 	GetClientRect(hwnd, &rt);
-	BeginPaint(hwnd, &ps);
-	HDC hdcMem = CreateCompatibleDC(ps.hdc);
-	HBITMAP hbmMem = CreateCompatibleBitmap(ps.hdc, m_Size.Width, m_Size.Height);
+	HDC hdcMem = CreateCompatibleDC(hdc);
+	HBITMAP hbmMem = CreateCompatibleBitmap(hdc, m_Size.Width, m_Size.Height);
 	HBITMAP hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
 
 	switch (m_Animation)
@@ -74,7 +70,6 @@ void ProgressBar::OnPaint_Impl(HWND hwnd) noexcept
 	}
 	case ProgressBarAnimation::Marquee:	// Marquee ProgressBar is painted on another thread
 	{
-
 		HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(188, 188, 188));
 		HGDIOBJ draw = SelectObject(hdcMem, pen);
 		Rectangle(hdcMem, rt.left, rt.top, rt.right, rt.bottom);
@@ -96,13 +91,17 @@ void ProgressBar::OnPaint_Impl(HWND hwnd) noexcept
 
 	// Perform the bit-block transfer between the memory Device Context which has the next bitmap
 	// with the current image to avoid flickering
-	BitBlt(ps.hdc, 0, 0, m_Size.Width, m_Size.Height, hdcMem, 0, 0, SRCCOPY);
+	BitBlt(hdc, 0, 0, m_Size.Width, m_Size.Height, hdcMem, 0, 0, SRCCOPY);
 
 	SelectObject(hdcMem, hbmOld);
 	DeleteObject(hbmOld);
 	ReleaseDC(hwnd, hdcMem);
 	DeleteDC(hdcMem);
-	EndPaint(hwnd, &ps);
+}
+
+int ProgressBar::OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept
+{
+	return 1;	// Reduce control flickering
 }
 
 void ProgressBar::OnPaintMarquee_Thread(HWND hwnd) noexcept

@@ -2,8 +2,6 @@
 
 #include "Application.h"
 
-class TestApplication;
-
 template<typename T>
 class UserApplication : public Application
 {

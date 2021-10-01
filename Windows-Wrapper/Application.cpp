@@ -23,14 +23,9 @@ bool Application::RemoveWindow(Window* window)
 	return false;
 }
 
-void Application::TryCloseApplication() noexcept
+bool Application::CanCloseApplication() noexcept
 {
-	if (Windows->size() == 0)
-	{
-		delete Windows;
-		Windows = nullptr;
-		PostQuitMessage(0);
-	}
+	return (Windows->size() == 0);
 }
 
 void Application::Exit() noexcept

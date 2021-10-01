@@ -1,31 +1,12 @@
 #include "Label.h"
 
-void Label::OnPaint_Impl(HWND hwnd) noexcept
+void Label::Draw(const Graphics& graphics, Drawing::Rectangle rectangle)
 {
-	PAINTSTRUCT ps;
-	BeginPaint(hwnd, &ps);
-
-	SetBkMode(ps.hdc, OPAQUE);
-
-	HFONT hFont = CreateFont(
-		m_Font.GetSizeInPixels(), 
-		0, 
-		0, 
-		0, 
-		m_Font.IsBold() ? FW_BOLD : FW_NORMAL, 
-		m_Font.IsItalic(), 
-		m_Font.IsUnderline(), 
-		m_Font.IsStrikeOut(), 
-		ANSI_CHARSET,
-		OUT_TT_PRECIS, 
-		CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
-		DEFAULT_PITCH | FF_DONTCARE, 
-		m_Font.GetName().c_str());
-
-	SelectObject(ps.hdc, hFont);
+	auto hwnd = static_cast<HWND>(Handle.ToPointer());
+	auto hdc = static_cast<HDC>(graphics.GetHDC().ToPointer());
 
 	SIZE s;
-	GetTextExtentPoint32(ps.hdc, Text.c_str(), static_cast<int>(Text.length()), &s);
+	GetTextExtentPoint32(hdc, Text.c_str(), static_cast<int>(Text.length()), &s);
 	Resize(Size(s.cx + m_Margin.Left + m_Margin.Right + 8, s.cy + m_Margin.Top + m_Margin.Bottom + 2));
 
 	RECT r;
@@ -45,13 +26,13 @@ void Label::OnPaint_Impl(HWND hwnd) noexcept
 		HGDIOBJ old_pen;
 
 		pen = CreatePen(PS_INSIDEFRAME, 1, RGB(99, 103, 99));
-		old_pen = SelectObject(ps.hdc, pen);
-		Rectangle(ps.hdc, r.left, r.top, r.right, r.bottom);
+		old_pen = SelectObject(hdc, pen);
+		Rectangle(hdc, r.left, r.top, r.right, r.bottom);
 
 		//Clean up
-		SelectObject(ps.hdc, old_pen);
+		SelectObject(hdc, old_pen);
 		DeleteObject(old_pen);
-		SelectObject(ps.hdc, pen);
+		SelectObject(hdc, pen);
 		DeleteObject(pen);
 
 		// Adjust padding for text
@@ -69,13 +50,13 @@ void Label::OnPaint_Impl(HWND hwnd) noexcept
 
 		// Draw white border part
 		pen = CreatePen(PS_INSIDEFRAME, 1, RGB(255, 255, 255));
-		old_pen = SelectObject(ps.hdc, pen);
-		Rectangle(ps.hdc, r.left, r.top, r.right, r.bottom);
+		old_pen = SelectObject(hdc, pen);
+		Rectangle(hdc, r.left, r.top, r.right, r.bottom);
 
 		// Draw gray border part
 		pen = CreatePen(PS_INSIDEFRAME, 1, RGB(160, 160, 160));
-		old_pen = SelectObject(ps.hdc, pen);
-		Rectangle(ps.hdc, r.left, r.top, r.right - 1 , r.bottom - 1);
+		old_pen = SelectObject(hdc, pen);
+		Rectangle(hdc, r.left, r.top, r.right - 1, r.bottom - 1);
 
 		// Adjust padding for text
 		r.left += 1;
@@ -84,9 +65,9 @@ void Label::OnPaint_Impl(HWND hwnd) noexcept
 		r.bottom -= 1;
 
 		//Clean up
-		SelectObject(ps.hdc, old_pen);
+		SelectObject(hdc, old_pen);
 		DeleteObject(old_pen);
-		SelectObject(ps.hdc, pen);
+		SelectObject(hdc, pen);
 		DeleteObject(pen);
 
 		break;
@@ -102,8 +83,8 @@ void Label::OnPaint_Impl(HWND hwnd) noexcept
 	}
 
 	HBRUSH bgColor = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-	FillRect(ps.hdc, &r, bgColor);
-	SelectObject(ps.hdc, bgColor);
+	FillRect(hdc, &r, bgColor);
+	SelectObject(hdc, bgColor);
 	DeleteObject(bgColor);
 
 	r.left += m_Margin.Left;
@@ -122,13 +103,10 @@ void Label::OnPaint_Impl(HWND hwnd) noexcept
 	//r.top += (spacingForAlignment / 2) - 4;	// 4 Pixels extra for small TextBox and underline characteres
 
 	// Draw label text
-	SetBkMode(ps.hdc, TRANSPARENT);
-	SetTextColor(ps.hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-	DrawText(ps.hdc, Text.c_str(), -1, &r, DT_LEFT | DT_VCENTER);
-	DrawText(ps.hdc, Text.c_str(), static_cast<int>(Text.length()), &r, DT_LEFT | DT_VCENTER | DT_CALCRECT);
-	DeleteObject(hFont);
-
-	EndPaint(hwnd, &ps);
+	SetBkMode(hdc, TRANSPARENT);
+	SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
+	DrawText(hdc, Text.c_str(), -1, &r, DT_LEFT | DT_VCENTER);
+	DrawText(hdc, Text.c_str(), static_cast<int>(Text.length()), &r, DT_LEFT | DT_VCENTER | DT_CALCRECT);
 }
 
 Label::Label(Control* parent, const std::string& text, int x, int y)

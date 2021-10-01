@@ -1,656 +1,30 @@
 ﻿#include "TextBox.h"
 
-int TextBox::OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept
+void TextBox::PreDraw(const Graphics& graphics)
 {
-	return 1;   // Returns 1 to avoid flickering
+	Resize(CalculateSizeByFont());
+	WinAPI::PreDraw(graphics);
 }
 
-int TextBox::OnGetDLGCode_Impl(HWND hwnd, LPMSG msg) noexcept
-{
-	return DLGC_WANTALLKEYS | DLGC_WANTARROWS;
-}
-
-void TextBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept
-{
-	/**************************************************************************************************/
-	/* This is the most important function of the TextBox class. It's responsible to manage the user
-	input between the cursor and selection. By doing it so, it manages all navigation inside the TextBox
-	while handles and stores the indices for common delete operations, using Backspace and Delete keys.
-
-	To understand how selection and cursor index works:
-
-		OnEnter
-
-		Cursor:		        ↓
-		Select:		        ↓
-		Index:		0 1 2 3 4 5 6 7
-		Text:		T e x t B o x \0
-
-		OnLeftKeyPress (WITHOUT SHIFT)
-
-		Cursor:		      ↓					Can't go lesser than 0
-		Select:		      ↓					Can't go lesser than 0
-		Index:		0 1 2 3 4 5 6 7
-		Text:		T e x t B o x \0
-
-		OnLeftKeyPress (WITH SHIFT)
-
-		Cursor:		    ↓					Can't go lesser than 0
-		Select:		        ↓
-		Index:		0 1 2 3 4 5 6 7
-		Text:		T e x t B o x \0
-
-		OnRightKeyPress (WITHOUT SHIFT)
-
-		Cursor:		          ↓				Can't go higher than the string.length() = '\0'
-		Select:		          ↓				Can't go higher than the string.length() = '\0'
-		Index:		0 1 2 3 4 5 6 7
-		Text:		T e x t B o x \0
-
-		OnLeftKeyPress (WITH SHIFT)
-
-		Cursor:		            ↓			Can't go higher than the string.length() = '\0'
-		Select:		        ↓
-		Index:		0 1 2 3 4 5 6 7
-		Text:		T e x t B o x \0
-
-	/**************************************************************************************************/
-
-	switch (vk)
-	{
-	case 'A':		// Gives the TextBox the CTRL+A feature to select all text from the control
-	{
-		if (0x8000 & GetKeyState(VK_CONTROL))
-		{
-			m_SelectIndex = 0;
-			m_CursorIndex = Text.length();
-		}
-
-		InputRedraw(hwnd);
-		break;
-	}
-	case 'V':		// Gives the TextBox the CTRL+V feature to paste the data from the clipboard to the control
-	{
-		if (0x8000 & GetKeyState(VK_CONTROL))
-		{
-			PasteFromClipboard();
-		}
-
-		InputRedraw(hwnd);
-		break;
-	}
-	case 'C':		// Gives the TextBox the CTRL+C feature to copy the text from the control to the clipboard
-	{
-		if (0x8000 & GetKeyState(VK_CONTROL))
-		{
-			CopyToClipboard();
-		}
-
-		InputRedraw(hwnd);
-		break;
-	}
-	case 'X':		// Gives the TextBox the CTRL+X feature to cut the text from the control to the clipboard
-	{
-		if (0x8000 & GetKeyState(VK_CONTROL))
-		{
-			CopyToClipboard();
-			InputDelete(hwnd, DeleteInputType::CutAndPaste);
-		}
-
-		InputRedraw(hwnd);
-		break;
-	}
-	case VK_LEFT:	// Gives the TextBox the Navigation to Left feature by using the Left Arrow
-	{
-		// Doesn't let user go lower than index 0 if it's already at the beginning of the string
-		if (m_CursorIndex == 0 && m_SelectIndex == 0)
-		{
-			break;
-		}
-
-		// SHIFT + CONTROL Press
-		if ((GetKeyState(VK_CONTROL) & 0x8000) && (GetKeyState(VK_SHIFT) & 0x8000))
-		{
-			m_SelectIndex = 0;
-			InputRedraw(hwnd);
-			break;
-		}
-
-		// CONTROL Press
-		if ((GetKeyState(VK_CONTROL) & 0x8000))
-		{
-			m_SelectIndex = m_CursorIndex = 0;
-			InputRedraw(hwnd);
-			break;
-		}
-
-		// Shift Press
-		if ((GetKeyState(VK_SHIFT) & 0x8000))
-		{
-			if (m_SelectIndex > 0)
-			{
-				--m_SelectIndex;
-			}
-
-			InputRedraw(hwnd);
-			break;
-		}
-
-		// No Modifier Pressed
-		if (m_CursorIndex == m_SelectIndex)
-		{
-			--m_CursorIndex;
-			m_SelectIndex = m_CursorIndex;
-		}
-		else
-		{
-			if (m_SelectIndex == Text.length() || m_SelectIndex > m_CursorIndex)
-			{
-				m_SelectIndex = m_CursorIndex;
-			}
-			else
-			{
-				m_CursorIndex = m_SelectIndex;
-			}
-		}
-
-		InputRedraw(hwnd);
-		break;
-	}
-	case VK_RIGHT:	// Gives the TextBox the Navigation to Right feature by using the Right Arrow
-	{
-		// Doesn't let user get out of string if it's already at the end
-		if (m_CursorIndex == Text.length() && m_SelectIndex == Text.length())
-		{
-			break;
-		}
-
-		// SHIFT + CONTROL Press
-		if ((GetKeyState(VK_CONTROL) & 0x8000) && (GetKeyState(VK_SHIFT) & 0x8000))
-		{
-			m_SelectIndex = Text.length();
-			InputRedraw(hwnd);
-			break;
-		}
-
-		// CONTROL Press
-		if ((GetKeyState(VK_CONTROL) & 0x8000))
-		{
-			m_SelectIndex = m_CursorIndex = Text.length();
-			InputRedraw(hwnd);
-			break;
-		}
-
-		// SHIFT Press
-		if ((GetKeyState(VK_SHIFT) & 0x8000))
-		{
-			if (m_SelectIndex < Text.length())
-			{
-				++m_SelectIndex;
-			}
-
-			InputRedraw(hwnd);
-			break;
-		}
-
-		// No Modifier Pressed
-		if (m_CursorIndex == m_SelectIndex)
-		{
-			++m_CursorIndex;
-			m_SelectIndex = m_CursorIndex;
-		}
-		else
-		{
-			if (m_SelectIndex == 0 || m_SelectIndex < m_CursorIndex)
-			{
-				m_SelectIndex = m_CursorIndex;
-			}
-			else
-			{
-				m_CursorIndex = m_SelectIndex;
-			}
-		}
-
-		InputRedraw(hwnd);
-		break;
-	}
-	case VK_HOME:	// Allows the user to go to the beginning of the TextBox by pressing Home
-	{
-		if ((GetKeyState(VK_SHIFT) & 0x8000))
-		{
-			m_SelectIndex = 0;
-		}
-		else
-		{
-			m_CursorIndex = m_SelectIndex = 0;
-		}
-
-		InputRedraw(hwnd);
-		break;
-	}
-	case VK_END:	// Allows the user to go to the end of the TextBox by pressing End
-	{
-		if ((GetKeyState(VK_SHIFT) & 0x8000))
-		{
-			m_SelectIndex = Text.length();
-		}
-		else
-		{
-			m_CursorIndex = m_SelectIndex = Text.length();
-		}
-
-		InputRedraw(hwnd);
-		break;
-	}
-	case VK_DELETE:	// Gives the TextBox the feature to remove forward keys by pressing Delete
-	{
-		InputDelete(hwnd, DeleteInputType::Delete);
-		InputRedraw(hwnd);
-		break;
-	}
-	case VK_BACK:	// Gives the TextBox the feature to remove backward keys by pressing Backspace
-	{
-		// If CTRL+Backspace is pressed, clear the whole TextBox
-		if (0x8000 & GetKeyState(VK_CONTROL))
-		{
-			m_SelectIndex = 0;
-			m_CursorIndex = Text.length();
-		}
-
-		InputDelete(hwnd, DeleteInputType::Backspace);
-		InputRedraw(hwnd);
-		break;
-	}
-	}
-
-	Control::OnKeyDown_Impl(hwnd, vk, cRepeat, flags);
-}
-
-void TextBox::OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat) noexcept
-{
-	// Break processing if TextBox is multiline and ENTER is pressed
-	if (!m_IsMultiline && (c == '\r' || c == '\n'))
-	{
-		return;
-	}
-
-	// Skip key input if TAB (Switch tabbing) or Backspace (Remove last character) is pressed
-	if (c == VK_TAB || c == VK_BACK)
-	{
-		return;
-	}
-
-	// Block key input if CTRL key is pressed. Only CTRL+A, CTRL+C, CTRL+V and CTRL+X is allowed 
-	if (0x8000 & GetKeyState(VK_CONTROL))
-	{
-		return;
-	}
-
-	Control::OnKeyPressed_Impl(hwnd, c, cRepeat);
-
-	// Avoid key input if event is canceled
-	if (ArgsOnKeyPressed.Handled)
-	{
-		return;
-	}
-
-	if (Text.length() < m_MaximumLenght)
-	{
-		if (m_CursorIndex == m_SelectIndex)
-		{
-			Text.insert(m_CursorIndex, 1, c);
-			++m_CursorIndex;
-		}
-		else
-		{
-			size_t start = (std::min)(m_CursorIndex, m_SelectIndex);
-			size_t end = (std::max)(m_CursorIndex, m_SelectIndex);
-			Text.erase(start, end - start);
-			Text.insert(start, 1, c);
-			m_CursorIndex = start + 1;
-		}
-
-		m_SelectIndex = m_CursorIndex;
-	}
-
-	InputRedraw(hwnd);
-
-	if (Parent != nullptr)
-	{
-		HandleMessageForwarder(static_cast<HWND>(Parent->Handle.ToPointer()), WM_CHAR, c, MAKELPARAM(cRepeat, 0));
-	}
-}
-
-void TextBox::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
-{
-	if (Text.length() == 0)
-	{
-		return;
-	}
-
-	if (x > m_CaretPosition.back())
-	{
-		m_CursorIndex = Text.length();
-	}
-	else if (x < m_CaretPosition.front())
-	{
-		m_CursorIndex = 0;
-	}
-	else
-	{
-		const auto idx = std::lower_bound(m_CaretPosition.begin(), m_CaretPosition.end(), x);
-		m_CursorIndex = idx - m_CaretPosition.begin();
-	}
-
-	m_SelectIndex = m_CursorIndex;
-
-	Control::OnMouseLeftDown_Impl(hwnd, x, y, keyFlags);
-}
-
-void TextBox::OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
-{
-	if (IsClicking())
-	{
-		if (keyFlags & MK_LBUTTON)
-		{
-			if (x > m_CaretPosition.back())
-			{
-				m_SelectIndex = Text.length();
-			}
-			else if (x < m_CaretPosition.front())
-			{
-				m_SelectIndex = 0;
-			}
-			else
-			{
-				const auto idx = std::lower_bound(m_CaretPosition.begin(), m_CaretPosition.end(), x);
-				m_SelectIndex = idx - m_CaretPosition.begin();
-			}
-		}
-
-		Update();
-		InputRedraw(hwnd);
-	}
-
-	Control::OnMouseMove_Impl(hwnd, x, y, keyFlags);
-}
-
-void TextBox::OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept
-{
-	// Create a solid black caret. 
-	CreateCaret(hwnd, (HBITMAP)NULL, 2, m_Font.GetSizeInPixels());
-	EnableCaret();
-	InputRedraw(hwnd);
-
-	Control::OnFocusEnter_Impl(hwnd, hwndOldFocus);
-}
-
-void TextBox::OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept
-{
-	SetFocus(hwndNewFocus);
-	DisableCaret();
-	DestroyCaret();
-
-	Control::OnFocusLeave_Impl(hwnd, hwndNewFocus);
-}
-
-void TextBox::OnPaint_Impl(HWND hWnd) noexcept
-{
-	PAINTSTRUCT paint;
-
-	BeginPaint(hWnd, &paint);
-	InputDraw(hWnd, paint.hdc);
-	EndPaint(hWnd, &paint);
-}
-
-void TextBox::CalculateCaret(HWND hwnd, const HDC& hdc) noexcept
-{
-	if (Text.length() == 0)
-	{
-		return;
-	}
-
-	// Not the best solution for now.
-	// At least it calculates using the right values
-	m_CaretPosition.clear();
-
-	if (m_CaretPosition.size() < Text.length() + 1)
-	{
-		m_CaretPosition.resize(Text.length() + 1, 0ul);
-	}
-
-	for (int i = 0; i <= static_cast<int>(Text.length()); ++i)
-	{
-		if (i > 0)
-		{
-			SIZE s;
-			GetTextExtentPoint32(hdc, Text.substr(0, i).c_str(), i, &s);
-			m_CaretPosition[i] = s.cx;
-		}
-
-		switch (BorderStyle)
-		{
-		case BorderStyle::None: m_CaretPosition[i] += m_Margin.Left; break;
-		case BorderStyle::FixedSingle: m_CaretPosition[i] += m_Margin.Left + 1; break;
-		case BorderStyle::Fixed3D: m_CaretPosition[i] += m_Margin.Left + 2; break;
-		}
-	}
-}
-
-void TextBox::CopyToClipboard() const noexcept
-{
-	if (OpenClipboard(static_cast<HWND>(Handle.ToPointer())))
-	{
-		size_t start = 0;
-		size_t end = 0;
-
-		if (m_SelectIndex < m_CursorIndex)
-		{
-			start = m_SelectIndex;
-			end = m_CursorIndex;
-		}
-		else
-		{
-			start = m_CursorIndex;
-			end = m_SelectIndex;
-		}
-
-		HGLOBAL clipbuffer = NULL;
-		char* buffer = NULL;
-		EmptyClipboard();
-		clipbuffer = GlobalAlloc(GMEM_DDESHARE, end - start + 1);
-		if (clipbuffer != NULL)
-		{
-			buffer = reinterpret_cast<char*>(GlobalLock(clipbuffer));
-			if (buffer != NULL)
-			{
-				strcpy_s(buffer, end - start + 1, Text.substr(start, end - start).c_str());
-			}
-			GlobalUnlock(clipbuffer);
-			SetClipboardData(CF_TEXT, clipbuffer);
-		}
-		CloseClipboard();
-	}
-}
-
-void TextBox::PasteFromClipboard() noexcept
-{
-	OpenClipboard(NULL);
-	HANDLE h = GetClipboardData(CF_TEXT);
-
-	InputDelete(static_cast<HWND>(Handle.ToPointer()), DeleteInputType::CutAndPaste);
-
-	// Paste data from clipboard
-	std::ostringstream cb;
-	cb << reinterpret_cast<char*>(GlobalLock(h));
-
-	if (cb)
-	{
-		Text.insert(m_CursorIndex, cb.str());
-
-		m_CursorIndex += cb.str().length();
-		m_SelectIndex = m_CursorIndex;
-	}
-
-	GlobalUnlock(h);
-	CloseClipboard();
-}
-
-void TextBox::EnableCaret() noexcept
-{
-	if (!m_IsCaretVisible)
-	{
-		ShowCaret(static_cast<HWND>(Handle.ToPointer()));
-		m_IsCaretVisible = true;
-	}
-}
-
-void TextBox::DisableCaret() noexcept
-{
-	if (m_IsCaretVisible)
-	{
-		HideCaret(static_cast<HWND>(Handle.ToPointer()));
-		m_IsCaretVisible = false;
-	}
-}
-
-void TextBox::PrintDebug() const noexcept
-{
-	std::ostringstream oss;
-	oss << "Cursor: ";
-	for (int i = 0; i < static_cast<int>(m_CursorIndex); ++i) oss << "   ";
-	oss << " | " << std::endl;
-	oss << "Select: ";
-	for (int i = 0; i < static_cast<int>(m_SelectIndex); ++i) oss << "   ";
-	oss << " | " << std::endl;
-	oss << "  Text: ";
-	for (int i = 0; i < static_cast<int>(Text.size()); ++i) oss << " " << Text[i] << " ";
-	oss << "\\0" << std::endl;
-	printf_s(oss.str().c_str());
-}
-
-void TextBox::InputDelete(HWND hWnd, DeleteInputType deleteType) noexcept
-{
-	// Will try to optimize this layer.
-	// The important part now is to make it work.
-	switch (deleteType)
-	{
-	case DeleteInputType::Backspace:
-	{
-		// Does nothing if backspace is pressed on the beginning of the string
-		if (m_SelectIndex == 0 && m_CursorIndex == 0)
-		{
-			return;
-		}
-
-		if (m_SelectIndex < m_CursorIndex)
-		{
-			Text.erase(m_SelectIndex, GetSelectionLenght());
-			m_CursorIndex = m_SelectIndex;
-		}
-		else if (m_SelectIndex > m_CursorIndex)
-		{
-			Text.erase(m_CursorIndex, GetSelectionLenght());
-			m_SelectIndex = m_CursorIndex;
-		}
-		else
-		{
-			Text.erase(m_CursorIndex - 1, 1);
-
-			if (m_SelectIndex > 0)
-			{
-				--m_SelectIndex;
-				--m_CursorIndex;
-			}
-		}
-
-		break;
-	}
-	case DeleteInputType::Delete:
-	{
-		// Does nothing if delete is pressed on the end of the string
-		if (m_SelectIndex == Text.size() && m_CursorIndex == Text.size())
-		{
-			return;
-		}
-
-		if (m_SelectIndex < m_CursorIndex)
-		{
-			Text.erase(m_SelectIndex, GetSelectionLenght());
-			m_CursorIndex = m_SelectIndex;
-		}
-		else if (m_SelectIndex > m_CursorIndex)
-		{
-			Text.erase(m_CursorIndex, GetSelectionLenght());
-			m_SelectIndex = m_CursorIndex;
-		}
-		else
-		{
-			// Delete doesn't move cursor when used
-			Text.erase(m_CursorIndex, 1);
-		}
-
-		break;
-	}
-	case DeleteInputType::CutAndPaste:
-	{
-		if (m_SelectIndex == m_CursorIndex)
-		{
-			return;
-		}
-
-		if (m_SelectIndex < m_CursorIndex)
-		{
-			Text.erase(m_SelectIndex, GetSelectionLenght());
-			m_CursorIndex = m_SelectIndex;
-		}
-		else if (m_SelectIndex > m_CursorIndex)
-		{
-			Text.erase(m_CursorIndex, GetSelectionLenght());
-			m_SelectIndex = m_CursorIndex;
-		}
-		break;
-	}
-	}
-}
-
-void TextBox::InputRedraw(HWND hWnd) noexcept
-{
-	HDC hdc = GetDC(hWnd);
-	InputDraw(hWnd, hdc);
-	ReleaseDC(hWnd, hdc);
-	DeleteDC(hdc);
-}
-
-void TextBox::InputDraw(HWND hWnd, HDC& hdc) noexcept
+void TextBox::Draw(const Graphics& graphics, Drawing::Rectangle rectangle)
 {
 #ifdef _DEBUG
 	PrintDebug(); // Show string, cursor and selection indices on Output Window
 #endif
 
-	Resize(CalculateSizeByFont());
+	auto hwnd = static_cast<HWND>(Handle.ToPointer());
+	auto hdc = static_cast<HDC>(graphics.GetHDC().ToPointer());
 
 	HDC hdcMem = CreateCompatibleDC(hdc);
 	HBITMAP hbmMem = CreateCompatibleBitmap(hdc, m_Size.Width, m_Size.Height);
 	HBITMAP hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
 
-	HFONT hFont = CreateFont(m_Font.GetSizeInPixels(), 
-		0, 
-		0, 
-		0, 
-		m_Font.IsBold() ? FW_BOLD : FW_NORMAL, 
-		m_Font.IsItalic(), 
-		m_Font.IsUnderline(), 
-		m_Font.IsStrikeOut(),
-		ANSI_CHARSET,
-		OUT_TT_PRECIS, 
-		CLIP_DEFAULT_PRECIS, 
-		DEFAULT_QUALITY,
-		DEFAULT_PITCH | FF_DONTCARE, 
-		m_Font.GetName().c_str());
+	// Select current font
+	auto hFont = Fonts->find(m_Font.ToString());
+	SelectObject(hdcMem, hFont->second);
 
 	RECT r, cr;
-	GetClientRect(hWnd, &cr);
+	GetClientRect(hwnd, &cr);
 
 	// Create TextBox border
 	switch (BorderStyle)
@@ -760,10 +134,9 @@ void TextBox::InputDraw(HWND hWnd, HDC& hdc) noexcept
 	//cr.top += (cr.top + Font.GetSizeInPixels()) / 2;
 
 	CopyRect(&r, &cr);
-	SelectObject(hdcMem, hFont);
 
 	// Recalculate Caret position for each character
-	CalculateCaret(hWnd, hdcMem);
+	CalculateCaret(hwnd, hdcMem);
 
 	// Draw for when control is selected and cursor index is the same as select index
 	if (!m_IsTabSelected || m_CursorIndex == m_SelectIndex)
@@ -785,7 +158,7 @@ void TextBox::InputDraw(HWND hWnd, HDC& hdc) noexcept
 	}
 
 	// Caret position for after
-	if (GetFocus() == hWnd)
+	if (GetFocus() == hwnd)
 	{
 		std::ostringstream oss;
 
@@ -818,10 +191,618 @@ void TextBox::InputDraw(HWND hWnd, HDC& hdc) noexcept
 	DeleteObject(hbmOld);
 	SelectObject(hdcMem, hbmOld);
 	DeleteObject(hbmMem);
-	SelectObject(hdcMem, hFont);
-	DeleteObject(hFont);
-	ReleaseDC(hWnd, hdcMem);
+	ReleaseDC(hwnd, hdcMem);
 	DeleteDC(hdcMem);
+}
+
+int TextBox::OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept
+{
+	return 1;   // Returns 1 to avoid flickering
+}
+
+int TextBox::OnGetDLGCode_Impl(HWND hwnd, LPMSG msg) noexcept
+{
+	return DLGC_WANTALLKEYS | DLGC_WANTARROWS;
+}
+
+void TextBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept
+{
+	/**************************************************************************************************/
+	/* This is the most important function of the TextBox class. It's responsible to manage the user
+	input between the cursor and selection. By doing it so, it manages all navigation inside the TextBox
+	while handles and stores the indices for common delete operations, using Backspace and Delete keys.
+
+	To understand how selection and cursor index works:
+
+		OnEnter
+
+		Cursor:		        ↓
+		Select:		        ↓
+		Index:		0 1 2 3 4 5 6 7
+		Text:		T e x t B o x \0
+
+		OnLeftKeyPress (WITHOUT SHIFT)
+
+		Cursor:		      ↓					Can't go lesser than 0
+		Select:		      ↓					Can't go lesser than 0
+		Index:		0 1 2 3 4 5 6 7
+		Text:		T e x t B o x \0
+
+		OnLeftKeyPress (WITH SHIFT)
+
+		Cursor:		    ↓					Can't go lesser than 0
+		Select:		        ↓
+		Index:		0 1 2 3 4 5 6 7
+		Text:		T e x t B o x \0
+
+		OnRightKeyPress (WITHOUT SHIFT)
+
+		Cursor:		          ↓				Can't go higher than the string.length() = '\0'
+		Select:		          ↓				Can't go higher than the string.length() = '\0'
+		Index:		0 1 2 3 4 5 6 7
+		Text:		T e x t B o x \0
+
+		OnLeftKeyPress (WITH SHIFT)
+
+		Cursor:		            ↓			Can't go higher than the string.length() = '\0'
+		Select:		        ↓
+		Index:		0 1 2 3 4 5 6 7
+		Text:		T e x t B o x \0
+
+	/**************************************************************************************************/
+
+	switch (vk)
+	{
+	case 'A':		// Gives the TextBox the CTRL+A feature to select all text from the control
+	{
+		if (0x8000 & GetKeyState(VK_CONTROL))
+		{
+			m_SelectIndex = 0;
+			m_CursorIndex = Text.length();
+		}
+
+		InputRedraw();
+		break;
+	}
+	case 'V':		// Gives the TextBox the CTRL+V feature to paste the data from the clipboard to the control
+	{
+		if (0x8000 & GetKeyState(VK_CONTROL))
+		{
+			PasteFromClipboard();
+		}
+
+		InputRedraw();
+		break;
+	}
+	case 'C':		// Gives the TextBox the CTRL+C feature to copy the text from the control to the clipboard
+	{
+		if (0x8000 & GetKeyState(VK_CONTROL))
+		{
+			CopyToClipboard();
+		}
+
+		InputRedraw();
+		break;
+	}
+	case 'X':		// Gives the TextBox the CTRL+X feature to cut the text from the control to the clipboard
+	{
+		if (0x8000 & GetKeyState(VK_CONTROL))
+		{
+			CopyToClipboard();
+			InputDelete(DeleteInputType::CutAndPaste);
+		}
+
+		InputRedraw();
+		break;
+	}
+	case VK_LEFT:	// Gives the TextBox the Navigation to Left feature by using the Left Arrow
+	{
+		// Doesn't let user go lower than index 0 if it's already at the beginning of the string
+		if (m_CursorIndex == 0 && m_SelectIndex == 0)
+		{
+			break;
+		}
+
+		// SHIFT + CONTROL Press
+		if ((GetKeyState(VK_CONTROL) & 0x8000) && (GetKeyState(VK_SHIFT) & 0x8000))
+		{
+			m_SelectIndex = 0;
+			InputRedraw();
+			break;
+		}
+
+		// CONTROL Press
+		if ((GetKeyState(VK_CONTROL) & 0x8000))
+		{
+			m_SelectIndex = m_CursorIndex = 0;
+			InputRedraw();
+			break;
+		}
+
+		// Shift Press
+		if ((GetKeyState(VK_SHIFT) & 0x8000))
+		{
+			if (m_SelectIndex > 0)
+			{
+				--m_SelectIndex;
+			}
+
+			InputRedraw();
+			break;
+		}
+
+		// No Modifier Pressed
+		if (m_CursorIndex == m_SelectIndex)
+		{
+			--m_CursorIndex;
+			m_SelectIndex = m_CursorIndex;
+		}
+		else
+		{
+			if (m_SelectIndex == Text.length() || m_SelectIndex > m_CursorIndex)
+			{
+				m_SelectIndex = m_CursorIndex;
+			}
+			else
+			{
+				m_CursorIndex = m_SelectIndex;
+			}
+		}
+
+		InputRedraw();
+		break;
+	}
+	case VK_RIGHT:	// Gives the TextBox the Navigation to Right feature by using the Right Arrow
+	{
+		// Doesn't let user get out of string if it's already at the end
+		if (m_CursorIndex == Text.length() && m_SelectIndex == Text.length())
+		{
+			break;
+		}
+
+		// SHIFT + CONTROL Press
+		if ((GetKeyState(VK_CONTROL) & 0x8000) && (GetKeyState(VK_SHIFT) & 0x8000))
+		{
+			m_SelectIndex = Text.length();
+			InputRedraw();
+			break;
+		}
+
+		// CONTROL Press
+		if ((GetKeyState(VK_CONTROL) & 0x8000))
+		{
+			m_SelectIndex = m_CursorIndex = Text.length();
+			InputRedraw();
+			break;
+		}
+
+		// SHIFT Press
+		if ((GetKeyState(VK_SHIFT) & 0x8000))
+		{
+			if (m_SelectIndex < Text.length())
+			{
+				++m_SelectIndex;
+			}
+
+			InputRedraw();
+			break;
+		}
+
+		// No Modifier Pressed
+		if (m_CursorIndex == m_SelectIndex)
+		{
+			++m_CursorIndex;
+			m_SelectIndex = m_CursorIndex;
+		}
+		else
+		{
+			if (m_SelectIndex == 0 || m_SelectIndex < m_CursorIndex)
+			{
+				m_SelectIndex = m_CursorIndex;
+			}
+			else
+			{
+				m_CursorIndex = m_SelectIndex;
+			}
+		}
+
+		InputRedraw();
+		break;
+	}
+	case VK_HOME:	// Allows the user to go to the beginning of the TextBox by pressing Home
+	{
+		if ((GetKeyState(VK_SHIFT) & 0x8000))
+		{
+			m_SelectIndex = 0;
+		}
+		else
+		{
+			m_CursorIndex = m_SelectIndex = 0;
+		}
+
+		InputRedraw();
+		break;
+	}
+	case VK_END:	// Allows the user to go to the end of the TextBox by pressing End
+	{
+		if ((GetKeyState(VK_SHIFT) & 0x8000))
+		{
+			m_SelectIndex = Text.length();
+		}
+		else
+		{
+			m_CursorIndex = m_SelectIndex = Text.length();
+		}
+
+		InputRedraw();
+		break;
+	}
+	case VK_DELETE:	// Gives the TextBox the feature to remove forward keys by pressing Delete
+	{
+		InputDelete(DeleteInputType::Delete);
+		InputRedraw();
+		break;
+	}
+	case VK_BACK:	// Gives the TextBox the feature to remove backward keys by pressing Backspace
+	{
+		// If CTRL+Backspace is pressed, clear the whole TextBox
+		if (0x8000 & GetKeyState(VK_CONTROL))
+		{
+			m_SelectIndex = 0;
+			m_CursorIndex = Text.length();
+		}
+
+		InputDelete(DeleteInputType::Backspace);
+		InputRedraw();
+		break;
+	}
+	}
+
+	Control::OnKeyDown_Impl(hwnd, vk, cRepeat, flags);
+}
+
+void TextBox::OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat) noexcept
+{
+	// Break processing if TextBox is multiline and ENTER is pressed
+	if (!m_IsMultiline && (c == '\r' || c == '\n'))
+	{
+		return;
+	}
+
+	// Skip key input if TAB (Switch tabbing) or Backspace (Remove last character) is pressed
+	if (c == VK_TAB || c == VK_BACK)
+	{
+		return;
+	}
+
+	// Block key input if CTRL key is pressed. Only CTRL+A, CTRL+C, CTRL+V and CTRL+X is allowed 
+	if (0x8000 & GetKeyState(VK_CONTROL))
+	{
+		return;
+	}
+
+	Control::OnKeyPressed_Impl(hwnd, c, cRepeat);
+
+	// Avoid key input if event is canceled
+	if (ArgsOnKeyPressed.Handled)
+	{
+		return;
+	}
+
+	if (Text.length() < m_MaximumLenght)
+	{
+		if (m_CursorIndex == m_SelectIndex)
+		{
+			Text.insert(m_CursorIndex, 1, c);
+			++m_CursorIndex;
+		}
+		else
+		{
+			size_t start = (std::min)(m_CursorIndex, m_SelectIndex);
+			size_t end = (std::max)(m_CursorIndex, m_SelectIndex);
+			Text.erase(start, end - start);
+			Text.insert(start, 1, c);
+			m_CursorIndex = start + 1;
+		}
+
+		m_SelectIndex = m_CursorIndex;
+	}
+
+	InputRedraw();
+
+	if (Parent != nullptr)
+	{
+		HandleMessageForwarder(static_cast<HWND>(Parent->Handle.ToPointer()), WM_CHAR, c, MAKELPARAM(cRepeat, 0));
+	}
+}
+
+void TextBox::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
+{
+	if (Text.length() == 0)
+	{
+		return;
+	}
+
+	if (x > m_CaretPosition.back())
+	{
+		m_CursorIndex = Text.length();
+	}
+	else if (x < m_CaretPosition.front())
+	{
+		m_CursorIndex = 0;
+	}
+	else
+	{
+		const auto idx = std::lower_bound(m_CaretPosition.begin(), m_CaretPosition.end(), x);
+		m_CursorIndex = idx - m_CaretPosition.begin();
+	}
+
+	m_SelectIndex = m_CursorIndex;
+
+	Control::OnMouseLeftDown_Impl(hwnd, x, y, keyFlags);
+}
+
+void TextBox::OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
+{
+	if (IsClicking())
+	{
+		if (keyFlags & MK_LBUTTON)
+		{
+			if (x > m_CaretPosition.back())
+			{
+				m_SelectIndex = Text.length();
+			}
+			else if (x < m_CaretPosition.front())
+			{
+				m_SelectIndex = 0;
+			}
+			else
+			{
+				const auto idx = std::lower_bound(m_CaretPosition.begin(), m_CaretPosition.end(), x);
+				m_SelectIndex = idx - m_CaretPosition.begin();
+			}
+		}
+
+		Update();
+		InputRedraw();
+	}
+
+	Control::OnMouseMove_Impl(hwnd, x, y, keyFlags);
+}
+
+void TextBox::OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept
+{
+	// Create a solid black caret. 
+	CreateCaret(hwnd, (HBITMAP)NULL, 2, m_Font.GetSizeInPixels());
+	EnableCaret();
+	InputRedraw();
+
+	Control::OnFocusEnter_Impl(hwnd, hwndOldFocus);
+}
+
+void TextBox::OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept
+{
+	SetFocus(hwndNewFocus);
+	DisableCaret();
+	DestroyCaret();
+
+	Control::OnFocusLeave_Impl(hwnd, hwndNewFocus);
+}
+
+void TextBox::CalculateCaret(HWND hwnd, const HDC& hdc) noexcept
+{
+	if (Text.length() == 0)
+	{
+		return;
+	}
+
+	// Not the best solution for now.
+	// At least it calculates using the right values
+	m_CaretPosition.clear();
+
+	if (m_CaretPosition.size() < Text.length() + 1)
+	{
+		m_CaretPosition.resize(Text.length() + 1, 0ul);
+	}
+
+	for (int i = 0; i <= static_cast<int>(Text.length()); ++i)
+	{
+		if (i > 0)
+		{
+			SIZE s;
+			GetTextExtentPoint32(hdc, Text.substr(0, i).c_str(), i, &s);
+			m_CaretPosition[i] = s.cx;
+		}
+
+		switch (BorderStyle)
+		{
+		case BorderStyle::None: m_CaretPosition[i] += m_Margin.Left; break;
+		case BorderStyle::FixedSingle: m_CaretPosition[i] += m_Margin.Left + 1; break;
+		case BorderStyle::Fixed3D: m_CaretPosition[i] += m_Margin.Left + 2; break;
+		}
+	}
+}
+
+void TextBox::CopyToClipboard() const noexcept
+{
+	if (OpenClipboard(static_cast<HWND>(Handle.ToPointer())))
+	{
+		size_t start = 0;
+		size_t end = 0;
+
+		if (m_SelectIndex < m_CursorIndex)
+		{
+			start = m_SelectIndex;
+			end = m_CursorIndex;
+		}
+		else
+		{
+			start = m_CursorIndex;
+			end = m_SelectIndex;
+		}
+
+		HGLOBAL clipbuffer = NULL;
+		char* buffer = NULL;
+		EmptyClipboard();
+		clipbuffer = GlobalAlloc(GMEM_DDESHARE, end - start + 1);
+		if (clipbuffer != NULL)
+		{
+			buffer = reinterpret_cast<char*>(GlobalLock(clipbuffer));
+			if (buffer != NULL)
+			{
+				strcpy_s(buffer, end - start + 1, Text.substr(start, end - start).c_str());
+			}
+			GlobalUnlock(clipbuffer);
+			SetClipboardData(CF_TEXT, clipbuffer);
+		}
+		CloseClipboard();
+	}
+}
+
+void TextBox::PasteFromClipboard() noexcept
+{
+	OpenClipboard(NULL);
+	HANDLE h = GetClipboardData(CF_TEXT);
+
+	InputDelete(DeleteInputType::CutAndPaste);
+
+	// Paste data from clipboard
+	std::ostringstream cb;
+	cb << reinterpret_cast<char*>(GlobalLock(h));
+
+	if (cb)
+	{
+		Text.insert(m_CursorIndex, cb.str());
+
+		m_CursorIndex += cb.str().length();
+		m_SelectIndex = m_CursorIndex;
+	}
+
+	GlobalUnlock(h);
+	CloseClipboard();
+}
+
+void TextBox::EnableCaret() noexcept
+{
+	if (!m_IsCaretVisible)
+	{
+		ShowCaret(static_cast<HWND>(Handle.ToPointer()));
+		m_IsCaretVisible = true;
+	}
+}
+
+void TextBox::DisableCaret() noexcept
+{
+	if (m_IsCaretVisible)
+	{
+		HideCaret(static_cast<HWND>(Handle.ToPointer()));
+		m_IsCaretVisible = false;
+	}
+}
+
+void TextBox::PrintDebug() const noexcept
+{
+	std::ostringstream oss;
+	oss << "Cursor: ";
+	for (int i = 0; i < static_cast<int>(m_CursorIndex); ++i) oss << "   ";
+	oss << " | " << std::endl;
+	oss << "Select: ";
+	for (int i = 0; i < static_cast<int>(m_SelectIndex); ++i) oss << "   ";
+	oss << " | " << std::endl;
+	oss << "  Text: ";
+	for (int i = 0; i < static_cast<int>(Text.size()); ++i) oss << " " << Text[i] << " ";
+	oss << "\\0" << std::endl;
+	printf_s(oss.str().c_str());
+}
+
+void TextBox::InputDelete(DeleteInputType deleteType) noexcept
+{
+	// Will try to optimize this layer.
+	// The important part now is to make it work.
+	switch (deleteType)
+	{
+	case DeleteInputType::Backspace:
+	{
+		// Does nothing if backspace is pressed on the beginning of the string
+		if (m_SelectIndex == 0 && m_CursorIndex == 0)
+		{
+			return;
+		}
+
+		if (m_SelectIndex < m_CursorIndex)
+		{
+			Text.erase(m_SelectIndex, GetSelectionLenght());
+			m_CursorIndex = m_SelectIndex;
+		}
+		else if (m_SelectIndex > m_CursorIndex)
+		{
+			Text.erase(m_CursorIndex, GetSelectionLenght());
+			m_SelectIndex = m_CursorIndex;
+		}
+		else
+		{
+			Text.erase(m_CursorIndex - 1, 1);
+
+			if (m_SelectIndex > 0)
+			{
+				--m_SelectIndex;
+				--m_CursorIndex;
+			}
+		}
+
+		break;
+	}
+	case DeleteInputType::Delete:
+	{
+		// Does nothing if delete is pressed on the end of the string
+		if (m_SelectIndex == Text.size() && m_CursorIndex == Text.size())
+		{
+			return;
+		}
+
+		if (m_SelectIndex < m_CursorIndex)
+		{
+			Text.erase(m_SelectIndex, GetSelectionLenght());
+			m_CursorIndex = m_SelectIndex;
+		}
+		else if (m_SelectIndex > m_CursorIndex)
+		{
+			Text.erase(m_CursorIndex, GetSelectionLenght());
+			m_SelectIndex = m_CursorIndex;
+		}
+		else
+		{
+			// Delete doesn't move cursor when used
+			Text.erase(m_CursorIndex, 1);
+		}
+
+		break;
+	}
+	case DeleteInputType::CutAndPaste:
+	{
+		if (m_SelectIndex == m_CursorIndex)
+		{
+			return;
+		}
+
+		if (m_SelectIndex < m_CursorIndex)
+		{
+			Text.erase(m_SelectIndex, GetSelectionLenght());
+			m_CursorIndex = m_SelectIndex;
+		}
+		else if (m_SelectIndex > m_CursorIndex)
+		{
+			Text.erase(m_CursorIndex, GetSelectionLenght());
+			m_SelectIndex = m_CursorIndex;
+		}
+		break;
+	}
+	}
+}
+
+void TextBox::InputRedraw() noexcept
+{
+	Update();
 }
 
 void TextBox::PaintSelection(HDC& hdc, RECT& r, size_t start, size_t end) const noexcept

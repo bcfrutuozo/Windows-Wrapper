@@ -14,8 +14,7 @@ protected:
 	int Scrolling;
 	int MaximumValue;
 
-	int OnEraseBackground_Impl(HWND hwnd, HDC hdc) override;
-	void OnPaint_Impl(HWND hwnd) override;
+	void Draw(const Graphics& graphics, Drawing::Rectangle rectangle) override;
 
 	ScrollBar(ScrollableControl* parent, int width, int height, int x, int y);
 

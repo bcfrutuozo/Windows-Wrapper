@@ -27,6 +27,6 @@ protected:
 public:
 
 	virtual void Initialize() = 0;
-	static void TryCloseApplication() noexcept;
+	static bool CanCloseApplication() noexcept;
 	static void Exit() noexcept;
 };

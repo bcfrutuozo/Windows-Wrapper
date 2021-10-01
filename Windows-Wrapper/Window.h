@@ -31,8 +31,7 @@ private:
 	static void HideCursor() noexcept;
 	static void ShowCursor() noexcept;
 
-	// Events implementations
-	void OnPaint_Impl(HWND hwnd) noexcept override;
+	void Draw(const Graphics& graphics, Drawing::Rectangle rectangle) override;
 
 protected:
 

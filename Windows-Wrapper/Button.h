@@ -14,10 +14,10 @@ private:
 
 	void DrawBorder(HDC& hdc, RECT& rc);
 
+	void Draw(const Graphics& graphics, Drawing::Rectangle rectangle) override;
 	int OnEraseBackground_Impl(HWND hwnd, HDC hdc) override;
 	void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) override;
 	void OnKeyUp_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) override;
-	void OnPaint_Impl(HWND hwnd) override;
 
 	Button(Control* parent, const std::string& name, int width, int height, int x, int y);
 

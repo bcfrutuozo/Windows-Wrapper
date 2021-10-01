@@ -1,32 +1,18 @@
 #include "ToolStrip.h"
 
-void ToolStrip::OnPaint_Impl(HWND hWnd) noexcept
+void ToolStrip::Draw(const Graphics& graphics, Drawing::Rectangle rectangle)
 {
-	PAINTSTRUCT ps;
-	BeginPaint(hWnd, &ps);
-
-	HFONT hFont = CreateFont(m_Font.GetSizeInPixels(),
-		0, 
-		0, 
-		0, 
-		m_Font.IsBold() ? FW_BOLD : FW_NORMAL, 
-		m_Font.IsItalic(), 
-		m_Font.IsUnderline(), 
-		m_Font.IsStrikeOut(),
-		ANSI_CHARSET,
-		OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS,
-		DEFAULT_QUALITY,
-		DEFAULT_PITCH | FF_DONTCARE,
-		m_Font.GetName().c_str());
-
-	SendMessage(hWnd, WM_SETFONT, (WPARAM)hFont, TRUE);
+	auto hdc = static_cast<HDC>(graphics.GetHDC().ToPointer());
+	RECT rc = { 0 };
+	rc.left = rectangle.GetLeft();
+	rc.top = rectangle.GetTop();
+	rc.right = rectangle.GetRight();
+	rc.bottom = rectangle.GetBottom();
 
 	HBRUSH bgColor = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-	FillRect(ps.hdc, &ps.rcPaint, bgColor);
-	SelectObject(ps.hdc, bgColor);
+	FillRect(hdc, &rc, bgColor);
+	SelectObject(hdc, bgColor);
 	DeleteObject(bgColor);
-
-	EndPaint(hWnd, &ps);
 }
 
 ToolStrip::ToolStrip(Control* parent)
@@ -49,7 +35,7 @@ void ToolStrip::Initialize()
 	Handle = CreateWindow(
 		WindowClass::GetName(),																			// Class name
 		Text.c_str(),																						// Window title
-		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS,															// Style values
+		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,											// Style values
 		m_Location.X,																							// X position
 		m_Location.Y,																							// Y position
 		m_Size.Width,																						// Width

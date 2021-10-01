@@ -1,7 +1,6 @@
 #pragma once
 
 #include "WinAPI.h"
-#include "Color.h"
 #include "Utilities.h"
 #include "Padding.h"
 #include "EventHandler.h"
@@ -17,7 +16,6 @@
 #include "OnClosingEventArgs.h"
 #include "PaintEventArgs.h"
 #include "ControlException.h"
-#include "Graphics.h"
 
 #include <list>
 #include <memory>
@@ -40,8 +38,6 @@ private:
 
 	// Variable to check if control is tab selected
 	bool m_IsTabSelected;
-
-	bool m_IsVisible;
 
 	void OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) override;
 	void OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) override;
@@ -72,15 +68,10 @@ private:
 
 protected:
 
-	Point m_Location;
 	Control* Parent;
 	std::string Text;
-	Size m_Size;
-	Color m_ForeColor;
-	Color m_BackgroundColor;
 	Padding m_Margin;
 	Padding m_Padding;
-	Font m_Font;
 	unsigned int m_MinSize;
 
 	// Forces the implementation and call on individual childs because each WinApi control
@@ -101,17 +92,16 @@ protected:
 	Control(Control* parent, const std::string& text, int width, int height, int x, int y) noexcept;
 	Control(const std::string& text) noexcept;
 	Control(const std::string& text, int width, int height, int x, int y) noexcept;
-	Control(const Control&) = default;														// Copy constructor
-	Control(Control&&) = default;															// Move constructor
-	Control& operator=(const Control&) = default;											// Copy assignment constructor
-	Control& operator=(Control&&) = default;												// Move assignment constructor
+	Control(const Control&) = default;														
+	Control(Control&&) = default;															
+	Control& operator=(const Control&) = default;											
+	Control& operator=(Control&&) = default;												
 
 public:
 
 	std::list<Control*> Controls;
 
-	virtual ~Control() noexcept(false);																		// Destructor
-
+	virtual ~Control() noexcept(false);																		
 	void Dispose() override;
 
 	void OnActivateSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept;
@@ -139,16 +129,9 @@ public:
 	Size CalculateSizeByFont() noexcept;
 	bool IsEnabled() const noexcept override;
 	Window* GetWindow() noexcept;
-	Size GetSize() const noexcept;
-	void Resize(Size s) noexcept;
-	void Resize(int width, int height) noexcept;
 	Padding GetMargin() const noexcept;
 	Control* GetByTabIndex(const int& index) noexcept;
 	bool IsTabSelected() const noexcept;
-	Color GetForeColor() const noexcept;
-	void SetForeColor(const Color& color) noexcept;
-	Color GetBackgroundColor() const noexcept;
-	void SetBackgroundColor(const Color& color) noexcept;
 	const std::string& GetText() const noexcept;
 	void SetText(const std::string& text) noexcept;
 	Control* GetPreviousControl() noexcept;
@@ -157,13 +140,5 @@ public:
 	Control* GetByHandle(const IntPtr p) noexcept;
 	int GetTabIndex() const noexcept;
 	void SetTabIndex(const int& index) noexcept;
-	Font GetFont() const noexcept;
-	void SetFont(Font font) noexcept;
-	Point GetLocation() const noexcept;
-	void SetLocation(Point p) noexcept;
-	void SetLocation(int x, int y) noexcept;
-	bool IsShown() const noexcept;
-	virtual void Hide();
-	virtual void Show();
-	Graphics CreateGraphics() const noexcept;
+	void SetFont(Font font) noexcept override;
 };

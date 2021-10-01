@@ -28,7 +28,9 @@ Font::Font(const std::string& name, int size, bool isBold, bool isItalic, bool i
 	m_Size(size),
 	m_IsUnderline(isUnderline),
 	m_IsStrikeOut(isStrikeout),
-	m_Unit(unit)
+	m_Unit(unit),
+	m_GdiCharSet(1),
+	m_GdiVerticalFont(false)
 {
 }
 
@@ -192,4 +194,11 @@ void Font::SetStyle(FontStyle style) noexcept
 		break;
 	}
 	}
+}
+
+const std::string Font::ToString() const noexcept
+{
+	std::ostringstream oss;
+	oss << "[" << GetType().ToString() << ": Name=" << m_Name << ", Size=" << m_Size << ", Units=" << ", GdiCharSet=" << m_GdiCharSet << ", GdiVerticalFont=" << m_GdiVerticalFont << "]";
+	return oss.str();
 }

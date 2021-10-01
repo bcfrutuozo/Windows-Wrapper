@@ -1,11 +1,15 @@
 #include "HorizontalScrollBar.h"
 #include "ScrollableControl.h"
 
+void HorizontalScrollBar::Draw(const Graphics& graphics, Drawing::Rectangle rectangle)
+{
+}
+
 void HorizontalScrollBar::OnHorizontalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int code, int pos)
 {
 	int nPos;
 	int nOldPos;
-	SCROLLINFO si;
+	SCROLLINFO si = { 0 };
 
 	si.cbSize = sizeof(SCROLLINFO);
 	si.fMask = SIF_RANGE | SIF_PAGE | SIF_POS | SIF_TRACKPOS;
@@ -53,7 +57,7 @@ void HorizontalScrollBar::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int
 
 	if (IsShown())
 	{
-		SCROLLINFO si;
+		SCROLLINFO si = { 0 };
 		si.cbSize = sizeof(SCROLLINFO);
 		si.fMask = SIF_PAGE | SIF_RANGE;
 		si.nMin = 0;

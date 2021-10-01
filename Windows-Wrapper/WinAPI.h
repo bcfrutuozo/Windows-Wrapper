@@ -7,12 +7,15 @@
 #include "Event.h"
 #include "Font.h"
 #include "Size.h"
+#include "Color.h"
 #include "OnClosingEventArgs.h"
 #include "OnClosedEventArgs.h"
 #include "MouseEventArgs.h"
 #include "KeyEventArgs.h"
 #include "KeyPressEventArgs.h"
 #include "MessageMapper.h"
+#include "Graphics.h"
+#include "Rectangle.h"
 
 class Window;
 
@@ -46,6 +49,7 @@ private:
 	bool m_IsMouseOver;
 	bool m_IsClicking;
 	bool m_Enabled;
+	bool m_HasFontChanged;
 	static IntPtr m_OpenedControl;
 
 	// Scrolling
@@ -53,6 +57,17 @@ private:
 	int m_VerticalScrolling;
 	int m_VerticalScrollingUnit;
 	int m_VerticalScrollPaging;
+
+	Size m_Size;
+	Point m_Location;
+	Graphics m_Graphics;
+	Font m_Font;
+	Color m_ForeColor;
+	Color m_BackgroundColor;
+
+	// Store hFont to delete it after use
+	static std::map<std::string, HFONT>* Fonts;
+	bool m_IsVisible;
 
 	// Event fields
 	EventArgs ArgsDefault;
@@ -68,11 +83,20 @@ private:
 	MouseEventArgs ArgsOnMouseDoubleClick;
 	MouseEventArgs ArgsOnMouseWheel;
 
+	// Default PreDraw function which is used to recalculate elements according to DataSource, number of elements, etc...
+	virtual void PreDraw(const Graphics& graphics);
+
+	// Private Draw function called to base draw the control
+	// Rectangle is not passed as reference because it will be modified to draw elements while the user must receive the original one
+	virtual void Draw(const Graphics& graphics, Drawing::Rectangle rectangle) = 0;
+
+	// Perform the PostDraw to clear drawing objects
+	virtual void PostDraw(const Graphics& graphics);
+
 	/***** Global events declaration *****/
 	/* All are virtual to be overritten on the derived classes. Not all should be, but events like OnPaint(), OnMouseOver(),
 	OnKeyPressed() have different behaviors on each type of Control. So they are all virtual to decouple each kind of
 	functionality. */
-
 	virtual void OnActivate_Impl(HWND hwnd, unsigned int state, HWND hwndActDeact, bool minimized);
 	virtual void OnCommand_Impl(HWND hwnd, int id, HWND hwndCtl, unsigned int codeNotify);
 	virtual int OnClosing_Impl(HWND hwnd);
@@ -98,16 +122,18 @@ private:
 	virtual void OnMouseWheel_Impl(HWND hwnd, int x, int y, int delta, unsigned int fwKeys);
 	virtual void OnNextDialogControl_Impl(HWND hwnd, HWND hwndSetFocus, bool fNext) = 0;
 	virtual int OnNotify_Impl(HWND hwnd, int xPos, int yPos, int zDelta, unsigned int fwKeys);
-	virtual void OnPaint_Impl(HWND hwnd) = 0;
+	virtual void OnPaint_Impl(HWND hwnd);
 	virtual void OnRawInput_Impl(HWND hWnd, unsigned int inputCode, HRAWINPUT hRawInput);
 	virtual int OnSetCursor_Impl(HWND hwnd, HWND hwndCursor, unsigned int codeHitTest, unsigned int msg);
 	virtual void OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy);
 	virtual void OnShowWindow_Impl(HWND hwnd, bool fShow, unsigned int status);
 	virtual void OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, UINT code, int pos);
 
+	static void Free();
+
 protected:
 
-	WinAPI();
+	WinAPI(int width, int height, int x, int y);
 	virtual ~WinAPI() noexcept(false);
 
 	// Static function which handle WinAPI messages to corresponding member function of the control
@@ -132,10 +158,26 @@ public:
 	MessageMapper m;
 #endif
 	
+	Point GetLocation() const noexcept;
+	void SetLocation(Point p) noexcept;
+	void SetLocation(int x, int y) noexcept;
+	Size GetSize() const noexcept;
+	void Resize(Size s) noexcept;
+	void Resize(int width, int height) noexcept;
 	bool IsMouseOver() const noexcept;
 	bool IsClicking() const noexcept;
 	virtual bool IsEnabled() const noexcept;
 	void Enable();
 	void Disable();
 	virtual void Update() const;
+	const Graphics& CreateGraphics() const noexcept;
+	bool IsShown() const noexcept;
+	virtual void Hide();
+	virtual void Show();
+	Font GetFont() const noexcept;
+	virtual void SetFont(Font font) noexcept;
+	Color GetBackgroundColor() const noexcept;
+	void SetBackgroundColor(const Color& color) noexcept;
+	Color GetForeColor() const noexcept;
+	void SetForeColor(const Color& color) noexcept;
 };

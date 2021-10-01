@@ -16,8 +16,8 @@ private:
 	std::thread m_UpdateThread;
 	volatile int m_Speed;
 
+	void Draw(const Graphics& graphics, Drawing::Rectangle rectangle);
 	int OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept override;
-	void OnPaint_Impl(HWND hwnd) noexcept override;
 	void OnPaintMarquee_Thread(HWND hwnd) noexcept;
 
 	ProgressBar(Control* parent, int width, int height, int x, int y);

@@ -16,7 +16,7 @@ private:
 	ToolStripGripStyle m_GripStyle;
 	ToolStripRenderMode m_Renderer;
 
-	void OnPaint_Impl(HWND hWnd) noexcept override;
+	void Draw(const Graphics& graphics, Drawing::Rectangle rectangle);
 
 protected:
 

@@ -1,21 +1,25 @@
 #include "ScrollBar.h"
 #include "ScrollableControl.h"
 
-int ScrollBar::OnEraseBackground_Impl(HWND hwnd, HDC hdc)
+void ScrollBar::Draw(const Graphics& graphics, Drawing::Rectangle rectangle)
 {
-	/*RECT rc = { 0 };
-	GetClientRect(hwnd, &rc);
-	HBRUSH bgColor = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-	FillRect(hdc, &rc, bgColor);
-	SelectObject(hdc, bgColor);*/
-	return 1;
-}
+	auto hwnd = static_cast<HWND>(Handle.ToPointer());
+	auto hdc = static_cast<HDC>(graphics.GetHDC().ToPointer());
 
-void ScrollBar::OnPaint_Impl(HWND hwnd)
-{
-	PAINTSTRUCT ps;
-	BeginPaint(hwnd, &ps);
-	EndPaint(hwnd, &ps);
+	HDC hdcMem = CreateCompatibleDC(hdc);
+	HBITMAP hbmMem = CreateCompatibleBitmap(hdc, m_Size.Width, m_Size.Height);
+	HBITMAP hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
+
+	// Perform the bit-block transfer between the memory Device Context which has the next bitmap
+	// with the current image to avoid flickering
+	BitBlt(hdc, 0, 0, m_Size.Width, m_Size.Height, hdcMem, 0, 0, SRCCOPY);
+
+	SelectObject(hdcMem, hbmOld);
+	DeleteObject(hbmOld);
+	SelectObject(hdcMem, hbmOld);
+	DeleteObject(hbmMem);
+	ReleaseDC(hwnd, hdcMem);
+	DeleteDC(hdcMem);
 }
 
 ScrollBar::ScrollBar(ScrollableControl* parent, int width, int height, int x, int y)
@@ -38,9 +42,9 @@ void ScrollBar::Initialize()
 	Handle = CreateWindow(
 		WindowClass::GetName(),							// Class name
 		Text.c_str(),									// Window title
-		WS_CHILD | WS_CLIPSIBLINGS,						// Style values
-		m_Location.X,										// X position
-		m_Location.Y,										// Y position
+		WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,	// Style values
+		m_Location.X,									// X position
+		m_Location.Y,									// Y position
 		m_Size.Width,									// Width
 		m_Size.Height,									// Height
 		static_cast<HWND>(Parent->Handle.ToPointer()),	// Parent handle

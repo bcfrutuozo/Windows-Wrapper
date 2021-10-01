@@ -96,17 +96,17 @@ void ListControl::Initialize()
 {
 	// Create window and get its handle
 	Handle = CreateWindow(
-		WindowClass::GetName(),									// Class name
-		Text.c_str(),											// Window title
-		WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPSIBLINGS,	// Style values
-		m_Location.X,											// X position
-		m_Location.Y,											// Y position
-		m_Size.Width,											// Width
-		m_Size.Height,											// Height
-		static_cast<HWND>(Parent->Handle.ToPointer()),			// Parent handle
-		nullptr,						                		// Menu handle
-		WindowClass::GetInstance(),								// Module instance handle
-		this													// Pointer to the class instance to work along with HandleMessageSetup function.
+		WindowClass::GetName(),													// Class name
+		Text.c_str(),															// Window title
+		WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,	// Style values
+		m_Location.X,															// X position
+		m_Location.Y,															// Y position
+		m_Size.Width,															// Width
+		m_Size.Height,															// Height
+		static_cast<HWND>(Parent->Handle.ToPointer()),							// Parent handle
+		nullptr,						                						// Menu handle
+		WindowClass::GetInstance(),												// Module instance handle
+		this																	// Pointer to the class instance to work along with HandleMessageSetup function.
 	);
 
 	if (Handle.IsNull())

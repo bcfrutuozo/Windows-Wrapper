@@ -5,12 +5,13 @@
 class Label final : public Control
 {
 	friend class Control;
+
 private:
 
 	BorderStyle m_BorderStyle;
 	FlatStyle m_FlatStyle;
 
-	virtual void OnPaint_Impl(HWND hwnd) noexcept override;
+	void Draw(const Graphics& graphics, Drawing::Rectangle rectangle) override;
 
 	Label(Control* parent, const std::string& text, int x, int y);
 

@@ -32,6 +32,8 @@ private:
 		CutAndPaste,
 	};
 
+	void PreDraw(const Graphics& graphics) override;
+	void Draw(const Graphics& graphics, Drawing::Rectangle rectangle) override;
 	int OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept override;
 	int OnGetDLGCode_Impl(HWND hwnd, LPMSG msg) noexcept override;
 	void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept override;
@@ -40,7 +42,6 @@ private:
 	void OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept override;
 	void OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept override;
 	void OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept override;
-	void OnPaint_Impl(HWND hWnd) noexcept override;
 
 	void CalculateCaret(HWND hwnd, const HDC& hdc) noexcept;
 	void CopyToClipboard() const noexcept;
@@ -48,9 +49,8 @@ private:
 	void EnableCaret() noexcept;
 	void DisableCaret() noexcept;
 	void PrintDebug() const noexcept;
-	void InputDelete(HWND hWnd, DeleteInputType deleteType) noexcept;
-	void InputRedraw(HWND hWnd) noexcept;
-	void InputDraw(HWND hWnd, HDC& hdc) noexcept;
+	void InputDelete(DeleteInputType deleteType) noexcept;
+	void InputRedraw() noexcept;
 	void PaintSelection(HDC& hdc, RECT& r, size_t start, size_t end) const noexcept;
 
 	TextBox(Control* parent, int width, int x, int y);

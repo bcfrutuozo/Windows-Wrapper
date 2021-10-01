@@ -28,12 +28,10 @@ private:
 	std::vector<ListItem*> m_SelectedItems;
 	int m_Tabulation;
 
+	void PreDraw(const Graphics& graphics) override;
+	void Draw(const Graphics& graphics, Drawing::Rectangle rectangle) override;
 	void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept override;
 	void OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept override;
-	void OnPaint_Impl(HWND hwnd) noexcept override;
-
-	void CalculateListBoxParameters(HWND hwnd, HDC& hdc);
-	void Draw(HWND hwnd, HDC& hdc);
 
 	ListBox(Control* parent, int width, int height, int x, int y);
 

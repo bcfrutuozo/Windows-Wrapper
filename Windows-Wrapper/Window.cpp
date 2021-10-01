@@ -236,38 +236,19 @@ void Window::ShowCursor() noexcept
 	while (::ShowCursor(TRUE) < 0);
 }
 
-void Window::OnPaint_Impl(HWND hwnd) noexcept
+void Window::Draw(const Graphics& graphics, Drawing::Rectangle rectangle)
 {
-	PAINTSTRUCT ps;
-	BeginPaint(hwnd, &ps);
-
-	// TODO: OnPaint MUST receive a Graphics object which abstracts the PAINTSTRUCT and DeviceContext handle 
-	// to let the user customize the control.
-	//Dispatch("OnPaint", new PaintEventArgs());
-
-	HFONT hFont = CreateFont(m_Font.GetSizeInPixels(),
-		0,
-		0,
-		0,
-		m_Font.IsBold() ? FW_BOLD : FW_NORMAL,
-		m_Font.IsItalic(),
-		m_Font.IsUnderline(),
-		m_Font.IsStrikeOut(),
-		ANSI_CHARSET,
-		OUT_TT_PRECIS,
-		CLIP_DEFAULT_PRECIS,
-		DEFAULT_QUALITY,
-		DEFAULT_PITCH | FF_DONTCARE,
-		m_Font.GetName().c_str());
-
-	SendMessage(hwnd, WM_SETFONT, (WPARAM)hFont, TRUE);
+	auto hdc = static_cast<HDC>(graphics.GetHDC().ToPointer());
+	RECT rc = { 0 };
+	rc.left = rectangle.GetLeft();
+	rc.top = rectangle.GetTop();
+	rc.right = rectangle.GetRight();
+	rc.bottom = rectangle.GetBottom();
 
 	HBRUSH bgColor = CreateSolidBrush(GetBackgroundColor().ToRGB());
-	FillRect(ps.hdc, &ps.rcPaint, bgColor);
-	SelectObject(ps.hdc, bgColor);
+	FillRect(hdc, &rc, bgColor);
+	SelectObject(hdc, bgColor);
 	DeleteObject(bgColor);
-
-	EndPaint(hwnd, &ps);
 }
 
 bool Window::IsCursorEnabled() const noexcept

@@ -1,15 +1,43 @@
 #pragma once
 
 #include "WinAPI.h"
-#include "Window.h"
 #include "Application.h"
+#include "Window.h"
 
 // Includes for ::_TrackMouseEvent function
 #pragma comment(lib, "comctl32.lib")
 #include <Commctrl.h>
 
+std::map<std::string, HFONT>* WinAPI::Fonts = new std::map<std::string, HFONT>();
 unsigned int WinAPI::m_CurrentIndex = 1;
 IntPtr WinAPI::m_OpenedControl = nullptr;
+
+// Default PreDraw function which is used to recalculate elements according to DataSource, number of elements, etc...
+void WinAPI::PreDraw(const Graphics& graphics)
+{
+	auto hwnd = static_cast<HWND>(Handle.ToPointer());
+	auto hdc = static_cast<HDC>(graphics.GetHDC().ToPointer());
+
+	auto hFont = Fonts->find(m_Font.ToString());
+	
+	if (m_HasFontChanged)
+	{
+		SendMessage(hwnd, WM_SETFONT, (WPARAM)hFont->second, TRUE);
+		m_HasFontChanged = false;
+	}
+
+	SelectObject(hdc, hFont->second);
+}
+
+void WinAPI::Draw(const Graphics& graphics, Drawing::Rectangle rectangle)
+{
+
+}
+
+void WinAPI::PostDraw(const Graphics& graphics)
+{
+
+}
 
 void WinAPI::OnActivate_Impl(HWND hwnd, unsigned int state, HWND hwndActDeact, bool minimized)
 {
@@ -63,7 +91,12 @@ int WinAPI::OnClosing_Impl(HWND hwnd)
 			Application::RemoveWindow(dynamic_cast<Window*>(this));
 		}
 
-		Application::TryCloseApplication();
+		if (Application::CanCloseApplication())
+		{
+			WinAPI::Free();
+			Application::Exit();
+
+		}
 		return 0;
 	}
 
@@ -77,6 +110,26 @@ void WinAPI::OnClosed_Impl(HWND hwnd)
 
 void WinAPI::OnCreate_Impl(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
 {
+	if (!Fonts->contains(m_Font.ToString()))
+	{
+		HFONT hFont = CreateFont(
+			m_Font.GetSizeInPixels(),
+			0,
+			0,
+			0,
+			m_Font.IsBold() ? FW_BOLD : FW_NORMAL,
+			m_Font.IsItalic(),
+			m_Font.IsUnderline(),
+			m_Font.IsStrikeOut(),
+			ANSI_CHARSET,
+			OUT_TT_PRECIS,
+			CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+			DEFAULT_PITCH | FF_DONTCARE,
+			m_Font.GetName().c_str());
+
+		(*Fonts)[m_Font.ToString()] = hFont;
+	}
+
 	Dispatch("OnCreate", &ArgsDefault);
 }
 
@@ -277,6 +330,32 @@ int WinAPI::OnNotify_Impl(HWND hwnd, int xPos, int yPos, int zDelta, unsigned in
 	return 1;
 }
 
+void WinAPI::OnPaint_Impl(HWND hwnd)
+{
+	if (IsShown())
+	{
+		PAINTSTRUCT ps;
+		BeginPaint(hwnd, &ps);
+
+		
+		m_Graphics = Graphics(Handle, ps.hdc);
+		Drawing::Rectangle rect = Drawing::Rectangle(m_Location, m_Size);
+		PaintEventArgs pArgs = PaintEventArgs(m_Graphics, rect);
+
+		// Perform PreDraw to recalculate elements prior to drawing
+		PreDraw(m_Graphics);
+
+		// Proceed with the Draw function
+		Draw(m_Graphics, rect);
+		Dispatch("OnPaint", &pArgs);
+
+		// Call PostDraw to handle additional processing and object cleaning
+		PostDraw(m_Graphics);
+		
+		EndPaint(hwnd, &ps);
+	}
+}
+
 void WinAPI::OnRawInput_Impl(HWND hWnd, unsigned int inputCode, HRAWINPUT hRawInput)
 {
 
@@ -306,12 +385,23 @@ void WinAPI::OnShowWindow_Impl(HWND hwnd, bool fShow, unsigned int status)
 	Dispatch("OnVisibleChanged", &ArgsDefault);
 }
 
+void WinAPI::Free()
+{
+	for (const auto& f : *Fonts)
+	{
+		DeleteObject(f.second);
+	}
+
+	Fonts->clear();
+	SafeDelete(Fonts);
+}
+
 void WinAPI::OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int code, int pos)
 {
 	Dispatch("OnVerticalScroll", &ArgsDefault);
 }
 
-WinAPI::WinAPI()
+WinAPI::WinAPI(int width, int height, int x, int y)
 	:
 	ArgsOnClosing(CloseReason::None, false),
 	ArgsOnClosed(CloseReason::None),
@@ -324,14 +414,21 @@ WinAPI::WinAPI()
 	ArgsOnMouseUp(MouseButtons::None, 0, 0, 0, 0),
 	ArgsOnMouseDoubleClick(MouseButtons::None, 0, 0, 0, 0),
 	ArgsOnMouseWheel(MouseButtons::None, 0, 0, 0, 0),
+	m_Font("Segoe", 9, false, false, false, false, GraphicsUnit::Point),		// Default application font for controls
 	m_Enabled(true),
 	m_Id(m_CurrentIndex++),
 	m_IsMouseOver(false),
 	m_IsClicking(false),
+	m_IsVisible(true),
+	m_BackgroundColor(Color::ControlBackground()),
+	m_ForeColor(Color::Foreground()),
 	m_HorizontalScrolling(0),
 	m_VerticalScrolling(0),
 	m_VerticalScrollingUnit(0),
-	m_VerticalScrollPaging(0)
+	m_VerticalScrollPaging(0),
+	m_Size(width, height),
+	m_Location(x, y),
+	m_HasFontChanged(true)
 {
 
 }
@@ -562,6 +659,40 @@ void WinAPI::SetClickingState(bool state) noexcept
 	m_IsClicking = state;
 }
 
+Point WinAPI::GetLocation() const noexcept
+{
+	return m_Location;
+}
+
+void WinAPI::SetLocation(Point p) noexcept
+{
+	m_Location = p;
+	SetWindowPos(static_cast<HWND>(Handle.ToPointer()), nullptr, m_Location.X, m_Location.Y, m_Size.Width, m_Size.Height, SWP_NOZORDER);
+}
+
+void WinAPI::SetLocation(int x, int y) noexcept
+{
+	m_Location = Point(x, y);
+	SetWindowPos(static_cast<HWND>(Handle.ToPointer()), nullptr, m_Location.X, m_Location.Y, m_Size.Width, m_Size.Height, SWP_NOZORDER);
+}
+
+Size WinAPI::GetSize() const noexcept
+{
+	return m_Size;
+}
+
+void WinAPI::Resize(Size s) noexcept
+{
+	m_Size = s;
+	SetWindowPos(static_cast<HWND>(Handle.ToPointer()), nullptr, m_Location.X, m_Location.Y, m_Size.Width, m_Size.Height, SWP_NOZORDER);
+}
+
+void WinAPI::Resize(int width, int height) noexcept
+{
+	m_Size = Size(width, height);
+	SetWindowPos(static_cast<HWND>(Handle.ToPointer()), nullptr, m_Location.X, m_Location.Y, m_Size.Width, m_Size.Height, SWP_NOZORDER);
+}
+
 bool WinAPI::IsMouseOver() const noexcept
 {
 	return m_IsMouseOver;
@@ -592,4 +723,93 @@ void WinAPI::Disable()
 void WinAPI::Update() const
 {
 	InvalidateRect(static_cast<HWND>(Handle.ToPointer()), nullptr, true);
+}
+
+const Graphics& WinAPI::CreateGraphics() const noexcept
+{
+	return m_Graphics;
+}
+
+bool WinAPI::IsShown() const noexcept
+{
+	return m_IsVisible;
+}
+
+void WinAPI::Hide()
+{
+	if (IsShown())
+	{
+		m_IsVisible = false;
+		ShowWindow(static_cast<HWND>(Handle.ToPointer()), SW_HIDE);
+	}
+}
+
+void WinAPI::Show()
+{
+	if (!IsShown())
+	{
+		m_IsVisible = true;
+		ShowWindow(static_cast<HWND>(Handle.ToPointer()), SW_SHOWDEFAULT);
+	}
+}
+
+Font WinAPI::GetFont() const noexcept
+{
+	return m_Font;
+}
+
+void WinAPI::SetFont(Font font) noexcept
+{
+	if (!Fonts->contains(font.ToString()))
+	{
+		HFONT hFont = CreateFont(
+			font.GetSizeInPixels(),
+			0,
+			0,
+			0,
+			font.IsBold() ? FW_BOLD : FW_NORMAL,
+			font.IsItalic(),
+			font.IsUnderline(),
+			font.IsStrikeOut(),
+			ANSI_CHARSET,
+			OUT_TT_PRECIS,
+			CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+			DEFAULT_PITCH | FF_DONTCARE,
+			font.GetName().c_str());
+
+		(*Fonts)[font.ToString()] = hFont;
+	}
+	
+	m_Font = font;
+
+	m_HasFontChanged = true;
+	Update();
+}
+
+Color WinAPI::GetBackgroundColor() const noexcept
+{
+	if (m_BackgroundColor == Color::ControlBackground() && !IsEnabled())
+	{
+		return Color::DisabledControlBackground();
+	}
+
+	return m_BackgroundColor;
+}
+
+void WinAPI::SetBackgroundColor(const Color& color) noexcept
+{
+	m_BackgroundColor = color;
+	Update();
+}
+
+Color WinAPI::GetForeColor() const noexcept
+{
+	if (!IsEnabled()) return Color::DisabledForeground();
+	return m_ForeColor;
+}
+
+void WinAPI::SetForeColor(const Color& color) noexcept
+{
+	m_ForeColor = color;
+	Update();
 }

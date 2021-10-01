@@ -9,7 +9,8 @@ class HorizontalScrollBar : public ScrollBar
 	friend class ScrollableControl;
 
 private:
-
+	
+	void Draw(const Graphics& graphics, Drawing::Rectangle rectangle) override;
 	void OnHorizontalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int code, int pos) override;
 	void OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy) override;
 

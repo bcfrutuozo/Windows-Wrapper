@@ -8,9 +8,10 @@ LPRECT const ScrollableControl::GetDrawableArea() noexcept
 
 LPRECT const ScrollableControl::ResetDrawableArea() noexcept
 {
+	auto size = GetSize();
 	m_DrawableArea.left = m_DrawableArea.top = 0;
-	m_DrawableArea.right = m_Size.Width;
-	m_DrawableArea.bottom = m_Size.Height;
+	m_DrawableArea.right = size.Width;
+	m_DrawableArea.bottom = size.Height;
 	return &m_DrawableArea;
 }
 
@@ -22,8 +23,8 @@ void ScrollableControl::SetMinimumItemWidth(const int& weight) noexcept
 ScrollableControl::ScrollableControl(Control* parent, const std::string& name, int width, int height, int x, int y)
 	:
 	Control(parent, name, width, height, x, y),
-	HorizontalScrollBar(this, m_Size.Width - m_Margin.Left - m_Margin.Right, GetSystemMetrics(SM_CYHSCROLL) + 1, m_Margin.Left, m_Size.Height - (GetSystemMetrics(SM_CYHSCROLL) + 1) - m_Margin.Bottom),
-	VerticalScrollBar(this, GetSystemMetrics(SM_CXVSCROLL), m_Size.Height - m_Margin.Top - m_Margin.Bottom, m_Size.Width - GetSystemMetrics(SM_CXVSCROLL) - m_Margin.Right, m_Margin.Top),
+	HorizontalScrollBar(this, GetSize().Width - m_Margin.Left - m_Margin.Right, GetSystemMetrics(SM_CYHSCROLL) + 1, m_Margin.Left, GetSize().Height - (GetSystemMetrics(SM_CYHSCROLL) + 1) - m_Margin.Bottom),
+	VerticalScrollBar(this, GetSystemMetrics(SM_CXVSCROLL), GetSize().Height - m_Margin.Top - m_Margin.Bottom, GetSize().Width - GetSystemMetrics(SM_CXVSCROLL) - m_Margin.Right, m_Margin.Top),
 	m_ItemWidth(0),
 	m_ItemHeight(0),
 	m_IsHorizontalScrollEnabled(false),
@@ -107,10 +108,10 @@ void ScrollableControl::SetItemHeight(const int& height) noexcept
 
 int ScrollableControl::GetHorizontalPage() const noexcept
 {
-	return m_Size.Width / GetItemWidth();
+	return GetSize().Width / GetItemWidth();
 }
 
 int ScrollableControl::GetVerticalPage() const noexcept
 {
-	return m_Size.Height / GetItemHeight();
+	return GetSize().Height / GetItemHeight();
 }
