@@ -51,7 +51,7 @@ public:
 	const std::vector<ListItem>& GetDataSource() const noexcept;
 	void SetDataSource(const std::vector<ListItem>& dataSource);
 	virtual int GetSelectedIndex() const noexcept;
-	virtual void SetSelectedIndex(int index) = 0;
+	virtual void SetSelectedIndex(int index, bool value) = 0;
 	std::string GetSelectedValue() const noexcept;
 	virtual void SetSelectedValue(const ListItem& item) = 0;
 	bool IsRebinding() const noexcept;

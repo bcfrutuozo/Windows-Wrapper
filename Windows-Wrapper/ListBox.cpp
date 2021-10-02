@@ -18,9 +18,9 @@ void ListBox::PreDraw(const Graphics& graphics)
 		m_BorderSize = 0;
 		switch (m_BorderStyle)
 		{
-		case BorderStyle::FixedSingle: m_BorderSize = 1; break;
-		case BorderStyle::Fixed3D: m_BorderSize = 2; break;
-		default: break;
+			case BorderStyle::FixedSingle: m_BorderSize = 1; break;
+			case BorderStyle::Fixed3D: m_BorderSize = 2; break;
+			default: break;
 		}
 
 		// Drawable block inside ListBox
@@ -204,37 +204,16 @@ void ListBox::Draw(const Graphics& graphics, Drawing::Rectangle rectangle)
 
 	switch (m_BorderStyle)
 	{
-	case BorderStyle::None:
-	{
-		break;
-	}
-	case BorderStyle::FixedSingle:
-	{
-		if (m_IsTabSelected)
+		case BorderStyle::None:
 		{
-			// Draw outer border
-			HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(0, 0, 0));
-			HGDIOBJ old_pen = SelectObject(hdcMem, pen);
-			Rectangle(hdcMem, r.left, r.top, r.right, r.bottom);
-
-			// Move inside rectangle for inner board
-			r.left += 1;
-			r.top += 1;
-			r.right -= 1;
-			r.bottom -= 1;
-
-			//Clean up
-			SelectObject(hdcMem, old_pen);
-			DeleteObject(old_pen);
-			SelectObject(hdcMem, pen);
-			DeleteObject(pen);
+			break;
 		}
-		else
+		case BorderStyle::FixedSingle:
 		{
-			if (IsMouseOver())
+			if (m_IsTabSelected)
 			{
 				// Draw outer border
-				HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(0, 120, 215));
+				HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(0, 0, 0));
 				HGDIOBJ old_pen = SelectObject(hdcMem, pen);
 				Rectangle(hdcMem, r.left, r.top, r.right, r.bottom);
 
@@ -252,58 +231,79 @@ void ListBox::Draw(const Graphics& graphics, Drawing::Rectangle rectangle)
 			}
 			else
 			{
-				// Draw outer border
-				HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(122, 122, 122));
-				HGDIOBJ old_pen = SelectObject(hdcMem, pen);
-				Rectangle(hdcMem, r.left, r.top, r.right, r.bottom);
+				if (IsMouseOver())
+				{
+					// Draw outer border
+					HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(0, 120, 215));
+					HGDIOBJ old_pen = SelectObject(hdcMem, pen);
+					Rectangle(hdcMem, r.left, r.top, r.right, r.bottom);
 
-				// Move inside rectangle for inner board
-				r.left += 1;
-				r.top += 1;
-				r.right -= 1;
-				r.bottom -= 1;
+					// Move inside rectangle for inner board
+					r.left += 1;
+					r.top += 1;
+					r.right -= 1;
+					r.bottom -= 1;
 
-				//Clean up
-				SelectObject(hdcMem, old_pen);
-				DeleteObject(old_pen);
-				SelectObject(hdcMem, pen);
-				DeleteObject(pen);
+					//Clean up
+					SelectObject(hdcMem, old_pen);
+					DeleteObject(old_pen);
+					SelectObject(hdcMem, pen);
+					DeleteObject(pen);
+				}
+				else
+				{
+					// Draw outer border
+					HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(122, 122, 122));
+					HGDIOBJ old_pen = SelectObject(hdcMem, pen);
+					Rectangle(hdcMem, r.left, r.top, r.right, r.bottom);
+
+					// Move inside rectangle for inner board
+					r.left += 1;
+					r.top += 1;
+					r.right -= 1;
+					r.bottom -= 1;
+
+					//Clean up
+					SelectObject(hdcMem, old_pen);
+					DeleteObject(old_pen);
+					SelectObject(hdcMem, pen);
+					DeleteObject(pen);
+				}
 			}
+			break;
 		}
-		break;
-	}
-	case BorderStyle::Fixed3D:
-	{
-		// Draw outer border
-		HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(130, 135, 144));
-		HGDIOBJ old_pen = SelectObject(hdcMem, pen);
-		Rectangle(hdcMem, r.left, r.top, r.right, r.bottom);
+		case BorderStyle::Fixed3D:
+		{
+			// Draw outer border
+			HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(130, 135, 144));
+			HGDIOBJ old_pen = SelectObject(hdcMem, pen);
+			Rectangle(hdcMem, r.left, r.top, r.right, r.bottom);
 
-		// Move inside rectangle for inner board
-		r.left += 1;
-		r.top += 1;
-		r.right -= 1;
-		r.bottom -= 1;
+			// Move inside rectangle for inner board
+			r.left += 1;
+			r.top += 1;
+			r.right -= 1;
+			r.bottom -= 1;
 
-		// Draw outer border
-		pen = CreatePen(PS_INSIDEFRAME, 1, RGB(255, 255, 255));
-		old_pen = SelectObject(hdcMem, pen);
-		Rectangle(hdcMem, r.left, r.top, r.right, r.bottom);
+			// Draw outer border
+			pen = CreatePen(PS_INSIDEFRAME, 1, RGB(255, 255, 255));
+			old_pen = SelectObject(hdcMem, pen);
+			Rectangle(hdcMem, r.left, r.top, r.right, r.bottom);
 
-		// Move inside rectangle for inner board
-		r.left += 1;
-		r.top += 1;
-		r.right -= 1;
-		r.bottom -= 1;
+			// Move inside rectangle for inner board
+			r.left += 1;
+			r.top += 1;
+			r.right -= 1;
+			r.bottom -= 1;
 
-		//Clean up
-		SelectObject(hdcMem, old_pen);
-		DeleteObject(old_pen);
-		SelectObject(hdcMem, pen);
-		DeleteObject(pen);
+			//Clean up
+			SelectObject(hdcMem, old_pen);
+			DeleteObject(old_pen);
+			SelectObject(hdcMem, pen);
+			DeleteObject(pen);
 
-		break;
-	}
+			break;
+		}
 	}
 
 	const auto& dataSource = GetDataSource();
@@ -437,212 +437,300 @@ void ListBox::Draw(const Graphics& graphics, Drawing::Rectangle rectangle)
 void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept
 {
 	if (m_SelectionMode != SelectionMode::None)
-	{
-		if (m_SelectionMode == SelectionMode::Single || m_SelectionMode == SelectionMode::MultiSimple)
-		{
+	{ 
+		//if (m_SelectionMode == SelectionMode::Single || m_SelectionMode == SelectionMode::MultiSimple)
+		//{
 			switch (vk)
 			{
-			case VK_DOWN:
-			{
-				if (m_Tabulation < static_cast<int>(GetDataSource().size()) - 1)
+				case VK_DOWN:
 				{
-					Items[m_Tabulation++].Tabulated = false;
-					Items[m_Tabulation].Tabulated = true;
-
-					if (m_SelectionMode == SelectionMode::Single) m_SelectedIndex = m_Tabulation;
-
-					auto drawableArea = GetDrawableArea();
-
-					if (m_RowPosition[m_Tabulation].bottom > drawableArea->bottom && IsVerticalScrollEnabled())
+					if (m_Tabulation < static_cast<int>(GetDataSource().size()) - 1)
 					{
-						HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation - m_TotalItemsInDrawableArea + 1), 0);
+						Items[m_Tabulation++].Tabulated = false;
+						Items[m_Tabulation].Tabulated = true;
+
+						if (m_SelectionMode == SelectionMode::Single) m_SelectedIndex = m_Tabulation;
+						else if(m_SelectionMode == SelectionMode::MultiExtended)
+						{
+							if(0x8000 & GetKeyState(VK_SHIFT))
+							{
+								m_SelectionEnd = m_Tabulation;
+
+								int start = (std::min)(m_SelectionStart, m_SelectionEnd);
+								int end = (std::max)(m_SelectionStart, m_SelectionEnd);
+
+								ClearSelected();
+								for (; start <= end; ++start)
+								{
+									SetSelectedIndex(start, true);
+								}
+							}
+							else
+							{
+								m_SelectionStart = m_SelectionEnd = m_Tabulation;
+								ClearSelected();
+								SetSelectedIndex(m_Tabulation, true);
+							}
+						}
+
+						auto drawableArea = GetDrawableArea();
+
+						if (m_RowPosition[m_Tabulation].bottom > drawableArea->bottom && IsVerticalScrollEnabled())
+						{
+							HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation - m_TotalItemsInDrawableArea + 1), 0);
+						}
+
+						if (m_RowPosition[m_Tabulation].top < drawableArea->top && IsVerticalScrollEnabled())
+						{
+							HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation), 0);
+						}
+
+						if (m_RowPosition[m_Tabulation].right > drawableArea->right && IsHorizontalScrollEnabled())
+						{
+							HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, (m_Tabulation / m_RowNumber) - (m_ColumnNumber - 1)), 0);
+						}
+					}
+					else
+					{
+						if (IsVerticalScrollEnabled())
+						{
+							HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation), 0);
+						}
 					}
 
-					if (m_RowPosition[m_Tabulation].top < drawableArea->top && IsVerticalScrollEnabled())
-					{
-						HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation), 0);
-					}
-
-					if (m_RowPosition[m_Tabulation].right > drawableArea->right && IsHorizontalScrollEnabled())
-					{
-						HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, (m_Tabulation / m_RowNumber) - (m_ColumnNumber - 1)), 0);
-					}
-				}
-				else
-				{
-					if (IsVerticalScrollEnabled())
-					{
-						HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation), 0);
-					}
-				}
-
-				break;
-			}
-			case VK_UP:
-			{
-				if (m_Tabulation > 0)
-				{
-					Items[m_Tabulation--].Tabulated = false;
-					Items[m_Tabulation].Tabulated = true;
-
-					if (m_SelectionMode == SelectionMode::Single) m_SelectedIndex = m_Tabulation;
-
-					auto drawableArea = GetDrawableArea();
-
-					if (m_RowPosition[m_Tabulation].bottom > drawableArea->bottom && IsVerticalScrollEnabled())
-					{
-						HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation - m_TotalItemsInDrawableArea + 1), 0);
-					}
-
-					if (m_RowPosition[m_Tabulation].top < drawableArea->top && IsVerticalScrollEnabled())
-					{
-						HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation), 0);
-					}
-
-					if (m_RowPosition[m_Tabulation].left < drawableArea->left && IsHorizontalScrollEnabled())
-					{
-						HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation / m_RowNumber), 0);
-					}
-				}
-				else
-				{
-					if (IsVerticalScrollEnabled())
-					{
-						HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, 0), 0);
-					}
-				}
-
-				break;
-			}
-			case VK_LEFT:
-			{
-				if (!m_IsMultiColumn)
-				{
 					break;
 				}
-
-				if (m_Tabulation > m_RowNumber - 1)
+				case VK_UP:
 				{
-					auto drawableArea = GetDrawableArea();
-
-					Items[m_Tabulation].Tabulated = false;
-					m_Tabulation -= m_RowNumber;
-					Items[m_Tabulation].Tabulated = true;
-
-					if (m_SelectionMode == SelectionMode::Single) m_SelectedIndex = m_Tabulation;
-
-					if (m_RowPosition[m_Tabulation].right > drawableArea->right && IsHorizontalScrollEnabled())
+					if (m_Tabulation > 0)
 					{
-						HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation / m_RowNumber - m_TotalItemsInDrawableArea + 1), 0);
+						Items[m_Tabulation--].Tabulated = false;
+						Items[m_Tabulation].Tabulated = true;
+
+						if (m_SelectionMode == SelectionMode::Single) m_SelectedIndex = m_Tabulation;
+						else if (m_SelectionMode == SelectionMode::MultiExtended)
+						{
+							if (0x8000 & GetKeyState(VK_SHIFT))
+							{
+								m_SelectionEnd = m_Tabulation;
+
+								int start = (std::min)(m_SelectionStart, m_SelectionEnd);
+								int end = (std::max)(m_SelectionStart, m_SelectionEnd);
+
+								ClearSelected();
+								for (; start <= end; ++start)
+								{
+									SetSelectedIndex(start, true);
+								}
+							}
+							else
+							{
+								m_SelectionStart = m_SelectionEnd = m_Tabulation;
+								ClearSelected();
+								SetSelectedIndex(m_Tabulation, true);
+							}
+						}
+
+						auto drawableArea = GetDrawableArea();
+
+						if (m_RowPosition[m_Tabulation].bottom > drawableArea->bottom && IsVerticalScrollEnabled())
+						{
+							HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation - m_TotalItemsInDrawableArea + 1), 0);
+						}
+
+						if (m_RowPosition[m_Tabulation].top < drawableArea->top && IsVerticalScrollEnabled())
+						{
+							HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation), 0);
+						}
+
+						if (m_RowPosition[m_Tabulation].left < drawableArea->left && IsHorizontalScrollEnabled())
+						{
+							HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation / m_RowNumber), 0);
+						}
+					}
+					else
+					{
+						if (IsVerticalScrollEnabled())
+						{
+							HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, 0), 0);
+						}
 					}
 
-					if (m_RowPosition[m_Tabulation].left < drawableArea->left && IsHorizontalScrollEnabled())
-					{
-						HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation / m_RowNumber), 0);
-					}
+					break;
 				}
-				else
+				case VK_LEFT:
+				{
+					if (!m_IsMultiColumn)
+					{
+						break;
+					}
+
+					if (m_Tabulation > m_RowNumber - 1)
+					{
+						auto drawableArea = GetDrawableArea();
+
+						Items[m_Tabulation].Tabulated = false;
+						m_Tabulation -= m_RowNumber;
+						Items[m_Tabulation].Tabulated = true;
+
+						if (m_SelectionMode == SelectionMode::Single) m_SelectedIndex = m_Tabulation;
+						else if (m_SelectionMode == SelectionMode::MultiExtended)
+						{
+							if (0x8000 & GetKeyState(VK_SHIFT))
+							{
+								m_SelectionEnd = m_Tabulation;
+
+								int start = (std::min)(m_SelectionStart, m_SelectionEnd);
+								int end = (std::max)(m_SelectionStart, m_SelectionEnd);
+
+								ClearSelected();
+								for (; start <= end; ++start)
+								{
+									SetSelectedIndex(start, true);
+								}
+							}
+							else
+							{
+								m_SelectionStart = m_SelectionEnd = m_Tabulation;
+								ClearSelected();
+								SetSelectedIndex(m_Tabulation, true);
+							}
+						}
+
+						if (m_RowPosition[m_Tabulation].right > drawableArea->right && IsHorizontalScrollEnabled())
+						{
+							HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation / m_RowNumber - m_TotalItemsInDrawableArea + 1), 0);
+						}
+
+						if (m_RowPosition[m_Tabulation].left < drawableArea->left && IsHorizontalScrollEnabled())
+						{
+							HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation / m_RowNumber), 0);
+						}
+					}
+					else
+					{
+						if (IsHorizontalScrollEnabled())
+						{
+							HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, 0), 0);
+						}
+					}
+
+					break;
+				}
+				case VK_RIGHT:
+				{
+					if (!m_IsMultiColumn)
+					{
+						break;
+					}
+
+					if (m_Tabulation < static_cast<int>(GetDataSource().size()) - m_RowNumber)
+					{
+						auto drawableArea = GetDrawableArea();
+
+						Items[m_Tabulation].Tabulated = false;
+						m_Tabulation += m_RowNumber;
+						Items[m_Tabulation].Tabulated = true;
+
+						if (m_SelectionMode == SelectionMode::Single) m_SelectedIndex = m_Tabulation;
+						else if (m_SelectionMode == SelectionMode::MultiExtended)
+						{
+							if (0x8000 & GetKeyState(VK_SHIFT))
+							{
+								m_SelectionEnd = m_Tabulation;
+
+								int start = (std::min)(m_SelectionStart, m_SelectionEnd);
+								int end = (std::max)(m_SelectionStart, m_SelectionEnd);
+
+								ClearSelected();
+								for (; start <= end; ++start)
+								{
+									SetSelectedIndex(start, true);
+								}
+							}
+							else
+							{
+								m_SelectionStart = m_SelectionEnd = m_Tabulation;
+								ClearSelected();
+								SetSelectedIndex(m_Tabulation, true);
+							}
+						}
+
+						if (m_RowPosition[m_Tabulation].right > drawableArea->right && IsHorizontalScrollEnabled())
+						{
+							HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation / m_RowNumber - m_TotalItemsInDrawableArea + 1), 0);
+						}
+
+						if (m_RowPosition[m_Tabulation].left < drawableArea->left && IsHorizontalScrollEnabled())
+						{
+							HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation / m_RowNumber), 0);
+						}
+					}
+					else
+					{
+						if (IsHorizontalScrollEnabled())
+						{
+							HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation / m_RowNumber), 0);
+						}
+					}
+
+					break;
+				}
+				case VK_SPACE:
+				{
+					if (m_SelectionMode == SelectionMode::MultiSimple)
+					{
+						SetSelectedIndex(m_Tabulation, true);
+					}
+
+					break;
+				}
+				case VK_ESCAPE:
+				{
+					ClearSelected();
+					break;
+				}
+				case 'A':
+				{
+					if (0x8000 & GetKeyState(VK_CONTROL))
+					{
+						if (m_SelectionMode == SelectionMode::MultiSimple || m_SelectionMode == SelectionMode::MultiExtended)
+						{
+							SelectAll();
+						}
+					}
+					break;
+				}
+				case VK_NEXT:
 				{
 					if (IsHorizontalScrollEnabled())
 					{
-						HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, 0), 0);
+						HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_PAGERIGHT, 0), 0);
 					}
-				}
 
-				break;
-			}
-			case VK_RIGHT:
-			{
-				if (!m_IsMultiColumn)
-				{
+					if (IsVerticalScrollEnabled())
+					{
+						HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_PAGEDOWN, 0), 0);
+					}
+
 					break;
 				}
-
-				if (m_Tabulation < static_cast<int>(GetDataSource().size()) - m_RowNumber)
-				{
-					auto drawableArea = GetDrawableArea();
-
-					Items[m_Tabulation].Tabulated = false;
-					m_Tabulation += m_RowNumber;
-					Items[m_Tabulation].Tabulated = true;
-
-					if (m_SelectionMode == SelectionMode::Single) m_SelectedIndex = m_Tabulation;
-
-					if (m_RowPosition[m_Tabulation].right > drawableArea->right && IsHorizontalScrollEnabled())
-					{
-						HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation / m_RowNumber - m_TotalItemsInDrawableArea + 1), 0);
-					}
-
-					if (m_RowPosition[m_Tabulation].left < drawableArea->left && IsHorizontalScrollEnabled())
-					{
-						HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation / m_RowNumber), 0);
-					}
-				}
-				else
+				case VK_PRIOR:
 				{
 					if (IsHorizontalScrollEnabled())
 					{
-						HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation / m_RowNumber), 0);
+						HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_PAGELEFT, 0), 0);
 					}
-				}
 
-				break;
-			}
-			case VK_SPACE:
-			{
-				if (m_SelectionMode == SelectionMode::MultiSimple)
-				{
-					SetSelectedIndex(m_Tabulation);
-				}
-
-				break;
-			}
-			case VK_ESCAPE:
-			{
-				ClearSelected();
-				break;
-			}
-			case 'A':
-			{
-				if (0x8000 & GetKeyState(VK_CONTROL))
-				{
-					if (m_SelectionMode == SelectionMode::MultiSimple || m_SelectionMode == SelectionMode::MultiExtended)
+					if (IsVerticalScrollEnabled())
 					{
-						SelectAll();
+						HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_PAGEUP, 0), 0);
 					}
-				}
-				break;
-			}
-			case VK_NEXT:
-			{
-				if (IsHorizontalScrollEnabled())
-				{
-					HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_PAGERIGHT, 0), 0);
-				}
 
-				if (IsVerticalScrollEnabled())
-				{
-					HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_PAGEDOWN, 0), 0);
+					break;
 				}
-
-				break;
 			}
-			case VK_PRIOR:
-			{
-				if (IsHorizontalScrollEnabled())
-				{
-					HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_PAGELEFT, 0), 0);
-				}
-
-				if (IsVerticalScrollEnabled())
-				{
-					HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_PAGEUP, 0), 0);
-				}
-
-				break;
-			}
-			}
-		}
+		//}
 	}
 
 	Update();
@@ -661,7 +749,43 @@ void ListBox::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlag
 			if (y >= it->top && y <= it->bottom && x >= it->left && x <= it->right)
 			{
 				m_Tabulation = i;
-				SetSelectedIndex(i);
+
+				if (m_SelectionMode == SelectionMode::MultiExtended)
+				{
+					if (keyFlags & MK_SHIFT)
+					{
+						m_SelectionEnd = i;
+
+						int start = (std::min)(m_SelectionStart, m_SelectionEnd);
+						int end = (std::max)(m_SelectionStart, m_SelectionEnd);
+
+						ClearSelected();
+						for (; start <= end; ++start)
+						{
+							SetSelectedIndex(start, true);
+						}
+					}
+					else
+					{
+						m_SelectionStart = m_SelectionEnd = i;
+						
+						if((keyFlags & MK_CONTROL))
+						{
+						    SetSelectedIndex(i, !Items[i].Selected);
+						}
+						else
+						{
+							ClearSelected();
+							SetSelectedIndex(i, true);
+
+						}
+					}
+				}
+				else 
+				{
+					SetSelectedIndex(i, true);
+				}
+
 				break;
 			}
 		}
@@ -685,7 +809,9 @@ ListBox::ListBox(Control* parent, int width, int height, int x, int y)
 	m_RowNumber(1),
 	m_IsFormatChanged(false),
 	m_SelectedItem(nullptr),
-	m_Tabulation(-1)
+	m_Tabulation(-1),
+	m_SelectionStart(-1),
+	m_SelectionEnd(-1)
 {
 
 }
@@ -695,89 +821,92 @@ ListBox::~ListBox()
 
 }
 
-void ListBox::SetSelectedIndex(int index)
+void ListBox::SetSelectedIndex(int index, bool value)
 {
 	if (Items.size() == 0) return;
 
 	switch (m_SelectionMode)
 	{
-	case SelectionMode::None: throw ArgumentException("Cannot set index with in a ListBox with SelectionMode set as None"); break;
-	case SelectionMode::Single:
-	{
-		if (index < -1 || index >= Items.size()) throw ArgumentOutOfRangeException("index");
-
-		m_SelectedIndex = index;
-
-		if (m_SelectedIndex == -1)
+		case SelectionMode::None: throw ArgumentException("Cannot set index with in a ListBox with SelectionMode set as None"); break;
+		case SelectionMode::Single:
 		{
-			m_SelectedValue = "";
-		}
-		else
-		{
-			if (Items[m_SelectedIndex].Selected == true)
+			if (index < -1 || index >= Items.size()) throw ArgumentOutOfRangeException("index");
+
+
+			if (index == -1)
 			{
-				Items[m_SelectedIndex].Selected = false;
-				m_SelectedValue = -1;
+				m_SelectedValue = "";
 			}
 			else
 			{
-				Items[m_SelectedIndex].Selected = true;
-				m_SelectedValue = Items[m_SelectedIndex].Value;
-			}
-		}
-		break;
-	}
-	case SelectionMode::MultiSimple:
-	case SelectionMode::MultiExtended:
-	{
-		if (index < -1 || index >= Items.size()) throw ArgumentOutOfRangeException("index");
-
-		m_SelectedIndex = index;
-
-		// Clear the list if the passed index is equal -1
-		if (m_SelectedIndex == -1)
-		{
-			for (auto& it : m_SelectedItems)
-			{
-				it->Selected = false;
-			}
-
-			m_SelectedIndices.clear();
-			m_SelectedItems.clear();
-		}
-		else
-		{
-			if (Items[m_SelectedIndex].Selected == true)
-			{
-				Items[m_SelectedIndex].Selected = false;
-				m_SelectedIndices.erase(std::remove_if(m_SelectedIndices.begin(), m_SelectedIndices.end(), [&](int i) { return i == m_SelectedIndex; }));
-				m_SelectedItems.erase(std::remove_if(m_SelectedItems.begin(), m_SelectedItems.end(), [&](ListItem* it) { return it->Equals(&Items[m_SelectedIndex]); }));
-
-				if (m_SelectedItems.size() == 0)
+				if (!value)
 				{
-					m_SelectedItem = nullptr;
-					m_SelectedValue = "";
+					if (!Items[index].Selected) break;
+
+					Items[index].Selected = false;
+					m_SelectedValue = -1;
 				}
 				else
 				{
-					m_SelectedItem = m_SelectedItems.back();
-					m_SelectedValue = m_SelectedItems.back()->Value;
+					Items[index].Selected = true;
+					m_SelectedValue = Items[index].Value;
+					
+					// Clear old selection
+					Items[m_SelectedIndex].Selected = false;
+					m_SelectedIndex = index;
+				}
+			}
+			break;
+		}
+		case SelectionMode::MultiSimple:
+		case SelectionMode::MultiExtended:
+		{
+			if (index < -1 || index >= Items.size()) throw ArgumentOutOfRangeException("index");
+
+			// Clear the list if the passed index is equal -1
+			if (index == -1)
+			{
+				for (auto& it : m_SelectedItems)
+				{
+					it->Selected = false;
 				}
 
-				if (m_SelectedIndices.size() == 0) m_SelectedIndex = -1;
-				else m_SelectedIndex = m_SelectedIndices.back();
+				m_SelectedIndices.clear();
+				m_SelectedItems.clear();
 			}
 			else
 			{
-				Items[m_SelectedIndex].Selected = true;
-				// Select this item while keeping any previously selected items selected.
-				m_SelectedIndices.push_back(Items[m_SelectedIndex].Id);
-				m_SelectedItems.push_back(&Items[m_SelectedIndex]);
-				m_SelectedValue = Items[m_SelectedIndex].Value;
-				m_SelectedIndex = m_SelectedIndex;
+				if (Items[index].Selected && !value)
+				{
+					Items[index].Selected = false;
+					m_SelectedIndices.erase(std::remove_if(m_SelectedIndices.begin(), m_SelectedIndices.end(), [&](int i) { return i == index; }));
+					m_SelectedItems.erase(std::remove_if(m_SelectedItems.begin(), m_SelectedItems.end(), [&](ListItem* it) { return it->Equals(&Items[index]); }));
+
+					if (m_SelectedItems.size() == 0)
+					{
+						m_SelectedItem = nullptr;
+						m_SelectedValue = "";
+					}
+					else
+					{
+						m_SelectedItem = m_SelectedItems.back();
+						m_SelectedValue = m_SelectedItems.back()->Value;
+					}
+
+					if (m_SelectedIndices.size() == 0) m_SelectedIndex = -1;
+					else m_SelectedIndex = m_SelectedIndices.back();
+				}
+				else if(!Items[index].Selected && value)
+				{
+					Items[index].Selected = true;
+					// Select this item while keeping any previously selected items selected.
+					m_SelectedIndices.push_back(Items[index].Id);
+					m_SelectedItems.push_back(&Items[index]);
+					m_SelectedValue = Items[index].Value;
+					m_SelectedIndex = index;
+				}
 			}
 		}
-	}
 	}
 
 	Dispatch("OnSelectedIndexChanged", &ArgsDefault);
@@ -794,7 +923,7 @@ void ListBox::SetSelectedValue(const ListItem& item)
 	{
 		if (Items[i].Id == item.Id && Items[i].Value == item.Value)
 		{
-			SetSelectedIndex(static_cast<int>(i));
+			SetSelectedIndex(static_cast<int>(i), true);
 			err = false;
 			break;
 		}
@@ -890,7 +1019,7 @@ void ListBox::SelectAll()
 
 	for (size_t i = 0; i < Items.size(); ++i)
 	{
-		SetSelectedIndex(static_cast<int>(i));
+		SetSelectedIndex(static_cast<int>(i), true);
 	}
 
 	m_SelectedValue = m_SelectedItems.back()->Value;
@@ -907,24 +1036,24 @@ void ListBox::ClearSelected() noexcept
 
 	switch (m_SelectionMode)
 	{
-	case SelectionMode::None: break;
-	case SelectionMode::Single:
-	{
-		Items[m_SelectedIndex].Selected = false;
-		break;
-	}
-	case SelectionMode::MultiSimple:
-	case SelectionMode::MultiExtended:
-	{
-		for (auto& it : m_SelectedItems)
+		case SelectionMode::None: break;
+		case SelectionMode::Single:
 		{
-			it->Selected = false;
+			Items[m_SelectedIndex].Selected = false;
+			break;
 		}
+		case SelectionMode::MultiSimple:
+		case SelectionMode::MultiExtended:
+		{
+			for (auto& it : m_SelectedItems)
+			{
+				it->Selected = false;
+			}
 
-		m_SelectedIndices.clear();
-		m_SelectedItems.clear();
-		break;
-	}
+			m_SelectedIndices.clear();
+			m_SelectedItems.clear();
+			break;
+		}
 	}
 
 	m_SelectedIndex = -1;

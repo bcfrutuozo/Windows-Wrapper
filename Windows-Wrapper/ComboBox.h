@@ -45,6 +45,6 @@ public:
 
 	virtual ~ComboBox();
 
-	void SetSelectedIndex(int index) override;
+	void SetSelectedIndex(int index, bool value) override;
 	void SetSelectedValue(const ListItem& item) override;
 };

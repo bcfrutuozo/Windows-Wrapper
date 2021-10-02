@@ -150,8 +150,7 @@ void ListControl::SetDataSource(const std::vector<ListItem>& dataSource)
 
 	// Destroy the old DataSource to avoid memory leak
 	Items.clear();
-
-	SetSelectedIndex(-1);
+	SetSelectedIndex(-1, false);
 
 	Items = dataSource;
 	Dispatch("OnDataSourceChanged", &ArgsDefault);

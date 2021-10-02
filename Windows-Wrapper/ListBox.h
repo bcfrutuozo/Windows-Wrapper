@@ -28,6 +28,9 @@ private:
 	std::vector<ListItem*> m_SelectedItems;
 	int m_Tabulation;
 
+	int m_SelectionStart;
+	int m_SelectionEnd;
+
 	void PreDraw(const Graphics& graphics) override;
 	void Draw(const Graphics& graphics, Drawing::Rectangle rectangle) override;
 	void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept override;
@@ -40,7 +43,7 @@ public:
 
 	virtual ~ListBox();
 
-	void SetSelectedIndex(int index) override;
+	void SetSelectedIndex(int index, bool value) override;
 	void SetSelectedValue(const ListItem& item) override;
 
 	bool IsMultiColumn() const noexcept;

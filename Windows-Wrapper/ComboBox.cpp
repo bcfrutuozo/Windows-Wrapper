@@ -108,7 +108,7 @@ void ComboBox::ComboBoxChildNativeWindow::OnMouseLeftUp_Impl(HWND hwnd, int x, i
 		m_OpenedControl = nullptr;
 		Hide();
 
-		m_ComboBox->SetSelectedIndex(static_cast<int>(m_MouseOverIndex));
+		m_ComboBox->SetSelectedIndex(static_cast<int>(m_MouseOverIndex), true);
 	}
 
 	WinAPI::OnMouseLeftUp_Impl(hwnd, x, y, keyFlags);
@@ -357,7 +357,7 @@ size_t ComboBox::ComboBoxChildNativeWindow::GetMouseOverIndex() const noexcept
 	return m_MouseOverIndex;
 }
 
-void ComboBox::SetSelectedIndex(int index)
+void ComboBox::SetSelectedIndex(int index, bool value)
 {
 	m_SelectedIndex = index;
 
@@ -367,6 +367,7 @@ void ComboBox::SetSelectedIndex(int index)
 	}
 	else
 	{
+		Items[index].Selected = value;
 		m_SelectedValue = Items[m_SelectedIndex].Value;
 	}
 
@@ -381,7 +382,7 @@ void ComboBox::SetSelectedValue(const ListItem& item)
 	{
 		if (Items[i].Id == item.Id && Items[i].Value == item.Value)
 		{
-			SetSelectedIndex(static_cast<int>(i));
+			SetSelectedIndex(static_cast<int>(i), true);
 			err = false;
 			break;
 		}
