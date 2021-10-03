@@ -1,4 +1,3 @@
-
 #include "ListBox.h"
 #include "ComboBox.h"
 
@@ -437,300 +436,300 @@ void ListBox::Draw(const Graphics& graphics, Drawing::Rectangle rectangle)
 void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept
 {
 	if (m_SelectionMode != SelectionMode::None)
-	{ 
-		//if (m_SelectionMode == SelectionMode::Single || m_SelectionMode == SelectionMode::MultiSimple)
-		//{
-			switch (vk)
+	{
+		switch (vk)
+		{
+			case VK_DOWN:
 			{
-				case VK_DOWN:
+				if (m_Tabulation < static_cast<int>(GetDataSource().size()) - 1)
 				{
-					if (m_Tabulation < static_cast<int>(GetDataSource().size()) - 1)
+					Items[m_Tabulation++].Tabulated = false;
+					Items[m_Tabulation].Tabulated = true;
+
+
+					if (m_SelectionMode == SelectionMode::Single) m_SelectedIndex = m_Tabulation;
+					else if (m_SelectionMode == SelectionMode::MultiExtended)
 					{
-						Items[m_Tabulation++].Tabulated = false;
-						Items[m_Tabulation].Tabulated = true;
-
-						if (m_SelectionMode == SelectionMode::Single) m_SelectedIndex = m_Tabulation;
-						else if(m_SelectionMode == SelectionMode::MultiExtended)
+						if (0x8000 & GetKeyState(VK_SHIFT))
 						{
-							if(0x8000 & GetKeyState(VK_SHIFT))
-							{
-								m_SelectionEnd = m_Tabulation;
+							m_SelectionEnd = m_Tabulation;
 
-								int start = (std::min)(m_SelectionStart, m_SelectionEnd);
-								int end = (std::max)(m_SelectionStart, m_SelectionEnd);
+							int start = (std::min)(m_SelectionStart, m_SelectionEnd);
+							int end = (std::max)(m_SelectionStart, m_SelectionEnd);
 
-								ClearSelected();
-								for (; start <= end; ++start)
-								{
-									SetSelectedIndex(start, true);
-								}
-							}
-							else
+							ClearSelected();
+							for (; start <= end; ++start)
 							{
-								m_SelectionStart = m_SelectionEnd = m_Tabulation;
-								ClearSelected();
-								SetSelectedIndex(m_Tabulation, true);
+								SetSelectedIndex(start, true);
 							}
 						}
-
-						auto drawableArea = GetDrawableArea();
-
-						if (m_RowPosition[m_Tabulation].bottom > drawableArea->bottom && IsVerticalScrollEnabled())
+						else
 						{
-							HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation - m_TotalItemsInDrawableArea + 1), 0);
-						}
-
-						if (m_RowPosition[m_Tabulation].top < drawableArea->top && IsVerticalScrollEnabled())
-						{
-							HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation), 0);
-						}
-
-						if (m_RowPosition[m_Tabulation].right > drawableArea->right && IsHorizontalScrollEnabled())
-						{
-							HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, (m_Tabulation / m_RowNumber) - (m_ColumnNumber - 1)), 0);
-						}
-					}
-					else
-					{
-						if (IsVerticalScrollEnabled())
-						{
-							HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation), 0);
+							m_SelectionStart = m_SelectionEnd = m_Tabulation;
+							ClearSelected();
+							SetSelectedIndex(m_Tabulation, true);
 						}
 					}
 
-					break;
+					auto drawableArea = GetDrawableArea();
+
+					if (m_RowPosition[m_Tabulation].bottom > drawableArea->bottom && IsVerticalScrollEnabled())
+					{
+						HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation - m_TotalItemsInDrawableArea + 1), 0);
+					}
+
+					if (m_RowPosition[m_Tabulation].top < drawableArea->top && IsVerticalScrollEnabled())
+					{
+						HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation), 0);
+					}
+
+					if (m_RowPosition[m_Tabulation].right > drawableArea->right && IsHorizontalScrollEnabled())
+					{
+						HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, (m_Tabulation / m_RowNumber) - (m_ColumnNumber - 1)), 0);
+					}
 				}
-				case VK_UP:
+				else
 				{
-					if (m_Tabulation > 0)
-					{
-						Items[m_Tabulation--].Tabulated = false;
-						Items[m_Tabulation].Tabulated = true;
-
-						if (m_SelectionMode == SelectionMode::Single) m_SelectedIndex = m_Tabulation;
-						else if (m_SelectionMode == SelectionMode::MultiExtended)
-						{
-							if (0x8000 & GetKeyState(VK_SHIFT))
-							{
-								m_SelectionEnd = m_Tabulation;
-
-								int start = (std::min)(m_SelectionStart, m_SelectionEnd);
-								int end = (std::max)(m_SelectionStart, m_SelectionEnd);
-
-								ClearSelected();
-								for (; start <= end; ++start)
-								{
-									SetSelectedIndex(start, true);
-								}
-							}
-							else
-							{
-								m_SelectionStart = m_SelectionEnd = m_Tabulation;
-								ClearSelected();
-								SetSelectedIndex(m_Tabulation, true);
-							}
-						}
-
-						auto drawableArea = GetDrawableArea();
-
-						if (m_RowPosition[m_Tabulation].bottom > drawableArea->bottom && IsVerticalScrollEnabled())
-						{
-							HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation - m_TotalItemsInDrawableArea + 1), 0);
-						}
-
-						if (m_RowPosition[m_Tabulation].top < drawableArea->top && IsVerticalScrollEnabled())
-						{
-							HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation), 0);
-						}
-
-						if (m_RowPosition[m_Tabulation].left < drawableArea->left && IsHorizontalScrollEnabled())
-						{
-							HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation / m_RowNumber), 0);
-						}
-					}
-					else
-					{
-						if (IsVerticalScrollEnabled())
-						{
-							HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, 0), 0);
-						}
-					}
-
-					break;
-				}
-				case VK_LEFT:
-				{
-					if (!m_IsMultiColumn)
-					{
-						break;
-					}
-
-					if (m_Tabulation > m_RowNumber - 1)
-					{
-						auto drawableArea = GetDrawableArea();
-
-						Items[m_Tabulation].Tabulated = false;
-						m_Tabulation -= m_RowNumber;
-						Items[m_Tabulation].Tabulated = true;
-
-						if (m_SelectionMode == SelectionMode::Single) m_SelectedIndex = m_Tabulation;
-						else if (m_SelectionMode == SelectionMode::MultiExtended)
-						{
-							if (0x8000 & GetKeyState(VK_SHIFT))
-							{
-								m_SelectionEnd = m_Tabulation;
-
-								int start = (std::min)(m_SelectionStart, m_SelectionEnd);
-								int end = (std::max)(m_SelectionStart, m_SelectionEnd);
-
-								ClearSelected();
-								for (; start <= end; ++start)
-								{
-									SetSelectedIndex(start, true);
-								}
-							}
-							else
-							{
-								m_SelectionStart = m_SelectionEnd = m_Tabulation;
-								ClearSelected();
-								SetSelectedIndex(m_Tabulation, true);
-							}
-						}
-
-						if (m_RowPosition[m_Tabulation].right > drawableArea->right && IsHorizontalScrollEnabled())
-						{
-							HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation / m_RowNumber - m_TotalItemsInDrawableArea + 1), 0);
-						}
-
-						if (m_RowPosition[m_Tabulation].left < drawableArea->left && IsHorizontalScrollEnabled())
-						{
-							HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation / m_RowNumber), 0);
-						}
-					}
-					else
-					{
-						if (IsHorizontalScrollEnabled())
-						{
-							HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, 0), 0);
-						}
-					}
-
-					break;
-				}
-				case VK_RIGHT:
-				{
-					if (!m_IsMultiColumn)
-					{
-						break;
-					}
-
-					if (m_Tabulation < static_cast<int>(GetDataSource().size()) - m_RowNumber)
-					{
-						auto drawableArea = GetDrawableArea();
-
-						Items[m_Tabulation].Tabulated = false;
-						m_Tabulation += m_RowNumber;
-						Items[m_Tabulation].Tabulated = true;
-
-						if (m_SelectionMode == SelectionMode::Single) m_SelectedIndex = m_Tabulation;
-						else if (m_SelectionMode == SelectionMode::MultiExtended)
-						{
-							if (0x8000 & GetKeyState(VK_SHIFT))
-							{
-								m_SelectionEnd = m_Tabulation;
-
-								int start = (std::min)(m_SelectionStart, m_SelectionEnd);
-								int end = (std::max)(m_SelectionStart, m_SelectionEnd);
-
-								ClearSelected();
-								for (; start <= end; ++start)
-								{
-									SetSelectedIndex(start, true);
-								}
-							}
-							else
-							{
-								m_SelectionStart = m_SelectionEnd = m_Tabulation;
-								ClearSelected();
-								SetSelectedIndex(m_Tabulation, true);
-							}
-						}
-
-						if (m_RowPosition[m_Tabulation].right > drawableArea->right && IsHorizontalScrollEnabled())
-						{
-							HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation / m_RowNumber - m_TotalItemsInDrawableArea + 1), 0);
-						}
-
-						if (m_RowPosition[m_Tabulation].left < drawableArea->left && IsHorizontalScrollEnabled())
-						{
-							HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation / m_RowNumber), 0);
-						}
-					}
-					else
-					{
-						if (IsHorizontalScrollEnabled())
-						{
-							HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation / m_RowNumber), 0);
-						}
-					}
-
-					break;
-				}
-				case VK_SPACE:
-				{
-					if (m_SelectionMode == SelectionMode::MultiSimple)
-					{
-						SetSelectedIndex(m_Tabulation, true);
-					}
-
-					break;
-				}
-				case VK_ESCAPE:
-				{
-					ClearSelected();
-					break;
-				}
-				case 'A':
-				{
-					if (0x8000 & GetKeyState(VK_CONTROL))
-					{
-						if (m_SelectionMode == SelectionMode::MultiSimple || m_SelectionMode == SelectionMode::MultiExtended)
-						{
-							SelectAll();
-						}
-					}
-					break;
-				}
-				case VK_NEXT:
-				{
-					if (IsHorizontalScrollEnabled())
-					{
-						HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_PAGERIGHT, 0), 0);
-					}
-
 					if (IsVerticalScrollEnabled())
 					{
-						HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_PAGEDOWN, 0), 0);
+						HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation), 0);
 					}
-
-					break;
 				}
-				case VK_PRIOR:
-				{
-					if (IsHorizontalScrollEnabled())
-					{
-						HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_PAGELEFT, 0), 0);
-					}
 
-					if (IsVerticalScrollEnabled())
-					{
-						HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_PAGEUP, 0), 0);
-					}
-
-					break;
-				}
+				break;
 			}
-		//}
+			case VK_UP:
+			{
+				if (m_Tabulation > 0)
+				{
+					Items[m_Tabulation--].Tabulated = false;
+					Items[m_Tabulation].Tabulated = true;
+
+
+					if (m_SelectionMode == SelectionMode::Single) m_SelectedIndex = m_Tabulation;
+					else if (m_SelectionMode == SelectionMode::MultiExtended)
+					{
+						if (0x8000 & GetKeyState(VK_SHIFT))
+						{
+							m_SelectionEnd = m_Tabulation;
+
+							int start = (std::min)(m_SelectionStart, m_SelectionEnd);
+							int end = (std::max)(m_SelectionStart, m_SelectionEnd);
+
+							ClearSelected();
+							for (; start <= end; ++start)
+							{
+								SetSelectedIndex(start, true);
+							}
+						}
+						else
+						{
+							m_SelectionStart = m_SelectionEnd = m_Tabulation;
+							ClearSelected();
+							SetSelectedIndex(m_Tabulation, true);
+						}
+					}
+
+					auto drawableArea = GetDrawableArea();
+
+					if (m_RowPosition[m_Tabulation].bottom > drawableArea->bottom && IsVerticalScrollEnabled())
+					{
+						HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation - m_TotalItemsInDrawableArea + 1), 0);
+					}
+
+					if (m_RowPosition[m_Tabulation].top < drawableArea->top && IsVerticalScrollEnabled())
+					{
+						HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation), 0);
+					}
+
+					if (m_RowPosition[m_Tabulation].left < drawableArea->left && IsHorizontalScrollEnabled())
+					{
+						HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation / m_RowNumber), 0);
+					}
+				}
+				else
+				{
+					if (IsVerticalScrollEnabled())
+					{
+						HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, 0), 0);
+					}
+				}
+
+				break;
+			}
+			case VK_LEFT:
+			{
+				if (!m_IsMultiColumn)
+				{
+					break;
+				}
+
+				if (m_Tabulation > m_RowNumber - 1)
+				{
+					auto drawableArea = GetDrawableArea();
+
+					Items[m_Tabulation].Tabulated = false;
+					m_Tabulation -= m_RowNumber;
+					Items[m_Tabulation].Tabulated = true;
+
+					if (m_SelectionMode == SelectionMode::Single) m_SelectedIndex = m_Tabulation;
+					else if (m_SelectionMode == SelectionMode::MultiExtended)
+					{
+						if (0x8000 & GetKeyState(VK_SHIFT))
+						{
+							m_SelectionEnd = m_Tabulation;
+
+							int start = (std::min)(m_SelectionStart, m_SelectionEnd);
+							int end = (std::max)(m_SelectionStart, m_SelectionEnd);
+
+							ClearSelected();
+							for (; start <= end; ++start)
+							{
+								SetSelectedIndex(start, true);
+							}
+						}
+						else
+						{
+							m_SelectionStart = m_SelectionEnd = m_Tabulation;
+							ClearSelected();
+							SetSelectedIndex(m_Tabulation, true);
+						}
+					}
+
+					if (m_RowPosition[m_Tabulation].right > drawableArea->right && IsHorizontalScrollEnabled())
+					{
+						HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation / m_RowNumber - m_TotalItemsInDrawableArea + 1), 0);
+					}
+
+					if (m_RowPosition[m_Tabulation].left < drawableArea->left && IsHorizontalScrollEnabled())
+					{
+						HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation / m_RowNumber), 0);
+					}
+				}
+				else
+				{
+					if (IsHorizontalScrollEnabled())
+					{
+						HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, 0), 0);
+					}
+				}
+
+				break;
+			}
+			case VK_RIGHT:
+			{
+				if (!m_IsMultiColumn)
+				{
+					break;
+				}
+
+				if (m_Tabulation < static_cast<int>(GetDataSource().size()) - m_RowNumber)
+				{
+					auto drawableArea = GetDrawableArea();
+
+					Items[m_Tabulation].Tabulated = false;
+					m_Tabulation += m_RowNumber;
+					Items[m_Tabulation].Tabulated = true;
+
+
+					if (m_SelectionMode == SelectionMode::Single) m_SelectedIndex = m_Tabulation;
+					else if (m_SelectionMode == SelectionMode::MultiExtended)
+					{
+						if (0x8000 & GetKeyState(VK_SHIFT))
+						{
+							m_SelectionEnd = m_Tabulation;
+
+							int start = (std::min)(m_SelectionStart, m_SelectionEnd);
+							int end = (std::max)(m_SelectionStart, m_SelectionEnd);
+
+							ClearSelected();
+							for (; start <= end; ++start)
+							{
+								SetSelectedIndex(start, true);
+							}
+						}
+						else
+						{
+							m_SelectionStart = m_SelectionEnd = m_Tabulation;
+							ClearSelected();
+							SetSelectedIndex(m_Tabulation, true);
+						}
+					}
+
+					if (m_RowPosition[m_Tabulation].right > drawableArea->right && IsHorizontalScrollEnabled())
+					{
+						HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation / m_RowNumber - m_TotalItemsInDrawableArea + 1), 0);
+					}
+
+					if (m_RowPosition[m_Tabulation].left < drawableArea->left && IsHorizontalScrollEnabled())
+					{
+						HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation / m_RowNumber), 0);
+					}
+				}
+				else
+				{
+					if (IsHorizontalScrollEnabled())
+					{
+						HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation / m_RowNumber), 0);
+					}
+				}
+
+				break;
+			}
+			case VK_SPACE:
+			{
+				if (m_SelectionMode == SelectionMode::MultiSimple)
+				{
+					SetSelectedIndex(m_Tabulation, true);
+				}
+
+				break;
+			}
+			case VK_ESCAPE:
+			{
+				ClearSelected();
+				break;
+			}
+			case 'A':
+			{
+				if (0x8000 & GetKeyState(VK_CONTROL))
+				{
+					if (m_SelectionMode == SelectionMode::MultiSimple || m_SelectionMode == SelectionMode::MultiExtended)
+					{
+						SelectAll();
+					}
+				}
+				break;
+			}
+			case VK_NEXT:
+			{
+				if (IsHorizontalScrollEnabled())
+				{
+					HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_PAGERIGHT, 0), 0);
+				}
+
+				if (IsVerticalScrollEnabled())
+				{
+					HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_PAGEDOWN, 0), 0);
+				}
+
+				break;
+			}
+			case VK_PRIOR:
+			{
+				if (IsHorizontalScrollEnabled())
+				{
+					HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_PAGELEFT, 0), 0);
+				}
+
+				if (IsVerticalScrollEnabled())
+				{
+					HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_PAGEUP, 0), 0);
+				}
+
+				break;
+			}
+		}
 	}
 
 	Update();
@@ -748,7 +747,14 @@ void ListBox::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlag
 		{
 			if (y >= it->top && y <= it->bottom && x >= it->left && x <= it->right)
 			{
+				if (m_Tabulation > -1)
+				{
+					int oldTab = m_Tabulation;
+					Items[oldTab].Tabulated = false;
+				}
+
 				m_Tabulation = i;
+				Items[m_Tabulation].Tabulated = true;
 
 				if (m_SelectionMode == SelectionMode::MultiExtended)
 				{
@@ -768,10 +774,10 @@ void ListBox::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlag
 					else
 					{
 						m_SelectionStart = m_SelectionEnd = i;
-						
-						if((keyFlags & MK_CONTROL))
+
+						if ((keyFlags & MK_CONTROL))
 						{
-						    SetSelectedIndex(i, !Items[i].Selected);
+							SetSelectedIndex(i, !Items[i].Selected);
 						}
 						else
 						{
@@ -781,7 +787,7 @@ void ListBox::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlag
 						}
 					}
 				}
-				else 
+				else
 				{
 					SetSelectedIndex(i, true);
 				}
@@ -832,7 +838,6 @@ void ListBox::SetSelectedIndex(int index, bool value)
 		{
 			if (index < -1 || index >= Items.size()) throw ArgumentOutOfRangeException("index");
 
-
 			if (index == -1)
 			{
 				m_SelectedValue = "";
@@ -850,9 +855,9 @@ void ListBox::SetSelectedIndex(int index, bool value)
 				{
 					Items[index].Selected = true;
 					m_SelectedValue = Items[index].Value;
-					
+
 					// Clear old selection
-					Items[m_SelectedIndex].Selected = false;
+					Items[index].Selected = false;
 					m_SelectedIndex = index;
 				}
 			}
@@ -896,11 +901,11 @@ void ListBox::SetSelectedIndex(int index, bool value)
 					if (m_SelectedIndices.size() == 0) m_SelectedIndex = -1;
 					else m_SelectedIndex = m_SelectedIndices.back();
 				}
-				else if(!Items[index].Selected && value)
+				else if (!Items[index].Selected && value)
 				{
 					Items[index].Selected = true;
 					// Select this item while keeping any previously selected items selected.
-					m_SelectedIndices.push_back(Items[index].Id);
+					m_SelectedIndices.push_back(index);
 					m_SelectedItems.push_back(&Items[index]);
 					m_SelectedValue = Items[index].Value;
 					m_SelectedIndex = index;
