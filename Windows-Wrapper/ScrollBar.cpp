@@ -57,6 +57,8 @@ void ScrollBar::Initialize()
 	{
 		throw CTL_LAST_EXCEPT();
 	}
+
+	DisableTabStop();
 }
 
 int ScrollBar::GetScrolling() const noexcept

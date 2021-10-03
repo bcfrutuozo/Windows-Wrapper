@@ -9,6 +9,7 @@ class Button final: public Control
 
 private:
 
+	HBITMAP m_BackgroundImage;
 	FlatButtonAppearance m_FlatAppearance;
 	FlatStyle m_FlatStyle;
 

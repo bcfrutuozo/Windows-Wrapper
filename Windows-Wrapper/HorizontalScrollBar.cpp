@@ -7,6 +7,8 @@ void HorizontalScrollBar::Draw(const Graphics& graphics, Drawing::Rectangle rect
 
 void HorizontalScrollBar::OnHorizontalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int code, int pos)
 {
+	if (GetFocus() != static_cast<HWND>(Parent->Handle.ToPointer())) SetFocus(static_cast<HWND>(Parent->Handle.ToPointer()));
+
 	int nPos;
 	int nOldPos;
 	SCROLLINFO si = { 0 };

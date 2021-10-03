@@ -144,6 +144,8 @@ void Label::Initialize()
 	{
 		throw CTL_LAST_EXCEPT();
 	}
+
+	DisableTabStop();
 }
 
 BorderStyle Label::GetBorderStyle() const noexcept

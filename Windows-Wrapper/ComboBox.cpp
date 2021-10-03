@@ -342,7 +342,7 @@ void ComboBox::ComboBoxChildNativeWindow::Draw(const Graphics& graphics, Drawing
 	// Perform the bit-block transfer between the memory Device Context which has the next bitmap
 	// with the current image to avoid flickering
 
-		BitBlt(hdc, 0, 0, m_Size.Width, m_Size.Height, hdcMem, 0, 0, SRCCOPY);
+	BitBlt(hdc, 0, 0, m_Size.Width, m_Size.Height, hdcMem, 0, 0, SRCCOPY);
 
 	SelectObject(hdcMem, hbmOld);
 	DeleteObject(hbmOld);
@@ -359,17 +359,18 @@ size_t ComboBox::ComboBoxChildNativeWindow::GetMouseOverIndex() const noexcept
 
 void ComboBox::SetSelectedIndex(int index, bool value)
 {
-	m_SelectedIndex = index;
 
-	if (m_SelectedIndex == -1)
+	if (index == -1)
 	{
 		m_SelectedValue = "";
 	}
 	else
 	{
 		Items[index].Selected = value;
-		m_SelectedValue = Items[m_SelectedIndex].Value;
+		m_SelectedValue = Items[index].Value;
 	}
+
+	m_SelectedIndex = index;
 
 	Update();
 }
@@ -390,6 +391,6 @@ void ComboBox::SetSelectedValue(const ListItem& item)
 
 	if (err)
 	{
-		throw ArgumentException("item");
+		throw ArgumentException("The following Item could not be found on the ComboBox");
 	}
 }

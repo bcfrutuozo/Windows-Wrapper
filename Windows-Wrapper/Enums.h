@@ -1,5 +1,29 @@
 #pragma once
 
+enum class ImageLayout
+{
+	//
+	// Summary:
+	//     The image is left-aligned at the top across the control's client rectangle.
+	None,
+	//
+	// Summary:
+	//     The image is tiled across the control's client rectangle.
+	Tile,
+	//
+	// Summary:
+	//     The image is centered within the control's client rectangle.
+	Center,
+	//
+	// Summary:
+	//     The image is stretched across the control's client rectangle.
+	Stretch,
+	//
+	// Summary:
+	//     The image is enlarged within the control's client rectangle.
+	Zoom
+};
+
 enum class CloseReason
 {
 	//

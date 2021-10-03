@@ -32,12 +32,12 @@ class Control : public WinAPI
 private:
 
 	// Tabulation fields
+	bool m_IsTabSelected;
+	bool m_IsTabStop;
 	int m_TabIndex;
 	static int m_IncrementalTabIndex;
-	std::string Name;
 
-	// Variable to check if control is tab selected
-	bool m_IsTabSelected;
+	std::string Name;
 
 	void OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) override;
 	void OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) override;
@@ -141,4 +141,7 @@ public:
 	int GetTabIndex() const noexcept;
 	void SetTabIndex(const int& index) noexcept;
 	void SetFont(Font font) noexcept override;
+	void EnableTabStop() noexcept;
+	void DisableTabStop() noexcept;
+	bool IsTabStop() const noexcept;
 };

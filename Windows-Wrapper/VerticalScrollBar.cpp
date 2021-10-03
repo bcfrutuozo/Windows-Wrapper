@@ -28,6 +28,8 @@ void VerticalScrollBar::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int c
 
 void VerticalScrollBar::OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int code, int pos)
 {
+	if(GetFocus() != static_cast<HWND>(Parent->Handle.ToPointer())) SetFocus(static_cast<HWND>(Parent->Handle.ToPointer()));
+
 	int nPos;
 	int nOldPos;
 	SCROLLINFO si = { 0 };

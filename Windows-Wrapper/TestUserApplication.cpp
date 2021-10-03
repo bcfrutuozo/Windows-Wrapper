@@ -14,7 +14,7 @@ void TestUserApplication::Initialize()
 	window->GetKeyboard().DisableAutorepeat();
 	
 	auto lb = window->AddListBox(260, 240, 450, 50);
-    lb->SetSelectionMode(SelectionMode::None);
+    lb->SetSelectionMode(SelectionMode::Single);
     std::vector<ListItem> list;
 	for (int i = 0; i < 1000; ++i)
 	{

@@ -93,7 +93,7 @@ void Control::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlag
 	{
 		const auto& newCtl = GetByHandle(hwnd);
 
-		if (newCtl->IsEnabled())
+		if (newCtl->IsEnabled() && newCtl->IsTabStop())
 		{
 			SetFocus(static_cast<HWND>(newCtl->Handle.ToPointer()));
 		}
@@ -153,6 +153,27 @@ Control::Control(Control* parent, const std::string& text) noexcept
 
 }
 
+void Control::EnableTabStop() noexcept
+{
+	if (!IsTabStop())
+	{
+		m_IsTabStop = true;
+	}
+}
+
+void Control::DisableTabStop() noexcept
+{
+	if (IsTabStop())
+	{
+		m_IsTabStop = false;
+	}
+}
+
+bool Control::IsTabStop() const noexcept
+{
+	return m_IsTabStop;
+}
+
 void Control::SetFont(Font font) noexcept
 {
 	for (const auto& c : Controls)
@@ -177,6 +198,7 @@ Control::Control(Control* parent, const std::string& text, int width, int height
 	m_Margin(3, 3, 3, 3),	// Default margin for controls
 	m_TabIndex(m_IncrementalTabIndex++),
 	m_IsTabSelected(false),
+	m_IsTabStop(true),
 	m_MinSize(0u),
 	OnActivate(nullptr),
 	OnClick(nullptr),
@@ -407,7 +429,7 @@ Control* Control::GetPreviousControl() noexcept
 		for (auto i = searchIndex; i >= 0; --i)
 		{
 			const auto& ret = root->GetByTabIndex(i);
-			if (ret != nullptr && ret->IsEnabled())
+			if (ret != nullptr && ret->IsEnabled() && ret->IsTabStop())
 			{
 				return ret;
 			}
@@ -432,7 +454,7 @@ Control* Control::GetNextControl() noexcept
 		for (auto i = searchIndex; i < m_IncrementalTabIndex; ++i)
 		{
 			const auto& ret = root->GetByTabIndex(i);
-			if (ret != nullptr && ret->IsEnabled())
+			if (ret != nullptr && ret->IsEnabled() && ret->IsTabStop())
 			{
 				return ret;
 			}

@@ -271,6 +271,7 @@ void ProgressBar::Initialize()
 
 	m_BackgroundColor = Color(75, 154, 255);
 	m_ForeColor = Color::Foreground();
+	DisableTabStop();
 }
 
 int ProgressBar::GetValue() const noexcept
