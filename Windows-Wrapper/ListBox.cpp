@@ -738,6 +738,8 @@ void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 
 void ListBox::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
 {
+	if (m_SelectionMode == SelectionMode::None) return;
+
 	int i = 0;
 
 	const auto drawableArea = GetDrawableArea();
