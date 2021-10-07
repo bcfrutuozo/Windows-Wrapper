@@ -7,9 +7,15 @@
 #include "ControlException.h"
 #include "DivideByZeroException.h"
 #include "Exception.h"
+#include "ExternalException.h"
+#include "FileNotFoundException.h"
+#include "InvalidCastException.h"
 #include "InvalidOperationException.h"
+#include "IOException.h"
 #include "NotImplementedException.h"
 #include "NotSupportedException.h"
+#include "OutOfMemoryException.h"
+#include "OverflowException.h"
 
 /**************************************************************************************************************************************
 ArgumentException macro translations:
@@ -74,14 +80,42 @@ DivideByZeroException(const std::string& message, Exception* const innerExceptio
 Exception macro translations:
 
 Exception()
-Exception(HRESULT hr)
-Exception(HRESULT hr, const std::string& message)
 Exception(const std::string& message)
-Exception(HRESULT hr, const std::string& message, Exception* const innerException)
 Exception(const std::string& message, Exception* const innerException)
 **************************************************************************************************************************************/
 #define Exception(...) Exception( __LINE__, __FILE__, ##__VA_ARGS__)
 #define LAST_EXCEPTION() Exception(GetLastError())
+
+/**************************************************************************************************************************************
+ExternalException macro translations:
+
+ExternalException()
+ExternalException(const std::string& message)
+ExternalException(const std::string& message, Exception* const innerException)
+ExternalException(const std::string& message, int errorCode)
+**************************************************************************************************************************************/
+#define ExternalException(...) ExternalException(__LINE__, __FILE__, ##__VA_ARGS__)
+
+/**************************************************************************************************************************************
+FileNotFoundException macro translations:
+
+FileNotFoundException()
+FileNotFoundException(const std::string& message)
+FileNotFoundException(const std::string& message, Exception* const innerException)
+FileNotFoundException(const std::string& message, const std::string& filename)
+FileNotFoundException(const std::string& message, const std::string& filename, Exception* const innerException)
+**************************************************************************************************************************************/
+#define FileNotFoundException(...) FileNotFoundException(__LINE__, __FILE__, ##__VA_ARGS__)
+
+/**************************************************************************************************************************************
+InvalidCastException macro translations:
+
+InvalidCastException()
+InvalidCastException(const std::string& message)
+InvalidCastException(const std::string& message, Exception* const innerException)
+InvalidCastException(const std::string& message, HRESULT hr)
+**************************************************************************************************************************************/
+#define InvalidCastException(...) InvalidCastException(__LINE__, __FILE__, ##__VA_ARGS__)
 
 /**************************************************************************************************************************************
 InvalidOperationException macro translations:
@@ -91,6 +125,16 @@ InvalidOperationException(const std::string& message)
 InvalidOperationException(const std::string& message, Exception* const innerException)
 **************************************************************************************************************************************/
 #define InvalidOperationException(...) InvalidOperationException(__LINE__, __FILE__, ##__VA_ARGS__)
+
+/**************************************************************************************************************************************
+IOException macro translations:
+
+IOException()
+IOException(const std::string& message)
+IOException(const std::string& message, Exception* const innerException)
+IOException(const std::string& message, HRESULT hr)
+**************************************************************************************************************************************/
+#define IOException(...) IOException(__LINE__, __FILE__, ##__VA_ARGS__)
 
 /**************************************************************************************************************************************
 NotImplementedException macro translations:
@@ -109,6 +153,24 @@ NotSupportedException(const std::string& message)
 NotSupportedException(const std::string& message, Exception* const innerException)
 **************************************************************************************************************************************/
 #define NotSupportedException(...) NotSupportedException(__LINE__, __FILE__, ##__VA_ARGS__)
+
+/**************************************************************************************************************************************
+OutOfMemoryException macro translations:
+
+OutOfMemoryException()
+OutOfMemoryException(const std::string& message)
+OutOfMemoryException(const std::string& message, Exception* const innerException)
+**************************************************************************************************************************************/
+#define OutOfMemoryException(...) OutOfMemoryException(__LINE__, __FILE__, ##__VA_ARGS__)
+
+/**************************************************************************************************************************************
+OverflowException macro translations:
+
+OverflowException()
+OverflowException(const std::string& message)
+OverflowException(const std::string& message, Exception* const innerException)
+**************************************************************************************************************************************/
+#define OverflowException(...) OverflowException(__LINE__, __FILE__, ##__VA_ARGS__)
 
 /**************************************************************************************************************************************
 !!! Important !!!

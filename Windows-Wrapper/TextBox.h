@@ -32,8 +32,8 @@ private:
 		CutAndPaste,
 	};
 
-	void PreDraw(const Graphics& graphics) override;
-	void Draw(const Graphics& graphics, Drawing::Rectangle rectangle) override;
+	void PreDraw(Graphics* const graphics) override;
+	void Draw(Graphics* const graphics, Drawing::Rectangle rectangle) override;
 	int OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept override;
 	int OnGetDLGCode_Impl(HWND hwnd, LPMSG msg) noexcept override;
 	void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept override;

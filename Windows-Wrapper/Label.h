@@ -11,7 +11,7 @@ private:
 	BorderStyle m_BorderStyle;
 	FlatStyle m_FlatStyle;
 
-	void Draw(const Graphics& graphics, Drawing::Rectangle rectangle) override;
+	void Draw(Graphics* const graphics, Drawing::Rectangle rectangle) override;
 
 	Label(Control* parent, const std::string& text, int x, int y);
 

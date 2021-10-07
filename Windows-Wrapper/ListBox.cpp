@@ -1,7 +1,7 @@
 #include "ListBox.h"
 #include "ComboBox.h"
 
-void ListBox::PreDraw(const Graphics& graphics)
+void ListBox::PreDraw(Graphics* const graphics)
 {
 	// Load current font from default PreDraw function
 	WinAPI::PreDraw(graphics);
@@ -11,7 +11,7 @@ void ListBox::PreDraw(const Graphics& graphics)
 		// Example test draw with the desired font to calculate each ListBox item size
 		SIZE m_SingleSize;
 		const char* verifier = "A";
-		GetTextExtentPoint32(static_cast<HDC>(graphics.GetHDC().ToPointer()), verifier, 2, &m_SingleSize);
+		GetTextExtentPoint32(static_cast<HDC>(graphics->GetHDC().ToPointer()), verifier, 2, &m_SingleSize);
 		SetMinimumItemWidth(m_SingleSize.cx);
 
 		m_BorderSize = 0;
@@ -180,10 +180,10 @@ void ListBox::PreDraw(const Graphics& graphics)
 	}
 }
 
-void ListBox::Draw(const Graphics& graphics, Drawing::Rectangle rectangle)
+void ListBox::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 {
 	auto hwnd = static_cast<HWND>(Handle.ToPointer());
-	auto hdc = static_cast<HDC>(graphics.GetHDC().ToPointer());
+	auto hdc = static_cast<HDC>(graphics->GetHDC().ToPointer());
 
 	HDC hdcMem;
 	HBITMAP hbmMem;

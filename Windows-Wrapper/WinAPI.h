@@ -14,9 +14,9 @@
 #include "KeyEventArgs.h"
 #include "KeyPressEventArgs.h"
 #include "MessageMapper.h"
-#include "Graphics.h"
 #include "Rectangle.h"
 
+class Graphics;
 class Window;
 
 class WinAPI : public Component, public IHandle
@@ -60,7 +60,7 @@ private:
 
 	Size m_Size;
 	Point m_Location;
-	Graphics m_Graphics;
+	Graphics* m_Graphics;
 	Font m_Font;
 	Color m_ForeColor;
 	Color m_BackgroundColor;
@@ -84,14 +84,14 @@ private:
 	MouseEventArgs ArgsOnMouseWheel;
 
 	// Default PreDraw function which is used to recalculate elements according to DataSource, number of elements, etc...
-	virtual void PreDraw(const Graphics& graphics);
+	virtual void PreDraw(Graphics* const graphics);
 
 	// Private Draw function called to base draw the control
 	// Rectangle is not passed as reference because it will be modified to draw elements while the user must receive the original one
-	virtual void Draw(const Graphics& graphics, Drawing::Rectangle rectangle) = 0;
+	virtual void Draw(Graphics* const graphics, Drawing::Rectangle rectangle) = 0;
 
 	// Perform the PostDraw to clear drawing objects
-	virtual void PostDraw(const Graphics& graphics);
+	virtual void PostDraw(Graphics* const graphics);
 
 	/***** Global events declaration *****/
 	/* All are virtual to be overritten on the derived classes. Not all should be, but events like OnPaint(), OnMouseOver(),
@@ -170,7 +170,7 @@ public:
 	void Enable();
 	void Disable();
 	virtual void Update() const;
-	const Graphics& CreateGraphics() const noexcept;
+	const Graphics* CreateGraphics() const noexcept;
 	bool IsShown() const noexcept;
 	virtual void Hide();
 	virtual void Show();

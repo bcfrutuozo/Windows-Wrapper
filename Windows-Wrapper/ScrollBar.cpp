@@ -1,10 +1,10 @@
 #include "ScrollBar.h"
 #include "ScrollableControl.h"
 
-void ScrollBar::Draw(const Graphics& graphics, Drawing::Rectangle rectangle)
+void ScrollBar::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 {
 	auto hwnd = static_cast<HWND>(Handle.ToPointer());
-	auto hdc = static_cast<HDC>(graphics.GetHDC().ToPointer());
+	auto hdc = static_cast<HDC>(graphics->GetHDC().ToPointer());
 
 	HDC hdcMem = CreateCompatibleDC(hdc);
 	HBITMAP hbmMem = CreateCompatibleBitmap(hdc, m_Size.Width, m_Size.Height);

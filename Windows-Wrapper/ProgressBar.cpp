@@ -1,9 +1,9 @@
 #include "ProgressBar.h"
 
-void ProgressBar::Draw(const Graphics& graphics, Drawing::Rectangle rectangle)
+void ProgressBar::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 {
 	auto hwnd = static_cast<HWND>(Handle.ToPointer());
-	auto hdc = static_cast<HDC>(graphics.GetHDC().ToPointer());
+	auto hdc = static_cast<HDC>(graphics->GetHDC().ToPointer());
 
 	// Process default paint only when thread is not running
 	if (m_IsRunning)

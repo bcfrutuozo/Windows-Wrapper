@@ -16,7 +16,7 @@ private:
 	std::thread m_UpdateThread;
 	volatile int m_Speed;
 
-	void Draw(const Graphics& graphics, Drawing::Rectangle rectangle);
+	void Draw(Graphics* const graphics, Drawing::Rectangle rectangle);
 	int OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept override;
 	void OnPaintMarquee_Thread(HWND hwnd) noexcept;
 

@@ -5,14 +5,13 @@
 #include "Rectangle.h"
 #include "IDeviceContext.h"
 
-class PaintEventArgs : public EventArgs, public IDeviceContext
+class PaintEventArgs : public EventArgs, IDisposable
 {
 public:
 
-	PaintEventArgs(Graphics gfx, Drawing::Rectangle rect)
+	PaintEventArgs(Graphics* const graphics, Drawing::Rectangle rect)
 		:
-		IDeviceContext(gfx.GetHDC()),
-		Graphics(gfx),
+		Graphics(graphics),
 		Rectangle(rect)
 	{
 
@@ -20,9 +19,9 @@ public:
 
 	void Dispose() override
 	{
-		Graphics.Dispose();
+		Graphics->Dispose();
 	}
 
-	Graphics Graphics;
+	Graphics* const Graphics;
 	Drawing::Rectangle Rectangle;
 };

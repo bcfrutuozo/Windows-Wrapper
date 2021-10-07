@@ -1,18 +1,22 @@
 #include "SystemException.h"
 
-// SystemException uses the HRESULT COR_E_SYSTEM, that has the value 0x80131501.
-
 SystemException::SystemException(int line, const char* file) noexcept
 	:
-	Exception(line, file, 0x80131501)
-{	}
+	Exception(line, file, "Arg_SystemException")
+{
+	SetErrorCode(HResult::COR_E_SYSTEM);
+}
 
 SystemException::SystemException(int line, const char* file, const std::string& message) noexcept
 	:
-	Exception(line, file, 0x80131501, message)
-{	}
+	Exception(line, file, message)
+{
+	SetErrorCode(HResult::COR_E_SYSTEM);
+}
 
 SystemException::SystemException(int line, const char* file, const std::string& message, Exception* const innerException) noexcept
 	:
-	Exception(line, file, 0x80131501, message, innerException)
-{	}
+	Exception(line, file, message, innerException)
+{
+	SetErrorCode(HResult::COR_E_SYSTEM);
+}

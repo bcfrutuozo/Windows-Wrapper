@@ -162,12 +162,21 @@
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="Container.cpp" />
     <ClCompile Include="ControlException.cpp" />
+    <ClCompile Include="Direct2D.cpp" />
     <ClCompile Include="DivideByZeroException.cpp" />
+    <ClCompile Include="EncoderParameter.cpp" />
     <ClCompile Include="EventDispatcher.cpp" />
+    <ClCompile Include="ExternalException.cpp" />
+    <ClCompile Include="File.cpp" />
+    <ClCompile Include="FileNotFoundException.cpp" />
     <ClCompile Include="Font.cpp" />
+    <ClCompile Include="GDI.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="HorizontalScrollBar.cpp" />
+    <ClCompile Include="Image.cpp" />
+    <ClCompile Include="InvalidCastException.cpp" />
     <ClCompile Include="InvalidOperationException.cpp" />
+    <ClCompile Include="IOException.cpp" />
     <ClCompile Include="Label.cpp" />
     <ClCompile Include="ListBox.cpp" />
     <ClCompile Include="ListControl.cpp" />
@@ -175,6 +184,8 @@
     <ClCompile Include="MenuStrip.cpp" />
     <ClCompile Include="NotImplementedException.cpp" />
     <ClCompile Include="NotSupportedException.cpp" />
+    <ClCompile Include="OutOfMemoryException.cpp" />
+    <ClCompile Include="OverflowException.cpp" />
     <ClCompile Include="PointF.cpp" />
     <ClCompile Include="Rectangle.cpp" />
     <ClCompile Include="RectangleF.cpp" />
@@ -228,22 +239,30 @@
   <ItemGroup>
     <ClInclude Include="ArgumentNullException.h" />
     <ClInclude Include="ArgumentOutOfRangeException.h" />
+    <ClInclude Include="Bitmap.h" />
     <ClInclude Include="CancelEventArgs.h" />
     <ClInclude Include="CancelEventHandler.h" />
     <ClInclude Include="ComboBox.h" />
     <ClInclude Include="CommonObject.h" />
     <ClInclude Include="Appheaders.h" />
     <ClInclude Include="ArithmeticException.h" />
+    <ClInclude Include="Direct2D.h" />
     <ClInclude Include="DivideByZeroException.h" />
+    <ClInclude Include="Encoder.h" />
+    <ClInclude Include="EncoderParameter.h" />
     <ClInclude Include="Exceptions.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Container.h" />
     <ClInclude Include="ControlException.h" />
     <ClInclude Include="ConvertEventArgs.h" />
     <ClInclude Include="EventDispatcher.h" />
+    <ClInclude Include="ExternalException.h" />
+    <ClInclude Include="File.h" />
+    <ClInclude Include="FileNotFoundException.h" />
     <ClInclude Include="FlatButtonAppearance.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="ArgumentException.h" />
+    <ClInclude Include="GDI.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="HorizontalScrollBar.h" />
     <ClInclude Include="IComparable.h" />
@@ -254,7 +273,10 @@
     <ClInclude Include="IEnumerable.h" />
     <ClInclude Include="IEnumerator.h" />
     <ClInclude Include="IEvent.h" />
+    <ClInclude Include="Image.h" />
+    <ClInclude Include="InvalidCastException.h" />
     <ClInclude Include="InvalidOperationException.h" />
+    <ClInclude Include="IOException.h" />
     <ClInclude Include="ISite.h" />
     <ClInclude Include="Keys.h" />
     <ClInclude Include="Label.h" />
@@ -266,6 +288,8 @@
     <ClInclude Include="MenuStrip.h" />
     <ClInclude Include="NotImplementedException.h" />
     <ClInclude Include="NotSupportedException.h" />
+    <ClInclude Include="OutOfMemoryException.h" />
+    <ClInclude Include="OverflowException.h" />
     <ClInclude Include="PaintEventArgs.h" />
     <ClInclude Include="PaintEventHandler.h" />
     <ClInclude Include="PointF.h" />
@@ -337,6 +361,7 @@
     <ClInclude Include="Guid.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="WindowClass.h" />
+    <ClInclude Include="_HResults.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />

@@ -16,7 +16,7 @@ private:
 	ToolStripGripStyle m_GripStyle;
 	ToolStripRenderMode m_Renderer;
 
-	void Draw(const Graphics& graphics, Drawing::Rectangle rectangle);
+	void Draw(Graphics* const graphics, Drawing::Rectangle rectangle);
 
 protected:
 

@@ -1,5 +1,6 @@
 #include "Button.h"
 #include "ControlException.h"
+#include "Direct2D.h"
 
 void Button::DrawBorder(HDC& hdc, RECT& rc)
 {
@@ -431,10 +432,12 @@ void Button::DrawBorder(HDC& hdc, RECT& rc)
 	}
 }
 
-void Button::Draw(const Graphics& graphics, Drawing::Rectangle rectangle)
+void Button::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 {
 	auto hwnd = static_cast<HWND>(Handle.ToPointer());
-	auto hdc = static_cast<HDC>(graphics.GetHDC().ToPointer());
+	auto hdc = static_cast<HDC>(graphics->GetHDC().ToPointer());
+	auto bgColor = GetBackgroundColor();
+	auto ftColor = GetForeColor();
 
 	SetBkMode(hdc, OPAQUE);
 	RECT rc;
@@ -449,10 +452,13 @@ void Button::Draw(const Graphics& graphics, Drawing::Rectangle rectangle)
 	SelectObject(hdcMem, hFont->second);
 
 	// Draw background inside before drawing borders to round rectangle
-	HBRUSH background = CreateSolidBrush(GetBackgroundColor().ToRGB());
+	HBRUSH background = CreateSolidBrush(bgColor.ToRGB());
 	FillRect(hdcMem, &rc, background);
 	SelectObject(hdcMem, background);
 	DeleteObject(background);
+
+	graphics->CreateSolidBrush(bgColor.ToString(), bgColor.ToRGB());
+	graphics->FillRectangle(rectangle, bgColor.ToString());
 
 	DrawBorder(hdcMem, rc);
 

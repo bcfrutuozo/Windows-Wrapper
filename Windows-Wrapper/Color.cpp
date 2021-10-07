@@ -45,3 +45,10 @@ inline bool Color::Equals(const Color* const c) const
 	if (c == nullptr) return c;
 	return rgba == c->rgba;
 }
+
+const std::string Color::ToString() const noexcept
+{
+	std::ostringstream oss;
+	oss << "{{ARGB=(" << ((rgba >> 24) & 0xFF) << ", " << ((rgba >> 0) & 0xFF) << ", " << ((rgba >> 8) & 0xFF) << ", " << ((rgba >> 16) & 0xFF) << ")}}";
+	return std::string();
+}

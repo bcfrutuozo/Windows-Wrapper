@@ -31,7 +31,7 @@ private:
 	static void HideCursor() noexcept;
 	static void ShowCursor() noexcept;
 
-	void Draw(const Graphics& graphics, Drawing::Rectangle rectangle) override;
+	void Draw(Graphics* const graphics, Drawing::Rectangle rectangle) override;
 
 protected:
 

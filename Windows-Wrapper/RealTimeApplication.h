@@ -19,7 +19,7 @@ protected:
 	RealTimeApplication(RealTimeApplication&&) = delete;				// Move constructor
 	RealTimeApplication& operator=(const Application&) = delete;		// Copy assignment constructor
 	RealTimeApplication& operator=(RealTimeApplication&&) = delete;		// Move assignment constructor
-	~RealTimeApplication() = default;
+	virtual ~RealTimeApplication() = default;
 
 public:
 
@@ -28,6 +28,8 @@ public:
 
 	static const int Run()
 	{
+		Start();
+
 		App.Initialize();
 
 		while (true)
@@ -57,6 +59,8 @@ public:
 			App.HandleInput(dt);
 			App.Process(dt);
 		}
+
+		Stop();
 	}
 };
 

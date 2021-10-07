@@ -1,7 +1,7 @@
 #include "HorizontalScrollBar.h"
 #include "ScrollableControl.h"
 
-void HorizontalScrollBar::Draw(const Graphics& graphics, Drawing::Rectangle rectangle)
+void HorizontalScrollBar::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 {
 }
 

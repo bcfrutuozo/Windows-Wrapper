@@ -176,9 +176,6 @@
     <ClCompile Include="Timer.cpp">
       <Filter>Helpers</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics.cpp">
-      <Filter>Types</Filter>
-    </ClCompile>
     <ClCompile Include="ArithmeticException.cpp">
       <Filter>Exceptions</Filter>
     </ClCompile>
@@ -199,6 +196,42 @@
     </ClCompile>
     <ClCompile Include="Font.cpp">
       <Filter>Types</Filter>
+    </ClCompile>
+    <ClCompile Include="Image.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
+    <ClCompile Include="File.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
+    <ClCompile Include="IOException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="FileNotFoundException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="ExternalException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="OutOfMemoryException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="OverflowException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="EncoderParameter.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
+    <ClCompile Include="Direct2D.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="InvalidCastException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="GDI.cpp">
+      <Filter>Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -491,9 +524,6 @@
     <ClInclude Include="IDeviceContext.h">
       <Filter>Interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics.h">
-      <Filter>Types</Filter>
-    </ClInclude>
     <ClInclude Include="PaintEventArgs.h">
       <Filter>Events</Filter>
     </ClInclude>
@@ -520,6 +550,51 @@
     </ClInclude>
     <ClInclude Include="Font.h">
       <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Image.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="File.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="IOException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="FileNotFoundException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="_HResults.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Bitmap.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="ExternalException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="OutOfMemoryException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="OverflowException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="EncoderParameter.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Encoder.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Direct2D.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="InvalidCastException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="GDI.h">
+      <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -558,6 +633,9 @@
     </Filter>
     <Filter Include="Application">
       <UniqueIdentifier>{af9ce343-c962-49f9-a7a8-2b15b999aecf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics">
+      <UniqueIdentifier>{3696c7ac-dbdf-4a9f-a2df-92213de83dad}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

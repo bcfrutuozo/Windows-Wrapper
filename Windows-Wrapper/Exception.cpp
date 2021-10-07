@@ -9,25 +9,6 @@ Exception::Exception(int line, const char* file) noexcept
 	m_HasHRResult(false),
 	m_InnerException(nullptr),
 	m_HR(0)
-{}
-
-Exception::Exception(int line, const char* file, HRESULT hr) noexcept
-	:
-	m_Line(line),
-	m_File(file),
-	m_HR(hr),
-	m_HasHRResult(true),
-	m_InnerException(nullptr)
-{ }
-
-Exception::Exception(int line, const char* file, HRESULT hr, const std::string & message) noexcept
-	:
-	m_Line(line),
-	m_File(file),
-	m_HR(hr),
-	m_HasHRResult(true),
-	m_Message(message),
-	m_InnerException(nullptr)
 {
 }
 
@@ -39,17 +20,6 @@ Exception::Exception(int line, const char* file, const std::string& message) noe
 	m_Message(message),
 	m_InnerException(nullptr),
 	m_HR(0)
-{
-}
-
-Exception::Exception(int line, const char* file, HRESULT hr, const std::string& message, Exception* const innerException) noexcept
-	:
-	m_Line(line),
-	m_File(file),
-	m_HR(hr),
-	m_HasHRResult(true),
-	m_Message(message),
-	m_InnerException(innerException)
 {
 }
 
@@ -96,7 +66,7 @@ const char* Exception::what() const noexcept
 		{
 			oss << ToString() << std::endl
 				<< "Error Code: 0x" << std::hex << std::uppercase << GetErrorCode()
-				<< std::dec << " (" << static_cast<unsigned long>(GetErrorCode()) << ")" << std::endl
+				<< std::dec << " (" << GetErrorCode() << ")" << std::endl
 				<< "Description: " << TranslateErrorCode(m_HR) << std::endl
 				<< GetErrorSpot();
 		}
@@ -104,7 +74,7 @@ const char* Exception::what() const noexcept
 		{
 			oss << ToString() << std::endl
 				<< "Error Code: 0x" << std::hex << std::uppercase << GetErrorCode()
-				<< std::dec << " (" << static_cast<unsigned long>(GetErrorCode()) << ")" << std::endl
+				<< std::dec << " (" << GetErrorCode() << ")" << std::endl
 				<< "Description: " << TranslateErrorCode(m_HR) << std::endl
 				<< "Message: " << m_Message << std::endl
 				<< GetErrorSpot();
@@ -133,6 +103,12 @@ HRESULT Exception::GetErrorCode() const noexcept
 	return m_HR;
 }
 
+void Exception::SetErrorCode(HRESULT hr) noexcept
+{
+	m_HR = hr;
+	m_HasHRResult = (static_cast<long>(hr) != 0);
+}
+
 const std::string& Exception::GetFile() const noexcept
 {
 	return m_File;
@@ -143,6 +119,11 @@ std::string Exception::GetErrorSpot() const noexcept
 	std::ostringstream oss;
 	oss << "File: " << m_File << std::endl << "Line: " << m_Line;
 	return oss.str();
+}
+
+void Exception::SetMessage(const std::string& message) noexcept
+{
+	m_Message = message;
 }
 
 const std::string Exception::TranslateErrorCode(HRESULT hr) noexcept

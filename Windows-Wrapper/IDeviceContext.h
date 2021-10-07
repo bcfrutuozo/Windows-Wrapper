@@ -9,9 +9,14 @@ private:
 
 	IntPtr m_HDC;
 
-public:
+protected:
 
-	constexpr IDeviceContext(IntPtr hdcHandle) : m_HDC(hdcHandle) { }
+	inline void SetHDC(IntPtr dcHandle) noexcept
+	{ 
+		m_HDC = dcHandle; 
+	}
+
+public:
 
 	inline constexpr IntPtr GetHDC() const noexcept { return m_HDC; }
 };

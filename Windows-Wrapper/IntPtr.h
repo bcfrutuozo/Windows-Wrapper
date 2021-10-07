@@ -16,6 +16,7 @@ private:
 public:
 
 #ifdef _WIN64
+	constexpr IntPtr() : m_Ptr(0L) { }
 	constexpr IntPtr(const uint64_t ptr) : m_Ptr(ptr) {}
 	constexpr IntPtr(void* ptr) : m_Ptr(ptr == nullptr ? 0 : (uint64_t)ptr) {}
 
@@ -27,6 +28,7 @@ public:
 		return *this;
 	}
 #else
+	constexpr IntPtr() : m_Ptr(0) { }
 	constexpr IntPtr(const uint32_t ptr) : m_Ptr(ptr) {}
 	constexpr IntPtr(void* ptr) : m_Ptr(ptr == nullptr ? 0 : (uint32_t)ptr) {}
 #endif
@@ -63,6 +65,8 @@ public:
 	}
 
 	constexpr bool IsNull() const noexcept { return m_Ptr == 0; }
+	constexpr bool IsValid() const noexcept { return !IsNull(); }
+
 	static constexpr IntPtr Add(IntPtr p, uint32_t offset) noexcept { return IntPtr(p.m_Ptr + offset); }
 
 	constexpr IntPtr& operator=(uint32_t p) noexcept

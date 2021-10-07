@@ -3,20 +3,18 @@
 #include "WinAPI.h"
 #include "Application.h"
 #include "Window.h"
-
-// Includes for ::_TrackMouseEvent function
-#pragma comment(lib, "comctl32.lib")
-#include <Commctrl.h>
+#include "GDI.h"
+#include "Direct2D.h"
 
 std::map<std::string, HFONT>* WinAPI::Fonts = new std::map<std::string, HFONT>();
 unsigned int WinAPI::m_CurrentIndex = 1;
 IntPtr WinAPI::m_OpenedControl = nullptr;
 
 // Default PreDraw function which is used to recalculate elements according to DataSource, number of elements, etc...
-void WinAPI::PreDraw(const Graphics& graphics)
+void WinAPI::PreDraw(Graphics* const graphics)
 {
 	auto hwnd = static_cast<HWND>(Handle.ToPointer());
-	auto hdc = static_cast<HDC>(graphics.GetHDC().ToPointer());
+	auto hdc = static_cast<HDC>(graphics->GetHDC().ToPointer());
 
 	auto hFont = Fonts->find(m_Font.ToString());
 	
@@ -29,12 +27,12 @@ void WinAPI::PreDraw(const Graphics& graphics)
 	SelectObject(hdc, hFont->second);
 }
 
-void WinAPI::Draw(const Graphics& graphics, Drawing::Rectangle rectangle)
+void WinAPI::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 {
 
 }
 
-void WinAPI::PostDraw(const Graphics& graphics)
+void WinAPI::PostDraw(Graphics* const graphics)
 {
 
 }
@@ -334,25 +332,42 @@ void WinAPI::OnPaint_Impl(HWND hwnd)
 {
 	if (IsShown())
 	{
-		PAINTSTRUCT ps;
-		BeginPaint(hwnd, &ps);
-
+		if (m_Graphics == nullptr) 
+		{
+			m_Graphics = Graphics::Create(Handle, Application::GetGraphicsType());
+		}
 		
-		m_Graphics = Graphics(Handle, ps.hdc);
 		Drawing::Rectangle rect = Drawing::Rectangle(m_Location, m_Size);
 		PaintEventArgs pArgs = PaintEventArgs(m_Graphics, rect);
 
-		// Perform PreDraw to recalculate elements prior to drawing
+		m_Graphics->BeginDraw();
 		PreDraw(m_Graphics);
-
-		// Proceed with the Draw function
 		Draw(m_Graphics, rect);
 		Dispatch("OnPaint", &pArgs);
-
-		// Call PostDraw to handle additional processing and object cleaning
+		m_Graphics->EndDraw();
 		PostDraw(m_Graphics);
-		
-		EndPaint(hwnd, &ps);
+
+		//PAINTSTRUCT ps = { 0 };
+		//BeginPaint(hwnd, &ps);
+		//Direct2D::BeginDraw(this);
+
+		//
+		//m_Graphics = Graphics(Handle, ps.hdc);
+		//Drawing::Rectangle rect = Drawing::Rectangle(m_Location, m_Size);
+		//PaintEventArgs pArgs = PaintEventArgs(m_Graphics, rect);
+
+		//// Perform PreDraw to recalculate elements prior to drawing
+		//PreDraw(m_Graphics);
+
+		//// Proceed with the Draw function
+		//Draw(m_Graphics, rect);
+		//Dispatch("OnPaint", &pArgs);
+
+		//// Call PostDraw to handle additional processing and object cleaning
+		//PostDraw(m_Graphics);
+		//
+		//Direct2D::EndDraw();
+		//EndPaint(hwnd, &ps);
 	}
 }
 
@@ -428,7 +443,8 @@ WinAPI::WinAPI(int width, int height, int x, int y)
 	m_VerticalScrollPaging(0),
 	m_Size(width, height),
 	m_Location(x, y),
-	m_HasFontChanged(true)
+	m_HasFontChanged(true),
+	m_Graphics(nullptr)
 {
 
 }
@@ -439,6 +455,9 @@ WinAPI::~WinAPI() noexcept(false)
 	{
 		throw CTL_LAST_EXCEPT();
 	}
+
+	m_Graphics->ReleaseHDC();
+	SafeDelete(m_Graphics);
 }
 
 // Static function which handle WinAPI messages to corresponding member function of the control
@@ -725,7 +744,7 @@ void WinAPI::Update() const
 	InvalidateRect(static_cast<HWND>(Handle.ToPointer()), nullptr, true);
 }
 
-const Graphics& WinAPI::CreateGraphics() const noexcept
+const Graphics* WinAPI::CreateGraphics() const noexcept
 {
 	return m_Graphics;
 }

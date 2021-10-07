@@ -1,5 +1,10 @@
 #include "Application.h"
 #include "Window.h"
+#include "Graphics.h"
+
+bool Application::m_IsRunning = false;
+bool Application::m_HasGraphicsChanged = false;
+GraphicsType Application::m_SetGraphicsType = GraphicsType::GDI;
 
 std::list<Window*>* Application::Windows = new std::list<Window*>();
 
@@ -23,6 +28,23 @@ bool Application::RemoveWindow(Window* window)
 	return false;
 }
 
+void Application::Stop() noexcept
+{
+	m_IsRunning = false;
+}
+
+void Application::Start() noexcept
+{
+	m_IsRunning = true;
+	m_HasGraphicsChanged = false;
+}
+
+void Application::SetGraphicsType(GraphicsType graphicsType) noexcept
+{
+	m_SetGraphicsType = graphicsType; 
+	m_HasGraphicsChanged = true;
+}
+
 bool Application::CanCloseApplication() noexcept
 {
 	return (Windows->size() == 0);
@@ -39,7 +61,7 @@ void Application::Exit() noexcept
 		window = nullptr;
 	}
 
-	delete Windows;
-	Windows = nullptr;
+	SafeDelete(Windows);
+
 	PostQuitMessage(0);
 }

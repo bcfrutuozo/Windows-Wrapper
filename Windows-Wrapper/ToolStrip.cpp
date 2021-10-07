@@ -1,8 +1,8 @@
 #include "ToolStrip.h"
 
-void ToolStrip::Draw(const Graphics& graphics, Drawing::Rectangle rectangle)
+void ToolStrip::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 {
-	auto hdc = static_cast<HDC>(graphics.GetHDC().ToPointer());
+	auto hdc = static_cast<HDC>(graphics->GetHDC().ToPointer());
 	RECT rc = { 0 };
 	rc.left = rectangle.GetLeft();
 	rc.top = rectangle.GetTop();

@@ -4,9 +4,10 @@
 
 ArgumentOutOfRangeException::ArgumentOutOfRangeException(int line, const char* file) noexcept
 	:
-	ArgumentException(line, file),
+	ArgumentException(line, file, "Arg_ArgumentOutOfRangeException"),
 	m_Value(nullptr)
 {
+	SetErrorCode(HResult::COR_E_ARGUMENTOUTOFRANGE);
 }
 
 ArgumentOutOfRangeException::ArgumentOutOfRangeException(int line, const char* file, const std::string& param) noexcept
@@ -14,6 +15,7 @@ ArgumentOutOfRangeException::ArgumentOutOfRangeException(int line, const char* f
 	ArgumentException(line, file, "", param),
 	m_Value(nullptr)
 {
+	SetErrorCode(HResult::COR_E_ARGUMENTOUTOFRANGE);
 }
 
 ArgumentOutOfRangeException::ArgumentOutOfRangeException(int line, const char* file, const std::string& message, Exception* const innerException) noexcept
@@ -21,6 +23,7 @@ ArgumentOutOfRangeException::ArgumentOutOfRangeException(int line, const char* f
 	ArgumentException(line, file, message, innerException),
 	m_Value(nullptr)
 {
+	SetErrorCode(HResult::COR_E_ARGUMENTOUTOFRANGE);
 }
 
 ArgumentOutOfRangeException::ArgumentOutOfRangeException(int line, const char* file, const std::string& param, Object* value, const std::string& message) noexcept
@@ -28,6 +31,7 @@ ArgumentOutOfRangeException::ArgumentOutOfRangeException(int line, const char* f
 	ArgumentException(line, file, message, param),
 	m_Value(value)
 {
+	SetErrorCode(HResult::COR_E_ARGUMENTOUTOFRANGE);
 }
 
 ArgumentOutOfRangeException::ArgumentOutOfRangeException(int line, const char* file, const std::string& param, const std::string& message) noexcept
@@ -35,6 +39,7 @@ ArgumentOutOfRangeException::ArgumentOutOfRangeException(int line, const char* f
 	ArgumentException(line, file, message, param),
 	m_Value(nullptr)
 {
+	SetErrorCode(HResult::COR_E_ARGUMENTOUTOFRANGE);
 }
 
 const char* ArgumentOutOfRangeException::what() const noexcept

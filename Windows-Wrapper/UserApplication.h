@@ -22,6 +22,8 @@ public:
 
 	static const int Run()
 	{
+		Start();
+
 		App.Initialize();
 
 		MSG msg;
@@ -38,6 +40,8 @@ public:
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
+
+		Stop();
 
 		return 0;
 	}

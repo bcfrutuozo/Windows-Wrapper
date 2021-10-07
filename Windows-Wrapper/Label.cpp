@@ -1,9 +1,9 @@
 #include "Label.h"
 
-void Label::Draw(const Graphics& graphics, Drawing::Rectangle rectangle)
+void Label::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 {
 	auto hwnd = static_cast<HWND>(Handle.ToPointer());
-	auto hdc = static_cast<HDC>(graphics.GetHDC().ToPointer());
+	auto hdc = static_cast<HDC>(graphics->GetHDC().ToPointer());
 
 	SIZE s;
 	GetTextExtentPoint32(hdc, Text.c_str(), static_cast<int>(Text.length()), &s);

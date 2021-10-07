@@ -14,7 +14,7 @@ protected:
 	int Scrolling;
 	int MaximumValue;
 
-	void Draw(const Graphics& graphics, Drawing::Rectangle rectangle) override;
+	void Draw(Graphics* const graphics, Drawing::Rectangle rectangle) override;
 
 	ScrollBar(ScrollableControl* parent, int width, int height, int x, int y);
 

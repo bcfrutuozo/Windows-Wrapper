@@ -2,6 +2,7 @@
 
 #include "Control.h"
 #include "FlatButtonAppearance.h"
+#include "Image.h"
 
 class Button final: public Control
 {
@@ -9,13 +10,13 @@ class Button final: public Control
 
 private:
 
-	HBITMAP m_BackgroundImage;
+	//Image m_BackgroundImage;
 	FlatButtonAppearance m_FlatAppearance;
 	FlatStyle m_FlatStyle;
 
 	void DrawBorder(HDC& hdc, RECT& rc);
 
-	void Draw(const Graphics& graphics, Drawing::Rectangle rectangle) override;
+	void Draw(Graphics* const graphics, Drawing::Rectangle rectangle) override;
 	int OnEraseBackground_Impl(HWND hwnd, HDC hdc) override;
 	void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) override;
 	void OnKeyUp_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) override;

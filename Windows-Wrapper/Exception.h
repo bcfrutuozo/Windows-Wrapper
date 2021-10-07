@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CommonObject.h"
+#include "_HResults.h"
 
 class Exception : public Object, public std::exception
 {
@@ -20,18 +21,17 @@ protected:
 public:
 
 	Exception(int line, const char* file) noexcept;
-	Exception(int line, const char* file, HRESULT hr) noexcept;
-	Exception(int line, const char* file, HRESULT hr, const std::string& message) noexcept;
 	Exception(int line, const char* file, const std::string& message) noexcept;
-	Exception(int line, const char* file, HRESULT hr, const std::string& message, Exception* const innerException) noexcept;
 	Exception(int line, const char* file, const std::string& message, Exception* const innerException) noexcept;
 	~Exception() noexcept;
 
 	virtual const char* what() const noexcept override;
 	const int GetLine() const noexcept;
 	HRESULT GetErrorCode() const noexcept;
+	void SetErrorCode(HRESULT hr) noexcept;
 	const std::string& GetFile() const noexcept;
 	std::string GetErrorSpot() const noexcept;
+	void SetMessage(const std::string& message) noexcept;
 
 	static const std::string TranslateErrorCode(HRESULT hr) noexcept;
 };

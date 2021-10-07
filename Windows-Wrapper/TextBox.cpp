@@ -1,19 +1,19 @@
 ﻿#include "TextBox.h"
 
-void TextBox::PreDraw(const Graphics& graphics)
+void TextBox::PreDraw(Graphics* const graphics)
 {
 	Resize(CalculateSizeByFont());
 	WinAPI::PreDraw(graphics);
 }
 
-void TextBox::Draw(const Graphics& graphics, Drawing::Rectangle rectangle)
+void TextBox::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 {
 #ifdef _DEBUG
 	PrintDebug(); // Show string, cursor and selection indices on Output Window
 #endif
 
 	auto hwnd = static_cast<HWND>(Handle.ToPointer());
-	auto hdc = static_cast<HDC>(graphics.GetHDC().ToPointer());
+	auto hdc = static_cast<HDC>(graphics->GetHDC().ToPointer());
 
 	HDC hdcMem = CreateCompatibleDC(hdc);
 	HBITMAP hbmMem = CreateCompatibleBitmap(hdc, m_Size.Width, m_Size.Height);

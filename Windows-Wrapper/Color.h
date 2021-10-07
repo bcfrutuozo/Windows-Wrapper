@@ -15,10 +15,10 @@ public:
 
 	inline constexpr bool operator==(const Color& c) const { return rgba == c.rgba; }
 
-	constexpr uint8_t GetR() const { return (rgba >> 0) & 0xFF; }
-	constexpr uint8_t GetG() const { return (rgba >> 8) & 0xFF; }
-	constexpr uint8_t GetB() const { return (rgba >> 16) & 0xFF; }
-	constexpr uint8_t GetA() const { return (rgba >> 24) & 0xFF; }
+	inline constexpr uint8_t GetR() const { return (rgba >> 0) & 0xFF; }
+	inline constexpr uint8_t GetG() const { return (rgba >> 8) & 0xFF; }
+	inline constexpr uint8_t GetB() const { return (rgba >> 16) & 0xFF; }
+	inline constexpr uint8_t GetA() const { return (rgba >> 24) & 0xFF; }
 
 	void SetR(uint8_t value) noexcept;
 	void SetG(uint8_t value) noexcept;
@@ -33,6 +33,11 @@ public:
 	constexpr XMFLOAT4 ToFloat4() const
 	{
 		return XMFLOAT4(((rgba >> 0) & 0xFF) / 255.0f, ((rgba >> 8) & 0xFF) / 255.0f, ((rgba >> 16) & 0xFF) / 255.0f, ((rgba >> 24) & 0xFF) / 255.0f);
+	}
+
+	constexpr D3DCOLORVALUE ToD3DColor() const
+	{
+		return D3DCOLORVALUE(((rgba >> 0) & 0xFF) / 255.0f, ((rgba >> 8) & 0xFF) / 255.0f, ((rgba >> 16) & 0xFF) / 255.0f, ((rgba >> 24) & 0xFF) / 255.0f);
 	}
 
 	constexpr uint32_t ToRGB() const
@@ -89,4 +94,5 @@ public:
 	int GetHashCode() const override;
 	inline bool Equals(const Object* const c) const override;
 	inline bool Equals(const Color* const c) const override;
+	const std::string ToString() const noexcept override;
 };

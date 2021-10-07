@@ -1,5 +1,11 @@
 #pragma once
 
+enum class GraphicsType
+{
+	GDI,
+	D2D
+};
+
 enum class ImageLayout
 {
 	//
