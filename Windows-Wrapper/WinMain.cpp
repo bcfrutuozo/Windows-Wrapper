@@ -31,7 +31,7 @@ int CALLBACK WinMain(
 	try
 	{
 		SetProcessDPIAware();
-		TestUserApplication::SetGraphicsType(GraphicsType::GDI);
+		TestUserApplication::SetGraphicsType(GraphicsType::D2D);
 		TestUserApplication::Run();
 	}
 	catch (const ControlException& e)

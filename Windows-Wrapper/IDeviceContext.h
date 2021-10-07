@@ -5,18 +5,13 @@
 
 class IDeviceContext : public IDisposable
 {
-private:
-
-	IntPtr m_HDC;
-
 protected:
 
-	inline void SetHDC(IntPtr dcHandle) noexcept
-	{ 
-		m_HDC = dcHandle; 
-	}
+	IntPtr DCHandle;
 
 public:
 
-	inline constexpr IntPtr GetHDC() const noexcept { return m_HDC; }
+	virtual void Dispose() override = 0;
+
+	inline constexpr IntPtr GetHDC() const { return DCHandle; };
 };

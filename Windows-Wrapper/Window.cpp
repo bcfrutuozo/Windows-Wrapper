@@ -238,20 +238,9 @@ void Window::ShowCursor() noexcept
 
 void Window::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 {
-	//auto hdc = static_cast<HDC>(graphics.GetHDC().ToPointer());
-	RECT rc = { 0 };
-	rc.left = rectangle.GetLeft();
-	rc.top = rectangle.GetTop();
-	rc.right = rectangle.GetRight();
-	rc.bottom = rectangle.GetBottom();
-
-	/*HBRUSH bgColor = CreateSolidBrush(GetBackgroundColor().ToRGB());
-	FillRect(hdc, &rc, bgColor);
-	SelectObject(hdc, bgColor);
-	DeleteObject(bgColor);*/
-
-	graphics->CreateSolidBrush("Teste", GetBackgroundColor());
-	graphics->FillRectangle(rectangle, "Teste");
+	auto bgColor = GetBackgroundColor();
+	graphics->CreateSolidBrush(bgColor.ToString(), bgColor);
+	graphics->FillRectangle(rectangle, bgColor.ToString());
 }
 
 bool Window::IsCursorEnabled() const noexcept

@@ -8,7 +8,7 @@ inline bool Component::CanRaiseEvents()
 
 void Component::Dispose(bool disposing)
 {
-	if (disposing)
+	if (disposing && !IsDisposed())
 	{
 		if (m_Site != nullptr && m_Site->GetContainer() != nullptr)
 		{
@@ -16,9 +16,10 @@ void Component::Dispose(bool disposing)
 		}
 
 		Dispatch("OnDispose", &ArgsDisposed);
+		Disposed = true;
 	}
 
-	Disposed = true;
+	Disposing = false;
 }
 
 void Component::Dispatch(const std::string& name, EventArgs* e)
@@ -31,8 +32,6 @@ void Component::Dispatch(const std::string& name, EventArgs* e)
 
 Component::Component()
 	:
-	Disposing(false),
-	Disposed(false),
 	Events(this)
 {
 
@@ -40,18 +39,7 @@ Component::Component()
 
 Component::~Component()
 {
-	Dispose(false);
-	// GarbageCollector?? Too much to dream for now
-}
-
-bool Component::IsDisposed() const noexcept
-{
-	return Disposed;
-}
-
-bool Component::IsDisposing() const noexcept
-{
-	return Disposing;
+	Dispose(true);
 }
 
 bool Component::IsDesignMode()

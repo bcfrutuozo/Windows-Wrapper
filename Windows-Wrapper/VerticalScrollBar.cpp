@@ -1,10 +1,6 @@
 #include "VerticalScrollBar.h"
 #include "ScrollableControl.h"
 
-void VerticalScrollBar::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
-{
-}
-
 void VerticalScrollBar::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy)
 {
 	if (ShowScrollBar(hwnd, SB_VERT, true) == 0)

@@ -3,23 +3,7 @@
 
 void ScrollBar::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 {
-	auto hwnd = static_cast<HWND>(Handle.ToPointer());
-	auto hdc = static_cast<HDC>(graphics->GetHDC().ToPointer());
-
-	HDC hdcMem = CreateCompatibleDC(hdc);
-	HBITMAP hbmMem = CreateCompatibleBitmap(hdc, m_Size.Width, m_Size.Height);
-	HBITMAP hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
-
-	// Perform the bit-block transfer between the memory Device Context which has the next bitmap
-	// with the current image to avoid flickering
-	BitBlt(hdc, 0, 0, m_Size.Width, m_Size.Height, hdcMem, 0, 0, SRCCOPY);
-
-	SelectObject(hdcMem, hbmOld);
-	DeleteObject(hbmOld);
-	SelectObject(hdcMem, hbmOld);
-	DeleteObject(hbmMem);
-	ReleaseDC(hwnd, hdcMem);
-	DeleteDC(hdcMem);
+	
 }
 
 ScrollBar::ScrollBar(ScrollableControl* parent, int width, int height, int x, int y)

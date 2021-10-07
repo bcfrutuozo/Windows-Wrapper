@@ -17,8 +17,6 @@ class Component : public IComponent
 private:
 
 	EventDispatcher Events;
-	bool Disposed;
-	bool Disposing;
 
 protected:
 
@@ -31,8 +29,6 @@ public:
 	Component();
 	virtual ~Component() noexcept(false);
 
-	bool IsDisposed() const noexcept;
-	bool IsDisposing() const noexcept;
 	bool IsDesignMode();
 	virtual ISite* GetSite();
 	virtual void SetSite(ISite* const site);

@@ -1,10 +1,6 @@
 #include "HorizontalScrollBar.h"
 #include "ScrollableControl.h"
 
-void HorizontalScrollBar::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
-{
-}
-
 void HorizontalScrollBar::OnHorizontalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int code, int pos)
 {
 	if (GetFocus() != static_cast<HWND>(Parent->Handle.ToPointer())) SetFocus(static_cast<HWND>(Parent->Handle.ToPointer()));

@@ -12,7 +12,7 @@ WindowClass::WindowClass() noexcept
 {
 	WNDCLASSEX wc = { 0 };
 	wc.cbSize = sizeof(wc);
-	wc.style = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;
+	wc.style = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
 	wc.lpfnWndProc = WinAPI::HandleMessageSetup;
 	wc.hInstance = GetInstance();
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);

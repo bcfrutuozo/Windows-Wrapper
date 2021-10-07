@@ -7,28 +7,26 @@ class WinAPI;
 class Direct2D final : public Graphics
 {
 	friend class Graphics;
+	friend class Application;
 
 private:
 
 	static ID2D1Factory* m_pDirect2dFactory;
 	ID2D1HwndRenderTarget* m_pRenderTarget;
 
-	static ID2D1Factory* CreateDeviceIndependentResources();
-
-	Direct2D(IntPtr windowHandle);
+	Direct2D(IntPtr windowHandle, Size size);
 
 	void Initialize();
 	void SetRenderTarget();
+	void ClearResources() override;
 
-protected:
+	static ID2D1Factory* CreateDeviceIndependentResources();
+	static void DiscardDeviceResources();
 
 public:
 
-	virtual ~Direct2D();
-
 	void BeginDraw() override;
 	void EndDraw() override;
-	void ReleaseHDC() noexcept override;
 
 	const IntPtr CreateSolidBrush(const std::string& name, Color c) override;
 	void FillRectangle(Drawing::Rectangle rect, const std::string& brushName) override;

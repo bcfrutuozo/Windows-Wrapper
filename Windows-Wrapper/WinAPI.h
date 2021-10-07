@@ -157,6 +157,8 @@ public:
 	// Setting a static MessageMapper would cause memory leak because class destructor would not destroy it
 	MessageMapper m;
 #endif
+
+	virtual void Dispose() override;
 	
 	Point GetLocation() const noexcept;
 	void SetLocation(Point p) noexcept;

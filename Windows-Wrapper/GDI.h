@@ -8,16 +8,18 @@ class GDI final : public Graphics
 
 private:
 
-	PAINTSTRUCT ps;
+	PAINTSTRUCT m_PS;
+	HDC m_MemoryDC;
+	HBITMAP m_MemoryBitmap;
+	HBITMAP m_OldBitmap;
 
-	GDI(IntPtr window);
-	virtual ~GDI();
+	GDI(IntPtr window, Size size);
 
 public:
 
+	void ClearResources() override;
 	void BeginDraw() override;
 	void EndDraw() override;
-	void ReleaseHDC() noexcept override;
 
 	const IntPtr CreateSolidBrush(const std::string& name, Color c) override;
 	void FillRectangle(Drawing::Rectangle rect, const std::string& brushName) override;

@@ -125,7 +125,7 @@ void Control::OnNextDialogControl_Impl(HWND hwnd, HWND hwndSetFocus, bool fNext)
 
 void Control::Dispose()
 {
-	Component::Dispose();
+	WinAPI::Dispose();
 
 	for (auto c : Controls)
 	{

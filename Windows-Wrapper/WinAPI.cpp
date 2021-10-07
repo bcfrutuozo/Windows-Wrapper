@@ -17,7 +17,7 @@ void WinAPI::PreDraw(Graphics* const graphics)
 	auto hdc = static_cast<HDC>(graphics->GetHDC().ToPointer());
 
 	auto hFont = Fonts->find(m_Font.ToString());
-	
+
 	if (m_HasFontChanged)
 	{
 		SendMessage(hwnd, WM_SETFONT, (WPARAM)hFont->second, TRUE);
@@ -307,12 +307,12 @@ void WinAPI::OnMouseWheel_Impl(HWND hwnd, int x, int y, int delta, unsigned int 
 {
 	switch (fwKeys)
 	{
-	case MK_LBUTTON: ArgsOnMouseWheel = MouseEventArgs(MouseButtons::Left, 0, delta, x, y); break;
-	case MK_MBUTTON: ArgsOnMouseWheel = MouseEventArgs(MouseButtons::Middle, 0, delta, x, y); break;
-	case MK_RBUTTON: ArgsOnMouseWheel = MouseEventArgs(MouseButtons::Right, 0, delta, x, y);  break;
-	case MK_XBUTTON1: ArgsOnMouseWheel = MouseEventArgs(MouseButtons::XButton1, 0, delta, x, y); break;
-	case MK_XBUTTON2: ArgsOnMouseWheel = MouseEventArgs(MouseButtons::XButton2, 0, delta, x, y); break;
-	default: ArgsOnMouseWheel = MouseEventArgs(MouseButtons::None, 0, delta, x, y); break;
+		case MK_LBUTTON: ArgsOnMouseWheel = MouseEventArgs(MouseButtons::Left, 0, delta, x, y); break;
+		case MK_MBUTTON: ArgsOnMouseWheel = MouseEventArgs(MouseButtons::Middle, 0, delta, x, y); break;
+		case MK_RBUTTON: ArgsOnMouseWheel = MouseEventArgs(MouseButtons::Right, 0, delta, x, y);  break;
+		case MK_XBUTTON1: ArgsOnMouseWheel = MouseEventArgs(MouseButtons::XButton1, 0, delta, x, y); break;
+		case MK_XBUTTON2: ArgsOnMouseWheel = MouseEventArgs(MouseButtons::XButton2, 0, delta, x, y); break;
+		default: ArgsOnMouseWheel = MouseEventArgs(MouseButtons::None, 0, delta, x, y); break;
 	}
 
 	Dispatch("OnMouseWheel", &ArgsOnMouseWheel);
@@ -332,12 +332,13 @@ void WinAPI::OnPaint_Impl(HWND hwnd)
 {
 	if (IsShown())
 	{
-		if (m_Graphics == nullptr) 
-		{
-			m_Graphics = Graphics::Create(Handle, Application::GetGraphicsType());
-		}
-		
 		Drawing::Rectangle rect = Drawing::Rectangle(m_Location, m_Size);
+
+		if (m_Graphics == nullptr)
+		{
+			m_Graphics = Graphics::Create(Handle, m_Size);
+		}
+
 		PaintEventArgs pArgs = PaintEventArgs(m_Graphics, rect);
 
 		m_Graphics->BeginDraw();
@@ -451,13 +452,11 @@ WinAPI::WinAPI(int width, int height, int x, int y)
 
 WinAPI::~WinAPI() noexcept(false)
 {
+	SafeDelete(m_Graphics);
 	if (DestroyWindow(static_cast<HWND>(Handle.ToPointer())) == 0)
 	{
 		throw CTL_LAST_EXCEPT();
 	}
-
-	m_Graphics->ReleaseHDC();
-	SafeDelete(m_Graphics);
 }
 
 // Static function which handle WinAPI messages to corresponding member function of the control
@@ -504,160 +503,160 @@ LRESULT WINAPI WinAPI::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
 
 	switch (msg)
 	{
-	case WM_SETCURSOR:
-	{
-		/* If an application processes this message, it should return TRUE to halt further processing or FALSE to continue. */
-		return OnSetCursor_Impl(hWnd, (HWND)wParam, static_cast<unsigned int>(LOWORD(lParam)), static_cast<unsigned int>(HIWORD(lParam)));
-	}
-	case WM_CREATE:
-	{
-		OnCreate_Impl(hWnd, (LPCREATESTRUCT)lParam);
-		break;
-	}
-	case WM_ERASEBKGND:
-	{
-		return OnEraseBackground_Impl(hWnd, (HDC)wParam);
-	}
-	case WM_COMMAND:
-	{
-		OnCommand_Impl(hWnd, static_cast<int>(LOWORD(wParam)), (HWND)lParam, static_cast<unsigned int>(HIWORD(wParam)));
-		break;
-	}
-	case WM_CLOSE:
-	{
-		return OnClosing_Impl(hWnd);
-	}
-	case WM_NCDESTROY:
-	{
-		OnClosed_Impl(hWnd);
-		break;
-	}
-	case WM_SETFOCUS:
-	{
-		OnFocusEnter_Impl(hWnd, (HWND)wParam);
-		break;
-	}
-	case WM_KILLFOCUS:
-	{
-		OnFocusLeave_Impl(hWnd, (HWND)wParam);
-		break;
-	}
-	case WM_ACTIVATE:
-	{
-		OnActivate_Impl(hWnd, static_cast<unsigned int>(LOWORD(wParam)), (HWND)(lParam), static_cast<bool> (HIWORD(wParam)));
-		break;
-	}
-	case WM_SIZE:
-	{
-		OnSize_Impl(hWnd, (unsigned int)wParam, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam));
-		break;
-	}
-	/******************** KEYBOARD MESSAGES *********************/
-	case WM_KEYDOWN:
-	case WM_SYSKEYDOWN:	// Syskey commands need to be handled to track ALT key (VK_MENU)
-	{
-		OnKeyDown_Impl(hWnd, static_cast<unsigned int>(wParam), (int)(short)LOWORD(lParam), static_cast<unsigned int>(HIWORD(lParam)));
-		break;
-	}
-	case WM_KEYUP:
-	case WM_SYSKEYUP:	// Syskey commands need to be handled to track ALT key (VK_MENU)
-	{
-		OnKeyUp_Impl(hWnd, static_cast<unsigned int>(wParam), (int)(short)LOWORD(lParam), static_cast<unsigned int>(HIWORD(lParam)));
-		break;
-	}
-	case WM_CHAR:
-	{
-		OnKeyPressed_Impl(hWnd, static_cast<char>(wParam), (int)(short)LOWORD(lParam));
-		break;
-	}
-	/******************* END KEYBOARD MESSAGES ******************/
+		case WM_SETCURSOR:
+		{
+			/* If an application processes this message, it should return TRUE to halt further processing or FALSE to continue. */
+			return OnSetCursor_Impl(hWnd, (HWND)wParam, static_cast<unsigned int>(LOWORD(lParam)), static_cast<unsigned int>(HIWORD(lParam)));
+		}
+		case WM_CREATE:
+		{
+			OnCreate_Impl(hWnd, (LPCREATESTRUCT)lParam);
+			break;
+		}
+		case WM_ERASEBKGND:
+		{
+			return OnEraseBackground_Impl(hWnd, (HDC)wParam);
+		}
+		case WM_COMMAND:
+		{
+			OnCommand_Impl(hWnd, static_cast<int>(LOWORD(wParam)), (HWND)lParam, static_cast<unsigned int>(HIWORD(wParam)));
+			break;
+		}
+		case WM_CLOSE:
+		{
+			return OnClosing_Impl(hWnd);
+		}
+		case WM_NCDESTROY:
+		{
+			OnClosed_Impl(hWnd);
+			break;
+		}
+		case WM_SETFOCUS:
+		{
+			OnFocusEnter_Impl(hWnd, (HWND)wParam);
+			break;
+		}
+		case WM_KILLFOCUS:
+		{
+			OnFocusLeave_Impl(hWnd, (HWND)wParam);
+			break;
+		}
+		case WM_ACTIVATE:
+		{
+			OnActivate_Impl(hWnd, static_cast<unsigned int>(LOWORD(wParam)), (HWND)(lParam), static_cast<bool> (HIWORD(wParam)));
+			break;
+		}
+		case WM_SIZE:
+		{
+			OnSize_Impl(hWnd, (unsigned int)wParam, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam));
+			break;
+		}
+		/******************** KEYBOARD MESSAGES *********************/
+		case WM_KEYDOWN:
+		case WM_SYSKEYDOWN:	// Syskey commands need to be handled to track ALT key (VK_MENU)
+		{
+			OnKeyDown_Impl(hWnd, static_cast<unsigned int>(wParam), (int)(short)LOWORD(lParam), static_cast<unsigned int>(HIWORD(lParam)));
+			break;
+		}
+		case WM_KEYUP:
+		case WM_SYSKEYUP:	// Syskey commands need to be handled to track ALT key (VK_MENU)
+		{
+			OnKeyUp_Impl(hWnd, static_cast<unsigned int>(wParam), (int)(short)LOWORD(lParam), static_cast<unsigned int>(HIWORD(lParam)));
+			break;
+		}
+		case WM_CHAR:
+		{
+			OnKeyPressed_Impl(hWnd, static_cast<char>(wParam), (int)(short)LOWORD(lParam));
+			break;
+		}
+		/******************* END KEYBOARD MESSAGES ******************/
 
-	case WM_GETDLGCODE:
-	{
-		return OnGetDLGCode_Impl(hWnd, (LPMSG)(lParam));
-	}
+		case WM_GETDLGCODE:
+		{
+			return OnGetDLGCode_Impl(hWnd, (LPMSG)(lParam));
+		}
 
-	/********************** MOUSE MESSAGES **********************/
-	case WM_MOUSEMOVE:
-	{
-		OnMouseMove_Impl(hWnd, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), static_cast<unsigned int>(wParam));
-		break;
-	}
-	case WM_LBUTTONDOWN:
-	{
-		OnMouseLeftDown_Impl(hWnd, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), static_cast<unsigned int>(wParam));
-		break;
-	}
-	case WM_MOUSELEAVE:
-	{
-		OnMouseLeave_Impl(hWnd);
-		break;
-	}
-	case WM_LBUTTONUP:
-	{
-		OnMouseLeftUp_Impl(hWnd, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), static_cast<unsigned int>(wParam));
-		break;
-	}
-	case WM_RBUTTONDOWN:
-	{
-		OnMouseRightDown_Impl(hWnd, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), static_cast<unsigned int>(wParam));
-		break;
-	}
-	case WM_RBUTTONUP:
-	{
-		OnMouseRightUp_Impl(hWnd, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), static_cast<unsigned int>(wParam));
-		break;
-	}
-	case WM_LBUTTONDBLCLK:
-	{
-		OnMouseLeftDoubleClick_Impl(hWnd, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), static_cast<unsigned int>(wParam));
-		break;
-	}
-	case WM_RBUTTONDBLCLK:
-	{
-		OnMouseRightDoubleClick_Impl(hWnd, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), static_cast<unsigned int>(wParam));
-		break;
-	}
-	case WM_MOUSEWHEEL:
-	{
-		OnMouseWheel_Impl(hWnd, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), (int)(short)HIWORD(wParam), (UINT)(short)LOWORD(wParam));
-		break;
-	}
-	case WM_SHOWWINDOW:
-	{
-		OnShowWindow_Impl(hWnd, static_cast<bool>(wParam), static_cast<unsigned int>(lParam));
-		break;
-	}
-	case WM_PAINT:
-	{
-		OnPaint_Impl(hWnd);
-		break;
-	}
-	/******************** END MOUSE MESSAGES ********************/
+		/********************** MOUSE MESSAGES **********************/
+		case WM_MOUSEMOVE:
+		{
+			OnMouseMove_Impl(hWnd, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), static_cast<unsigned int>(wParam));
+			break;
+		}
+		case WM_LBUTTONDOWN:
+		{
+			OnMouseLeftDown_Impl(hWnd, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), static_cast<unsigned int>(wParam));
+			break;
+		}
+		case WM_MOUSELEAVE:
+		{
+			OnMouseLeave_Impl(hWnd);
+			break;
+		}
+		case WM_LBUTTONUP:
+		{
+			OnMouseLeftUp_Impl(hWnd, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), static_cast<unsigned int>(wParam));
+			break;
+		}
+		case WM_RBUTTONDOWN:
+		{
+			OnMouseRightDown_Impl(hWnd, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), static_cast<unsigned int>(wParam));
+			break;
+		}
+		case WM_RBUTTONUP:
+		{
+			OnMouseRightUp_Impl(hWnd, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), static_cast<unsigned int>(wParam));
+			break;
+		}
+		case WM_LBUTTONDBLCLK:
+		{
+			OnMouseLeftDoubleClick_Impl(hWnd, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), static_cast<unsigned int>(wParam));
+			break;
+		}
+		case WM_RBUTTONDBLCLK:
+		{
+			OnMouseRightDoubleClick_Impl(hWnd, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), static_cast<unsigned int>(wParam));
+			break;
+		}
+		case WM_MOUSEWHEEL:
+		{
+			OnMouseWheel_Impl(hWnd, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), (int)(short)HIWORD(wParam), (UINT)(short)LOWORD(wParam));
+			break;
+		}
+		case WM_SHOWWINDOW:
+		{
+			OnShowWindow_Impl(hWnd, static_cast<bool>(wParam), static_cast<unsigned int>(lParam));
+			break;
+		}
+		case WM_PAINT:
+		{
+			OnPaint_Impl(hWnd);
+			break;
+		}
+		/******************** END MOUSE MESSAGES ********************/
 
-	/******************** RAW MOUSE MESSAGES ********************/
-	case WM_INPUT:
-	{
-		OnRawInput_Impl(hWnd, GET_RAWINPUT_CODE_WPARAM(wParam), (HRAWINPUT)lParam);
-		break;
-	}
-	case WM_NEXTDLGCTL:
-	{
-		OnNextDialogControl_Impl(hWnd, (HWND)wParam, static_cast<bool>(lParam));
-		break;
-	}
-	/****************** END RAW MOUSE MESSAGES ******************/
-	/********************* SCROLL MESSAGES **********************/
-	case WM_HSCROLL:
-	{
-		OnHorizontalScrolling_Impl(hWnd, (HWND)lParam, (unsigned int)LOWORD(wParam), (int)(short)HIWORD(wParam));
-		break;
-	}
-	case WM_VSCROLL:
-	{
-		OnVerticalScrolling_Impl(hWnd, (HWND)lParam, (unsigned int)LOWORD(wParam), (int)(short)HIWORD(wParam));
-		break;
-	}
+		/******************** RAW MOUSE MESSAGES ********************/
+		case WM_INPUT:
+		{
+			OnRawInput_Impl(hWnd, GET_RAWINPUT_CODE_WPARAM(wParam), (HRAWINPUT)lParam);
+			break;
+		}
+		case WM_NEXTDLGCTL:
+		{
+			OnNextDialogControl_Impl(hWnd, (HWND)wParam, static_cast<bool>(lParam));
+			break;
+		}
+		/****************** END RAW MOUSE MESSAGES ******************/
+		/********************* SCROLL MESSAGES **********************/
+		case WM_HSCROLL:
+		{
+			OnHorizontalScrolling_Impl(hWnd, (HWND)lParam, (unsigned int)LOWORD(wParam), (int)(short)HIWORD(wParam));
+			break;
+		}
+		case WM_VSCROLL:
+		{
+			OnVerticalScrolling_Impl(hWnd, (HWND)lParam, (unsigned int)LOWORD(wParam), (int)(short)HIWORD(wParam));
+			break;
+		}
 	}
 	/******************* END SCROLL MESSAGES ********************/
 	return DefWindowProc(hWnd, msg, wParam, lParam);
@@ -676,6 +675,13 @@ void WinAPI::SetMouseOverState(bool state) noexcept
 void WinAPI::SetClickingState(bool state) noexcept
 {
 	m_IsClicking = state;
+}
+
+void WinAPI::Dispose()
+{
+	Component::Dispose();
+
+	if(m_Graphics != nullptr) m_Graphics->Dispose();
 }
 
 Point WinAPI::GetLocation() const noexcept
@@ -798,7 +804,7 @@ void WinAPI::SetFont(Font font) noexcept
 
 		(*Fonts)[font.ToString()] = hFont;
 	}
-	
+
 	m_Font = font;
 
 	m_HasFontChanged = true;

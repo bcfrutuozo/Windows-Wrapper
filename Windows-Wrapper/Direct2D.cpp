@@ -13,16 +13,16 @@ ID2D1Factory* Direct2D::CreateDeviceIndependentResources()
 	return d2dFactory;
 }
 
+void Direct2D::DiscardDeviceResources()
+{
+	SafeRelease(&m_pDirect2dFactory);
+}
+
 void Direct2D::SetRenderTarget()
 {
-	HWND hwnd = static_cast<HWND>(GetWindowHandle());
-	RECT rc;
-	GetClientRect(hwnd, &rc);
+	HWND hwnd = static_cast<HWND>(WindowHandle.ToPointer());
 
-	D2D1_SIZE_U size = D2D1::SizeU(
-		rc.right - rc.left,
-		rc.bottom - rc.top
-	);
+	D2D1_SIZE_U size = D2D1::SizeU(WindowSize.Width, WindowSize.Height);
 
 	// Create a Direct2D render target.
 	auto hr = m_pDirect2dFactory->CreateHwndRenderTarget(
@@ -31,14 +31,10 @@ void Direct2D::SetRenderTarget()
 		&m_pRenderTarget
 	);
 
-	// SetDC() INTERROGACAO TECLADO FDP
+	// Set DCHandl to D2D RenderTarget
+	DCHandle = m_pDirect2dFactory;
 
 	if (!SUCCEEDED(hr)) throw ExternalException("Error setting render target", hr);
-}
-
-Direct2D::~Direct2D()
-{
-	SafeRelease(&m_pRenderTarget);
 }
 
 void Direct2D::Initialize()
@@ -47,14 +43,15 @@ void Direct2D::Initialize()
 	SetRenderTarget();
 }
 
+
 void Direct2D::BeginDraw()
 {
 	m_pRenderTarget->BeginDraw();
 }
 
-Direct2D::Direct2D(IntPtr windowHandle)
+Direct2D::Direct2D(IntPtr windowHandle, Size size)
 	:
-	Graphics(windowHandle)
+	Graphics(windowHandle, size)
 {
 	Initialize();
 }
@@ -66,19 +63,24 @@ void Direct2D::EndDraw()
 	if (!SUCCEEDED(hr)) throw ExternalException("Could not finish WM_PAINT event", hr);
 }
 
-void Direct2D::ReleaseHDC() noexcept
+void Direct2D::ClearResources()
 {
+	for (auto p : Elements)
+	{
+		auto obj = (IUnknown*)p.second;
+		SafeRelease(&obj);
+	}
+
 	SafeRelease(&m_pRenderTarget);
-	SafeRelease(&m_pDirect2dFactory);
 }
 
 const IntPtr Direct2D::CreateSolidBrush(const std::string& name, Color c)
 {
 	ID2D1SolidColorBrush* brush = nullptr;
 
-	if (Elements->contains(name))
+	if (Elements.contains(name))
 	{
-		brush = (ID2D1SolidColorBrush*)Elements->at(name);
+		brush = (ID2D1SolidColorBrush*)Elements.at(name);
 
 		if (!brush) throw ArgumentException("Element already exist but it's not from ID2D1SolidColorBrush type");
 
@@ -89,16 +91,16 @@ const IntPtr Direct2D::CreateSolidBrush(const std::string& name, Color c)
 
 	if (!SUCCEEDED(hr)) throw ExternalException("Could not create solid color brush", hr);
 
-	Elements->insert(std::pair<std::string, void*>(name, brush));
+	Elements.insert(std::pair<std::string, void*>(name, brush));
 
 	return brush;
 }
 
 void Direct2D::FillRectangle(Drawing::Rectangle rect, const std::string& brushName)
 {
-	if (!Elements->contains(brushName)) throw ArgumentNullException("brushName doesn't exist");
+	if (!Elements.contains(brushName)) throw ArgumentNullException("brushName doesn't exist");
 
-	ID2D1Brush* brush = (ID2D1Brush*)Elements->at(brushName);
+	ID2D1Brush* brush = (ID2D1Brush*)Elements.at(brushName);
 
 	if (!brush) throw InvalidCastException("Cannot convert the following item to brush type!");
 
@@ -113,9 +115,9 @@ void Direct2D::FillRectangle(Drawing::Rectangle rect, const std::string& brushNa
 
 void Direct2D::FillRoundedRectangle(Drawing::Rectangle rect, int width, int height, const std::string& brushName)
 {
-	if (!Elements->contains(brushName)) throw ArgumentNullException("brushName doesn't exist");
+	if (!Elements.contains(brushName)) throw ArgumentNullException("brushName doesn't exist");
 
-	ID2D1Brush* brush = (ID2D1Brush*)Elements->at(brushName);
+	ID2D1Brush* brush = (ID2D1Brush*)Elements.at(brushName);
 
 	if (!brush) throw InvalidCastException("Cannot convert the following item to brush type!");
 

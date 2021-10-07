@@ -1,6 +1,6 @@
 #include "Application.h"
 #include "Window.h"
-#include "Graphics.h"
+#include "Direct2D.h"
 
 bool Application::m_IsRunning = false;
 bool Application::m_HasGraphicsChanged = false;
@@ -15,7 +15,7 @@ void Application::AddWindow(Window* window)
 
 bool Application::RemoveWindow(Window* window)
 {
-	if (std::contains(*Windows, window) && window->IsDisposing())
+	if (std::contains(*Windows, window) && window->IsDisposed())
 	{
 		if (Windows->remove(window))
 		{
@@ -62,6 +62,8 @@ void Application::Exit() noexcept
 	}
 
 	SafeDelete(Windows);
+
+	if (m_SetGraphicsType == GraphicsType::D2D) Direct2D::DiscardDeviceResources();
 
 	PostQuitMessage(0);
 }

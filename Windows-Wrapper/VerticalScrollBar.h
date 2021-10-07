@@ -10,7 +10,6 @@ class VerticalScrollBar : public ScrollBar
 
 private:
 
-	void Draw(Graphics* const graphics, Drawing::Rectangle rectangle);
 	void OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy) override;
 	void OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int code, int pos) override;
 
