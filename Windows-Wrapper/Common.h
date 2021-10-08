@@ -39,8 +39,9 @@
 #include <filesystem>
 #include <Windows.h>
 
-// Linker for Direc2D
+// Linker for Direct2D
 #pragma comment(lib, "d2d1")
+#pragma comment(lib, "dwrite")
 
 // Linker for ::_TrackMouseEvent function (WinAPI.cpp usage)
 #pragma comment(lib, "comctl32.lib")

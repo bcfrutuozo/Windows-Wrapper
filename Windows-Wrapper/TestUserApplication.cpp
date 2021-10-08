@@ -5,6 +5,11 @@ void TestClick(Object* sender, EventArgs* e)
 	std::ostringstream ossin;
 	ossin << sender->ToString() << std::endl << e->ToString() << std::endl << "Clicked!" << std::endl << std::endl;
 	printf_s(ossin.str().c_str());
+
+    Button* b = (Button*)sender;
+    auto f = b->GetFont();
+    f.SetSize(24);
+    b->SetFont(f);
 }
 
 void TestUserApplication::Initialize()
@@ -66,6 +71,7 @@ void TestUserApplication::Initialize()
             printf_s("Button2 clicked");
     	}
     );
+    button2->SetFlatStyle(FlatStyle::Standard_Windows10);
     
     txtBox1 = window->AddTextBox("TextBox", 400, 20, 400);
     txtBox1->BorderStyle = BorderStyle::None;

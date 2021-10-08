@@ -13,7 +13,7 @@
 #define WM_UAHNCPAINTMENUPOPUP 0x0095
 
 // Register Message Macro
-#define REGISTER_MESSAGE(msg){msg,#msg}
+#define REGISTER_MESSAGE(msg){msg, #msg}
 
 MessageMapper::MessageMapper() noexcept
 	:

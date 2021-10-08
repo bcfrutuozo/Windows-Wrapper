@@ -19,5 +19,5 @@ public:
 
 	bool Equals(const Object* const b) const override;
 	bool Equals(const Type* const t) const override;
-	const std::string ToString() const noexcept;
+	const std::string ToString() const noexcept override;
 };

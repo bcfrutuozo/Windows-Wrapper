@@ -42,15 +42,15 @@ void GDI::EndDraw()
 	EndPaint(static_cast<HWND>(WindowHandle.ToPointer()), &m_PS);
 }
 
-const IntPtr GDI::CreateSolidBrush(const std::string& name, Color c)
+const IntPtr GDI::CreateSolidBrush(Color c)
 {
 	HBRUSH brush;
 
-	if (Elements.contains(name))
+	if (Elements.contains(c.ToString()))
 	{
-		brush = (HBRUSH)Elements.at(name);
+		brush = (HBRUSH)GetElement(c.ToString());
 
-		if (!brush) throw ArgumentException("Element already exist but it's not from ID2D1SolidColorBrush type");
+		if (!brush) throw ArgumentException("Element already exist but it's not from HBRUSH type");
 
 		return brush;
 	}
@@ -59,42 +59,205 @@ const IntPtr GDI::CreateSolidBrush(const std::string& name, Color c)
 
 	if (!brush) throw ExternalException("Could not create solid color brush", GetLastError());
 
-	Elements.insert(std::pair<std::string, void*>(name, brush));
+	Elements.insert(std::pair<std::string, void*>(c.ToString(), brush));
 
 	return brush;
 }
 
-void GDI::FillRectangle(Drawing::Rectangle rect, const std::string& brushName)
+const IntPtr GDI::CreateFontObject(const Font& f)
 {
-	if (!Elements.contains(brushName)) throw ArgumentNullException("brushName doesn't exist");
+	HFONT font;
 
-	HBRUSH brush = (HBRUSH)Elements.at(brushName);
+	if (Elements.contains(f.ToString()))
+	{
+		font = (HFONT)GetElement(f.ToString());
 
-	if (!brush) throw InvalidCastException("Cannot convert the following item to brush type!");
+		if (!font) throw ArgumentException("Element already exist but it's not from HFONT type");
 
-	RECT rc;
-	rc.left = 0;
-	rc.top = 0;
-	rc.right = rect.Width;
-	rc.bottom = rect.Height;
+		return font;
+	}
 
-	::FillRect(m_MemoryDC, &rc, brush);
+	font = ::CreateFont(
+		f.GetSizeInPixels(),
+		0,
+		0,
+		0,
+		f.IsBold() ? FW_BOLD : FW_NORMAL,
+		f.IsItalic(),
+		f.IsUnderline(),
+		f.IsStrikeOut(),
+		ANSI_CHARSET,
+		OUT_TT_PRECIS,
+		CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+		DEFAULT_PITCH | FF_DONTCARE,
+		f.GetName().c_str());
+
+	if (!font) throw ExternalException("Could not create font", GetLastError());
+
+	Elements.insert(std::pair<std::string, void*>(f.ToString(), font));
+
+	return font;
 }
 
-void GDI::FillRoundedRectangle(Drawing::Rectangle rect, int width, int height, const std::string& brushName)
+Drawing::Rectangle GDI::DrawRectangle(Color c, Drawing::Rectangle rect, int borderSize, ChartDashStyle borderStyle)
 {
-	if (!Elements.contains(brushName)) throw ArgumentNullException("brushName doesn't exist");
-
-	HBRUSH brush = (HBRUSH)Elements.at(brushName);
+	auto brush = Elements.contains(c.ToString()) ? Elements.at(c.ToString()) : (HBRUSH)CreateSolidBrush(c).ToPointer();
 
 	if (!brush) throw InvalidCastException("Cannot convert the following item to brush type!");
 
 	RECT rc;
-	rc.left = 0;
-	rc.top = 0;
-	rc.right = rect.Width;
-	rc.bottom = rect.Height;
+	rc.left = rect.GetLeft();
+	rc.top = rect.GetTop();
+	rc.right = rect.GetRight();
+	rc.bottom = rect.GetBottom();
 
-	SelectObject(m_MemoryDC, brush);
-	::RoundRect(m_MemoryDC, rc.left, rc.top, rc.right, rc.bottom, width, height);
+	int bordergdi = -1;
+
+	switch (borderStyle)
+	{
+		case ChartDashStyle::Dash: bordergdi = PS_DASH; break;
+		case ChartDashStyle::DashDot: bordergdi = PS_DASHDOT;  break;
+		case ChartDashStyle::DashDotDot: bordergdi = PS_DASHDOTDOT; break;
+		case ChartDashStyle::Dot: bordergdi = PS_DOT; break;
+		case ChartDashStyle::Solid: bordergdi = PS_SOLID; break;
+		default:
+		throw ArgumentNullException("borderStyle");
+	}
+
+	HPEN pen = nullptr;
+	HGDIOBJ old_pen = nullptr;
+
+	SetBkMode(m_MemoryDC, OPAQUE);
+
+	if (borderStyle != ChartDashStyle::Solid)
+	{
+		pen = CreatePen(bordergdi, 1, Color::Black().ToRGB());
+		old_pen = SelectObject(m_MemoryDC, pen);
+	}
+	else
+	{
+		pen = CreatePen(PS_SOLID, borderSize, c.ToRGB());
+		old_pen = SelectObject(m_MemoryDC, pen);	
+	}
+
+	SetBkColor(m_MemoryDC, c.ToRGB());
+	SetBkMode(m_MemoryDC, OPAQUE);
+	Rectangle(m_MemoryDC, rc.left, rc.top, rc.right, rc.bottom);
+
+	//Clean up
+	SelectObject(m_MemoryDC, old_pen);
+	DeleteObject(old_pen);
+	SelectObject(m_MemoryDC, pen);
+	DeleteObject(pen);
+
+	return Drawing::Rectangle::Deflate(rect, borderSize, borderSize);
+}
+
+Drawing::Rectangle GDI::DrawRoundedRectangle(Color c, Drawing::Rectangle rect, int borderSize, ChartDashStyle borderStyle, int radius)
+{
+	auto brush = Elements.contains(c.ToString()) ? Elements.at(c.ToString()) : (HBRUSH)CreateSolidBrush(c).ToPointer();
+
+	if (!brush) throw InvalidCastException("Cannot convert the following item to brush type!");
+
+	RECT rc;
+	rc.left = rect.GetLeft();
+	rc.top = rect.GetTop();
+	rc.right = rect.GetRight();
+	rc.bottom = rect.GetBottom();
+
+	int bordergdi = -1;
+
+	switch (borderStyle)
+	{
+		case ChartDashStyle::Dash: bordergdi = PS_DASH; break;
+		case ChartDashStyle::DashDot: bordergdi = PS_DASHDOT;  break;
+		case ChartDashStyle::DashDotDot: bordergdi = PS_DASHDOTDOT; break;
+		case ChartDashStyle::Dot: bordergdi = PS_DOT; break;
+		case ChartDashStyle::Solid: bordergdi = PS_SOLID; break;
+		default:
+		throw ArgumentNullException("borderStyle");
+	}
+
+	HPEN pen = nullptr;
+	HGDIOBJ old_pen = nullptr;
+	
+	SetBkMode(m_MemoryDC, TRANSPARENT);
+	
+	if (borderStyle != ChartDashStyle::Solid)
+	{
+		pen = CreatePen(bordergdi, 0, Color::Black().ToRGB());
+		old_pen = SelectObject(m_MemoryDC, pen);
+	}
+	else
+	{
+		pen = CreatePen(PS_SOLID, borderSize, c.ToRGB());
+		old_pen = SelectObject(m_MemoryDC, pen);		
+	}
+
+	SetBkColor(m_MemoryDC, c.ToRGB());
+	SetBkMode(m_MemoryDC, TRANSPARENT);
+	RoundRect(m_MemoryDC, rc.left, rc.top, rc.right, rc.bottom, radius, radius);
+
+	//Clean up
+	SelectObject(m_MemoryDC, old_pen);
+	DeleteObject(old_pen);
+	SelectObject(m_MemoryDC, pen);
+	DeleteObject(pen);
+
+	return Drawing::Rectangle::Deflate(rect, borderSize, borderSize);
+}
+
+void GDI::FillRectangle(Color c, Drawing::Rectangle rect)
+{
+	auto brush = Elements.contains(c.ToString()) ? (HBRUSH)Elements.at(c.ToString()) : (HBRUSH)CreateSolidBrush(c).ToPointer();
+
+	if (!brush) throw InvalidCastException("Cannot convert the following item to brush type!");
+
+	RECT rc;
+	rc.left = rect.GetLeft();
+	rc.top = rect.GetTop();
+	rc.right = rect.GetRight();
+	rc.bottom = rect.GetBottom();
+
+	FillRect(m_MemoryDC, &rc, brush);
+}
+
+void GDI::FillRoundedRectangle(Color c, Drawing::Rectangle rect, int radius)
+{
+	auto brush = Elements.contains(c.ToString()) ? (HBRUSH)Elements.at(c.ToString()) : (HBRUSH)CreateSolidBrush(c).ToPointer();
+
+	RECT rcLeftToRight;
+	rcLeftToRight.left = rect.GetLeft();
+	rcLeftToRight.top = rect.GetTop() + radius;
+	rcLeftToRight.right = rect.GetRight();
+	rcLeftToRight.bottom = rect.GetBottom() - radius;
+
+	FillRect(m_MemoryDC, &rcLeftToRight, brush);
+
+	RECT rcTopToBottom;
+	rcTopToBottom.left = rect.GetLeft() + radius;
+	rcTopToBottom.top = rect.GetTop();
+	rcTopToBottom.right = rect.GetRight() - radius;
+	rcTopToBottom.bottom = rect.GetBottom() ;
+
+	FillRect(m_MemoryDC, &rcTopToBottom, brush);
+}
+
+void GDI::CommonDrawText(const std::string& text, const Font& font, Color c, Drawing::Rectangle rect)
+{
+	auto winFont = Elements.contains(font.ToString()) ? Elements.at(font.ToString()) : (HFONT)CreateFontObject(font).ToPointer();
+	SelectObject(m_MemoryDC, winFont);
+
+	SetBkMode(m_MemoryDC, TRANSPARENT);
+	SetTextColor(m_MemoryDC, c.ToRGB());
+
+	RECT rc;
+	rc.left = rect.GetLeft();
+	rc.top = rect.GetTop();
+	rc.right = rect.GetRight();
+	rc.bottom = rect.GetBottom();
+
+	DrawText(m_MemoryDC, std::string(text.begin(), text.end()).c_str(), -1, &rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+
+	SetBkMode(m_MemoryDC, OPAQUE);
 }

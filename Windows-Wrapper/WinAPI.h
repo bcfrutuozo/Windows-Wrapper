@@ -65,8 +65,6 @@ private:
 	Color m_ForeColor;
 	Color m_BackgroundColor;
 
-	// Store hFont to delete it after use
-	static std::map<std::string, HFONT>* Fonts;
 	bool m_IsVisible;
 
 	// Event fields
@@ -128,8 +126,6 @@ private:
 	virtual void OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy);
 	virtual void OnShowWindow_Impl(HWND hwnd, bool fShow, unsigned int status);
 	virtual void OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, UINT code, int pos);
-
-	static void Free();
 
 protected:
 

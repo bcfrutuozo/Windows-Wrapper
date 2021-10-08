@@ -82,7 +82,8 @@ public:
 
 	// Windows defaul control color
 	static constexpr Color Border() { return Color(173, 173, 173, 255); }
-	static constexpr Color ControlBackground() { return Color(255, 255, 255, 255); }
+	static constexpr Color ControlBackground_Win10() { return Color(240, 240, 240, 255); }
+	static constexpr Color ControlBackground_Win11() { return Color(255, 255, 255, 255); }
 	static constexpr Color Default() { return Color(212, 208, 200, 255); }
 	static constexpr Color SelectionBackground() { return Color(0, 120, 215, 255); }
 	static constexpr Color SelectionForeground() { return Color(255, 255, 255, 255); }

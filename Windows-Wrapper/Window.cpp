@@ -238,9 +238,7 @@ void Window::ShowCursor() noexcept
 
 void Window::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 {
-	auto bgColor = GetBackgroundColor();
-	graphics->CreateSolidBrush(bgColor.ToString(), bgColor);
-	graphics->FillRectangle(rectangle, bgColor.ToString());
+	graphics->FillRectangle(GetBackgroundColor(), rectangle);
 }
 
 bool Window::IsCursorEnabled() const noexcept

@@ -195,8 +195,8 @@ void ListBox::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 	hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
 
 	// Select current font
-	auto hFont = Fonts->find(m_Font.ToString());
-	SelectObject(hdcMem, hFont->second);
+	//auto hFont = Fonts->find(m_Font.ToString());
+	//SelectObject(hdcMem, hFont->second);
 
 	RECT r;
 	GetClientRect(hwnd, &r);

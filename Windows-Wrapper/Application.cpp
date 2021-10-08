@@ -37,6 +37,8 @@ void Application::Start() noexcept
 {
 	m_IsRunning = true;
 	m_HasGraphicsChanged = false;
+
+	if (m_SetGraphicsType == GraphicsType::D2D) Direct2D::CreateDeviceIndependentResources();
 }
 
 void Application::SetGraphicsType(GraphicsType graphicsType) noexcept

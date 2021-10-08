@@ -8,6 +8,10 @@ private:
 
 	Object* m_Value;
 
+protected:
+
+	const char* what() const noexcept override;
+
 public:
 
 	ArgumentOutOfRangeException(int line, const char* file) noexcept;
@@ -15,7 +19,5 @@ public:
 	ArgumentOutOfRangeException(int line, const char* file, const std::string& message, Exception* const innerException) noexcept;
 	ArgumentOutOfRangeException(int line, const char* file, const std::string& param, Object* value, const std::string& message) noexcept;
 	ArgumentOutOfRangeException(int line, const char* file, const std::string& param, const std::string& message) noexcept;
-	
-	const char* what() const noexcept override;
 };
 

@@ -2,480 +2,113 @@
 #include "ControlException.h"
 #include "Direct2D.h"
 
-void Button::DrawBorder(HDC& hdc, RECT& rc)
+void Button::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 {
-	// ONLY STANDARD BUTTON TYPE IS IMPLEMENTED
-	// NEED TO DRAW FLAT, POPUP AND SYSTEM STYLES
+	auto bgColor = GetBackgroundColor();
+	auto ftColor = GetForeColor();
+
+	auto insider = rectangle;
+
 	switch (m_FlatStyle)
 	{
-		case FlatStyle::Flat:
-		{
-			break;
-		}
-		case FlatStyle::Popup:
-		{
-			break;
-		}
 		case FlatStyle::Standard_Windows10:	// Standard button MouseOver and Clicking effects are pre-defineds. User can only change the background color
 		{
 			if (IsClicking())		// m_IsTabSelected ALWAYS true when Clicking
 			{
-				// Draw outer border
-				HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(0, 84, 153));
-				HGDIOBJ old_pen = SelectObject(hdc, pen);
-				Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-
-				// Move inside rectangle for inner board
-				rc.left += 1;
-				rc.top += 1;
-				rc.right -= 1;
-				rc.bottom -= 1;
-
-				// Draw dot for tabbed click and mouseover
-				SetBkMode(hdc, OPAQUE);
-				pen = CreatePen(PS_DOT, 0, RGB(0, 0, 0));
-				old_pen = SelectObject(hdc, pen);
-				SetBkColor(hdc, RGB(204, 228, 247));
-				Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-
-				rc.left += 1;
-				rc.top += 1;
-				rc.right -= 1;
-				rc.bottom -= 1;
-
-				//// Draw inner board
-				pen = CreatePen(PS_INSIDEFRAME, 2, RGB(204, 228, 247));
-				old_pen = SelectObject(hdc, pen);
-				Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-
-				// Move even more for background
-				rc.left += 1;
-				rc.top += 1;
-				rc.right -= 1;
-				rc.bottom -= 1;
-
-				//Clean up
-				SelectObject(hdc, old_pen);
-				DeleteObject(old_pen);
-				SelectObject(hdc, pen);
-				DeleteObject(pen);
+				insider = graphics->DrawRectangle(Color(0, 84, 153), insider, 1, ChartDashStyle::Solid);
+				insider = graphics->DrawRectangle(Color(204, 228, 247), insider, 1, ChartDashStyle::Dot);
+				insider = graphics->DrawRectangle(Color(204, 228, 247), insider, 1, ChartDashStyle::Solid);
 			}
 			else if (IsMouseOver())
 			{
 				if (m_IsTabSelected)
 				{
-					// Draw outer border
-					HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(0, 120, 215));
-					HGDIOBJ old_pen = SelectObject(hdc, pen);
-					Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-
-					// Move inside rectangle for inner board
-					rc.left += 1;
-					rc.top += 1;
-					rc.right -= 1;
-					rc.bottom -= 1;
-
-					// Draw dot for tabbed click and mouseover
-					SetBkMode(hdc, OPAQUE);
-					pen = CreatePen(PS_DOT, 0, RGB(0, 0, 0));
-					old_pen = SelectObject(hdc, pen);
-					SetBkColor(hdc, RGB(229, 241, 251));
-					Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-
-					rc.left += 1;
-					rc.top += 1;
-					rc.right -= 1;
-					rc.bottom -= 1;
-
-					//// Draw inner board
-					pen = CreatePen(PS_INSIDEFRAME, 2, RGB(229, 241, 251));
-					old_pen = SelectObject(hdc, pen);
-					Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-
-					// Move even more for background
-					rc.left += 1;
-					rc.top += 1;
-					rc.right -= 1;
-					rc.bottom -= 1;
-
-					//Clean up
-					SelectObject(hdc, old_pen);
-					DeleteObject(old_pen);
-					SelectObject(hdc, pen);
-					DeleteObject(pen);
+					insider = graphics->DrawRectangle(Color(0, 120, 215), insider, 1, ChartDashStyle::Solid);
+					insider = graphics->DrawRectangle(Color(229, 241, 251), insider, 1, ChartDashStyle::Dot);
+					insider = graphics->DrawRectangle(Color(229, 241, 251), insider, 1, ChartDashStyle::Solid);
 				}
 				else
 				{
-					// Draw outer border
-					HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(0, 120, 215));
-					HGDIOBJ old_pen = SelectObject(hdc, pen);
-					Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-
-					// Move inside rectangle for inner board
-					rc.left += 1;
-					rc.top += 1;
-					rc.right -= 1;
-					rc.bottom -= 1;
-
-					// Draw inner board
-					pen = CreatePen(PS_INSIDEFRAME, 2, RGB(229, 241, 251));
-					old_pen = SelectObject(hdc, pen);
-					Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-
-					// Move even more for background
-					rc.left += 2;
-					rc.top += 2;
-					rc.right -= 2;
-					rc.bottom -= 2;
-
-					//Clean up
-					SelectObject(hdc, old_pen);
-					DeleteObject(old_pen);
-					SelectObject(hdc, pen);
-					DeleteObject(pen);
+					insider = graphics->DrawRectangle(Color(0, 120, 215), insider, 1, ChartDashStyle::Solid);
+					insider = graphics->DrawRectangle(Color(229, 241, 251), insider, 2, ChartDashStyle::Solid);
 				}
 			}
 			else
 			{
 				if (m_IsTabSelected)
 				{
-					// Draw outer border
-					HPEN pen = CreatePen(PS_INSIDEFRAME, 2, RGB(0, 120, 215));
-					HGDIOBJ old_pen = SelectObject(hdc, pen);
-					Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-
-					// Move inside rectangle for inner board
-					rc.left += 1;
-					rc.top += 1;
-					rc.right -= 1;
-					rc.bottom -= 1;
-
-					// Draw dot for tabbed click and mouseover
-					SetBkMode(hdc, OPAQUE);
-					pen = CreatePen(PS_DOT, 0, RGB(0, 0, 0));
-					old_pen = SelectObject(hdc, pen);
-					SetBkColor(hdc, RGB(0, 120, 215));
-					Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-
-					// Move inside rectangle for inner board
-					rc.left += 1;
-					rc.top += 1;
-					rc.right -= 1;
-					rc.bottom -= 1;
-
-					// Draw dot for tabbed click and mouseover
-					pen = CreatePen(PS_INSIDEFRAME, 0, RGB(225, 225, 225));
-					old_pen = SelectObject(hdc, pen);
-					Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-
-					// Move even more for background
-					rc.left += 1;
-					rc.top += 1;
-					rc.right -= 1;
-					rc.bottom -= 1;
-
-					//Clean up
-					SelectObject(hdc, old_pen);
-					DeleteObject(old_pen);
-					SelectObject(hdc, pen);
-					DeleteObject(pen);
+					insider = graphics->DrawRectangle(Color(0, 120, 215), insider, 1, ChartDashStyle::Solid);
+					insider = graphics->DrawRectangle(Color(0, 120, 215), insider, 1, ChartDashStyle::Dot);
+					insider = graphics->DrawRectangle(Color(225, 225, 225), insider, 1, ChartDashStyle::Solid);
 				}
 				else
 				{
-					// Draw outer border
-					HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(173, 173, 173));
-					HGDIOBJ old_pen = SelectObject(hdc, pen);
-					Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-
-					// Move inside rectangle for inner board
-					rc.left += 1;
-					rc.top += 1;
-					rc.right -= 1;
-					rc.bottom -= 1;
-
-					// Draw inner board
-					pen = CreatePen(PS_INSIDEFRAME, 2, RGB(225, 225, 225));
-					old_pen = SelectObject(hdc, pen);
-					Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-
-					// Move even more for background
-					rc.left += 2;
-					rc.top += 2;
-					rc.right -= 2;
-					rc.bottom -= 2;
-
-					//Clean up
-					SelectObject(hdc, old_pen);
-					DeleteObject(old_pen);
-					SelectObject(hdc, pen);
-					DeleteObject(pen);
+					insider = graphics->DrawRectangle(Color(173, 173, 173), insider, 1, ChartDashStyle::Solid);
+					insider = graphics->DrawRectangle(Color(222, 225, 225), insider, 2, ChartDashStyle::Solid);
 				}
 			}
+
+			graphics->FillRectangle(bgColor, insider);
 
 			break;
 		}
 		case FlatStyle::Standard_Windows11:
 		{
-			if (IsClicking())		// m_IsTabSelected ALWAYS true when Clicking
+			// Fill the original rectangle with parent background to remove empty black spaces
+			graphics->FillRectangle(Parent->GetBackgroundColor(), rectangle);
+
+			if (IsClicking())
 			{
-				// Draw outer border
-				HPEN pen = CreatePen(PS_INSIDEFRAME, 2, RGB(0, 84, 153));
-				HGDIOBJ old_pen = SelectObject(hdc, pen);
-				//Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-				RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 15, 15);
+				insider = graphics->DrawRoundedRectangle(Color(226, 226, 226), rectangle, 1, ChartDashStyle::Solid, 5);
+				
+				if (GetBackgroundColor() == Color::ControlBackground_Win11()) graphics->FillRoundedRectangle(Color(243, 243, 243), insider, 1);
+				else graphics->FillRectangle(Color::ControlBackground_Win11(), insider);
+				
+				insider.Deflate(2, 2);
 
-				// Move inside rectangle for inner board
-				rc.left += 1;
-				rc.top += 1;
-				rc.right -= 1;
-				rc.bottom -= 1;
+				insider = graphics->DrawRectangle(bgColor, insider, 1, ChartDashStyle::Dot);
 
-				// Draw dot for tabbed click and mouseover
-				SetBkMode(hdc, OPAQUE);
-				pen = CreatePen(PS_DOT, 0, RGB(0, 0, 0));
-				old_pen = SelectObject(hdc, pen);
-				SetBkColor(hdc, RGB(204, 228, 247));
-				Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-				//RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 25, 25);
-
-				rc.left += 1;
-				rc.top += 1;
-				rc.right -= 1;
-				rc.bottom -= 1;
-
-				//// Draw inner board
-				//pen = CreatePen(PS_INSIDEFRAME, 2, RGB(204, 228, 247));
-				//old_pen = SelectObject(hdc, pen);
-				////Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-				//RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 25, 25);
-
-				// Move even more for background
-				rc.left += 1;
-				rc.top += 1;
-				rc.right -= 1;
-				rc.bottom -= 1;
-
-				//Clean up
-				SelectObject(hdc, old_pen);
-				DeleteObject(old_pen);
-				SelectObject(hdc, pen);
-				DeleteObject(pen);
+				if (GetBackgroundColor() == Color::ControlBackground_Win11()) graphics->FillRectangle(Color(243, 243, 243), insider);
+				else graphics->FillRectangle(bgColor, insider);
 			}
 			else if (IsMouseOver())
 			{
+				insider = graphics->DrawRoundedRectangle(Color(0, 120, 212), rectangle, 1, ChartDashStyle::Solid, 5);
+				graphics->FillRoundedRectangle(Color::ControlBackground_Win11(), insider, 1);
+
+				insider.Deflate(2, 2);
+
 				if (m_IsTabSelected)
 				{
-					// Draw outer border
-					HPEN pen = CreatePen(PS_INSIDEFRAME, 2, RGB(0, 120, 215));
-					HGDIOBJ old_pen = SelectObject(hdc, pen);
-					//Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-					RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 15, 15);
-
-					// Move inside rectangle for inner board
-					rc.left += 1;
-					rc.top += 1;
-					rc.right -= 1;
-					rc.bottom -= 1;
-
-					// Draw dot for tabbed click and mouseover
-					SetBkMode(hdc, OPAQUE);
-					pen = CreatePen(PS_DOT, 0, RGB(0, 0, 0));
-					old_pen = SelectObject(hdc, pen);
-					SetBkColor(hdc, RGB(229, 241, 251));
-					//Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-					RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 15, 15);
-
-					rc.left += 1;
-					rc.top += 1;
-					rc.right -= 1;
-					rc.bottom -= 1;
-
-					//// Draw inner board
-					//pen = CreatePen(PS_INSIDEFRAME, 2, RGB(229, 241, 251));
-					//old_pen = SelectObject(hdc, pen);
-					////Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-					//RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 25, 25);
-
-					// Move even more for background
-					rc.left += 1;
-					rc.top += 1;
-					rc.right -= 1;
-					rc.bottom -= 1;
-
-					//Clean up
-					SelectObject(hdc, old_pen);
-					DeleteObject(old_pen);
-					SelectObject(hdc, pen);
-					DeleteObject(pen);
+					insider = graphics->DrawRectangle(Color(216, 230, 241), insider, 1, ChartDashStyle::Dot);
 				}
-				else
-				{
-					// Draw outer border
-					HPEN pen = CreatePen(PS_INSIDEFRAME, 2, RGB(0, 120, 215));
-					HGDIOBJ old_pen = SelectObject(hdc, pen);
-					//Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-					RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 15, 15);
 
-					// Move inside rectangle for inner board
-					rc.left += 1;
-					rc.top += 1;
-					rc.right -= 1;
-					rc.bottom -= 1;
-
-					// Draw inner board
-					//pen = CreatePen(PS_INSIDEFRAME, 2, RGB(229, 241, 251));
-					//old_pen = SelectObject(hdc, pen);
-					////Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-					//RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 25, 25);
-
-					// Move even more for background
-					rc.left += 2;
-					rc.top += 2;
-					rc.right -= 2;
-					rc.bottom -= 2;
-
-					//Clean up
-					SelectObject(hdc, old_pen);
-					DeleteObject(old_pen);
-					SelectObject(hdc, pen);
-					DeleteObject(pen);
-				}
+				graphics->FillRectangle(bgColor, insider);
 			}
 			else
 			{
 				if (m_IsTabSelected)
 				{
-					// Draw outer border
-					HPEN pen = CreatePen(PS_INSIDEFRAME, 2, RGB(0, 120, 215));
-					HGDIOBJ old_pen = SelectObject(hdc, pen);
-					//Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-					RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 15, 15);
-
-					// Move inside rectangle for inner board
-					rc.left += 1;
-					rc.top += 1;
-					rc.right -= 1;
-					rc.bottom -= 1;
-
-					// Draw dot for tabbed click and mouseover
-					SetBkMode(hdc, OPAQUE);
-					pen = CreatePen(PS_DOT, 0, RGB(0, 0, 0));
-					old_pen = SelectObject(hdc, pen);
-					SetBkColor(hdc, RGB(0, 120, 215));
-					//Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-					RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 15, 15);
-
-					// Move inside rectangle for inner board
-					rc.left += 1;
-					rc.top += 1;
-					rc.right -= 1;
-					rc.bottom -= 1;
-
-					// Draw dot for tabbed click and mouseover
-					//pen = CreatePen(PS_INSIDEFRAME, 0, RGB(225, 225, 225));
-					//old_pen = SelectObject(hdc, pen);
-					////Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-					//RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 25, 25);
-
-					// Move even more for background
-					rc.left += 1;
-					rc.top += 1;
-					rc.right -= 1;
-					rc.bottom -= 1;
-
-					//Clean up
-					SelectObject(hdc, old_pen);
-					DeleteObject(old_pen);
-					SelectObject(hdc, pen);
-					DeleteObject(pen);
+					insider = graphics->DrawRoundedRectangle(Color(0, 120, 212), rectangle, 1, ChartDashStyle::Solid, 5);
+					graphics->FillRoundedRectangle(Color::ControlBackground_Win11(), insider, 1);
+					insider.Deflate(2, 2);
+					insider = graphics->DrawRectangle(bgColor, insider, 1, ChartDashStyle::Dot);
+					graphics->FillRectangle(bgColor, insider);
 				}
 				else
 				{
-					SetBkMode(hdc, TRANSPARENT);
-					// Draw outer border
-					HPEN pen = CreatePen(PS_INSIDEFRAME, 2, RGB(173, 173, 173));
-					HGDIOBJ old_pen = SelectObject(hdc, pen);
-					//Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-					RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 15, 15);
+					insider = graphics->DrawRoundedRectangle(Color(201, 201, 201), rectangle, 1, ChartDashStyle::Solid, 5);
 
-					// Move inside rectangle for inner board
-					rc.left += 1;
-					rc.top += 1;
-					rc.right -= 1;
-					rc.bottom -= 1;
-
-					// Draw inner board
-					//pen = CreatePen(PS_INSIDEFRAME, 2, RGB(225, 225, 225));
-					//old_pen = SelectObject(hdc, pen);
-					////Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
-					//RoundRect(hdc, rc.left, rc.top, rc.right, rc.bottom, 25, 25);
-
-					// Move even more for background
-					rc.left += 2;
-					rc.top += 2;
-					rc.right -= 2;
-					rc.bottom -= 2;
-
-					//Clean up
-					SelectObject(hdc, old_pen);
-					DeleteObject(old_pen);
-					SelectObject(hdc, pen);
-					DeleteObject(pen);
+					insider.Deflate(2, 2);
+					graphics->FillRoundedRectangle(bgColor, insider, 1);
 				}
 			}
-			break;
-		}
-		case FlatStyle::System:
-		{
+
 			break;
 		}
 	}
-}
 
-void Button::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
-{
-	auto hwnd = static_cast<HWND>(Handle.ToPointer());
-	auto hdc = static_cast<HDC>(graphics->GetHDC().ToPointer());
-	auto bgColor = GetBackgroundColor();
-	auto ftColor = GetForeColor();
-
-	SetBkMode(hdc, OPAQUE);
-	RECT rc;
-	GetClientRect(hwnd, &rc);
-
-	HDC hdcMem = CreateCompatibleDC(hdc);
-	HBITMAP hbmMem = CreateCompatibleBitmap(hdc, m_Size.Width, m_Size.Height);
-	HBITMAP hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
-
-	// Select current font
-	auto hFont = Fonts->find(m_Font.ToString());
-	SelectObject(hdcMem, hFont->second);
-
-	// Draw background inside before drawing borders to round rectangle
-	HBRUSH background = CreateSolidBrush(bgColor.ToRGB());
-	FillRect(hdcMem, &rc, background);
-	SelectObject(hdcMem, background);
-	DeleteObject(background);
-
-	graphics->CreateSolidBrush(bgColor.ToString(), bgColor.ToRGB());
-	graphics->FillRectangle(rectangle, bgColor.ToString());
-
-	DrawBorder(hdcMem, rc);
-
-	SetBkMode(hdcMem, TRANSPARENT);
-	SetTextColor(hdcMem, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-	DrawText(hdcMem, GetText().c_str(), -1, &rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-
-	// Perform the bit-block transfer between the memory Device Context which has the next bitmap
-	// with the current image to avoid flickering
-	BitBlt(hdc, 0, 0, m_Size.Width, m_Size.Height, hdcMem, 0, 0, SRCCOPY);
-
-	SelectObject(hdc, hbmMem);
-	DeleteObject(hbmMem);
-	SelectObject(hdcMem, hbmOld);
-	DeleteObject(hbmOld);
-	ReleaseDC(hwnd, hdcMem);
-	DeleteDC(hdcMem);
+	graphics->CommonDrawText(Text, GetFont(), ftColor, insider);
 }
 
 int Button::OnEraseBackground_Impl(HWND hwnd, HDC hdc)
@@ -569,6 +202,16 @@ FlatStyle Button::GetFlatStyle() const noexcept
 
 void Button::SetFlatStyle(FlatStyle style) noexcept
 {
+	if (m_FlatStyle == FlatStyle::Standard_Windows11 && GetBackgroundColor() == Color::ControlBackground_Win11())
+	{
+		SetBackgroundColor(Color::ControlBackground_Win10());
+	}
+	else if (m_FlatStyle == FlatStyle::Standard_Windows10 && GetBackgroundColor() == Color::ControlBackground_Win10())
+	{
+		SetBackgroundColor(Color::ControlBackground_Win11());
+	}
+
 	m_FlatStyle = style;
+
 	Update();
 }

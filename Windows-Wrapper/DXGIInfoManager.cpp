@@ -19,16 +19,15 @@ DXGIInfoManager::DXGIInfoManager()
 	const auto hModDXGIDebug = LoadLibraryEx("dxgidebug.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
 	if (hModDXGIDebug == nullptr)
 	{
-		throw CTL_LAST_EXCEPT();
+		//throw CTL_LAST_EXCEPT();
 	}
 
 	// Get the address of DXGIGetDebugInterface in DLL
-	const auto DxgiGetDebugInterface = reinterpret_cast<DXGIGetDebugInterface>(
-		reinterpret_cast<void*>(GetProcAddress(hModDXGIDebug, "DXGIGetDebugInterface")));
+	const auto DxgiGetDebugInterface = reinterpret_cast<DXGIGetDebugInterface>(reinterpret_cast<void*>(GetProcAddress(hModDXGIDebug, "DXGIGetDebugInterface")));
 
 	if (DxgiGetDebugInterface == nullptr)
 	{
-		throw CTL_LAST_EXCEPT();
+		//throw CTL_LAST_EXCEPT();
 	}
 
 	//GFX_THROW_NOINFO(DxgiGetDebugInterface(__uuidof(IDXGIInfoQueue), &m_DXGIInfoQueue));

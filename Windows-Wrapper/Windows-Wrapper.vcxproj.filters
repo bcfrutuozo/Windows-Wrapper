@@ -338,12 +338,6 @@
     <ClInclude Include="EventDispatcher.h">
       <Filter>Events</Filter>
     </ClInclude>
-    <ClInclude Include="IEnumerator.h">
-      <Filter>Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="IEnumerable.h">
-      <Filter>Interfaces</Filter>
-    </ClInclude>
     <ClInclude Include="TestRealTimeApplication.h" />
     <ClInclude Include="ConvertEventArgs.h">
       <Filter>Events</Filter>

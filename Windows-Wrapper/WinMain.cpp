@@ -31,18 +31,13 @@ int CALLBACK WinMain(
 	try
 	{
 		SetProcessDPIAware();
-		TestUserApplication::SetGraphicsType(GraphicsType::D2D);
+		TestUserApplication::SetGraphicsType(GraphicsType::GDI);
 		TestUserApplication::Run();
 	}
 	catch (const ControlException& e)
 	{
 		return -1;
-		MessageBox(nullptr, e.what(), "Standard Exception", MB_OK | MB_ICONEXCLAMATION);
-	}
-	catch (const std::exception& e)
-	{
-		return -1;
-		MessageBox(nullptr, e.what(), "Standard Exception", MB_OK | MB_ICONEXCLAMATION);
+		MessageBox(nullptr, e.GetExceptionMessage(), "Standard Exception", MB_OK | MB_ICONEXCLAMATION);
 	}
 	catch (...)
 	{

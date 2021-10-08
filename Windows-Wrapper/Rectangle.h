@@ -27,8 +27,8 @@ namespace Drawing
 		constexpr bool IsEmpty() const noexcept { return (X == 0 && Y == 0 && Width == 0 && Height == 0); }
 		constexpr int GetLeft() const noexcept { return X; }
 		constexpr int GetTop() const noexcept { return Y; }
-		constexpr int GetRight() const noexcept { return Width - X; }
-		constexpr int GetBottom() const noexcept { return Height - Y; }
+		constexpr int GetRight() const noexcept { return Width; }
+		constexpr int GetBottom() const noexcept { return Height; }
 		constexpr Point GetLocation() const noexcept { return Point(X, Y); }
 		constexpr Size GetSize() const noexcept { return Size(Width, Height); }
 		constexpr void Offset(int x, int y) noexcept { X += x; Y += y; }
@@ -38,11 +38,21 @@ namespace Drawing
 		{
 			X -= width;
 			Y -= height;
-			Width += 2 * width;
-			Height += 2 * height;
+			Width += width;
+			Height += height;
 		}
 
-		constexpr void Inflate(Size s) noexcept { return Inflate(s.Width, s.Height); }
+		constexpr void Deflate(int width, int height) noexcept
+		{
+			X += width;
+			Y += height;
+			Width -= width;
+			Height -= height;
+		}
+
+		constexpr void Inflate(Size s) noexcept { Inflate(s.Width, s.Height); }
+
+		constexpr void Deflate(Size s) noexcept { Deflate(s.Width, s.Height); }
 
 		constexpr void Intersect(Rectangle rect) noexcept
 		{
@@ -60,6 +70,13 @@ namespace Drawing
 		{
 			Rectangle rect = r;
 			rect.Inflate(x, y);
+			return rect;
+		}
+
+		static constexpr Rectangle Deflate(Rectangle r, int x, int y) noexcept
+		{
+			Rectangle rect = r;
+			rect.Deflate(x, y);
 			return rect;
 		}
 

@@ -6,7 +6,6 @@
 #include "GDI.h"
 #include "Direct2D.h"
 
-std::map<std::string, HFONT>* WinAPI::Fonts = new std::map<std::string, HFONT>();
 unsigned int WinAPI::m_CurrentIndex = 1;
 IntPtr WinAPI::m_OpenedControl = nullptr;
 
@@ -14,17 +13,17 @@ IntPtr WinAPI::m_OpenedControl = nullptr;
 void WinAPI::PreDraw(Graphics* const graphics)
 {
 	auto hwnd = static_cast<HWND>(Handle.ToPointer());
-	auto hdc = static_cast<HDC>(graphics->GetHDC().ToPointer());
-
-	auto hFont = Fonts->find(m_Font.ToString());
 
 	if (m_HasFontChanged)
 	{
-		SendMessage(hwnd, WM_SETFONT, (WPARAM)hFont->second, TRUE);
+		graphics->CreateFontObject(m_Font);
+		auto hFont = graphics->GetElement(m_Font.ToString());
+		SendMessage(hwnd, WM_SETFONT, (WPARAM)hFont, true);
 		m_HasFontChanged = false;
 	}
 
-	SelectObject(hdc, hFont->second);
+	graphics->CreateSolidBrush(GetBackgroundColor());
+	graphics->CreateSolidBrush(GetForeColor());
 }
 
 void WinAPI::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
@@ -91,7 +90,6 @@ int WinAPI::OnClosing_Impl(HWND hwnd)
 
 		if (Application::CanCloseApplication())
 		{
-			WinAPI::Free();
 			Application::Exit();
 
 		}
@@ -108,26 +106,6 @@ void WinAPI::OnClosed_Impl(HWND hwnd)
 
 void WinAPI::OnCreate_Impl(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
 {
-	if (!Fonts->contains(m_Font.ToString()))
-	{
-		HFONT hFont = CreateFont(
-			m_Font.GetSizeInPixels(),
-			0,
-			0,
-			0,
-			m_Font.IsBold() ? FW_BOLD : FW_NORMAL,
-			m_Font.IsItalic(),
-			m_Font.IsUnderline(),
-			m_Font.IsStrikeOut(),
-			ANSI_CHARSET,
-			OUT_TT_PRECIS,
-			CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
-			DEFAULT_PITCH | FF_DONTCARE,
-			m_Font.GetName().c_str());
-
-		(*Fonts)[m_Font.ToString()] = hFont;
-	}
-
 	Dispatch("OnCreate", &ArgsDefault);
 }
 
@@ -332,7 +310,7 @@ void WinAPI::OnPaint_Impl(HWND hwnd)
 {
 	if (IsShown())
 	{
-		Drawing::Rectangle rect = Drawing::Rectangle(m_Location, m_Size);
+		Drawing::Rectangle rect = Drawing::Rectangle(0, 0, m_Size.Width, m_Size.Height);
 
 		if (m_Graphics == nullptr)
 		{
@@ -384,6 +362,11 @@ int WinAPI::OnSetCursor_Impl(HWND hwnd, HWND hwndCursor, unsigned int codeHitTes
 
 void WinAPI::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy)
 {
+	m_Size.Width = cx;
+	m_Size.Height = cy;
+
+	if(m_Graphics) m_Graphics->UpdateSize(m_Size);
+
 	Dispatch("OnResize", &ArgsDefault);
 }
 
@@ -399,17 +382,6 @@ void WinAPI::OnShowWindow_Impl(HWND hwnd, bool fShow, unsigned int status)
 	}
 
 	Dispatch("OnVisibleChanged", &ArgsDefault);
-}
-
-void WinAPI::Free()
-{
-	for (const auto& f : *Fonts)
-	{
-		DeleteObject(f.second);
-	}
-
-	Fonts->clear();
-	SafeDelete(Fonts);
 }
 
 void WinAPI::OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int code, int pos)
@@ -436,7 +408,7 @@ WinAPI::WinAPI(int width, int height, int x, int y)
 	m_IsMouseOver(false),
 	m_IsClicking(false),
 	m_IsVisible(true),
-	m_BackgroundColor(Color::ControlBackground()),
+	m_BackgroundColor(Color::ControlBackground_Win11()),
 	m_ForeColor(Color::Foreground()),
 	m_HorizontalScrolling(0),
 	m_VerticalScrolling(0),
@@ -785,26 +757,6 @@ Font WinAPI::GetFont() const noexcept
 
 void WinAPI::SetFont(Font font) noexcept
 {
-	if (!Fonts->contains(font.ToString()))
-	{
-		HFONT hFont = CreateFont(
-			font.GetSizeInPixels(),
-			0,
-			0,
-			0,
-			font.IsBold() ? FW_BOLD : FW_NORMAL,
-			font.IsItalic(),
-			font.IsUnderline(),
-			font.IsStrikeOut(),
-			ANSI_CHARSET,
-			OUT_TT_PRECIS,
-			CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
-			DEFAULT_PITCH | FF_DONTCARE,
-			font.GetName().c_str());
-
-		(*Fonts)[font.ToString()] = hFont;
-	}
-
 	m_Font = font;
 
 	m_HasFontChanged = true;
@@ -813,7 +765,7 @@ void WinAPI::SetFont(Font font) noexcept
 
 Color WinAPI::GetBackgroundColor() const noexcept
 {
-	if (m_BackgroundColor == Color::ControlBackground() && !IsEnabled())
+	if ((m_BackgroundColor ==Color::ControlBackground_Win11() || m_BackgroundColor == Color::ControlBackground_Win10()) && !IsEnabled())
 	{
 		return Color::DisabledControlBackground();
 	}

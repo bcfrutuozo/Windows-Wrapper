@@ -14,8 +14,6 @@ private:
 	FlatButtonAppearance m_FlatAppearance;
 	FlatStyle m_FlatStyle;
 
-	void DrawBorder(HDC& hdc, RECT& rc);
-
 	void Draw(Graphics* const graphics, Drawing::Rectangle rectangle) override;
 	int OnEraseBackground_Impl(HWND hwnd, HDC hdc) override;
 	void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) override;

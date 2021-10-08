@@ -18,6 +18,8 @@ protected:
 
 	mutable std::string m_WhatBuffer;
 
+	virtual const char* what() const noexcept override;
+
 public:
 
 	Exception(int line, const char* file) noexcept;
@@ -25,12 +27,12 @@ public:
 	Exception(int line, const char* file, const std::string& message, Exception* const innerException) noexcept;
 	~Exception() noexcept;
 
-	virtual const char* what() const noexcept override;
 	const int GetLine() const noexcept;
 	HRESULT GetErrorCode() const noexcept;
 	void SetErrorCode(HRESULT hr) noexcept;
 	const std::string& GetFile() const noexcept;
 	std::string GetErrorSpot() const noexcept;
+	const char* GetExceptionMessage() const noexcept;
 	void SetMessage(const std::string& message) noexcept;
 
 	static const std::string TranslateErrorCode(HRESULT hr) noexcept;

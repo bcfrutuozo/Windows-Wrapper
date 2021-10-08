@@ -121,6 +121,11 @@ std::string Exception::GetErrorSpot() const noexcept
 	return oss.str();
 }
 
+const char* Exception::GetExceptionMessage() const noexcept
+{
+	return m_WhatBuffer.c_str();
+}
+
 void Exception::SetMessage(const std::string& message) noexcept
 {
 	m_Message = message;

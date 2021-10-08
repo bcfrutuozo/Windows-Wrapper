@@ -39,11 +39,21 @@ namespace Drawing
 		{
 			X -= width;
 			Y -= height;
-			Width += 2 * width;
-			Height += 2 * height;
+			Width += width;
+			Height += height;
 		}
 
-		constexpr void Inflate(SizeF s) noexcept { return Inflate(static_cast<float>(s.Width), static_cast<float>(s.Height)); }
+		constexpr void Deflate(float width, float height) noexcept
+		{
+			X += width;
+			Y += height;
+			Width -= width;
+			Height -= height;
+		}
+
+		constexpr void Inflate(SizeF s) noexcept { Inflate(s.Width, s.Height); }
+
+		constexpr void Deflate(SizeF s) noexcept { Deflate(s.Width, s.Height); }
 
 		constexpr void Intersect(RectangleF rect) noexcept
 		{
@@ -63,6 +73,13 @@ namespace Drawing
 		{
 			RectangleF rect = r;
 			rect.Inflate(x, y);
+			return rect;
+		}
+
+		static constexpr RectangleF Deflate(RectangleF r, float x, float y) noexcept
+		{
+			RectangleF rect = r;
+			rect.Deflate(x, y);
 			return rect;
 		}
 
