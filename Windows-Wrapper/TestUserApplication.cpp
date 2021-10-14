@@ -73,8 +73,8 @@ void TestUserApplication::Initialize()
     );
     button2->SetFlatStyle(FlatStyle::Standard_Windows10);
     
-    txtBox1 = window->AddTextBox("TextBox", 400, 20, 400);
-    txtBox1->BorderStyle = BorderStyle::None;
+    txtBox1 = window->AddTextBox("TextBox\nLinha2\nLinha3", 400, 20, 400);
+    txtBox1->SetBorderStyle(BorderStyle::None);
     txtBox1->OnKeyPressSet([](Object* sender, KeyPressEventArgs* e)
     	{
 			std::ostringstream ossin;
@@ -88,7 +88,7 @@ void TestUserApplication::Initialize()
     );
     
     txtBox2 = window->AddTextBox("TextBox2", 400, 20, 460);
-    txtBox2->BorderStyle = BorderStyle::FixedSingle;
+    txtBox2->SetBorderStyle(BorderStyle::FixedSingle);
     txtBox2->OnKeyPressSet([](Object* sender, KeyPressEventArgs* e)
         {
 			std::ostringstream ossin;
@@ -99,10 +99,11 @@ void TestUserApplication::Initialize()
                 printf_s("printing Z");
             }
         });
+    txtBox2->SetTextAlign(HorizontalAlignment::Center);
     
     
     txtBox3 = window->AddTextBox("TextBox3", 400, 20, 560);
-    txtBox3->BorderStyle = BorderStyle::Fixed3D;
+    txtBox3->SetBorderStyle(BorderStyle::Fixed3D);
     txtBox3->OnKeyPressSet([](Object* sender, KeyPressEventArgs* e)
     	{
 			std::ostringstream ossin;
@@ -114,6 +115,8 @@ void TestUserApplication::Initialize()
     		}
     	}
     );
+    txtBox3->SetTextAlign(HorizontalAlignment::Right);
+
     
     progressBar = window->AddProgressBar("abc", 300, 50, 50, 20);
 }

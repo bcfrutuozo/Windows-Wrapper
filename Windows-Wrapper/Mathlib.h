@@ -1,7 +1,17 @@
 #pragma once
 
-#include "Common.h"
+#include <algorithm>
+#include <bit>
+#include <limits>
 
+// DirectX extension libraries
+#include <DirectXMath.h>
+#include <DirectXPackedVector.h>
+#include <DirectXCollision.h>
+using namespace DirectX;
+using namespace DirectX::PackedVector;
+
+#define ArraySize(a) (sizeof(a) / sizeof(a[0]))
 #define Saturate(x) (std::min)((std::max)(x, 0.0f), 1.0f)	// std::min and std::max between brackets to avoid default minmax macro call
 
 static constexpr float PI = 3.14159265f;

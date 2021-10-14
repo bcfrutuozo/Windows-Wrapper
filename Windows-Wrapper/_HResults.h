@@ -5,7 +5,6 @@ class HResult
 public:
 
 	// System
-	
 	static constexpr int COR_E_AMBIGUOUSMATCH = 0x8000211D;
 	static constexpr int COR_E_APPDOMAINUNLOADED = 0x80131014;
 	static constexpr int COR_E_APPLICATION = 0x80131600;
@@ -95,7 +94,6 @@ public:
 	static constexpr int FUSION_E_INVALID_NAME = 0x80131047;
 	
 	// System.IO
-	
 	static constexpr int COR_E_ENDOFSTREAM = 0x80070026;  // OS defined
 	static constexpr int COR_E_FILELOAD = 0x80131621;
 	static constexpr int COR_E_FILENOTFOUND = 0x80070002;

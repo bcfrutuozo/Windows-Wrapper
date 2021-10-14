@@ -1,12 +1,12 @@
 #pragma once
 
-#include "CommonObject.h"
+#include "Object.h"
 
 class EventArgs : public Object
 {
 public:
 
-	EventArgs()
+	constexpr EventArgs()
 	{
 
 	}

@@ -1,6 +1,31 @@
 #pragma once
 
 #include "IEquatable.h"
+#include "Mathlib.h"
+
+#include <string>
+
+// Linker for Direct2D
+#pragma comment(lib, "d2d1")
+#pragma comment(lib, "dwrite")
+
+// Direct2D
+#include <stdlib.h>
+#include <malloc.h>
+#include <memory.h>
+#include <wchar.h>
+#include <math.h>
+#include <d2d1.h>
+#include <d2d1helper.h>
+#include <dwrite.h>
+#include <wincodec.h>
+
+// DirectX extension libraries
+#include <DirectXMath.h>
+#include <DirectXPackedVector.h>
+#include <DirectXCollision.h>
+using namespace DirectX;
+using namespace DirectX::PackedVector;
 
 struct Color : public IEquatable<Color>
 {
@@ -95,5 +120,5 @@ public:
 	int GetHashCode() const override;
 	inline bool Equals(const Object* const c) const override;
 	inline bool Equals(const Color* const c) const override;
-	const std::string ToString() const noexcept override;
+	std::string ToString() const noexcept override;
 };

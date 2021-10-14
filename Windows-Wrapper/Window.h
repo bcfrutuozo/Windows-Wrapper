@@ -16,7 +16,7 @@
 class Window final : public Control
 {
 	friend class Menu;
-	friend class WinAPI;
+	friend class NativeWindow;
 
 private:
 

@@ -1,5 +1,5 @@
 #include "Direct2D.h"
-#include "WinAPI.h"
+#include "NativeWindow.h"
 #include "Exceptions.h"
 
 ID2D1Factory* Direct2D::m_pDirect2dFactory = nullptr;
@@ -87,7 +87,7 @@ const IntPtr Direct2D::CreateSolidBrush(Color c)
 
 	if (Elements.contains(c.ToString()))
 	{
-		brush = (ID2D1SolidColorBrush*)GetElement(c.ToString());
+		brush = (ID2D1SolidColorBrush*)GetElement(std::string(c.ToString()));
 
 		if (!brush) throw ArgumentException("Element already exist but it's not from ID2D1SolidColorBrush type");
 
@@ -109,7 +109,7 @@ const IntPtr Direct2D::CreateFontObject(const Font& f)
 
 	if (Elements.contains(f.ToString()))
 	{
-		font = (HFONT)GetElement(f.ToString());
+		font = (HFONT)GetElement(std::string(f.ToString()));
 
 		if (!font) throw ArgumentException("Element already exist but it's not from HFONT type");
 
@@ -127,15 +127,15 @@ const IntPtr Direct2D::CreateFontObject(const Font& f)
 
 Drawing::Rectangle Direct2D::DrawRectangle(Color c, Drawing::Rectangle rect, int borderSize, ChartDashStyle borderStyle)
 {
-	ID2D1Brush* brush = (ID2D1Brush*)GetElement(c.ToString());
+	ID2D1Brush* brush = (ID2D1Brush*)GetElement(std::string(c.ToString()));
 
 	if (!brush) throw InvalidCastException("Cannot convert the following item to brush type!");
 
 	D2D1_RECT_F a;
 	a.left = 0.0f;
 	a.top = 0.0f;
-	a.right = (float)rect.Width;
-	a.bottom = (float)rect.Height;
+	a.right = (float)rect.Right;
+	a.bottom = (float)rect.Bottom;
 
 	m_pRenderTarget->DrawRectangle(a, brush);
 
@@ -149,30 +149,30 @@ Drawing::Rectangle Direct2D::DrawRoundedRectangle(Color c, Drawing::Rectangle re
 
 void Direct2D::FillRectangle(Color c, Drawing::Rectangle rect)
 {
-	ID2D1Brush* brush = (ID2D1Brush*)GetElement(c.ToString());
+	ID2D1Brush* brush = (ID2D1Brush*)GetElement(std::string(c.ToString()));
 
 	if (!brush) throw InvalidCastException("Cannot convert the following item to brush type!");
 
 	D2D1_RECT_F a;
 	a.left = 0.0f;
 	a.top = 0.0f;
-	a.right = (float)rect.Width;
-	a.bottom = (float)rect.Height;
+	a.right = (float)rect.Right;
+	a.bottom = (float)rect.Bottom;
 
 	m_pRenderTarget->FillRectangle(a, brush);
 }
 
 void Direct2D::FillRoundedRectangle(Color c, Drawing::Rectangle rect, int radius)
 {
-	ID2D1Brush* brush = (ID2D1Brush*)GetElement(c.ToString());
+	ID2D1Brush* brush = (ID2D1Brush*)GetElement(std::string(c.ToString()));
 
 	if (!brush) throw InvalidCastException("Cannot convert the following item to brush type!");
 
 	D2D1_RECT_F a;
 	a.left = 0.0f;
 	a.top = 0.0f;
-	a.right = (float)rect.Width;
-	a.bottom = (float)rect.Height;
+	a.right = (float)rect.Right;
+	a.bottom = (float)rect.Bottom;
 
 	D2D1_ROUNDED_RECT rr;
 	rr.radiusX = (float)radius;
@@ -181,7 +181,17 @@ void Direct2D::FillRoundedRectangle(Color c, Drawing::Rectangle rect, int radius
 	m_pRenderTarget->FillRoundedRectangle(rr, brush);
 }
 
-void Direct2D::CommonDrawText(const std::string& text, const Font& font, Color c, Drawing::Rectangle rect)
+Size Direct2D::GetTextSize(const std::string& text, const Font& font)
+{
+	return Size(0, 0);
+}
+
+Size Direct2D::GetTextSize(const char* text, int length, const Font& font)
+{
+	return Size(0, 0);
+}
+
+Drawing::Rectangle Direct2D::DrawTransparentText(const std::string& text, HorizontalAlignment alignment, const Font& font, Color foreColor, Drawing::Rectangle rect, size_t cursorIndex)
 {
 	//// Create a DirectWrite text format object.
 	//auto hr = m_pDWriteFactory->CreateTextFormat(
@@ -199,4 +209,11 @@ void Direct2D::CommonDrawText(const std::string& text, const Font& font, Color c
 	//
 	//
 	//m_pRenderTarget->DrawTextA(, , m_pTextFormat, rect, brush);
+	return Drawing::Rectangle(0, 0, 0, 0);
 }
+
+Drawing::Rectangle Direct2D::DrawOpaqueText(const std::string& text, HorizontalAlignment alignment, const Font& font, Color foreColor, Drawing::Rectangle rect, Color backColor, size_t cursorIndex)
+{
+	return Drawing::Rectangle(0, 0, 0, 0);
+}
+

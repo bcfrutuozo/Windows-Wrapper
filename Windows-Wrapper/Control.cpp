@@ -6,6 +6,7 @@
 #include "KeyPressEventHandler.h"
 #include "CancelEventHandler.h"
 #include "Window.h"
+#include "IntPtr.h"
 
 int Control::m_IncrementalTabIndex = 0;
 
@@ -38,13 +39,13 @@ void Control::OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus)
 		suppressed.
 	/**************************************************************************************************/
 	m_IsTabSelected = true;
-	WinAPI::OnFocusEnter_Impl(hwnd, hwndOldFocus);
+	NativeWindow::OnFocusEnter_Impl(hwnd, hwndOldFocus);
 }
 
 void Control::OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus)
 {
 	m_IsTabSelected = false;
-	WinAPI::OnFocusLeave_Impl(hwnd, hwndNewFocus);
+	NativeWindow::OnFocusLeave_Impl(hwnd, hwndNewFocus);
 }
 
 void Control::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags)
@@ -75,7 +76,7 @@ void Control::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 	}
 	}
 
-	WinAPI::OnKeyDown_Impl(hwnd, vk, cRepeat, flags);
+	NativeWindow::OnKeyDown_Impl(hwnd, vk, cRepeat, flags);
 }
 
 void Control::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags)
@@ -103,7 +104,7 @@ void Control::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlag
 		Update();
 	}
 
-	WinAPI::OnMouseLeftDown_Impl(hwnd, x, y, keyFlags);
+	NativeWindow::OnMouseLeftDown_Impl(hwnd, x, y, keyFlags);
 }
 
 void Control::OnNextDialogControl_Impl(HWND hwnd, HWND hwndSetFocus, bool fNext)
@@ -123,9 +124,26 @@ void Control::OnNextDialogControl_Impl(HWND hwnd, HWND hwndSetFocus, bool fNext)
 	}
 }
 
+Drawing::Rectangle const Control::GetDrawableArea() noexcept
+{
+	return m_DrawableArea;
+}
+
+void Control::Resize(Size size)
+{
+	NativeWindow::Resize(size);
+	m_DrawableArea = Drawing::Rectangle(m_Margin.Left, m_Margin.Top, size.Width - m_Margin.Right, size.Height - m_Margin.Bottom);
+}
+
+void Control::Resize(int width, int height)
+{
+	NativeWindow::Resize(Size(width, height));
+	m_DrawableArea = Drawing::Rectangle(m_Margin.Left, m_Margin.Top, width - m_Margin.Right, height - m_Margin.Bottom);
+}
+
 void Control::Dispose()
 {
-	WinAPI::Dispose();
+	NativeWindow::Dispose();
 
 	for (auto c : Controls)
 	{
@@ -181,7 +199,7 @@ void Control::SetFont(Font font) noexcept
 		c->SetFont(font);
 	}
 
-	WinAPI::SetFont(font);
+	NativeWindow::SetFont(font);
 }
 
 void Control::SetText(const std::string& text) noexcept
@@ -191,11 +209,10 @@ void Control::SetText(const std::string& text) noexcept
 
 Control::Control(Control* parent, const std::string& text, int width, int height, int x, int y) noexcept
 	:
-	WinAPI(width, height, x, y),
+	NativeWindow(width, height, x, y),
 	Parent(parent),
 	Text(text),
 	m_Padding(0),
-	m_Margin(3, 3, 3, 3),	// Default margin for controls
 	m_TabIndex(m_IncrementalTabIndex++),
 	m_IsTabSelected(false),
 	m_IsTabStop(true),
@@ -219,12 +236,11 @@ Control::Control(Control* parent, const std::string& text, int width, int height
 	OnMouseUp(nullptr),
 	OnMouseWheel(nullptr),
 	OnVisibleChanged(nullptr),
-	OnPaint(nullptr)
+	OnPaint(nullptr),
+	m_Margin(3, 3, 3, 3),
+	m_DrawableArea(3, 3, width - 3, height - 3)
 {
-	if (m_Size.Height == 0 || m_Size.Width == 0)
-	{
-		m_Size = CalculateSizeByFont();
-	}
+
 }
 
 Control::Control(const std::string& text) noexcept
@@ -390,6 +406,18 @@ Padding Control::GetMargin() const noexcept
 	return m_Margin;
 }
 
+void Control::SetMargin(Padding margin) noexcept
+{
+	auto size = GetSize();
+	m_DrawableArea = Drawing::Rectangle(margin.Left, margin.Top, size.Width - margin.Right, size.Height - margin.Bottom);
+	m_Margin = margin;
+}
+
+void Control::SetMargin(int left, int top, int right, int bottom) noexcept
+{
+	SetMargin(Padding(left, top, right, bottom));
+}
+
 Control* Control::GetByTabIndex(const int& index) noexcept
 {
 	if (m_TabIndex == index)
@@ -523,52 +551,9 @@ void Control::SetTabIndex(const int& index) noexcept
 	}
 }
 
-Size Control::CalculateSizeByFont() noexcept
-{
-	Size r(m_Size);
-
-	if (m_Size.Height == 0)
-	{
-		int height = 5;
-		for (int i = 5, j = 0; i < m_Font.GetSizeInPixels(); ++i, ++j)
-		{
-			if (j == 2)
-			{
-				height += 2;
-				j = -1;
-			}
-			else
-			{
-				height += 1;
-			}
-		}
-
-		// Size is always the default plus the calculated area size
-		r.Height = Font::DefaultHeight() + height;
-
-		// Adjust height margin
-		r.Height += m_Margin.Top + m_Margin.Bottom;
-	}
-
-	if (m_Size.Width == 0)
-	{
-		SIZE s;
-		HDC hdc = GetDC(static_cast<HWND>(GetWindow()->Handle.ToPointer()));
-		GetTextExtentPoint32(hdc, Text.c_str(), static_cast<int>(Text.length()), &s);
-		ReleaseDC(static_cast<HWND>(GetWindow()->Handle.ToPointer()), hdc);
-		DeleteDC(hdc);
-		r.Width = s.cx;
-
-		// Adjust width margin
-		r.Width += m_Margin.Left + m_Margin.Right;
-	}
-
-	return r;
-}
-
 bool Control::IsEnabled() const noexcept
 {
-	if (!WinAPI::IsEnabled())
+	if (!NativeWindow::IsEnabled())
 	{
 		return false;
 	}

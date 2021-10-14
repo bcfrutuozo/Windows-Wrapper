@@ -18,7 +18,7 @@ private:
 	SelectionMode m_SelectionMode;
 	DockStyle m_DockStyle;
 	BorderStyle m_BorderStyle;
-	std::vector<RECT> m_RowPosition;
+	std::vector<Drawing::Rectangle> m_RowPosition;
 	int m_TotalItemsInDrawableArea;
 	int m_ColumnWidth;
 	int m_RowNumber;

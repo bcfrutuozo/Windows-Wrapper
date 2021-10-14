@@ -4,13 +4,15 @@
 #include "Type.h"
 #include "Guid.h"
 
-inline bool Object::Equals(const Object* const b) const
+#include <string>
+
+bool Object::Equals(const Object* const b) const
 {
 	if (b == nullptr) return false;
 	return ReferenceEquals(*b);
 }
 
-inline int Object::GetHashCode() const
+int Object::GetHashCode() const
 {
 	auto guid = uuid_system_generator{}();
 
@@ -23,12 +25,12 @@ inline int Object::GetHashCode() const
 	return ret;
 }
 
-inline const Type Object::GetType() const noexcept
+const Type Object::GetType() const noexcept
 {
 	return Type(typeid(*this));
 }
 
-inline const std::string Object::ToString() const noexcept
+std::string Object::ToString() const noexcept
 {
 	// Default ToString method return it's type, unless the function is overriden in the derived class.
 	return GetType().ToString();

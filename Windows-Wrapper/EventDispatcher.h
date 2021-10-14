@@ -3,6 +3,9 @@
 #include "IEvent.h"
 #include "EventArgs.h"
 
+#include <map>
+#include <string>
+
 class Component;
 
 class EventDispatcher : public Object

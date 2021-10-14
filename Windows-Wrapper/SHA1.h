@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CommonObject.h"
+#include "Object.h"
 
 class SHA1 : public Object
 {

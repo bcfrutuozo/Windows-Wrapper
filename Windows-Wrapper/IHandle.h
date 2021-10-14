@@ -2,7 +2,7 @@
 
 #include "IntPtr.h"
 
-class IHandle
+class IWin32Window
 {
 public:
 

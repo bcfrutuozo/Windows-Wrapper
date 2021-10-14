@@ -2,6 +2,7 @@
 
 #include "IDisposable.h"
 
+#include <string>
 #include <vector>
 
 class IComponent;
@@ -18,6 +19,7 @@ public:
 
 	virtual void Add(IComponent* const component) = 0;
 	virtual void Add(IComponent* const component, const std::string& name) = 0;
-	const std::vector<IComponent*>& GetComponents() { return Components; }
 	virtual void Remove(IComponent* const component) = 0;
+
+	constexpr std::vector<IComponent*>& GetComponents() { return Components; }
 };

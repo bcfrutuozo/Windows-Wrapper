@@ -1,6 +1,8 @@
 #pragma once
 
-#include "CommonObject.h"
+#include "Object.h"
+
+#include <string>
 
 class IComponent;
 class IContainer;
@@ -16,7 +18,7 @@ protected:
 	bool m_DesingMode;
 	std::string m_Name;
 
-	ISite()
+	constexpr ISite()
 		:
 		m_Component(nullptr),
 		m_Container(nullptr),
@@ -27,9 +29,10 @@ protected:
 
 public:
 
-	IComponent* GetComponent() { return m_Component; };
-	IContainer* GetContainer() { return m_Container; };
 	virtual bool IsDesignMode() = 0;
-	std::string GetName() { return m_Name; }
 	virtual void SetName(const std::string& name) = 0;
+
+	constexpr IComponent* GetComponent() const noexcept { return m_Component; };
+	constexpr IContainer* GetContainer() const noexcept { return m_Container; };
+	constexpr std::string GetName() const noexcept { return m_Name; }
 };

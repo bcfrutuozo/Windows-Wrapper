@@ -1,5 +1,7 @@
 #include "TestRealTimeApplication.h"
 
+#include <iomanip>
+
 void TestRealTimeApplication::HandleInput(float dt)
 {
 	while (const auto& e = MainWindow->GetKeyboard().ReadKey())
@@ -142,7 +144,7 @@ void TestRealTimeApplication::Initialize()
 	);
 
 	auto txtBox1 = MainWindow->AddTextBox("TextBox", 400, 20, 400);
-	txtBox1->BorderStyle = BorderStyle::None;
+	txtBox1->SetBorderStyle(BorderStyle::None);
 	txtBox1->OnKeyPressSet([](Object* sender, KeyPressEventArgs* e)
 		{
 			std::ostringstream ossin;
@@ -152,7 +154,7 @@ void TestRealTimeApplication::Initialize()
 	);
 
 	auto txtBox2 = MainWindow->AddTextBox("TextBox2", 400, 20, 460);
-	txtBox2->BorderStyle = BorderStyle::FixedSingle;
+	txtBox2->SetBorderStyle(BorderStyle::FixedSingle);
 	txtBox2->OnKeyPressSet([](Object* sender, KeyPressEventArgs* e)
 		{
 			std::ostringstream ossin;
@@ -162,7 +164,7 @@ void TestRealTimeApplication::Initialize()
 	);
 
 	auto txtBox3 = MainWindow->AddTextBox("TextBox3", 400, 20, 560);
-	txtBox3->BorderStyle = BorderStyle::Fixed3D;
+	txtBox3->SetBorderStyle(BorderStyle::Fixed3D);
 	txtBox3->OnKeyPressSet([](Object* sender, KeyPressEventArgs* e)
 		{
 			std::ostringstream ossin;

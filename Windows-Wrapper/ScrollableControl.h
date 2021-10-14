@@ -17,7 +17,6 @@ private:
 	int m_ItemWidth;
 	int m_ItemHeight;
 	int m_MinimumItemWidth;
-	RECT m_DrawableArea;
 
 protected:
 
@@ -25,8 +24,6 @@ protected:
 	VerticalScrollBar VerticalScrollBar;
 
 	void SetMinimumItemWidth(const int& weight) noexcept;
-	LPRECT const GetDrawableArea() noexcept;
-	LPRECT const ResetDrawableArea() noexcept;
 
 	ScrollableControl(Control* parent, const std::string& name, int width, int height, int x, int y);
 	virtual ~ScrollableControl();
@@ -40,9 +37,9 @@ public:
 	void EnableVerticalScroll() noexcept;
 	void DisableVerticalScroll() noexcept;
 	int GetItemWidth() const noexcept;
-	void SetItemWidth(const int& width);
+	void SetItemWidth(int width);
 	int GetItemHeight() const noexcept;
-	void SetItemHeight(const int& height) noexcept;
+	void SetItemHeight(int height) noexcept;
 	int GetHorizontalPage() const noexcept;
 	int GetVerticalPage() const noexcept;
 };

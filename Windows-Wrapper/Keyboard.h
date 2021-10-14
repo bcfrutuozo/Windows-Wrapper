@@ -1,6 +1,10 @@
 #pragma once
 
-#include "CommonObject.h"
+#include "Object.h"
+
+#include <bitset>
+#include <optional>
+#include <queue>
 
 class Keyboard : public Object
 {

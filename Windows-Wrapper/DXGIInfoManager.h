@@ -3,12 +3,17 @@
 #include "Common.h"
 #include "dxerr.h"
 
+// DirectX debug
+#include <dxgidebug.h>
+
+#include <vector>
+
 class DXGIInfoManager
 {
 private:
 
 	unsigned long long m_Next = 0u;
-	ComPtr<IDXGIInfoQueue> m_DXGIInfoQueue;
+	IDXGIInfoQueue* m_DXGIInfoQueue;
 
 public:
 

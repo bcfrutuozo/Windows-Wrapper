@@ -1,6 +1,10 @@
 #pragma once
 
+#include "Object.h"
 #include "IEquatable.h"
+
+#include <string>
+#include <typeinfo>
 
 class Type : public IEquatable<Type>
 {
@@ -9,6 +13,8 @@ class Type : public IEquatable<Type>
 private:
 
 	const type_info& m_Type;
+
+protected:
 
 	constexpr Type(const type_info& t) noexcept : m_Type(t) { }
 
@@ -19,5 +25,5 @@ public:
 
 	bool Equals(const Object* const b) const override;
 	bool Equals(const Type* const t) const override;
-	const std::string ToString() const noexcept override;
+	virtual std::string ToString() const noexcept override;
 };

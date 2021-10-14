@@ -2,6 +2,8 @@
 
 #include "Control.h"
 
+#include <thread>
+
 class ProgressBar final: public Control
 {
 	friend class Control;

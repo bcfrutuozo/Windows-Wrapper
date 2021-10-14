@@ -2,6 +2,8 @@
 
 #include "IContainer.h"
 
+#include <string>
+
 class ISite;
 class IComponent;
 

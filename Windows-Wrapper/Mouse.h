@@ -1,6 +1,10 @@
 #pragma once
 
-#include "CommonObject.h"
+#include "Object.h"
+
+#include <optional>
+#include <utility>
+#include <queue>
 
 class Mouse : public Object
 {

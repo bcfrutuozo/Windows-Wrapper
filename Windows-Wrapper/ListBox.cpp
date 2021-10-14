@@ -1,18 +1,18 @@
 #include "ListBox.h"
 #include "ComboBox.h"
+#include "Exceptions.h"
 
 void ListBox::PreDraw(Graphics* const graphics)
 {
 	// Load current font from default PreDraw function
-	WinAPI::PreDraw(graphics);
+	NativeWindow::PreDraw(graphics);
 
 	if (m_IsRebinding || m_IsFormatChanged)
 	{
 		// Example test draw with the desired font to calculate each ListBox item size
-		SIZE m_SingleSize;
 		const char* verifier = "A";
-		GetTextExtentPoint32(static_cast<HDC>(graphics->GetHDC().ToPointer()), verifier, 2, &m_SingleSize);
-		SetMinimumItemWidth(m_SingleSize.cx);
+		auto size = graphics->GetTextSize(verifier, GetFont());
+		SetMinimumItemWidth(size.Width);
 
 		m_BorderSize = 0;
 		switch (m_BorderStyle)
@@ -23,14 +23,14 @@ void ListBox::PreDraw(Graphics* const graphics)
 		}
 
 		// Drawable block inside ListBox
-		auto drawableArea = ResetDrawableArea();
-		drawableArea->left += m_Margin.Left + m_BorderSize;
-		drawableArea->top += m_Margin.Top + m_BorderSize;
-		drawableArea->right -= m_Margin.Right + m_BorderSize;
-		drawableArea->bottom -= m_Margin.Bottom + m_BorderSize;
+		auto drawableArea = GetDrawableArea();
+		drawableArea.Left += m_BorderSize;
+		drawableArea.Top += m_BorderSize;
+		drawableArea.Right -= m_BorderSize;
+		drawableArea.Bottom -= m_BorderSize;
 
-		SetItemWidth(m_IsMultiColumn ? m_ColumnWidth : static_cast<int>(drawableArea->right - drawableArea->left));
-		SetItemHeight(m_SingleSize.cy);
+		SetItemWidth(m_IsMultiColumn ? m_ColumnWidth : static_cast<int>(drawableArea.Right - drawableArea.Left));
+		SetItemHeight(size.Height);
 
 		const auto& dataSource = GetDataSource();
 
@@ -64,8 +64,8 @@ void ListBox::PreDraw(Graphics* const graphics)
 
 		int newWidth = 0;
 		int newHeight = 0;
-		int oldWidth = static_cast<int>(drawableArea->right) - static_cast<int>(drawableArea->left);
-		int oldHeight = static_cast<int>(drawableArea->bottom) - static_cast<int>(drawableArea->top);
+		int oldWidth = static_cast<int>(drawableArea.Right) - static_cast<int>(drawableArea.Left);
+		int oldHeight = static_cast<int>(drawableArea.Bottom) - static_cast<int>(drawableArea.Top);
 
 		m_RowNumber = !m_IsMultiColumn ? itemsNumber : (oldHeight) / GetItemHeight();
 		m_ColumnNumber = !m_IsMultiColumn ? 1 : (oldWidth) / GetItemWidth();
@@ -95,8 +95,8 @@ void ListBox::PreDraw(Graphics* const graphics)
 
 				// Recalculate drawable area to check if HorizontalScrollBar is needed
 
-				drawableArea->right = newWidth + m_Margin.Left + (m_BorderSize * 2);
-				drawableArea->bottom = newHeight + m_Margin.Top + (m_BorderSize * 2);
+				drawableArea.Right = newWidth + m_Margin.Left + (m_BorderSize * 2);
+				drawableArea.Bottom = newHeight + m_Margin.Top + (m_BorderSize * 2);
 
 				if (m_RowNumber * m_ColumnNumber > itemsNumber)
 				{
@@ -142,12 +142,12 @@ void ListBox::PreDraw(Graphics* const graphics)
 					newHeight += GetItemHeight();
 				}
 
-				drawableArea->right -= VerticalScrollBar.GetSize().Width;
+				drawableArea.Right -= VerticalScrollBar.GetSize().Width;
 
 				// Recalculate the new item width size
-				SetItemWidth(m_IsMultiColumn ? m_ColumnWidth : drawableArea->right - drawableArea->left);
+				SetItemWidth(m_IsMultiColumn ? m_ColumnWidth : drawableArea.Right - drawableArea.Left);
 
-				drawableArea->bottom = newHeight + m_Margin.Top + (m_BorderSize * 2);
+				drawableArea.Bottom = newHeight + m_Margin.Top + (m_BorderSize * 2);
 				newHeight += m_Margin.Top + m_Margin.Bottom + (m_BorderSize * 2);
 				int oldHeightY = m_Size.Height;
 				m_Size.Height = newHeight;
@@ -178,28 +178,13 @@ void ListBox::PreDraw(Graphics* const graphics)
 		m_IsRebinding = false;
 		m_IsFormatChanged = false;
 	}
+
+	NativeWindow::PreDraw(graphics);
 }
 
 void ListBox::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 {
-	auto hwnd = static_cast<HWND>(Handle.ToPointer());
-	auto hdc = static_cast<HDC>(graphics->GetHDC().ToPointer());
-
-	HDC hdcMem;
-	HBITMAP hbmMem;
-	HBITMAP hbmOld;
-
-	auto drawableArea = GetDrawableArea();
-	hdcMem = CreateCompatibleDC(hdc);
-	hbmMem = CreateCompatibleBitmap(hdc, m_Size.Width, m_Size.Height);
-	hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
-
-	// Select current font
-	//auto hFont = Fonts->find(m_Font.ToString());
-	//SelectObject(hdcMem, hFont->second);
-
-	RECT r;
-	GetClientRect(hwnd, &r);
+	Drawing::Rectangle insider = rectangle;
 
 	switch (m_BorderStyle)
 	{
@@ -211,95 +196,26 @@ void ListBox::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 		{
 			if (m_IsTabSelected)
 			{
-				// Draw outer border
-				HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(0, 0, 0));
-				HGDIOBJ old_pen = SelectObject(hdcMem, pen);
-				Rectangle(hdcMem, r.left, r.top, r.right, r.bottom);
-
-				// Move inside rectangle for inner board
-				r.left += 1;
-				r.top += 1;
-				r.right -= 1;
-				r.bottom -= 1;
-
-				//Clean up
-				SelectObject(hdcMem, old_pen);
-				DeleteObject(old_pen);
-				SelectObject(hdcMem, pen);
-				DeleteObject(pen);
+				insider = graphics->DrawRectangle(Color::Black(), insider, 1, ChartDashStyle::Solid);
 			}
 			else
 			{
 				if (IsMouseOver())
 				{
-					// Draw outer border
-					HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(0, 120, 215));
-					HGDIOBJ old_pen = SelectObject(hdcMem, pen);
-					Rectangle(hdcMem, r.left, r.top, r.right, r.bottom);
+					insider = graphics->DrawRectangle(Color(0, 120, 215), insider, 1, ChartDashStyle::Solid);
 
-					// Move inside rectangle for inner board
-					r.left += 1;
-					r.top += 1;
-					r.right -= 1;
-					r.bottom -= 1;
-
-					//Clean up
-					SelectObject(hdcMem, old_pen);
-					DeleteObject(old_pen);
-					SelectObject(hdcMem, pen);
-					DeleteObject(pen);
 				}
 				else
 				{
-					// Draw outer border
-					HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(122, 122, 122));
-					HGDIOBJ old_pen = SelectObject(hdcMem, pen);
-					Rectangle(hdcMem, r.left, r.top, r.right, r.bottom);
-
-					// Move inside rectangle for inner board
-					r.left += 1;
-					r.top += 1;
-					r.right -= 1;
-					r.bottom -= 1;
-
-					//Clean up
-					SelectObject(hdcMem, old_pen);
-					DeleteObject(old_pen);
-					SelectObject(hdcMem, pen);
-					DeleteObject(pen);
+					insider = graphics->DrawRectangle(Color(122, 122, 122), insider, 1, ChartDashStyle::Solid);
 				}
 			}
 			break;
 		}
 		case BorderStyle::Fixed3D:
 		{
-			// Draw outer border
-			HPEN pen = CreatePen(PS_INSIDEFRAME, 1, RGB(130, 135, 144));
-			HGDIOBJ old_pen = SelectObject(hdcMem, pen);
-			Rectangle(hdcMem, r.left, r.top, r.right, r.bottom);
-
-			// Move inside rectangle for inner board
-			r.left += 1;
-			r.top += 1;
-			r.right -= 1;
-			r.bottom -= 1;
-
-			// Draw outer border
-			pen = CreatePen(PS_INSIDEFRAME, 1, RGB(255, 255, 255));
-			old_pen = SelectObject(hdcMem, pen);
-			Rectangle(hdcMem, r.left, r.top, r.right, r.bottom);
-
-			// Move inside rectangle for inner board
-			r.left += 1;
-			r.top += 1;
-			r.right -= 1;
-			r.bottom -= 1;
-
-			//Clean up
-			SelectObject(hdcMem, old_pen);
-			DeleteObject(old_pen);
-			SelectObject(hdcMem, pen);
-			DeleteObject(pen);
+			insider = graphics->DrawRectangle(Color(130, 135, 144), insider, 1, ChartDashStyle::Solid);
+			insider = graphics->DrawRectangle(Color(255, 255, 255), insider, 1, ChartDashStyle::Solid);
 
 			break;
 		}
@@ -352,15 +268,15 @@ void ListBox::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 		DrawText(hdcMem, Text.c_str(), static_cast<int>((*dataSource)[i]->Value.length()), &cr, DT_LEFT | DT_VCENTER | DT_CALCRECT);
 	}*/
 
+	auto drawableArea = GetDrawableArea();
 	for (auto [i, rw, c] = std::tuple{ 0, 0, 0 }; i < static_cast<int>(dataSource.size()); ++i, ++rw)
 	{
-		RECT cr;
-		CopyRect(&cr, drawableArea);
+		Drawing::Rectangle cr = drawableArea;
 
-		cr.top = drawableArea->top - (GetItemHeight() * VerticalScrollBar.GetScrolling()) + (GetItemHeight() * rw);
-		cr.bottom = (cr.top + GetItemHeight());
-		cr.left = drawableArea->left - (HorizontalScrollBar.GetScrolling() * GetItemWidth()) + (GetItemWidth() * c);
-		cr.right = cr.left + GetItemWidth() - m_Margin.Right;
+		cr.Top = drawableArea.Top - (GetItemHeight() * VerticalScrollBar.GetScrolling()) + (GetItemHeight() * rw);
+		cr.Bottom = (cr.Top + GetItemHeight());
+		cr.Left = drawableArea.Left - (HorizontalScrollBar.GetScrolling() * GetItemWidth()) + (GetItemWidth() * c);
+		cr.Right = cr.Left + GetItemWidth() - m_Margin.Right;
 
 		if (rw == m_RowNumber - 1)
 		{
@@ -370,67 +286,27 @@ void ListBox::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 
 		m_RowPosition[i] = cr;
 
-		if (cr.left >= drawableArea->left &&
-			cr.top >= drawableArea->top &&
-			cr.right <= drawableArea->right &&
-			cr.bottom <= drawableArea->bottom)
+		if (cr.Left >= drawableArea.Left &&
+			cr.Top >= drawableArea.Top &&
+			cr.Right <= drawableArea.Right &&
+			cr.Bottom <= drawableArea.Bottom)
 		{
 			if (dataSource[i].Tabulated && IsTabSelected() && m_SelectionMode == SelectionMode::MultiSimple)
 			{
-				HPEN pen = CreatePen(PS_DOT, 0, RGB(0, 0, 0));
-				HGDIOBJ old_pen = SelectObject(hdcMem, pen);
-				SetBkColor(hdcMem, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetG()));
-				Rectangle(hdcMem, cr.left, cr.top, cr.right, cr.bottom);
-
-				SelectObject(hdcMem, old_pen);
-				DeleteObject(old_pen);
-				SelectObject(hdcMem, pen);
-				DeleteObject(pen);
+				cr = graphics->DrawRectangle(GetBackgroundColor(), cr, 1, ChartDashStyle::Dot);
 			}
-
-			// To draw tabulation dot
-			cr.left += 1;
-			cr.top += 1;
-			cr.right -= 1;
-			cr.bottom -= 1;
-
-			HBRUSH brush = 0;
 
 			if ((m_SelectionMode == SelectionMode::Single && m_SelectedIndex == i) ||
 				(m_SelectionMode == SelectionMode::MultiSimple || m_SelectionMode == SelectionMode::MultiExtended) && std::find(m_SelectedIndices.begin(), m_SelectedIndices.end(), i) != m_SelectedIndices.end())
 			{
-				auto clr = Color::SelectionBackground().ToRGB();
-				SetBkColor(hdcMem, clr);
-				SetTextColor(hdcMem, Color::SelectionForeground().ToRGB());
-				brush = CreateSolidBrush(clr);
+				graphics->DrawOpaqueText(dataSource[i].Value, HorizontalAlignment::Left, GetFont(), Color::SelectionForeground(), cr, Color::SelectionBackground());
 			}
 			else
 			{
-				auto clr = GetBackgroundColor().ToRGB();
-				SetBkColor(hdcMem, clr);
-				SetTextColor(hdcMem, GetForeColor().ToRGB());
-				brush = CreateSolidBrush(clr);
+				graphics->DrawTransparentText(dataSource[i].Value, HorizontalAlignment::Left, GetFont(), GetForeColor(), cr);
 			}
-
-			FillRect(hdcMem, &cr, brush);
-			SelectObject(hdcMem, brush);
-			DeleteObject(brush);
-
-			DrawText(hdcMem, dataSource[i].Value.c_str(), -1, &cr, DT_LEFT | DT_VCENTER);
-			DrawText(hdcMem, Text.c_str(), static_cast<int>(dataSource[i].Value.length()), &cr, DT_LEFT | DT_VCENTER | DT_CALCRECT);
 		}
 	}
-
-	// Perform the bit-block transfer between the memory Device Context which has the next bitmap
-	// with the current image to avoid flickering
-	BitBlt(hdc, 0, 0, m_Size.Width, m_Size.Height, hdcMem, 0, 0, SRCCOPY);
-
-	SelectObject(hdcMem, hbmOld);
-	DeleteObject(hbmOld);
-	SelectObject(hdcMem, hbmOld);
-	DeleteObject(hbmMem);
-	ReleaseDC(hwnd, hdcMem);
-	DeleteDC(hdcMem);
 }
 
 void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) noexcept
@@ -494,12 +370,12 @@ void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 						if (IsVerticalScrollEnabled())
 						{
 							auto drawableArea = GetDrawableArea();
-							if (m_RowPosition[m_Tabulation].bottom > drawableArea->bottom)
+							if (m_RowPosition[m_Tabulation].Bottom > drawableArea.Bottom)
 							{
 								HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation - m_TotalItemsInDrawableArea + 1), 0);
 							}
 
-							if (m_RowPosition[m_Tabulation].top < drawableArea->top)
+							if (m_RowPosition[m_Tabulation].Top < drawableArea.Top)
 							{
 								HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation), 0);
 							}
@@ -507,12 +383,12 @@ void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 						else if (IsHorizontalScrollEnabled())
 						{
 							auto drawableArea = GetDrawableArea();
-							if (m_RowPosition[m_Tabulation].right > drawableArea->right)
+							if (m_RowPosition[m_Tabulation].Right > drawableArea.Right)
 							{
 								HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, (m_Tabulation / m_RowNumber) - (m_ColumnNumber - 1)), 0);
 							}
 
-							if (m_RowPosition[m_Tabulation].left < drawableArea->left)
+							if (m_RowPosition[m_Tabulation].Left < drawableArea.Left)
 							{
 								HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation / m_RowNumber), 0);
 							}
@@ -566,12 +442,12 @@ void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 						if (IsVerticalScrollEnabled())
 						{
 							auto drawableArea = GetDrawableArea();
-							if (m_RowPosition[m_Tabulation].bottom > drawableArea->bottom)
+							if (m_RowPosition[m_Tabulation].Bottom > drawableArea.Bottom)
 							{
 								HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation - m_TotalItemsInDrawableArea + 1), 0);
 							}
 
-							if (m_RowPosition[m_Tabulation].top < drawableArea->top)
+							if (m_RowPosition[m_Tabulation].Top < drawableArea.Top)
 							{
 								HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_VSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation), 0);
 							}
@@ -579,12 +455,12 @@ void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 						else if (IsHorizontalScrollEnabled())
 						{
 							auto drawableArea = GetDrawableArea();
-							if (m_RowPosition[m_Tabulation].right > drawableArea->right)
+							if (m_RowPosition[m_Tabulation].Right > drawableArea.Right)
 							{
 								HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, (m_Tabulation / m_RowNumber) - (m_ColumnNumber - 1)), 0);
 							}
 
-							if (m_RowPosition[m_Tabulation].left < drawableArea->left)
+							if (m_RowPosition[m_Tabulation].Left < drawableArea.Left)
 							{
 								HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation / m_RowNumber), 0);
 							}
@@ -644,12 +520,12 @@ void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 						if (IsHorizontalScrollEnabled())
 						{
 							auto drawableArea = GetDrawableArea();
-							if (m_RowPosition[m_Tabulation].right > drawableArea->right)
+							if (m_RowPosition[m_Tabulation].Right > drawableArea.Right)
 							{
 								HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation / m_RowNumber - m_TotalItemsInDrawableArea + 1), 0);
 							}
 
-							if (m_RowPosition[m_Tabulation].left < drawableArea->left)
+							if (m_RowPosition[m_Tabulation].Left < drawableArea.Left)
 							{
 								HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation / m_RowNumber), 0);
 							}
@@ -706,12 +582,12 @@ void ListBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 						if (IsHorizontalScrollEnabled())
 						{
 							auto drawableArea = GetDrawableArea();
-							if (m_RowPosition[m_Tabulation].right > drawableArea->right)
+							if (m_RowPosition[m_Tabulation].Right > drawableArea.Right)
 							{
 								HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation / m_RowNumber - m_TotalItemsInDrawableArea + 1), 0);
 							}
 
-							if (m_RowPosition[m_Tabulation].left < drawableArea->left)
+							if (m_RowPosition[m_Tabulation].Left < drawableArea.Left)
 							{
 								HandleMessageForwarder(static_cast<HWND>(HorizontalScrollBar.Handle.ToPointer()), WM_HSCROLL, MAKEWPARAM(SB_THUMBTRACK, m_Tabulation / m_RowNumber), 0);
 							}
@@ -794,11 +670,11 @@ void ListBox::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlag
 		int i = 0;
 
 		const auto drawableArea = GetDrawableArea();
-		if (y >= drawableArea->top && y <= drawableArea->bottom && x >= drawableArea->left && x <= drawableArea->right)
+		if (y >= drawableArea.Top && y <= drawableArea.Bottom && x >= drawableArea.Left && x <= drawableArea.Right)
 		{
 			for (auto it = m_RowPosition.begin(); it != m_RowPosition.end(); ++it, ++i)
 			{
-				if (y >= it->top && y <= it->bottom && x >= it->left && x <= it->right)
+				if (y >= it->Top && y <= it->Bottom && x >= it->Left && x <= it->Right)
 				{
 					if (m_Tabulation > -1)
 					{

@@ -1,6 +1,8 @@
 #pragma once
 
-#include "CommonObject.h"
+#include "Object.h"
+
+#include <chrono>
 
 class Timer : public Object
 {

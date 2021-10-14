@@ -1,6 +1,8 @@
 #include "IntPtr.h"
 #include "Exceptions.h"
 
+#include <sstream>
+
 int IntPtr::CompareTo(const Object* const obj) const
 {
 	if (obj == nullptr) return 1;
@@ -28,7 +30,7 @@ int IntPtr::CompareTo(const IntPtr* const b) const
 
 int IntPtr::GetHashCode() const
 {
-	return static_cast<int>(m_Ptr);
+	return static_cast<int>(static_cast<long>(m_Ptr));
 }
 
 bool IntPtr::Equals(const Object* const obj) const
@@ -47,4 +49,11 @@ bool IntPtr::Equals(const IntPtr* const p) const
 {
 	if (p == nullptr) return false;
 	return *this == *p;
+}
+
+std::string IntPtr::ToString() const noexcept
+{
+	std::ostringstream oss;
+	oss << "0x" << std::hex << m_Ptr;
+	return oss.str();
 }

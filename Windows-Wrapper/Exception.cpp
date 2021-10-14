@@ -109,7 +109,7 @@ void Exception::SetErrorCode(HRESULT hr) noexcept
 	m_HasHRResult = (static_cast<long>(hr) != 0);
 }
 
-const std::string& Exception::GetFile() const noexcept
+std::string_view Exception::GetFile() const noexcept
 {
 	return m_File;
 }

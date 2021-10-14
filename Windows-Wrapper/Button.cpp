@@ -1,5 +1,5 @@
 #include "Button.h"
-#include "ControlException.h"
+#include "Exceptions.h"
 #include "Direct2D.h"
 
 void Button::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
@@ -108,7 +108,7 @@ void Button::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 		}
 	}
 
-	graphics->CommonDrawText(Text, GetFont(), ftColor, insider);
+	graphics->DrawTransparentText(Text, HorizontalAlignment::Center, GetFont(), ftColor, insider);
 }
 
 int Button::OnEraseBackground_Impl(HWND hwnd, HDC hdc)
@@ -164,8 +164,8 @@ Button::~Button()
 void Button::Initialize()
 {
 	// Create window and get its handle
-	Handle = CreateWindow(
-		WindowClass::GetName(),							// Class name
+	CreateWindow(
+		"BUTTON",							// Class name
 		Text.c_str(),									// Window title
 		WS_CHILD | WS_VISIBLE | WS_TABSTOP,				// Style values
 		m_Location.X,										// X position
@@ -174,7 +174,7 @@ void Button::Initialize()
 		m_Size.Height,									// Height
 		static_cast<HWND>(Parent->Handle.ToPointer()),	// Parent handle
 		nullptr,					                	// Menu handle
-		WindowClass::GetInstance(),						// Module instance handle
+		nullptr,						// Module instance handle
 		this											// Pointer to the button instance to work along with HandleMessageSetup function.
 	);
 

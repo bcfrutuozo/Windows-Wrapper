@@ -1,6 +1,8 @@
 #include "Color.h"
 #include "Exceptions.h"
 
+#include <sstream>
+
 void Color::SetR(uint8_t value) noexcept
 {
 	*this = Color(value, GetG(), GetB(), GetA());
@@ -46,7 +48,7 @@ inline bool Color::Equals(const Color* const c) const
 	return rgba == c->rgba;
 }
 
-const std::string Color::ToString() const noexcept
+std::string Color::ToString() const noexcept
 {
 	std::ostringstream oss;
 	oss << "{{ARGB=(" << ((rgba >> 24) & 0xFF) << ", " << ((rgba >> 0) & 0xFF) << ", " << ((rgba >> 8) & 0xFF) << ", " << ((rgba >> 16) & 0xFF) << ")}}";

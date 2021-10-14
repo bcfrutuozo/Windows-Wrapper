@@ -1,198 +1,203 @@
 ﻿#include "TextBox.h"
+#include "Exceptions.h"
+
+#include <sstream>
 
 void TextBox::PreDraw(Graphics* const graphics)
 {
-	Resize(CalculateSizeByFont());
-	WinAPI::PreDraw(graphics);
+	if (m_HasFontChanged)
+	{
+		Resize(m_Size.Width, CalculateHeightForSingleLine());
+	}
+
+	if (m_HasTextChanged)
+	{
+		// Not the best solution for now.
+		// At least it calculates using the right values
+		m_CaretPosition.clear();
+
+		if (m_CaretPosition.size() < Text.length() + 1)
+		{
+			m_CaretPosition.resize(Text.length() + 1, 0ul);
+		}
+
+		auto textSize = graphics->GetTextSize(Text, GetFont());
+
+		for (int i = 0; i <= static_cast<int>(Text.length()); ++i)
+		{
+			if (i > 0)
+			{
+				auto size = graphics->GetTextSize(Text.substr(0, i), GetFont());
+				m_CaretPosition[i] = size.Width;
+			}
+
+			switch (m_BorderStyle)
+			{
+				case BorderStyle::None:
+				{
+					switch (m_TextAlign)
+					{
+						case HorizontalAlignment::Left: m_CaretPosition[i] += m_Margin.Left; break;
+						case HorizontalAlignment::Right: m_CaretPosition[i] += GetSize().Width - m_Margin.Right - textSize.Width;
+						case HorizontalAlignment::Center: m_CaretPosition[i] += ((GetSize().Width - m_Margin.Left - m_Margin.Right) / 2) - (textSize.Width / 2); break;
+					}
+
+					break;
+				}
+				case BorderStyle::FixedSingle:
+				{
+					switch (m_TextAlign)
+					{
+						case HorizontalAlignment::Left: m_CaretPosition[i] += m_Margin.Left + 1; break;
+						case HorizontalAlignment::Right: m_CaretPosition[i] += GetSize().Width - (m_Margin.Right - 1) - textSize.Width;
+						case HorizontalAlignment::Center: m_CaretPosition[i] += ((GetSize().Width - m_Margin.Left - m_Margin.Right - 2) / 2) - (textSize.Width / 2); break;
+					}
+
+					break;
+				}
+				case BorderStyle::Fixed3D:
+				{
+					switch (m_TextAlign)
+					{
+						case HorizontalAlignment::Left: m_CaretPosition[i] += m_Margin.Left + 2; break;
+						case HorizontalAlignment::Right: m_CaretPosition[i] += GetSize().Width - (m_Margin.Right - 2) - textSize.Width;
+						case HorizontalAlignment::Center: m_CaretPosition[i] += ((GetSize().Width - m_Margin.Left - m_Margin.Right - 4) / 2) - (textSize.Width / 2); break;
+					}
+
+					break;
+				}
+			}
+		}
+
+		m_HasTextChanged = false;
+	}
+
+	NativeWindow::PreDraw(graphics);
 }
 
 void TextBox::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 {
 #ifdef _DEBUG
-	PrintDebug(); // Show string, cursor and selection indices on Output Window
+	//	PrintDebug(); // Show string, cursor and selection indices on Output Window
 #endif
 
-	auto hwnd = static_cast<HWND>(Handle.ToPointer());
-	auto hdc = static_cast<HDC>(graphics->GetHDC().ToPointer());
-
-	HDC hdcMem = CreateCompatibleDC(hdc);
-	HBITMAP hbmMem = CreateCompatibleBitmap(hdc, m_Size.Width, m_Size.Height);
-	HBITMAP hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
-
-	// Select current font
-	//auto hFont = Fonts->find(m_Font.ToString());
-	//SelectObject(hdcMem, hFont->second);
-
-	RECT r, cr;
-	GetClientRect(hwnd, &cr);
+	auto insider = rectangle;
 
 	// Create TextBox border
-	switch (BorderStyle)
+	switch (m_BorderStyle)
 	{
-	case BorderStyle::None:
-	{
-		// No border is drawn
-		break;
-	}
-	case BorderStyle::FixedSingle:
-	{
-		HPEN pen;
-		HGDIOBJ old_pen;
-
-		pen = CreatePen(PS_INSIDEFRAME, 1, RGB(100, 100, 100));
-		old_pen = SelectObject(hdcMem, pen);
-		Rectangle(hdcMem, cr.left, cr.top, cr.right, cr.bottom);
-
-		// Adjust padding for text
-		cr.left += 1;
-		cr.top += 1;
-		cr.right -= 1;
-		cr.bottom -= 1;
-
-		//Clean up
-		SelectObject(hdcMem, old_pen);
-		DeleteObject(old_pen);
-		SelectObject(hdcMem, pen);
-		DeleteObject(pen);
-
-		break;
-	}
-	case BorderStyle::Fixed3D:
-	{
-		HPEN pen;
-		HGDIOBJ old_pen;
-
-		if (m_IsTabSelected)
+		case BorderStyle::None:
 		{
-			// Draw outer border
-			pen = CreatePen(PS_INSIDEFRAME, 1, RGB(0, 120, 215));
-			old_pen = SelectObject(hdcMem, pen);
-			Rectangle(hdcMem, cr.left, cr.top, cr.right, cr.bottom);
-
-			// Adjust padding for next border
-			cr.left += 1;
-			cr.top += 1;
-			cr.right -= 1;
-			cr.bottom -= 1;
-
-			// Draw inner border
-			pen = CreatePen(PS_INSIDEFRAME, 1, RGB(255, 255, 255));
-			old_pen = SelectObject(hdcMem, pen);
-			Rectangle(hdcMem, cr.left, cr.top, cr.right, cr.bottom);
+			// No border is drawn
+			break;
 		}
-		else
+		case BorderStyle::FixedSingle:
 		{
-			// Draw outer border
-			pen = CreatePen(PS_INSIDEFRAME, 1, RGB(122, 122, 122));
-			old_pen = SelectObject(hdcMem, pen);
-			Rectangle(hdcMem, cr.left, cr.top, cr.right, cr.bottom);
+			insider = graphics->DrawRectangle(Color(100, 100, 100), insider, 1, ChartDashStyle::Solid);
 
-			// Adjust padding for next border
-			cr.left += 1;
-			cr.top += 1;
-			cr.right -= 1;
-			cr.bottom -= 1;
-
-			// Draw inner border
-			pen = CreatePen(PS_INSIDEFRAME, 1, RGB(255, 255, 255));
-			old_pen = SelectObject(hdcMem, pen);
-			Rectangle(hdcMem, cr.left, cr.top, cr.right, cr.bottom);
+			break;
 		}
-
-		//Clean up
-		SelectObject(hdcMem, old_pen);
-		DeleteObject(old_pen);
-		SelectObject(hdcMem, pen);
-		DeleteObject(pen);
-
-		// Adjust padding for text
-		cr.left += 1;
-		cr.top += 1;
-		cr.right -= 1;
-		cr.bottom -= 1;
-		break;
-	}
+		case BorderStyle::Fixed3D:
+		{
+			if (m_IsTabSelected)
+			{
+				insider = graphics->DrawRectangle(Color(0, 120, 215), insider, 1, ChartDashStyle::Solid);
+				insider = graphics->DrawRectangle(Color(255, 255, 255), insider, 1, ChartDashStyle::Solid);
+			}
+			else
+			{
+				insider = graphics->DrawRectangle(Color(122, 122, 122), insider, 1, ChartDashStyle::Solid);
+				insider = graphics->DrawRectangle(Color(255, 255, 255), insider, 1, ChartDashStyle::Solid);
+			}
+			break;
+		}
 	}
 
 	// Draw background
-	HBRUSH brush = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-	FillRect(hdcMem, &cr, brush);
-	SelectObject(hdcMem, brush);
-	DeleteObject(brush);
+	graphics->FillRectangle(GetBackgroundColor(), insider);
 
 	// Adjust text margin after border draw
-	cr.left += m_Margin.Left;
-	cr.top += m_Margin.Top;
-	cr.right -= m_Margin.Right;
-	cr.bottom -= m_Margin.Bottom;
+	insider.AddMargin(m_Margin);
 
-	// Adjust text in center based on default TextBox size with font size as 1
-	int spacingForAlignment = cr.bottom - m_Font.GetSizeInPixels();
-	cr.top += (spacingForAlignment / 2) - 4;	// 4 Pixels extra for small TextBox and underline characteres
-
-	// BOTTOM ALIGNMENT
-	//cr.top += (cr.top + Font.GetSizeInPixels()) / 2;
-
-	CopyRect(&r, &cr);
-
-	// Recalculate Caret position for each character
-	CalculateCaret(hwnd, hdcMem);
+	Drawing::Rectangle r = insider;
 
 	// Draw for when control is selected and cursor index is the same as select index
 	if (!m_IsTabSelected || m_CursorIndex == m_SelectIndex)
 	{
-		SetBkMode(hdcMem, TRANSPARENT);
-		SetTextColor(hdcMem, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-		DrawText(hdcMem, Text.c_str(), -1, &r, DT_LEFT | DT_VCENTER);
-		DrawText(hdcMem, Text.c_str(), static_cast<int>(m_CursorIndex), &r, DT_LEFT | DT_VCENTER | DT_CALCRECT);
+		r = graphics->DrawTransparentText(Text, m_TextAlign, GetFont(), GetForeColor(), insider, m_CursorIndex);
 
 		if (m_CursorIndex == 0)
 		{
-			r.right = cr.left;
+			r.Right = insider.Left;
 		}
 	}
 	else
 	{
+		int start = (std::min)(static_cast<int>(m_CursorIndex), static_cast<int>(m_SelectIndex));
+		int end = (std::max)(static_cast<int>(m_CursorIndex), static_cast<int>(m_SelectIndex));
 		// Such beauty with a different function for draw
-		PaintSelection(hdcMem, r, (std::min)(m_CursorIndex, m_SelectIndex), (std::max)(m_CursorIndex, m_SelectIndex));
+		//PaintSelection(hdcMem, r, (std::min)(m_CursorIndex, m_SelectIndex), (std::max)(m_CursorIndex, m_SelectIndex));
+
+		std::string temp;
+		Size tempSize(0, 0);
+		Drawing::Rectangle rc = insider;
+
+		if (start != 0)
+		{
+			temp = Text.substr(0, start);
+			tempSize = graphics->GetTextSize(temp, GetFont());
+			graphics->DrawTransparentText(temp, m_TextAlign, GetFont(), GetForeColor(), rc);
+			rc.Left += tempSize.Width;
+		}
+
+		temp = Text.substr(start, end - start);
+		tempSize = graphics->GetTextSize(temp, GetFont());
+		r = graphics->DrawOpaqueText(temp, m_TextAlign, GetFont(), Color(255, 255, 255), rc, Color(0, 120, 215));
+		rc.Left += tempSize.Width;
+		r.Right = rc.Left;
+
+		if (end != Text.length())
+		{
+			temp = Text.substr(end, Text.length() - end);
+			tempSize = graphics->GetTextSize(temp, GetFont());
+			graphics->DrawTransparentText(temp, m_TextAlign, GetFont(), GetForeColor(), rc);
+		}
 	}
 
 	// Caret position for after
-	if (GetFocus() == hwnd)
+	if (GetFocus() == static_cast<HWND>(Handle.ToPointer()))
 	{
 		std::ostringstream oss;
 
 		if (m_CursorIndex == m_SelectIndex)
 		{
-			if (r.right > cr.right)
+			EnableCaret();
+
+			if (r.Right > insider.Right)
 			{
-				oss << "Caret X: " << cr.right << " | " << "Caret Y: " << cr.top << std::endl;
-				SetCaretPos(cr.right, cr.top);
+				oss << "Caret X: " << insider.Right << " | " << "Caret Y: " << insider.Top << std::endl;
+				SetCaretPos(insider.Right, insider.Top + 2);
 			}
 			else
 			{
-				oss << "Caret X: " << r.right << " | " << "Caret Y: " << cr.top << std::endl;
-				SetCaretPos(r.right, cr.top);
+				oss << "Caret X: " << r.Right << " | " << "Caret Y: " << insider.Top << std::endl;
+				SetCaretPos(r.Right, insider.Top + 2);
 			}
-
-			EnableCaret();
 		}
 		else
 		{
 			DisableCaret();
 		}
+
+		printf_s(oss.str().c_str());
 	}
+}
 
-	// Perform the bit-block transfer between the memory Device Context which has the next bitmap
-	// with the current image to avoid flickering
-	BitBlt(hdc, 0, 0, m_Size.Width, m_Size.Height, hdcMem, 0, 0, SRCCOPY);
-
-	SelectObject(hdcMem, hbmOld);
-	DeleteObject(hbmOld);
-	SelectObject(hdcMem, hbmOld);
-	DeleteObject(hbmMem);
-	ReleaseDC(hwnd, hdcMem);
-	DeleteDC(hdcMem);
+void TextBox::OnCreate_Impl(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
+{
+	// Call base function to create Graphics handle
+	NativeWindow::OnCreate_Impl(hwnd, lpCreateStruct);
+	Resize(m_Size.Width, CalculateHeightForSingleLine());
 }
 
 int TextBox::OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept
@@ -253,209 +258,209 @@ void TextBox::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 
 	switch (vk)
 	{
-	case 'A':		// Gives the TextBox the CTRL+A feature to select all text from the control
-	{
-		if (0x8000 & GetKeyState(VK_CONTROL))
+		case 'A':		// Gives the TextBox the CTRL+A feature to select all text from the control
 		{
-			m_SelectIndex = 0;
-			m_CursorIndex = Text.length();
-		}
-
-		InputRedraw();
-		break;
-	}
-	case 'V':		// Gives the TextBox the CTRL+V feature to paste the data from the clipboard to the control
-	{
-		if (0x8000 & GetKeyState(VK_CONTROL))
-		{
-			PasteFromClipboard();
-		}
-
-		InputRedraw();
-		break;
-	}
-	case 'C':		// Gives the TextBox the CTRL+C feature to copy the text from the control to the clipboard
-	{
-		if (0x8000 & GetKeyState(VK_CONTROL))
-		{
-			CopyToClipboard();
-		}
-
-		InputRedraw();
-		break;
-	}
-	case 'X':		// Gives the TextBox the CTRL+X feature to cut the text from the control to the clipboard
-	{
-		if (0x8000 & GetKeyState(VK_CONTROL))
-		{
-			CopyToClipboard();
-			InputDelete(DeleteInputType::CutAndPaste);
-		}
-
-		InputRedraw();
-		break;
-	}
-	case VK_LEFT:	// Gives the TextBox the Navigation to Left feature by using the Left Arrow
-	{
-		// Doesn't let user go lower than index 0 if it's already at the beginning of the string
-		if (m_CursorIndex == 0 && m_SelectIndex == 0)
-		{
-			break;
-		}
-
-		// SHIFT + CONTROL Press
-		if ((GetKeyState(VK_CONTROL) & 0x8000) && (GetKeyState(VK_SHIFT) & 0x8000))
-		{
-			m_SelectIndex = 0;
-			InputRedraw();
-			break;
-		}
-
-		// CONTROL Press
-		if ((GetKeyState(VK_CONTROL) & 0x8000))
-		{
-			m_SelectIndex = m_CursorIndex = 0;
-			InputRedraw();
-			break;
-		}
-
-		// Shift Press
-		if ((GetKeyState(VK_SHIFT) & 0x8000))
-		{
-			if (m_SelectIndex > 0)
+			if (0x8000 & GetKeyState(VK_CONTROL))
 			{
-				--m_SelectIndex;
+				m_SelectIndex = 0;
+				m_CursorIndex = Text.length();
 			}
 
 			InputRedraw();
 			break;
 		}
-
-		// No Modifier Pressed
-		if (m_CursorIndex == m_SelectIndex)
+		case 'V':		// Gives the TextBox the CTRL+V feature to paste the data from the clipboard to the control
 		{
-			--m_CursorIndex;
-			m_SelectIndex = m_CursorIndex;
-		}
-		else
-		{
-			if (m_SelectIndex == Text.length() || m_SelectIndex > m_CursorIndex)
+			if (0x8000 & GetKeyState(VK_CONTROL))
 			{
+				PasteFromClipboard();
+			}
+
+			InputRedraw();
+			break;
+		}
+		case 'C':		// Gives the TextBox the CTRL+C feature to copy the text from the control to the clipboard
+		{
+			if (0x8000 & GetKeyState(VK_CONTROL))
+			{
+				CopyToClipboard();
+			}
+
+			InputRedraw();
+			break;
+		}
+		case 'X':		// Gives the TextBox the CTRL+X feature to cut the text from the control to the clipboard
+		{
+			if (0x8000 & GetKeyState(VK_CONTROL))
+			{
+				CopyToClipboard();
+				InputDelete(DeleteInputType::CutAndPaste);
+			}
+
+			InputRedraw();
+			break;
+		}
+		case VK_LEFT:	// Gives the TextBox the Navigation to Left feature by using the Left Arrow
+		{
+			// Doesn't let user go lower than index 0 if it's already at the beginning of the string
+			if (m_CursorIndex == 0 && m_SelectIndex == 0)
+			{
+				break;
+			}
+
+			// SHIFT + CONTROL Press
+			if ((GetKeyState(VK_CONTROL) & 0x8000) && (GetKeyState(VK_SHIFT) & 0x8000))
+			{
+				m_SelectIndex = 0;
+				InputRedraw();
+				break;
+			}
+
+			// CONTROL Press
+			if ((GetKeyState(VK_CONTROL) & 0x8000))
+			{
+				m_SelectIndex = m_CursorIndex = 0;
+				InputRedraw();
+				break;
+			}
+
+			// Shift Press
+			if ((GetKeyState(VK_SHIFT) & 0x8000))
+			{
+				if (m_SelectIndex > 0)
+				{
+					--m_SelectIndex;
+				}
+
+				InputRedraw();
+				break;
+			}
+
+			// No Modifier Pressed
+			if (m_CursorIndex == m_SelectIndex)
+			{
+				--m_CursorIndex;
 				m_SelectIndex = m_CursorIndex;
 			}
 			else
 			{
-				m_CursorIndex = m_SelectIndex;
-			}
-		}
-
-		InputRedraw();
-		break;
-	}
-	case VK_RIGHT:	// Gives the TextBox the Navigation to Right feature by using the Right Arrow
-	{
-		// Doesn't let user get out of string if it's already at the end
-		if (m_CursorIndex == Text.length() && m_SelectIndex == Text.length())
-		{
-			break;
-		}
-
-		// SHIFT + CONTROL Press
-		if ((GetKeyState(VK_CONTROL) & 0x8000) && (GetKeyState(VK_SHIFT) & 0x8000))
-		{
-			m_SelectIndex = Text.length();
-			InputRedraw();
-			break;
-		}
-
-		// CONTROL Press
-		if ((GetKeyState(VK_CONTROL) & 0x8000))
-		{
-			m_SelectIndex = m_CursorIndex = Text.length();
-			InputRedraw();
-			break;
-		}
-
-		// SHIFT Press
-		if ((GetKeyState(VK_SHIFT) & 0x8000))
-		{
-			if (m_SelectIndex < Text.length())
-			{
-				++m_SelectIndex;
+				if (m_SelectIndex == Text.length() || m_SelectIndex > m_CursorIndex)
+				{
+					m_SelectIndex = m_CursorIndex;
+				}
+				else
+				{
+					m_CursorIndex = m_SelectIndex;
+				}
 			}
 
 			InputRedraw();
 			break;
 		}
-
-		// No Modifier Pressed
-		if (m_CursorIndex == m_SelectIndex)
+		case VK_RIGHT:	// Gives the TextBox the Navigation to Right feature by using the Right Arrow
 		{
-			++m_CursorIndex;
-			m_SelectIndex = m_CursorIndex;
-		}
-		else
-		{
-			if (m_SelectIndex == 0 || m_SelectIndex < m_CursorIndex)
+			// Doesn't let user get out of string if it's already at the end
+			if (m_CursorIndex == Text.length() && m_SelectIndex == Text.length())
 			{
+				break;
+			}
+
+			// SHIFT + CONTROL Press
+			if ((GetKeyState(VK_CONTROL) & 0x8000) && (GetKeyState(VK_SHIFT) & 0x8000))
+			{
+				m_SelectIndex = Text.length();
+				InputRedraw();
+				break;
+			}
+
+			// CONTROL Press
+			if ((GetKeyState(VK_CONTROL) & 0x8000))
+			{
+				m_SelectIndex = m_CursorIndex = Text.length();
+				InputRedraw();
+				break;
+			}
+
+			// SHIFT Press
+			if ((GetKeyState(VK_SHIFT) & 0x8000))
+			{
+				if (m_SelectIndex < Text.length())
+				{
+					++m_SelectIndex;
+				}
+
+				InputRedraw();
+				break;
+			}
+
+			// No Modifier Pressed
+			if (m_CursorIndex == m_SelectIndex)
+			{
+				++m_CursorIndex;
 				m_SelectIndex = m_CursorIndex;
 			}
 			else
 			{
-				m_CursorIndex = m_SelectIndex;
+				if (m_SelectIndex == 0 || m_SelectIndex < m_CursorIndex)
+				{
+					m_SelectIndex = m_CursorIndex;
+				}
+				else
+				{
+					m_CursorIndex = m_SelectIndex;
+				}
 			}
-		}
 
-		InputRedraw();
-		break;
-	}
-	case VK_HOME:	// Allows the user to go to the beginning of the TextBox by pressing Home
-	{
-		if ((GetKeyState(VK_SHIFT) & 0x8000))
-		{
-			m_SelectIndex = 0;
+			InputRedraw();
+			break;
 		}
-		else
+		case VK_HOME:	// Allows the user to go to the beginning of the TextBox by pressing Home
 		{
-			m_CursorIndex = m_SelectIndex = 0;
-		}
+			if ((GetKeyState(VK_SHIFT) & 0x8000))
+			{
+				m_SelectIndex = 0;
+			}
+			else
+			{
+				m_CursorIndex = m_SelectIndex = 0;
+			}
 
-		InputRedraw();
-		break;
-	}
-	case VK_END:	// Allows the user to go to the end of the TextBox by pressing End
-	{
-		if ((GetKeyState(VK_SHIFT) & 0x8000))
-		{
-			m_SelectIndex = Text.length();
+			InputRedraw();
+			break;
 		}
-		else
+		case VK_END:	// Allows the user to go to the end of the TextBox by pressing End
 		{
-			m_CursorIndex = m_SelectIndex = Text.length();
-		}
+			if ((GetKeyState(VK_SHIFT) & 0x8000))
+			{
+				m_SelectIndex = Text.length();
+			}
+			else
+			{
+				m_CursorIndex = m_SelectIndex = Text.length();
+			}
 
-		InputRedraw();
-		break;
-	}
-	case VK_DELETE:	// Gives the TextBox the feature to remove forward keys by pressing Delete
-	{
-		InputDelete(DeleteInputType::Delete);
-		InputRedraw();
-		break;
-	}
-	case VK_BACK:	// Gives the TextBox the feature to remove backward keys by pressing Backspace
-	{
-		// If CTRL+Backspace is pressed, clear the whole TextBox
-		if (0x8000 & GetKeyState(VK_CONTROL))
-		{
-			m_SelectIndex = 0;
-			m_CursorIndex = Text.length();
+			InputRedraw();
+			break;
 		}
+		case VK_DELETE:	// Gives the TextBox the feature to remove forward keys by pressing Delete
+		{
+			InputDelete(DeleteInputType::Delete);
+			InputRedraw();
+			break;
+		}
+		case VK_BACK:	// Gives the TextBox the feature to remove backward keys by pressing Backspace
+		{
+			// If CTRL+Backspace is pressed, clear the whole TextBox
+			if (0x8000 & GetKeyState(VK_CONTROL))
+			{
+				m_SelectIndex = 0;
+				m_CursorIndex = Text.length();
+			}
 
-		InputDelete(DeleteInputType::Backspace);
-		InputRedraw();
-		break;
-	}
+			InputDelete(DeleteInputType::Backspace);
+			InputRedraw();
+			break;
+		}
 	}
 
 	Control::OnKeyDown_Impl(hwnd, vk, cRepeat, flags);
@@ -512,17 +517,12 @@ void TextBox::OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat) noexcept
 
 	if (Parent != nullptr)
 	{
-		HandleMessageForwarder(static_cast<HWND>(Parent->Handle.ToPointer()), WM_CHAR, c, MAKELPARAM(cRepeat, 0));
+		NativeWindow::HandleMessageForwarder(static_cast<HWND>(Parent->Handle.ToPointer()), WM_CHAR, c, MAKELPARAM(cRepeat, 0));
 	}
 }
 
 void TextBox::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) noexcept
 {
-	if (Text.length() == 0)
-	{
-		return;
-	}
-
 	if (x > m_CaretPosition.back())
 	{
 		m_CursorIndex = Text.length();
@@ -573,7 +573,7 @@ void TextBox::OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) n
 void TextBox::OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept
 {
 	// Create a solid black caret. 
-	CreateCaret(hwnd, (HBITMAP)NULL, 2, m_Font.GetSizeInPixels());
+	CreateCaret(hwnd, (HBITMAP)NULL, 2, nCharY);
 	EnableCaret();
 	InputRedraw();
 
@@ -587,40 +587,6 @@ void TextBox::OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept
 	DestroyCaret();
 
 	Control::OnFocusLeave_Impl(hwnd, hwndNewFocus);
-}
-
-void TextBox::CalculateCaret(HWND hwnd, const HDC& hdc) noexcept
-{
-	if (Text.length() == 0)
-	{
-		return;
-	}
-
-	// Not the best solution for now.
-	// At least it calculates using the right values
-	m_CaretPosition.clear();
-
-	if (m_CaretPosition.size() < Text.length() + 1)
-	{
-		m_CaretPosition.resize(Text.length() + 1, 0ul);
-	}
-
-	for (int i = 0; i <= static_cast<int>(Text.length()); ++i)
-	{
-		if (i > 0)
-		{
-			SIZE s;
-			GetTextExtentPoint32(hdc, Text.substr(0, i).c_str(), i, &s);
-			m_CaretPosition[i] = s.cx;
-		}
-
-		switch (BorderStyle)
-		{
-		case BorderStyle::None: m_CaretPosition[i] += m_Margin.Left; break;
-		case BorderStyle::FixedSingle: m_CaretPosition[i] += m_Margin.Left + 1; break;
-		case BorderStyle::Fixed3D: m_CaretPosition[i] += m_Margin.Left + 2; break;
-		}
-	}
 }
 
 void TextBox::CopyToClipboard() const noexcept
@@ -721,141 +687,115 @@ void TextBox::InputDelete(DeleteInputType deleteType) noexcept
 	// The important part now is to make it work.
 	switch (deleteType)
 	{
-	case DeleteInputType::Backspace:
-	{
-		// Does nothing if backspace is pressed on the beginning of the string
-		if (m_SelectIndex == 0 && m_CursorIndex == 0)
+		case DeleteInputType::Backspace:
 		{
-			return;
-		}
-
-		if (m_SelectIndex < m_CursorIndex)
-		{
-			Text.erase(m_SelectIndex, GetSelectionLenght());
-			m_CursorIndex = m_SelectIndex;
-		}
-		else if (m_SelectIndex > m_CursorIndex)
-		{
-			Text.erase(m_CursorIndex, GetSelectionLenght());
-			m_SelectIndex = m_CursorIndex;
-		}
-		else
-		{
-			Text.erase(m_CursorIndex - 1, 1);
-
-			if (m_SelectIndex > 0)
+			// Does nothing if backspace is pressed on the beginning of the string
+			if (m_SelectIndex == 0 && m_CursorIndex == 0)
 			{
-				--m_SelectIndex;
-				--m_CursorIndex;
+				return;
 			}
-		}
 
-		break;
-	}
-	case DeleteInputType::Delete:
-	{
-		// Does nothing if delete is pressed on the end of the string
-		if (m_SelectIndex == Text.size() && m_CursorIndex == Text.size())
-		{
-			return;
-		}
+			if (m_SelectIndex < m_CursorIndex)
+			{
+				Text.erase(m_SelectIndex, GetSelectionLenght());
+				m_CursorIndex = m_SelectIndex;
+			}
+			else if (m_SelectIndex > m_CursorIndex)
+			{
+				Text.erase(m_CursorIndex, GetSelectionLenght());
+				m_SelectIndex = m_CursorIndex;
+			}
+			else
+			{
+				Text.erase(m_CursorIndex - 1, 1);
 
-		if (m_SelectIndex < m_CursorIndex)
-		{
-			Text.erase(m_SelectIndex, GetSelectionLenght());
-			m_CursorIndex = m_SelectIndex;
-		}
-		else if (m_SelectIndex > m_CursorIndex)
-		{
-			Text.erase(m_CursorIndex, GetSelectionLenght());
-			m_SelectIndex = m_CursorIndex;
-		}
-		else
-		{
-			// Delete doesn't move cursor when used
-			Text.erase(m_CursorIndex, 1);
-		}
+				if (m_SelectIndex > 0)
+				{
+					--m_SelectIndex;
+					--m_CursorIndex;
+				}
+			}
 
-		break;
-	}
-	case DeleteInputType::CutAndPaste:
-	{
-		if (m_SelectIndex == m_CursorIndex)
-		{
-			return;
+			break;
 		}
+		case DeleteInputType::Delete:
+		{
+			// Does nothing if delete is pressed on the end of the string
+			if (m_SelectIndex == Text.size() && m_CursorIndex == Text.size())
+			{
+				return;
+			}
 
-		if (m_SelectIndex < m_CursorIndex)
-		{
-			Text.erase(m_SelectIndex, GetSelectionLenght());
-			m_CursorIndex = m_SelectIndex;
+			if (m_SelectIndex < m_CursorIndex)
+			{
+				Text.erase(m_SelectIndex, GetSelectionLenght());
+				m_CursorIndex = m_SelectIndex;
+			}
+			else if (m_SelectIndex > m_CursorIndex)
+			{
+				Text.erase(m_CursorIndex, GetSelectionLenght());
+				m_SelectIndex = m_CursorIndex;
+			}
+			else
+			{
+				// Delete doesn't move cursor when used
+				Text.erase(m_CursorIndex, 1);
+			}
+
+			break;
 		}
-		else if (m_SelectIndex > m_CursorIndex)
+		case DeleteInputType::CutAndPaste:
 		{
-			Text.erase(m_CursorIndex, GetSelectionLenght());
-			m_SelectIndex = m_CursorIndex;
+			if (m_SelectIndex == m_CursorIndex)
+			{
+				return;
+			}
+
+			if (m_SelectIndex < m_CursorIndex)
+			{
+				Text.erase(m_SelectIndex, GetSelectionLenght());
+				m_CursorIndex = m_SelectIndex;
+			}
+			else if (m_SelectIndex > m_CursorIndex)
+			{
+				Text.erase(m_CursorIndex, GetSelectionLenght());
+				m_SelectIndex = m_CursorIndex;
+			}
+			break;
 		}
-		break;
-	}
 	}
 }
 
 void TextBox::InputRedraw() noexcept
 {
+	m_HasTextChanged = true;
 	Update();
 }
 
-void TextBox::PaintSelection(HDC& hdc, RECT& r, size_t start, size_t end) const noexcept
+int TextBox::CalculateHeightForSingleLine() noexcept
 {
-	/**************************************************************************************************/
-	/* Paint selection section by section
-	The logic is working flawlessly with just small pixel flaws on the first letter :D
-	However, it'll be very hard to implement autoscroll with Caret and Text redraw because the redraw
-	process is executed after the key press, meaning that the key would be draw one time, check it's
-	position and then redraw again in the right region... GEEZZZ
+	Size r(m_Size);
 
-	I'll try to find a proper way to implement this in a better to handle the scrolling for two reasons:
-		1 - AS A DECENT TEXTBOX, IT MUST HAVE THE FEATURE;
-		2 - Multiline TextBox in the future (Try no to cry, cry a lot)		:'(
-
-	As everything is working fine except the scrolling, I'll delay this feature to the future.
-	/**************************************************************************************************/
-	int currentX = 0;
-
-	// Draw text prior to selection
-	SIZE s;
-
-	if (start != 0)
+	auto size = m_Graphics->GetTextSize(Text, GetFont()).Height;
+	
+	switch (m_BorderStyle)
 	{
-		GetTextExtentPoint32(hdc, Text.substr(0, start).c_str(), static_cast<int>(start), &s);
-		SetBkMode(hdc, TRANSPARENT);
-		SetBkColor(hdc, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-		SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-		TextOut(hdc, r.left, r.top, Text.substr(0, start).c_str(), static_cast<int>(start));
-		currentX += s.cx;
+		case BorderStyle::None: break;
+		case BorderStyle::FixedSingle: size += 2; break;
+		case BorderStyle::Fixed3D: size += 4; break;
 	}
 
-	GetTextExtentPoint32(hdc, Text.substr(start, end - start).c_str(), static_cast<int>(end - start), &s);
-	SetBkMode(hdc, OPAQUE);
-	SetBkColor(hdc, RGB(0, 120, 215));
-	SetTextColor(hdc, RGB(255, 255, 255));
-	TextOut(hdc, r.left + currentX, r.top, Text.substr(start, end - start).c_str(), static_cast<int>(end - start));
-	currentX += s.cx;
-	r.right = currentX;
+	TEXTMETRIC tm;
+	GetTextMetrics(static_cast<HDC>(m_Graphics->GetHDC().ToPointer()), &tm);
+	nCharX = tm.tmAveCharWidth;
+	nCharY = tm.tmHeight;
 
-	if (end != Text.length())
-	{
-		GetTextExtentPoint32(hdc, Text.substr(end, Text.length() - end).c_str(), static_cast<int>(Text.length() - end), &s);
-		SetBkMode(hdc, TRANSPARENT);
-		SetBkColor(hdc, RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
-		SetTextColor(hdc, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
-		TextOut(hdc, r.left + currentX, r.top, Text.substr(end, Text.length() - end).c_str(), static_cast<int>(Text.length() - end));
-	}
+	return size + 8;
 }
 
 TextBox::TextBox(Control* parent, int width, int x, int y)
 	:
-	TextBox(parent, "", width, x, y)			// Default control size without font is 9
+	TextBox(parent, "", width, x, y)
 {
 
 }
@@ -868,7 +808,10 @@ TextBox::TextBox(Control* parent, const std::string& name, int width, int x, int
 	m_IsCaretVisible(false),
 	m_IsMultiline(false),
 	m_MaximumLenght(32767),
-	BorderStyle(BorderStyle::Fixed3D)
+	m_BorderStyle(BorderStyle::Fixed3D),
+	m_TextAlign(HorizontalAlignment::Left),
+	m_HasTextChanged(true),
+	m_IsWordWrap(false)
 {
 	Initialize();
 }
@@ -881,27 +824,46 @@ TextBox::~TextBox()
 void TextBox::Initialize()
 {
 	// Create window and get its handle
-	Handle = CreateWindow(
-		WindowClass::GetName(),											 // Class name
-		Text.c_str(),													 // Window title
-		WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPSIBLINGS | SS_LEFT,	 // Style values
-		m_Location.X,														 // X position
-		m_Location.Y,														 // Y position
-		m_Size.Width,													 // Width
-		m_Size.Height,													 // Height
-		static_cast<HWND>(Parent->Handle.ToPointer()),					 // Parent handle
-		nullptr,						                				 // Menu handle
-		WindowClass::GetInstance(),										 // Module instance handle
-		this															 // Pointer to the button instance to work along with HandleMessageSetup function.
-	);
+	//CreateWindow(
+	//	WindowClass::GetName(),
+	//	Text.c_str(),
+	//	WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPSIBLINGS | SS_LEFT,
+	//	m_Location.X,
+	//	m_Location.Y,
+	//	m_Size.Width,
+	//	m_Size.Height,
+	//	static_cast<HWND>(Parent->Handle.ToPointer()),
+	//	nullptr,
+	//	WindowClass::GetInstance(),
+	//	this
+	//);
 
 	if (Handle.IsNull())
 	{
 		throw CTL_LAST_EXCEPT();
 	}
+}
 
-	// Set default TextBox margin to 3 pixels
-	m_Size = CalculateSizeByFont();
+HorizontalAlignment TextBox::GetTextAlign() const noexcept
+{
+	return m_TextAlign;
+}
+
+void TextBox::SetTextAlign(HorizontalAlignment alignment) noexcept
+{
+	m_TextAlign = alignment;
+	m_HasTextChanged = true;
+}
+
+BorderStyle TextBox::GetBorderStyle() const noexcept
+{
+	return m_BorderStyle;
+}
+
+void TextBox::SetBorderStyle(BorderStyle borderStyle) noexcept
+{
+	m_BorderStyle = borderStyle;
+	m_HasTextChanged = true;
 }
 
 size_t TextBox::GetSelectionLenght() const noexcept
@@ -940,4 +902,35 @@ void TextBox::SetMaximumLength(unsigned int maximumLength) noexcept
 	{
 		m_MaximumLenght = maximumLength;
 	}
+}
+
+bool TextBox::IsMultiline() const noexcept
+{
+	return m_IsMultiline;
+}
+
+void TextBox::EnableMultiline() noexcept
+{
+	m_IsMultiline = true;
+}
+
+void TextBox::DisableMultiline() noexcept
+{
+	m_IsMultiline = false;
+	Resize(m_Size.Width, CalculateHeightForSingleLine());
+}
+
+bool TextBox::IsWordWrapped() const noexcept
+{
+	return m_IsWordWrap;
+}
+
+void TextBox::EnableWordWrap() noexcept
+{
+	m_IsWordWrap = true;
+}
+
+void TextBox::DisableWordWrap() noexcept
+{
+	m_IsWordWrap = false;
 }

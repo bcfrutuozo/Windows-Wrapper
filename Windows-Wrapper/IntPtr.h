@@ -3,6 +3,8 @@
 #include "IEquatable.h"
 #include "IComparable.h"
 
+#include <Windows.h>
+
 class IntPtr : public IComparable<IntPtr>, public IEquatable<IntPtr>
 {
 private:
@@ -19,6 +21,14 @@ public:
 	constexpr IntPtr() : m_Ptr(0L) { }
 	constexpr IntPtr(const uint64_t ptr) : m_Ptr(ptr) {}
 	constexpr IntPtr(void* ptr) : m_Ptr(ptr == nullptr ? 0 : (uint64_t)ptr) {}
+
+	constexpr operator HWND() { return static_cast<HWND>((void*)m_Ptr); }
+	constexpr operator HDC() { return static_cast<HDC>((void*)m_Ptr); }
+	constexpr operator HBRUSH() { return static_cast<HBRUSH>((void*)m_Ptr); }
+	constexpr operator HFONT() { return static_cast<HFONT>((void*)m_Ptr); }
+	constexpr operator HINSTANCE() { return static_cast<HINSTANCE>((void*)m_Ptr); }
+	constexpr operator WPARAM() { return (WPARAM)((void*)m_Ptr); }
+	constexpr operator LPARAM() { return (LPARAM)((void*)ToInt64()); }
 
 	constexpr bool operator==(uint64_t p) const noexcept { return m_Ptr == p; }
 
@@ -107,12 +117,21 @@ public:
 #endif
 	}
 
+	constexpr bool operator!=(void* p) const noexcept
+	{
+#if _WIN64
+		return m_Ptr != (p != nullptr ? 0 : (uint64_t)p);
+#else
+		return m_Ptr != (p != nullptr ? 0 : (uint32_t)p);
+#endif
+	}
+
 	int GetHashCode() const override;
 	int CompareTo(const Object* const obj) const override;
 	int CompareTo(const IntPtr* const b) const override;
 	bool Equals(const Object* const obj) const override;
 	bool Equals(const IntPtr* const p) const override;
-	//OVERRIDE OBJECT TO STRING inline virtual const std::string ToString() const noexcept;
+	std::string ToString() const noexcept override;
 
 #if _WIN64
 	static constexpr IntPtr Zero() { return IntPtr(static_cast<uint64_t>(0UL)); }

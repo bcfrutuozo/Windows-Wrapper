@@ -1,7 +1,12 @@
 #pragma once
 
-#include "CommonObject.h"
+#include "Object.h"
 #include "_HResults.h"
+
+#include <exception>
+#include <string_view>
+#include <string>
+#include <Windows.h>
 
 class Exception : public Object, public std::exception
 {
@@ -30,7 +35,7 @@ public:
 	const int GetLine() const noexcept;
 	HRESULT GetErrorCode() const noexcept;
 	void SetErrorCode(HRESULT hr) noexcept;
-	const std::string& GetFile() const noexcept;
+	std::string_view GetFile() const noexcept;
 	std::string GetErrorSpot() const noexcept;
 	const char* GetExceptionMessage() const noexcept;
 	void SetMessage(const std::string& message) noexcept;

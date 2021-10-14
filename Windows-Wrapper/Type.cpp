@@ -29,7 +29,7 @@ bool Type::Equals(const Type* const t) const
 	return m_Type == t->m_Type;
 }
 
-const std::string Type::ToString() const noexcept
+std::string Type::ToString() const noexcept
 {
 	return m_Type.name();
 }

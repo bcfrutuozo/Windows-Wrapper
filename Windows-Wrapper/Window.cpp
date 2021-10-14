@@ -43,8 +43,8 @@ void Window::Initialize()
 	}
 
 	// Create window and get its handle
-	Handle = CreateWindow(
-		WindowClass::GetName(),																								// Class name
+	CreateWindow(
+		"STATIC",																								// Class name
 		Text.c_str(),																										// Window title
 		WS_OVERLAPPEDWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU | WS_CLIPCHILDREN | WS_VISIBLE,		// Style values
 		CW_USEDEFAULT,																										// X position
@@ -53,7 +53,7 @@ void Window::Initialize()
 		(r.bottom - r.top),																									// Height
 		nullptr,																											// Parent handle
 		nullptr,																											// Menu handle
-		WindowClass::GetInstance(),																							// Module instance handle
+		nullptr,																							// Module instance handle
 		this																												// Pointer to the window instance to work along with HandleMessageSetup function.
 	);
 

@@ -2,6 +2,8 @@
 
 #include "Graphics.h"
 
+#include <Windows.h>
+
 class GDI final : public Graphics
 {
 	friend class Graphics;
@@ -27,5 +29,8 @@ public:
 	Drawing::Rectangle DrawRoundedRectangle(Color c, Drawing::Rectangle rect, int borderSize, ChartDashStyle borderStyle, int radius) override;
 	void FillRectangle(Color c, Drawing::Rectangle rect) override;
 	void FillRoundedRectangle(Color c, Drawing::Rectangle rect,int radius) override;
-	void CommonDrawText(const std::string& text, const Font& font, Color c, Drawing::Rectangle rect) override;
+	Size GetTextSize(const std::string& text, const Font& font) override;
+	Size GetTextSize(const char* text, int length, const Font& font) override;
+	Drawing::Rectangle DrawTransparentText(const std::string& text, HorizontalAlignment alignment, const Font& font, Color foreColor, Drawing::Rectangle rect, size_t cursorIndex = 0) override;
+	Drawing::Rectangle DrawOpaqueText(const std::string& text, HorizontalAlignment alignment, const Font& font, Color foreColor, Drawing::Rectangle rect, Color backColor, size_t cursorIndex = 0) override;
 };

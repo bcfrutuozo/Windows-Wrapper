@@ -1,5 +1,6 @@
 #include "HorizontalScrollBar.h"
 #include "ScrollableControl.h"
+#include "Exceptions.h"
 
 void HorizontalScrollBar::OnHorizontalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int code, int pos)
 {
@@ -42,8 +43,11 @@ void HorizontalScrollBar::OnHorizontalScrolling_Impl(HWND hwnd, HWND hwndCtl, un
 	SetScrollPos(hwnd, SB_HORZ, nPos, true);
 	Scrolling = GetScrollPos(hwnd, SB_HORZ);
 
-	InvalidateRect(static_cast<HWND>(Owner->Handle.ToPointer()), Owner->GetDrawableArea(), false);
-	WinAPI::OnHorizontalScrolling_Impl(hwnd, hwndCtl, code, pos);
+	RECT rc;
+	GetClientRect(hwnd, &rc);
+
+	InvalidateRect(static_cast<HWND>(Owner->Handle.ToPointer()), &rc, false);
+	NativeWindow::OnHorizontalScrolling_Impl(hwnd, hwndCtl, code, pos);
 }
 
 void HorizontalScrollBar::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy)
@@ -64,7 +68,7 @@ void HorizontalScrollBar::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int
 		SetScrollInfo(hwnd, SB_HORZ, &si, true);
 	}
 
-	WinAPI::OnSize_Impl(hwnd, state, cx, cy);
+	NativeWindow::OnSize_Impl(hwnd, state, cx, cy);
 }
 
 HorizontalScrollBar::HorizontalScrollBar(ScrollableControl* parent, int width, int height, int x, int y)

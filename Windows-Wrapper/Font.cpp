@@ -1,5 +1,9 @@
 #include "Font.h"
 #include "Exceptions.h"
+#include "Type.h"
+
+#include <sstream>
+#include "Windows.h"
 
 int Font::PixelToPoint(int sizeInPixels) noexcept
 {
@@ -196,7 +200,7 @@ void Font::SetStyle(FontStyle style) noexcept
 	}
 }
 
-const std::string Font::ToString() const noexcept
+std::string Font::ToString() const noexcept
 {
 	std::ostringstream oss;
 	oss << "[" << GetType().ToString() << ": Name=" << m_Name << ", Size=" << m_Size << ", Units=" << ", GdiCharSet=" << m_GdiCharSet << ", GdiVerticalFont=" << m_GdiVerticalFont << "]";

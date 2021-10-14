@@ -2,6 +2,8 @@
 
 #include "Application.h"
 
+#include <Windows.h>
+
 constexpr auto SPEEDFACTOR = 1.0f;
 
 template<typename T>

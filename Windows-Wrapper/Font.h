@@ -1,8 +1,37 @@
 #pragma once
 
-#include "CommonObject.h"
+#include "Object.h"
 
-class Font : public Object
+#include <string>
+
+enum class GenericFontFamilies
+{
+	Serif = 0,
+	SansSerif = 1,
+	Monospace = 2
+};
+
+enum class FontStyle
+{
+	Regular = 0,
+	Bold = 1,
+	Italic = 2,
+	Underline = 4,
+	Strikeout = 8
+};
+
+enum class GraphicsUnit
+{
+	World = 0,
+	Display = 1,
+	Pixel = 2,
+	Point = 3,
+	Inch = 4,
+	Document = 5,
+	Millimeter = 6
+};
+
+class Font final: public Object
 {
 private:
 
@@ -13,7 +42,7 @@ private:
 	std::string m_Name;
 	int m_Size;
 	GraphicsUnit m_Unit;
-	byte m_GdiCharSet;
+	unsigned char m_GdiCharSet;
 	bool m_GdiVerticalFont;
 
 	static int PixelToPoint(int sizeInPixels) noexcept;
@@ -37,6 +66,5 @@ public:
 	GraphicsUnit GetUnit() const noexcept;
 	void SetUnit(GraphicsUnit unit) noexcept;
 	void SetStyle(FontStyle style) noexcept;
-	const std::string ToString() const noexcept override;
+	std::string ToString() const noexcept override;
 };
-

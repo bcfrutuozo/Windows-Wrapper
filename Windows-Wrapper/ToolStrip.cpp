@@ -1,13 +1,10 @@
 #include "ToolStrip.h"
+#include "Exceptions.h"
 
 void ToolStrip::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 {
 	auto hdc = static_cast<HDC>(graphics->GetHDC().ToPointer());
-	RECT rc = { 0 };
-	rc.left = rectangle.GetLeft();
-	rc.top = rectangle.GetTop();
-	rc.right = rectangle.GetRight();
-	rc.bottom = rectangle.GetBottom();
+	RECT rc = { rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom};
 
 	HBRUSH bgColor = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
 	FillRect(hdc, &rc, bgColor);
@@ -32,19 +29,19 @@ ToolStrip::ToolStrip(Control* parent)
 void ToolStrip::Initialize()
 {
 	// Create window and get its handle
-	Handle = CreateWindow(
-		WindowClass::GetName(),																			// Class name
-		Text.c_str(),																						// Window title
-		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,											// Style values
-		m_Location.X,																							// X position
-		m_Location.Y,																							// Y position
-		m_Size.Width,																						// Width
-		m_Size.Height,																						// Height
-		static_cast<HWND>(Parent->Handle.ToPointer()),														// Parent handle
-		nullptr,						                												// Menu handle
-		WindowClass::GetInstance(),																		// Module instance handle
-		this																								// Pointer to the button instance to work along with HandleMessageSetup function.
-	);
+	//Handle = CreateWindow(
+	//	WindowClass::GetName(),																			// Class name
+	//	Text.c_str(),																						// Window title
+	//	WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,											// Style values
+	//	m_Location.X,																							// X position
+	//	m_Location.Y,																							// Y position
+	//	m_Size.Width,																						// Width
+	//	m_Size.Height,																						// Height
+	//	static_cast<HWND>(Parent->Handle.ToPointer()),														// Parent handle
+	//	nullptr,						                												// Menu handle
+	//	WindowClass::GetInstance(),																		// Module instance handle
+	//	this																								// Pointer to the button instance to work along with HandleMessageSetup function.
+	//);
 
 	if (Handle.IsNull())
 	{

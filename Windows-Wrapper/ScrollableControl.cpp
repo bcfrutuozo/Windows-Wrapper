@@ -1,19 +1,6 @@
 #include "ScrollableControl.h"
 #include "ScrollBar.h"
-
-LPRECT const ScrollableControl::GetDrawableArea() noexcept
-{
-	return &m_DrawableArea;
-}
-
-LPRECT const ScrollableControl::ResetDrawableArea() noexcept
-{
-	auto size = GetSize();
-	m_DrawableArea.left = m_DrawableArea.top = 0;
-	m_DrawableArea.right = size.Width;
-	m_DrawableArea.bottom = size.Height;
-	return &m_DrawableArea;
-}
+#include "Exceptions.h"
 
 void ScrollableControl::SetMinimumItemWidth(const int& weight) noexcept
 {
@@ -31,7 +18,7 @@ ScrollableControl::ScrollableControl(Control* parent, const std::string& name, i
 	m_IsVerticalScrollEnabled(false),
 	m_MinimumItemWidth(0)
 {
-	ResetDrawableArea();
+
 }
 
 ScrollableControl::~ScrollableControl()
@@ -86,11 +73,11 @@ int ScrollableControl::GetItemWidth() const noexcept
 	return m_ItemWidth;
 }
 
-void ScrollableControl::SetItemWidth(const int& width)
+void ScrollableControl::SetItemWidth(int width)
 {
 	if (width < m_MinimumItemWidth)
 	{
-		throw std::logic_error("Desired width for each column is smaller than a single character.");
+		throw ArgumentException("Desired width for each column is smaller than a single character.");
 	}
 
 	m_ItemWidth = width;
@@ -101,7 +88,7 @@ int ScrollableControl::GetItemHeight() const noexcept
 	return m_ItemHeight;
 }
 
-void ScrollableControl::SetItemHeight(const int& height) noexcept
+void ScrollableControl::SetItemHeight(int height) noexcept
 {
 	m_ItemHeight = height;
 }

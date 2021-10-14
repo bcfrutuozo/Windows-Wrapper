@@ -14,7 +14,7 @@ private:
 	public:
 
 		ComboBox* m_ComboBox;
-		std::vector<RECT> m_RowPosition;
+		std::vector<Drawing::Rectangle> m_RowPosition;
 		size_t m_TotalItemsInDrawableArea;
 		size_t m_RowNumber;
 		size_t m_MouseOverIndex;

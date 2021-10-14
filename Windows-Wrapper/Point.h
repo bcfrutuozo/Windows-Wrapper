@@ -12,7 +12,12 @@ public:
 	int X;
 	int Y;
 
-	constexpr Point(int word) : X(LOWORD(word)), Y(HIWORD(word)) { }
+	constexpr Point(int word)
+		: // Using direct LOWORD and HIWORD definition to avoid #include in header file
+		X((unsigned short)(((unsigned long long)(word)) & 0xffff)), 
+		Y(((unsigned short)((((unsigned long long)(word)) >> 16) & 0xffff))) 
+	{ }
+
 	constexpr Point(int x, int y) : X(x), Y(y) { }
 	Point(Size size);
 

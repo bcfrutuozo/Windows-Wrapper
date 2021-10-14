@@ -3,6 +3,7 @@
 #include "IEvent.h"
 
 #include <functional>
+#include <cassert>
 
 class Component;
 
@@ -16,7 +17,7 @@ private:
 
 public:
 
-	explicit Event(const std::string& name, const std::function<void(Object*, TArgs)>& callback)
+	explicit constexpr Event(const std::string& name, const std::function<void(Object*, TArgs)>& callback)
 		:
 		m_Name(name),
 		m_Callback(callback)

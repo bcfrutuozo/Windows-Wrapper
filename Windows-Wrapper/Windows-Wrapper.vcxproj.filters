@@ -29,9 +29,6 @@
     <ClCompile Include="MenuBar.cpp">
       <Filter>Menu</Filter>
     </ClCompile>
-    <ClCompile Include="Event.cpp">
-      <Filter>Events</Filter>
-    </ClCompile>
     <ClCompile Include="MenuEntryItem.cpp">
       <Filter>Menu</Filter>
     </ClCompile>
@@ -125,9 +122,6 @@
     <ClCompile Include="ProgressBar.cpp">
       <Filter>Controls</Filter>
     </ClCompile>
-    <ClCompile Include="ScrollableControl.cpp">
-      <Filter>Controls</Filter>
-    </ClCompile>
     <ClCompile Include="ScrollBar.cpp">
       <Filter>Controls</Filter>
     </ClCompile>
@@ -143,11 +137,8 @@
     <ClCompile Include="MenuStrip.cpp">
       <Filter>Controls</Filter>
     </ClCompile>
-    <ClCompile Include="WinAPI.cpp">
+    <ClCompile Include="NativeWindow.cpp">
       <Filter>Controls\Base</Filter>
-    </ClCompile>
-    <ClCompile Include="WindowClass.cpp">
-      <Filter>Controls\Wrapper</Filter>
     </ClCompile>
     <ClCompile Include="Control.cpp">
       <Filter>Controls\Base</Filter>
@@ -160,9 +151,6 @@
     </ClCompile>
     <ClCompile Include="Site.cpp">
       <Filter>Controls\Base</Filter>
-    </ClCompile>
-    <ClCompile Include="MessageMapper.cpp">
-      <Filter>Helpers</Filter>
     </ClCompile>
     <ClCompile Include="HorizontalScrollBar.cpp">
       <Filter>Controls</Filter>
@@ -232,6 +220,21 @@
     </ClCompile>
     <ClCompile Include="GDI.cpp">
       <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="ScrollableControl.cpp">
+      <Filter>Controls\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Win32Exception.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="Message.cpp">
+      <Filter>Controls\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="MessageDecoder.cpp">
+      <Filter>Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="CreateParams.cpp">
+      <Filter>Controls\Base</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -349,7 +352,6 @@
       <Filter>Events</Filter>
     </ClInclude>
     <ClInclude Include="ListItem.h" />
-    <ClInclude Include="CommonObject.h" />
     <ClInclude Include="ArgumentException.h">
       <Filter>Exceptions</Filter>
     </ClInclude>
@@ -455,9 +457,6 @@
     <ClInclude Include="ProgressBar.h">
       <Filter>Controls</Filter>
     </ClInclude>
-    <ClInclude Include="ScrollableControl.h">
-      <Filter>Controls</Filter>
-    </ClInclude>
     <ClInclude Include="ScrollBar.h">
       <Filter>Controls</Filter>
     </ClInclude>
@@ -473,11 +472,8 @@
     <ClInclude Include="MenuStrip.h">
       <Filter>Controls</Filter>
     </ClInclude>
-    <ClInclude Include="WinAPI.h">
+    <ClInclude Include="NativeWindow.h">
       <Filter>Controls\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="WindowClass.h">
-      <Filter>Controls\Wrapper</Filter>
     </ClInclude>
     <ClInclude Include="Control.h">
       <Filter>Controls\Base</Filter>
@@ -491,7 +487,7 @@
     <ClInclude Include="Site.h">
       <Filter>Controls\Base</Filter>
     </ClInclude>
-    <ClInclude Include="MessageMapper.h">
+    <ClInclude Include="MessageDecoder.h">
       <Filter>Helpers</Filter>
     </ClInclude>
     <ClInclude Include="HorizontalScrollBar.h">
@@ -589,6 +585,21 @@
     </ClInclude>
     <ClInclude Include="GDI.h">
       <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="ScrollableControl.h">
+      <Filter>Controls\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="CreateParams.h">
+      <Filter>Controls\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Win32Exception.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Message.h">
+      <Filter>Controls\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Map.h">
+      <Filter>Helpers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

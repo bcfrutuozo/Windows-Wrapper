@@ -1,6 +1,6 @@
 #pragma once
 
-#include "WinAPI.h"
+#include "NativeWindow.h"
 #include "Utilities.h"
 #include "Padding.h"
 #include "EventHandler.h"
@@ -16,12 +16,13 @@
 #include "OnClosingEventArgs.h"
 #include "PaintEventArgs.h"
 #include "ControlException.h"
+#include "Rectangle.h"
 
 #include <list>
 #include <memory>
 #include <functional>
 
-class Control : public WinAPI
+class Control : public NativeWindow
 {
 	friend class Window;
 	friend class Button;
@@ -38,6 +39,7 @@ private:
 	static int m_IncrementalTabIndex;
 
 	std::string Name;
+	Drawing::Rectangle m_DrawableArea;
 
 	void OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) override;
 	void OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) override;
@@ -95,7 +97,7 @@ protected:
 	Control(const Control&) = default;														
 	Control(Control&&) = default;															
 	Control& operator=(const Control&) = default;											
-	Control& operator=(Control&&) = default;												
+	Control& operator=(Control&&) = default;	
 
 public:
 
@@ -126,10 +128,11 @@ public:
 	void OnVisibleChangedSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept;
 
 	bool HasChildren() const noexcept;
-	Size CalculateSizeByFont() noexcept;
 	bool IsEnabled() const noexcept override;
 	Window* GetWindow() noexcept;
 	Padding GetMargin() const noexcept;
+	void SetMargin(Padding margin) noexcept;
+	void SetMargin(int left, int top, int right, int bottom) noexcept;
 	Control* GetByTabIndex(const int& index) noexcept;
 	bool IsTabSelected() const noexcept;
 	const std::string& GetText() const noexcept;
@@ -144,4 +147,7 @@ public:
 	void EnableTabStop() noexcept;
 	void DisableTabStop() noexcept;
 	bool IsTabStop() const noexcept;
+	Drawing::Rectangle const GetDrawableArea() noexcept;
+	void Resize(Size size) override;
+	void Resize(int width, int height) override;
 };

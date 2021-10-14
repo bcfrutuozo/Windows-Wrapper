@@ -1,12 +1,14 @@
 #pragma once
 
-#include "CommonObject.h"
+#include "Object.h"
 #include "Appheaders.h"
+
+#include <list>
 
 class Application : public Object
 {
 	friend class Window;
-	friend class WinAPI;
+	friend class NativeWindow;
 
 private:
 

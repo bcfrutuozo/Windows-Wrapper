@@ -1,30 +1,15 @@
 #pragma once
 
-enum class ChartDashStyle
+enum class HorizontalAlignment
 {
-	// The line style is not set
-	NotSet = 0,
+	// The object or text is aligned on the left of the control element
+	Left =	0,
+	
+	// The object or text is aligned on the right of the control element
+	Right = 1,
 
-	// A dashed line
-	Dash = 1,
-
-	// A line with a repeating dash - dot pattern
-	DashDot = 2,
-
-	// A line a repeating dash - dot - dot pattern
-	DashDotDot = 3,
-
-	// A line with a repeating dot pattern.
-	Dot = 4,
-
-	// A solid line.
-	Solid = 5
-};
-
-enum class GraphicsType
-{
-	GDI,
-	D2D
+	// The object or text is aligned in the center of the control element
+	Center=2
 };
 
 enum class ImageLayout
@@ -94,51 +79,6 @@ enum class BorderStyle
 	None = 0,
 	FixedSingle = 1,
 	Fixed3D = 2
-};
-
-enum class GenericFontFamilies
-{
-	// A generic Serif FontFamily object.
-	Serif = 0,
-
-	// A generic Sans Serif FontFamily object.
-	SansSerif = 1,
-
-	// A generic Monospace FontFamily object.
-	Monospace = 2
-};
-
-enum class FontStyle
-{
-	Regular = 0,
-	Bold = 1,
-	Italic = 2,
-	Underline = 4,
-	Strikeout = 8
-};
-
-enum class GraphicsUnit
-{
-	// Specifies the world coordinate system unit as the unit of measure.
-	World = 0,
-
-	// Specifies the unit of measure of the display device.Typically pixels for video displays, and 1 / 100 inch for printers.
-	Display = 1,
-
-	// Specifies a device pixel as the unit of measure.
-	Pixel = 2,
-
-	// Specifies a printer's point (1/72 inch) as the unit of measure.
-	Point = 3,
-
-	// Specifies the inch as the unit of measure.
-	Inch = 4,
-
-	// Specifies the document unit(1 / 300 inch) as the unit of measure.
-	Document = 5,
-
-	// Specifies the millimeter as the unit of measure.
-	Millimeter = 6
 };
 
 enum class FlatStyle

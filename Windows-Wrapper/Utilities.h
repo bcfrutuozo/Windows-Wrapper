@@ -1,10 +1,11 @@
 #pragma once
 
-#include "Common.h"
 #include "Point.h"
 #include "Size.h"
 #include "PointF.h"
 #include "SizeF.h"
+
+#include <string>
 
 namespace Utilities
 {

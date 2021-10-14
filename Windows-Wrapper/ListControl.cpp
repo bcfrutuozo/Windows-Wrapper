@@ -1,5 +1,6 @@
 #include "ListControl.h"
 #include "ComboBox.h"
+#include "Exceptions.h"
 
 int ListControl::OnEraseBackground_Impl(HWND hwnd, HDC hdc)
 {
@@ -95,24 +96,24 @@ void ListControl::OnValueMemberChangedSet(const std::function<void(Object*, Even
 void ListControl::Initialize()
 {
 	// Create window and get its handle
-	Handle = CreateWindow(
-		WindowClass::GetName(),													// Class name
-		Text.c_str(),															// Window title
-		WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,	// Style values
-		m_Location.X,															// X position
-		m_Location.Y,															// Y position
-		m_Size.Width,															// Width
-		m_Size.Height,															// Height
-		static_cast<HWND>(Parent->Handle.ToPointer()),							// Parent handle
-		nullptr,						                						// Menu handle
-		WindowClass::GetInstance(),												// Module instance handle
-		this																	// Pointer to the class instance to work along with HandleMessageSetup function.
-	);
-
-	if (Handle.IsNull())
-	{
-		throw CTL_LAST_EXCEPT();
-	}
+	//CreateWindow(
+	//	WindowClass::GetName(),													// Class name
+	//	Text.c_str(),															// Window title
+	//	WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,	// Style values
+	//	m_Location.X,															// X position
+	//	m_Location.Y,															// Y position
+	//	m_Size.Width,															// Width
+	//	m_Size.Height,															// Height
+	//	static_cast<HWND>(Parent->Handle.ToPointer()),							// Parent handle
+	//	nullptr,						                						// Menu handle
+	//	WindowClass::GetInstance(),												// Module instance handle
+	//	this																	// Pointer to the class instance to work along with HandleMessageSetup function.
+	//);
+	//
+	//if (Handle.IsNull())
+	//{
+	//	throw CTL_LAST_EXCEPT();
+	//}
 
 	// Initialize scrollbars after control creation and hide it as default
 	HorizontalScrollBar.Initialize();

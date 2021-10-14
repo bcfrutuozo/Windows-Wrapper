@@ -16,6 +16,7 @@
 #include "NotSupportedException.h"
 #include "OutOfMemoryException.h"
 #include "OverflowException.h"
+#include "Win32Exception.h"
 
 /**************************************************************************************************************************************
 ArgumentException macro translations:
@@ -187,3 +188,14 @@ SystemException(const std::string& message)
 SystemException(const std::string& message, Exception* const innerException)
 **************************************************************************************************************************************/
 #define SystemException(...) SystemException(__LINE__, __FILE__, ##__VA_ARGS__)
+
+/**************************************************************************************************************************************
+Win32Exception macro translations:
+
+Win32Exception()
+Win32Exception(int errorCode)
+Win32Exception(int errorCode, const std::string& message)
+Win32Exception(const std::string& message)
+Win32Exception(const std::string& message, Exception* const innerException)
+**************************************************************************************************************************************/
+#define Win32Exception(...) Win32Exception(__LINE__, __FILE__, ##__VA_ARGS__)

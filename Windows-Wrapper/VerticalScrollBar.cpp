@@ -1,5 +1,6 @@
 #include "VerticalScrollBar.h"
 #include "ScrollableControl.h"
+#include "Exceptions.h"
 
 void VerticalScrollBar::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy)
 {
@@ -19,7 +20,7 @@ void VerticalScrollBar::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int c
 		SetScrollInfo(hwnd, SB_VERT, &si, true);
 	}
 
-	WinAPI::OnSize_Impl(hwnd, state, cx, cy);
+	NativeWindow::OnSize_Impl(hwnd, state, cx, cy);
 }
 
 void VerticalScrollBar::OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int code, int pos)
@@ -60,8 +61,11 @@ void VerticalScrollBar::OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsign
 	SetScrollPos(hwnd, SB_VERT, nPos, true);
 	Scrolling = GetScrollPos(hwnd, SB_VERT);
 
-	InvalidateRect(static_cast<HWND>(Owner->Handle.ToPointer()), Owner->GetDrawableArea(), false);	
-	WinAPI::OnVerticalScrolling_Impl(hwnd, hwndCtl, code, pos);
+	RECT rc;
+	GetClientRect(hwnd, &rc);
+
+	InvalidateRect(static_cast<HWND>(Owner->Handle.ToPointer()), &rc, false);
+	NativeWindow::OnVerticalScrolling_Impl(hwnd, hwndCtl, code, pos);
 }
 
 VerticalScrollBar::VerticalScrollBar(ScrollableControl* parent, int width, int height, int x, int y)

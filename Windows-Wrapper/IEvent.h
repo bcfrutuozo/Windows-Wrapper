@@ -2,6 +2,8 @@
 
 #include "EventArgs.h"
 
+#include <string>
+
 class IEvent : public Object
 {
 public:

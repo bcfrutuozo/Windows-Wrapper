@@ -1,4 +1,5 @@
 #include "ComboBox.h"
+#include "Exceptions.h"
 
 void ComboBox::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 {
@@ -72,9 +73,9 @@ void ComboBox::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFla
 	InflateRect(&rect, -GetSystemMetrics(SM_CXEDGE), -GetSystemMetrics(SM_CYEDGE));
 	rect.left = rect.right - GetSystemMetrics(SM_CXVSCROLL);
 
-	WinAPI::OnMouseLeftDown_Impl(hwnd, x, y, keyFlags);
+	NativeWindow::OnMouseLeftDown_Impl(hwnd, x, y, keyFlags);
 
-	// Sets the current opened control after calling WinAPI::OnMouseLeftDown_Impl which will first clear it.
+	// Sets the current opened control after calling NativeWindow::OnMouseLeftDown_Impl which will first clear it.
 	m_OpenedControl = m_ChildWindow->Handle;
 }
 
@@ -111,7 +112,7 @@ void ComboBox::ComboBoxChildNativeWindow::OnMouseLeftUp_Impl(HWND hwnd, int x, i
 		m_ComboBox->SetSelectedIndex(static_cast<int>(m_MouseOverIndex), true);
 	}
 
-	WinAPI::OnMouseLeftUp_Impl(hwnd, x, y, keyFlags);
+	NativeWindow::OnMouseLeftUp_Impl(hwnd, x, y, keyFlags);
 }
 
 void ComboBox::ComboBoxChildNativeWindow::OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags)
@@ -120,11 +121,11 @@ void ComboBox::ComboBoxChildNativeWindow::OnMouseMove_Impl(HWND hwnd, int x, int
 	size_t oldMouseOver = m_MouseOverIndex;
 
 	const auto drawableArea = GetDrawableArea();
-	if (y >= drawableArea->top && y <= drawableArea->bottom && x >= drawableArea->left && x <= drawableArea->right)
+	if (y >= drawableArea.Top && y <= drawableArea.Bottom && x >= drawableArea.Left && x <= drawableArea.Right)
 	{
 		for (auto it = m_RowPosition.begin(); it != m_RowPosition.end(); ++it, ++i)
 		{
-			if (y >= it->top && y <= it->bottom && x >= it->left && x <= it->right)
+			if (y >= it->Top && y <= it->Bottom && x >= it->Left && x <= it->Right)
 			{
 				m_MouseOverIndex = i;
 				break;
@@ -132,7 +133,7 @@ void ComboBox::ComboBoxChildNativeWindow::OnMouseMove_Impl(HWND hwnd, int x, int
 		}
 	}
 
-	WinAPI::OnMouseMove_Impl(hwnd, x, y, keyFlags);
+	NativeWindow::OnMouseMove_Impl(hwnd, x, y, keyFlags);
 
 	// Redraw control only if MouseOverIndex changes to avoid CPU burn
 	if (m_MouseOverIndex != oldMouseOver)
@@ -157,8 +158,8 @@ ComboBox::ComboBoxChildNativeWindow::~ComboBoxChildNativeWindow()
 void ComboBox::ComboBoxChildNativeWindow::Initialize()
 {
 	// Create window and get its handle
-	Handle = CreateWindow(
-		WindowClass::GetName(),									// Class name
+	CreateWindow(
+		"COMBOBOX",									// Class name
 		Text.c_str(),											// Window title
 		WS_CHILD | WS_TABSTOP | WS_CLIPSIBLINGS,				// Style values
 		m_Location.X,											// X position
@@ -167,7 +168,7 @@ void ComboBox::ComboBoxChildNativeWindow::Initialize()
 		m_Size.Height,											// Height
 		static_cast<HWND>(Parent->Handle.ToPointer()),			// Parent handle
 		nullptr,						                		// Menu handle
-		WindowClass::GetInstance(),								// Module instance handle
+		nullptr,								// Module instance handle
 		this													// Pointer to the class instance to work along with HandleMessageSetup function.
 	);
 
@@ -187,7 +188,7 @@ void ComboBox::ComboBoxChildNativeWindow::Initialize()
 void ComboBox::ComboBoxChildNativeWindow::PreDraw(Graphics* const graphics)
 {
 	// Load current font from default PreDraw function
-	WinAPI::PreDraw(graphics);
+	NativeWindow::PreDraw(graphics);
 
 	if (m_ComboBox->IsRebinding())
 	{
@@ -201,13 +202,13 @@ void ComboBox::ComboBoxChildNativeWindow::PreDraw(Graphics* const graphics)
 		int borderSize = 1;
 
 		// Drawable block inside ListBox
-		auto drawableArea = ResetDrawableArea();
-		drawableArea->left += m_Margin.Left + borderSize;
-		drawableArea->top += m_Margin.Top + borderSize;
-		drawableArea->right -= m_Margin.Right + borderSize;
-		drawableArea->bottom -= m_Margin.Bottom + borderSize;
+		auto drawableArea = GetDrawableArea();
+		drawableArea.Left += borderSize;
+		drawableArea.Top += borderSize;
+		drawableArea.Right -= borderSize;
+		drawableArea.Bottom -= borderSize;
 
-		SetItemWidth(drawableArea->right - drawableArea->left);
+		SetItemWidth(drawableArea.Right - drawableArea.Left);
 
 		const auto& dataSource = m_ComboBox->GetDataSource();
 
@@ -225,8 +226,8 @@ void ComboBox::ComboBoxChildNativeWindow::PreDraw(Graphics* const graphics)
 
 		//int newWidth = 0;
 		int newHeight = 0;
-		//int oldWidth = static_cast<int>(drawableArea->right) - static_cast<int>(drawableArea->left);
-		int oldHeight = static_cast<int>(drawableArea->bottom) - static_cast<int>(drawableArea->top);
+		//int oldWidth = static_cast<int>(drawableArea.Right) - static_cast<int>(drawableArea.Left);
+		int oldHeight = static_cast<int>(drawableArea.Bottom) - static_cast<int>(drawableArea.Top);
 
 		m_RowNumber = itemsNumber;
 
@@ -242,12 +243,12 @@ void ComboBox::ComboBoxChildNativeWindow::PreDraw(Graphics* const graphics)
 				newHeight += GetItemHeight();
 			}
 
-			drawableArea->right -= VerticalScrollBar.GetSize().Width;
+			drawableArea.Right -= VerticalScrollBar.GetSize().Width;
 
 			// Recalculate the new item width size
-			SetItemWidth(drawableArea->right - drawableArea->left);
+			SetItemWidth(drawableArea.Right - drawableArea.Left);
 
-			drawableArea->bottom = newHeight + m_Margin.Top + (borderSize * 2);
+			drawableArea.Bottom = newHeight + m_Margin.Top + (borderSize * 2);
 			newHeight += m_Margin.Top + m_Margin.Bottom + (borderSize * 2);
 			int oldHeightY = m_Size.Height;
 			m_Size.Height = newHeight;
@@ -304,29 +305,28 @@ void ComboBox::ComboBoxChildNativeWindow::Draw(Graphics* const graphics, Drawing
 
 	for (size_t i = 0; i < dataSource.size(); ++i)
 	{
-		RECT cr;
-		CopyRect(&cr, drawableArea);
+		Drawing::Rectangle cr = drawableArea;
 
-		cr.top = drawableArea->top - (GetItemHeight() * VerticalScrollBar.GetScrolling()) + (GetItemHeight() * static_cast<int>(i));
-		cr.bottom = (cr.top + GetItemHeight());
-		cr.left = drawableArea->left;
-		cr.right = cr.left + GetItemWidth() - m_Margin.Right;
+		cr.Top = drawableArea.Top - (GetItemHeight() * VerticalScrollBar.GetScrolling()) + (GetItemHeight() * static_cast<int>(i));
+		cr.Bottom = (cr.Top + GetItemHeight());
+		cr.Left = drawableArea.Left;
+		cr.Right = cr.Left + GetItemWidth() - m_Margin.Right;
 
 		m_RowPosition[i] = cr;
 
-		if (cr.left >= drawableArea->left &&
-			cr.top >= drawableArea->top &&
-			cr.right <= drawableArea->right &&
-			cr.bottom <= drawableArea->bottom)
+		if (cr.Left >= drawableArea.Left &&
+			cr.Top >= drawableArea.Top &&
+			cr.Right <= drawableArea.Right &&
+			cr.Bottom <= drawableArea.Bottom)
 		{
 			if (GetMouseOverIndex() == i)
 			{
 				SetBkColor(hdcMem, RGB(0, 120, 215));
 				SetTextColor(hdcMem, RGB(255, 255, 255));
-				HBRUSH brush = CreateSolidBrush(RGB(0, 120, 215));
-				FillRect(hdcMem, &cr, brush);
-				SelectObject(hdcMem, brush);
-				DeleteObject(brush);
+				//HBRUSH brush = CreateSolidBrush(RGB(0, 120, 215));
+				//FillRect(hdcMem, &cr, brush);
+				//SelectObject(hdcMem, brush);
+				//DeleteObject(brush);
 			}
 			else
 			{
@@ -334,8 +334,8 @@ void ComboBox::ComboBoxChildNativeWindow::Draw(Graphics* const graphics, Drawing
 				SetTextColor(hdcMem, RGB(m_ForeColor.GetR(), m_ForeColor.GetG(), m_ForeColor.GetB()));
 			}
 
-			DrawText(hdcMem, dataSource[i].Value.c_str(), -1, &cr, DT_LEFT | DT_VCENTER);
-			DrawText(hdcMem, Text.c_str(), static_cast<int>(dataSource[i].Value.length()), &cr, DT_LEFT | DT_VCENTER | DT_CALCRECT);
+			//DrawText(hdcMem, dataSource[i].Value.c_str(), -1, &cr, DT_LEFT | DT_VCENTER);
+			//DrawText(hdcMem, Text.c_str(), static_cast<int>(dataSource[i].Value.length()), &cr, DT_LEFT | DT_VCENTER | DT_CALCRECT);
 		}
 	}
 

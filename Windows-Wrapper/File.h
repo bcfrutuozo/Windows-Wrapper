@@ -1,6 +1,8 @@
 #pragma once
 
-#include "CommonObject.h"
+#include "Object.h"
+
+#include <string>
 
 class File : public Object
 {

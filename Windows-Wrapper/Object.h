@@ -2,12 +2,18 @@
 
 #include "Common.h"
 
+#include <string>
+#include <memory>
+
 class Type;
 class ListItem;
 
 class Object
 {
 public:
+
+	constexpr Object() 
+	{ }
 
 	constexpr bool ReferenceEquals(const Object& b) const noexcept { return std::addressof(*this) == std::addressof(b); }
 
@@ -20,8 +26,8 @@ public:
 	}
 
 	virtual bool Equals(const Object* const b) const;
-	inline virtual int GetHashCode() const;
-	inline const Type GetType() const noexcept;
-	inline virtual const std::string ToString() const noexcept;
+	virtual int GetHashCode() const;
+	const Type GetType() const noexcept;
+	virtual std::string ToString() const noexcept;
 	virtual ListItem ToListItem() const;
 };

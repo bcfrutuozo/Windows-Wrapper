@@ -13,6 +13,7 @@
 
 #pragma once
 #include "Common.h"
+#include <Windows.h>
 #include <sal.h>
 
 #ifdef __cplusplus

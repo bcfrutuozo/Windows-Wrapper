@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EventArgs.h"
+#include "Type.h"
 
 class ConvertEventArgs : public EventArgs
 {

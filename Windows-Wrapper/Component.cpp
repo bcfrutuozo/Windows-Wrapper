@@ -1,5 +1,8 @@
 #include "Component.h"
 #include "IContainer.h"
+#include "Type.h"
+
+#include <sstream>
 
 inline bool Component::CanRaiseEvents()
 {
@@ -68,11 +71,13 @@ void Component::Dispose()
 	Dispose(true);
 }
 
-const std::string Component::ToString() const noexcept
+std::string Component::ToString() const noexcept
 {
-	return m_Site == nullptr ?
-		GetType().ToString() :
-		std::string(m_Site->GetName() + " [" + GetType().ToString() + "]");
+	if (m_Site == nullptr) return GetType().ToString();
+
+	std::ostringstream oss;
+	oss << m_Site->GetName() << " [" << GetType().ToString() << "]";
+	return oss.str();
 }
 
 IContainer* Component::GetContainer() const noexcept

@@ -66,7 +66,7 @@ void Container::ValidateName(IComponent* component, const std::string& name)
 			ISite* s = m_Sites[i];
 			if (s != nullptr &&
 				s->GetName() != "" &&
-				Utilities::CaseInsensitiveCompare(name, s->GetName()) &&
+				Utilities::CaseInsensitiveCompare(name, std::string(s->GetName())) &&
 				s->GetComponent() != component)
 			{
 				// Duplicate name for site. Create Exception for it

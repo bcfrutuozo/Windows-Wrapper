@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CommonObject.h"
+#include "Object.h"
 
 class IDisposable : public Object
 {
