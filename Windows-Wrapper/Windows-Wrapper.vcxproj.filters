@@ -236,12 +236,15 @@
     <ClCompile Include="CreateParams.cpp">
       <Filter>Controls\Base</Filter>
     </ClCompile>
+    <ClCompile Include="MDIClient.cpp">
+      <Filter>Controls\Base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dxerr.h" />
     <ClInclude Include="DXGIInfoManager.h" />
     <ClInclude Include="Graphics3d.h" />
-    <ClInclude Include="IHandle.h">
+    <ClInclude Include="IWin32Window.h">
       <Filter>Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="IEquatable.h">
@@ -601,6 +604,49 @@
     <ClInclude Include="Map.h">
       <Filter>Helpers</Filter>
     </ClInclude>
+    <ClInclude Include="HorizontalAlignment.h" />
+    <ClInclude Include="ChartDashStyle.h">
+      <Filter>Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsUnit.h">
+      <Filter>Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="FontStyle.h">
+      <Filter>Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsType.h">
+      <Filter>Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="GenericFontFamilies.h">
+      <Filter>Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="ComboBoxStyle.h">
+      <Filter>Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="DrawMode.h">
+      <Filter>Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="FormBorderStyle.h">
+      <Filter>Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="FormWindowState.h">
+      <Filter>Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="FormStartPosition.h">
+      <Filter>Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="MDIClient.h">
+      <Filter>Controls\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="MDILayout.h">
+      <Filter>Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="IWindowTarget.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="ControlStyles.h">
+      <Filter>Enums</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interfaces">
@@ -641,6 +687,9 @@
     </Filter>
     <Filter Include="Graphics">
       <UniqueIdentifier>{3696c7ac-dbdf-4a9f-a2df-92213de83dad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Enums">
+      <UniqueIdentifier>{7b6d7c43-1bc8-4816-9c9f-7ca8b823dd6e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

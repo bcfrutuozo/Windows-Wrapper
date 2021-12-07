@@ -19,7 +19,7 @@ public:
     int Width;
     int Height;
     IntPtr Parent;
-    Object* Param;
+    void* Param;
 
     std::string ToString() const noexcept override;
 };

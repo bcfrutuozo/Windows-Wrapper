@@ -31,7 +31,7 @@ public:
 
 	virtual ~ProgressBar();
 
-	void Initialize() override;
+	//void Initialize() override;
 	int GetValue() const noexcept;
 	void SetValue(int value) noexcept;
 	void IncrementStep() noexcept;

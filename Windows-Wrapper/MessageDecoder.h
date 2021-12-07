@@ -20,7 +20,7 @@ class MessageDecoder : public Object
 
 private:
 
-	static constexpr std::array<std::pair<int, std::string_view>, 272> messages_array
+	static constexpr std::array<std::pair<int, std::string_view>, 273> messages_array
 	{
 		{
 			REGISTERMAP(WM_NULL),

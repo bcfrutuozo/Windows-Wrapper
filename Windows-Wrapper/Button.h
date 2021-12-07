@@ -25,7 +25,6 @@ public:
 
 	virtual ~Button();
 
-	void Initialize() override;
 	FlatButtonAppearance GetFlatButtonAppearance() const noexcept;
 	void SetFlatButtonAppearance(FlatButtonAppearance appearance) noexcept;
 	FlatStyle GetFlatStyle() const noexcept;

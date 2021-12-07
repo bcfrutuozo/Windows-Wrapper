@@ -22,7 +22,7 @@ public:
 
 	virtual ~ScrollBar();
 
-	void Initialize() override;
+	//void Initialize() override;
 	int GetScrolling() const noexcept;
 
 	void SetMaximumValue(int maxValue) noexcept;

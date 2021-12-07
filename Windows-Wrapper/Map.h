@@ -13,7 +13,7 @@ struct Map
 		const auto it = std::find_if(begin(data), end(data),
 									 [&key](const auto& v) { return v.first == key; });
 
-		if (it != end(data)) return it->second;
-		else throw ArgumentOutOfRangeException("key");
+		if(it != end(data)) return it->second;
+		else return "";		// Always return empty string for unknown messages (Messages created at runtime starts with C0)
 	}
 };

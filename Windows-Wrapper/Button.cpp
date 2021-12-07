@@ -153,7 +153,7 @@ Button::Button(Control* parent, const std::string& name, int width, int height, 
 	m_FlatStyle(FlatStyle::Standard_Windows11),
 	m_FlatAppearance()
 {
-	Initialize();
+	//Initialize();
 }
 
 Button::~Button()
@@ -161,28 +161,28 @@ Button::~Button()
 
 }
 
-void Button::Initialize()
-{
-	// Create window and get its handle
-	CreateWindow(
-		"BUTTON",							// Class name
-		Text.c_str(),									// Window title
-		WS_CHILD | WS_VISIBLE | WS_TABSTOP,				// Style values
-		m_Location.X,										// X position
-		m_Location.Y,										// Y position
-		m_Size.Width,									// Width
-		m_Size.Height,									// Height
-		static_cast<HWND>(Parent->Handle.ToPointer()),	// Parent handle
-		nullptr,					                	// Menu handle
-		nullptr,						// Module instance handle
-		this											// Pointer to the button instance to work along with HandleMessageSetup function.
-	);
-
-	if (Handle.IsNull())
-	{
-		throw CTL_LAST_EXCEPT();
-	}
-}
+//void Button::Initialize()
+//{
+//	// Create window and get its handle
+//	//CreateWindow(
+//	//	"BUTTON",							// Class name
+//	//	Text.c_str(),									// Window title
+//	//	WS_CHILD | WS_VISIBLE | WS_TABSTOP,				// Style values
+//	//	m_Location.X,										// X position
+//	//	m_Location.Y,										// Y position
+//	//	m_Size.Width,									// Width
+//	//	m_Size.Height,									// Height
+//	//	static_cast<HWND>(Parent->Handle.ToPointer()),	// Parent handle
+//	//	nullptr,					                	// Menu handle
+//	//	nullptr,						// Module instance handle
+//	//	this											// Pointer to the button instance to work along with HandleMessageSetup function.
+//	//);
+//	//
+//	//if (Handle.IsNull())
+//	//{
+//	//	throw CTL_LAST_EXCEPT();
+//	//}
+//}
 
 FlatButtonAppearance Button::GetFlatButtonAppearance() const noexcept
 {

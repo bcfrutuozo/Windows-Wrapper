@@ -1,6 +1,8 @@
 #pragma once
 
 #include "ListControl.h"
+#include "ComboBoxStyle.h"
+#include "DrawMode.h"
 #include "VerticalScrollBar.h"
 
 class ComboBox : public ListControl
@@ -29,15 +31,19 @@ private:
 		ComboBoxChildNativeWindow(Control* parent, ComboBox* comboBox, int width, int height, int x, int y);
 		virtual ~ComboBoxChildNativeWindow();
 
-		void Initialize() override;
+		//void Initialize() override;
 		size_t GetMouseOverIndex() const noexcept;
 	};
 
+	bool m_IntegralHeight;
+	ComboBoxStyle m_DropDownStyle;
+	DrawMode m_DrawMode;
 	ComboBoxChildNativeWindow* m_ChildWindow;
 	FlatStyle m_FlatStyle;
 
 	void Draw(Graphics* const graphics, Drawing::Rectangle rectangle) override;
 	void OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) override;
+	CreateParams* CreateParameters() override;
 
 	ComboBox(Control* parent, const std::string& name, int width, int x, int y);
 

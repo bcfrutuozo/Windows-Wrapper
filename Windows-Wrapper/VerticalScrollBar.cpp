@@ -20,12 +20,12 @@ void VerticalScrollBar::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int c
 		SetScrollInfo(hwnd, SB_VERT, &si, true);
 	}
 
-	NativeWindow::OnSize_Impl(hwnd, state, cx, cy);
+	Control::OnSize_Impl(hwnd, state, cx, cy);
 }
 
 void VerticalScrollBar::OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int code, int pos)
 {
-	if(GetFocus() != static_cast<HWND>(Parent->Handle.ToPointer())) SetFocus(static_cast<HWND>(Parent->Handle.ToPointer()));
+	if(GetFocus() != static_cast<HWND>(Parent->GetHandle().ToPointer())) SetFocus(static_cast<HWND>(Parent->GetHandle().ToPointer()));
 
 	int nPos;
 	int nOldPos;
@@ -64,8 +64,8 @@ void VerticalScrollBar::OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsign
 	RECT rc;
 	GetClientRect(hwnd, &rc);
 
-	InvalidateRect(static_cast<HWND>(Owner->Handle.ToPointer()), &rc, false);
-	NativeWindow::OnVerticalScrolling_Impl(hwnd, hwndCtl, code, pos);
+	InvalidateRect(static_cast<HWND>(Owner->GetHandle().ToPointer()), &rc, false);
+	Control::OnVerticalScrolling_Impl(hwnd, hwndCtl, code, pos);
 }
 
 VerticalScrollBar::VerticalScrollBar(ScrollableControl* parent, int width, int height, int x, int y)

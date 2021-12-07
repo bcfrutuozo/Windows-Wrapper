@@ -72,7 +72,7 @@ void TextBox::PreDraw(Graphics* const graphics)
 		m_HasTextChanged = false;
 	}
 
-	NativeWindow::PreDraw(graphics);
+	Control::PreDraw(graphics);
 }
 
 void TextBox::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
@@ -165,7 +165,7 @@ void TextBox::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 	}
 
 	// Caret position for after
-	if (GetFocus() == static_cast<HWND>(Handle.ToPointer()))
+	if (GetFocus() == static_cast<HWND>(GetHandle().ToPointer()))
 	{
 		std::ostringstream oss;
 
@@ -196,7 +196,7 @@ void TextBox::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 void TextBox::OnCreate_Impl(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
 {
 	// Call base function to create Graphics handle
-	NativeWindow::OnCreate_Impl(hwnd, lpCreateStruct);
+	Control::OnCreate_Impl(hwnd, lpCreateStruct);
 	Resize(m_Size.Width, CalculateHeightForSingleLine());
 }
 
@@ -517,7 +517,7 @@ void TextBox::OnKeyPressed_Impl(HWND hwnd, char c, int cRepeat) noexcept
 
 	if (Parent != nullptr)
 	{
-		NativeWindow::HandleMessageForwarder(static_cast<HWND>(Parent->Handle.ToPointer()), WM_CHAR, c, MAKELPARAM(cRepeat, 0));
+		//NativeWindow::HandleMessageForwarder(static_cast<HWND>(Parent->Handle.ToPointer()), WM_CHAR, c, MAKELPARAM(cRepeat, 0));
 	}
 }
 
@@ -589,9 +589,9 @@ void TextBox::OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept
 	Control::OnFocusLeave_Impl(hwnd, hwndNewFocus);
 }
 
-void TextBox::CopyToClipboard() const noexcept
+void TextBox::CopyToClipboard() noexcept
 {
-	if (OpenClipboard(static_cast<HWND>(Handle.ToPointer())))
+	if (OpenClipboard(static_cast<HWND>(GetHandle().ToPointer())))
 	{
 		size_t start = 0;
 		size_t end = 0;
@@ -652,7 +652,7 @@ void TextBox::EnableCaret() noexcept
 {
 	if (!m_IsCaretVisible)
 	{
-		ShowCaret(static_cast<HWND>(Handle.ToPointer()));
+		ShowCaret(static_cast<HWND>(GetHandle().ToPointer()));
 		m_IsCaretVisible = true;
 	}
 }
@@ -661,7 +661,7 @@ void TextBox::DisableCaret() noexcept
 {
 	if (m_IsCaretVisible)
 	{
-		HideCaret(static_cast<HWND>(Handle.ToPointer()));
+		HideCaret(static_cast<HWND>(GetHandle().ToPointer()));
 		m_IsCaretVisible = false;
 	}
 }
@@ -813,7 +813,7 @@ TextBox::TextBox(Control* parent, const std::string& name, int width, int x, int
 	m_HasTextChanged(true),
 	m_IsWordWrap(false)
 {
-	Initialize();
+	//Initialize();
 }
 
 TextBox::~TextBox()
@@ -821,28 +821,28 @@ TextBox::~TextBox()
 
 }
 
-void TextBox::Initialize()
-{
-	// Create window and get its handle
-	//CreateWindow(
-	//	WindowClass::GetName(),
-	//	Text.c_str(),
-	//	WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPSIBLINGS | SS_LEFT,
-	//	m_Location.X,
-	//	m_Location.Y,
-	//	m_Size.Width,
-	//	m_Size.Height,
-	//	static_cast<HWND>(Parent->Handle.ToPointer()),
-	//	nullptr,
-	//	WindowClass::GetInstance(),
-	//	this
-	//);
-
-	if (Handle.IsNull())
-	{
-		throw CTL_LAST_EXCEPT();
-	}
-}
+//void TextBox::Initialize()
+//{
+//	// Create window and get its handle
+//	//CreateWindow(
+//	//	WindowClass::GetName(),
+//	//	Text.c_str(),
+//	//	WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPSIBLINGS | SS_LEFT,
+//	//	m_Location.X,
+//	//	m_Location.Y,
+//	//	m_Size.Width,
+//	//	m_Size.Height,
+//	//	static_cast<HWND>(Parent->Handle.ToPointer()),
+//	//	nullptr,
+//	//	WindowClass::GetInstance(),
+//	//	this
+//	//);
+//
+//	//if (Handle.IsNull())
+//	//{
+//	//	throw CTL_LAST_EXCEPT();
+//	//}
+//}
 
 HorizontalAlignment TextBox::GetTextAlign() const noexcept
 {

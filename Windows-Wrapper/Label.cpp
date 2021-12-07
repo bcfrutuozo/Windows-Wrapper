@@ -3,7 +3,7 @@
 
 void Label::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 {
-	auto hwnd = static_cast<HWND>(Handle.ToPointer());
+	auto hwnd = static_cast<HWND>(GetHandle().ToPointer());
 	auto hdc = static_cast<HDC>(graphics->GetHDC().ToPointer());
 
 	SIZE s;
@@ -116,7 +116,7 @@ Label::Label(Control* parent, const std::string& text, int x, int y)
 	m_BorderStyle(BorderStyle::None),
 	m_FlatStyle(FlatStyle::Standard_Windows10)
 {
-	Initialize();
+	//Initialize();
 }
 
 Label::~Label()
@@ -124,30 +124,30 @@ Label::~Label()
 
 }
 
-void Label::Initialize()
-{
-	// Create window and get its handle
-	//CreateWindow(
-	//	WindowClass::GetName(),							// Class name
-	//	Text.c_str(),									// Window title
-	//	WS_CHILD | WS_VISIBLE | WS_TABSTOP,				// Style values
-	//	m_Location.X,										// X position
-	//	m_Location.Y,										// Y position
-	//	m_Size.Width,									// Width
-	//	m_Size.Height,									// Height
-	//	static_cast<HWND>(Parent->Handle.ToPointer()),	// Parent handle
-	//	nullptr,						               	// Menu handle
-	//	WindowClass::GetInstance(),						// Module instance handle
-	//	this											// Pointer to the button instance to work along with HandleMessageSetup function.
-	//);
-
-	if (Handle.IsNull())
-	{
-		throw CTL_LAST_EXCEPT();
-	}
-
-	DisableTabStop();
-}
+//void Label::Initialize()
+//{
+//	// Create window and get its handle
+//	//CreateWindow(
+//	//	WindowClass::GetName(),							// Class name
+//	//	Text.c_str(),									// Window title
+//	//	WS_CHILD | WS_VISIBLE | WS_TABSTOP,				// Style values
+//	//	m_Location.X,										// X position
+//	//	m_Location.Y,										// Y position
+//	//	m_Size.Width,									// Width
+//	//	m_Size.Height,									// Height
+//	//	static_cast<HWND>(Parent->Handle.ToPointer()),	// Parent handle
+//	//	nullptr,						               	// Menu handle
+//	//	WindowClass::GetInstance(),						// Module instance handle
+//	//	this											// Pointer to the button instance to work along with HandleMessageSetup function.
+//	//);
+//
+//	//if (Handle.IsNull())
+//	//{
+//	//	throw CTL_LAST_EXCEPT();
+//	//}
+//
+//	DisableTabStop();
+//}
 
 BorderStyle Label::GetBorderStyle() const noexcept
 {

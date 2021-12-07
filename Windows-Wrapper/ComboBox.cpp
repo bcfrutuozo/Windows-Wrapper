@@ -3,7 +3,7 @@
 
 void ComboBox::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 {
-	auto hwnd = static_cast<HWND>(Handle.ToPointer());
+	auto hwnd = static_cast<HWND>(GetHandle().ToPointer());
 	auto hdc = static_cast<HDC>(graphics->GetHDC().ToPointer());
 
 	RECT rect;
@@ -39,7 +39,7 @@ void ComboBox::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 	SelectClipRgn(hdc, NULL);
 	rect.left = rect.right - GetSystemMetrics(SM_CXVSCROLL);
 
-	if (m_OpenedControl == m_ChildWindow->Handle)
+	if (m_OpenedControl == m_ChildWindow->GetHandle())
 	{
 		DrawFrameControl(hdc, &rect, DFC_SCROLL, DFCS_SCROLLCOMBOBOX | DFCS_FLAT | DFCS_PUSHED);
 		//FillRect(hdc, &rect, GetSysColorBrush(COLOR_3DDKSHADOW));
@@ -73,16 +73,57 @@ void ComboBox::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFla
 	InflateRect(&rect, -GetSystemMetrics(SM_CXEDGE), -GetSystemMetrics(SM_CYEDGE));
 	rect.left = rect.right - GetSystemMetrics(SM_CXVSCROLL);
 
-	NativeWindow::OnMouseLeftDown_Impl(hwnd, x, y, keyFlags);
+	Control::OnMouseLeftDown_Impl(hwnd, x, y, keyFlags);
 
 	// Sets the current opened control after calling NativeWindow::OnMouseLeftDown_Impl which will first clear it.
-	m_OpenedControl = m_ChildWindow->Handle;
+	m_OpenedControl = m_ChildWindow->GetHandle();
+}
+
+CreateParams* ComboBox::CreateParameters()
+{
+	CreateParams* cp = Control::CreateParameters();
+	cp->ClassName = "COMBOBOX";
+	cp->Style |= WS_VSCROLL | CBS_HASSTRINGS | CBS_AUTOHSCROLL;
+	cp->ExStyle |= WS_EX_CLIENTEDGE;
+	if (!m_IntegralHeight) cp->Style |= CBS_NOINTEGRALHEIGHT;
+
+	switch (m_DropDownStyle) 
+	{
+	case ComboBoxStyle::Simple:
+		cp->Style |= CBS_SIMPLE;
+		break;
+	case ComboBoxStyle::DropDown:
+		cp->Style |= CBS_DROPDOWN;
+		// Make sure we put the height back or we won't be able to size the dropdown!
+		//cp->Height = PreferredHeight;
+		break;
+	case ComboBoxStyle::DropDownList:
+		cp->Style |= CBS_DROPDOWNLIST;
+		// Comment above...
+		// cp->Height = PreferredHeight;
+		break;
+	}
+	switch (m_DrawMode) 
+	{
+
+	case DrawMode::OwnerDrawFixed:
+		cp->Style |= CBS_OWNERDRAWFIXED;
+		break;
+	case DrawMode::OwnerDrawVariable:
+		cp->Style |= CBS_OWNERDRAWVARIABLE;
+		break;
+	}
+
+	return cp;
 }
 
 ComboBox::ComboBox(Control* parent, const std::string& name, int width, int x, int y)
 	:
 	ListControl(parent, name, width, 0, x, y),	// Default control size without font is 9
-	m_FlatStyle(FlatStyle::Standard_Windows10)
+	m_FlatStyle(FlatStyle::Standard_Windows10),
+	m_IntegralHeight(true),
+	m_DropDownStyle(ComboBoxStyle::Simple),
+	m_DrawMode(DrawMode::Normal)
 {
 	// The ComboBox list MUST be inserted on the PARENT. Othewise it will be set in an invalid rectangle of the ComboBox
 	m_ChildWindow = new ComboBoxChildNativeWindow(parent, this, m_Size.Width, 120, m_Location.X, m_Location.Y + m_Size.Height + 5);
@@ -104,7 +145,7 @@ void ComboBox::ComboBoxChildNativeWindow::OnMouseLeftDown_Impl(HWND hwnd, int x,
 
 void ComboBox::ComboBoxChildNativeWindow::OnMouseLeftUp_Impl(HWND hwnd, int x, int y, unsigned int keyFlags)
 {
-	if (m_OpenedControl == Handle)
+	if (m_OpenedControl == GetHandle())
 	{
 		m_OpenedControl = nullptr;
 		Hide();
@@ -112,7 +153,7 @@ void ComboBox::ComboBoxChildNativeWindow::OnMouseLeftUp_Impl(HWND hwnd, int x, i
 		m_ComboBox->SetSelectedIndex(static_cast<int>(m_MouseOverIndex), true);
 	}
 
-	NativeWindow::OnMouseLeftUp_Impl(hwnd, x, y, keyFlags);
+	Control::OnMouseLeftUp_Impl(hwnd, x, y, keyFlags);
 }
 
 void ComboBox::ComboBoxChildNativeWindow::OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags)
@@ -133,7 +174,7 @@ void ComboBox::ComboBoxChildNativeWindow::OnMouseMove_Impl(HWND hwnd, int x, int
 		}
 	}
 
-	NativeWindow::OnMouseMove_Impl(hwnd, x, y, keyFlags);
+	Control::OnMouseMove_Impl(hwnd, x, y, keyFlags);
 
 	// Redraw control only if MouseOverIndex changes to avoid CPU burn
 	if (m_MouseOverIndex != oldMouseOver)
@@ -147,7 +188,7 @@ ComboBox::ComboBoxChildNativeWindow::ComboBoxChildNativeWindow(Control* parent, 
 	ScrollableControl(parent, "", width, height, x, y),
 	m_ComboBox(comboBox)
 {
-	Initialize();
+	//Initialize();
 }
 
 ComboBox::ComboBoxChildNativeWindow::~ComboBoxChildNativeWindow()
@@ -155,40 +196,40 @@ ComboBox::ComboBoxChildNativeWindow::~ComboBoxChildNativeWindow()
 
 }
 
-void ComboBox::ComboBoxChildNativeWindow::Initialize()
-{
-	// Create window and get its handle
-	CreateWindow(
-		"COMBOBOX",									// Class name
-		Text.c_str(),											// Window title
-		WS_CHILD | WS_TABSTOP | WS_CLIPSIBLINGS,				// Style values
-		m_Location.X,											// X position
-		m_Location.Y,											// Y position
-		m_Size.Width,											// Width
-		m_Size.Height,											// Height
-		static_cast<HWND>(Parent->Handle.ToPointer()),			// Parent handle
-		nullptr,						                		// Menu handle
-		nullptr,								// Module instance handle
-		this													// Pointer to the class instance to work along with HandleMessageSetup function.
-	);
-
-	if (Handle.IsNull())
-	{
-		throw CTL_LAST_EXCEPT();
-	}
-
-	// Set default TextBox margin to 3 pixels
-	m_BackgroundColor = Color::WindowBackground();
-
-	// Initialize scrollbars after control creation
-	HorizontalScrollBar.Initialize();
-	VerticalScrollBar.Initialize();
-}
+//void ComboBox::ComboBoxChildNativeWindow::Initialize()
+//{
+//	// Create window and get its handle
+//	CreateWindow(
+//		"COMBOBOX",									// Class name
+//		Text.c_str(),											// Window title
+//		WS_CHILD | WS_TABSTOP | WS_CLIPSIBLINGS,				// Style values
+//		m_Location.X,											// X position
+//		m_Location.Y,											// Y position
+//		m_Size.Width,											// Width
+//		m_Size.Height,											// Height
+//		static_cast<HWND>(Parent->GetHandle().ToPointer()),			// Parent handle
+//		nullptr,						                		// Menu handle
+//		nullptr,								// Module instance handle
+//		this													// Pointer to the class instance to work along with HandleMessageSetup function.
+//	);
+//
+//	if (!IsHandleCreated())
+//	{
+//		throw CTL_LAST_EXCEPT();
+//	}
+//
+//	// Set default TextBox margin to 3 pixels
+//	m_BackgroundColor = Color::WindowBackground();
+//
+//	// Initialize scrollbars after control creation
+//	HorizontalScrollBar.Initialize();
+//	VerticalScrollBar.Initialize();
+//}
 
 void ComboBox::ComboBoxChildNativeWindow::PreDraw(Graphics* const graphics)
 {
 	// Load current font from default PreDraw function
-	NativeWindow::PreDraw(graphics);
+	Control::PreDraw(graphics);
 
 	if (m_ComboBox->IsRebinding())
 	{
@@ -272,7 +313,7 @@ void ComboBox::ComboBoxChildNativeWindow::PreDraw(Graphics* const graphics)
 				++m_TotalItemsInDrawableArea;
 			}
 
-			HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.Handle.ToPointer()), WM_SIZE, MAKEWPARAM(0, 0), MAKELPARAM(0, m_TotalItemsInDrawableArea));
+			//HandleMessageForwarder(static_cast<HWND>(VerticalScrollBar.GetHandle().ToPointer()), WM_SIZE, MAKEWPARAM(0, 0), MAKELPARAM(0, m_TotalItemsInDrawableArea));
 		}
 
 		m_ComboBox->m_IsRebinding = false;
@@ -285,7 +326,7 @@ void ComboBox::ComboBoxChildNativeWindow::Draw(Graphics* const graphics, Drawing
 	HBITMAP hbmMem;
 	HBITMAP hbmOld;
 
-	auto hwnd = static_cast<HWND>(Handle.ToPointer());
+	auto hwnd = static_cast<HWND>(GetHandle().ToPointer());
 	auto hdc = static_cast<HDC>(graphics->GetHDC().ToPointer());
 
 	auto drawableArea = GetDrawableArea();

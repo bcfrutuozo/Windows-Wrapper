@@ -26,7 +26,7 @@ public:
 
 	virtual ~ToolStrip() = default;
 
-	void Initialize() override;
+	//void Initialize() override;
 
 	DockStyle GetDockStyle() const noexcept;
 	void SetDockStyle(DockStyle style) noexcept;

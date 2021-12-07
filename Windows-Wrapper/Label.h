@@ -19,7 +19,7 @@ public:
 
 	virtual ~Label();
 
-	void Initialize() override;
+	//void Initialize() override;
 	BorderStyle GetBorderStyle() const noexcept;
 	void SetBorderStyle(BorderStyle style) noexcept;
 	FlatStyle GetFlatStyle() const noexcept;

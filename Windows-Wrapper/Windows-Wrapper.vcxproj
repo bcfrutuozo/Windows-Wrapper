@@ -81,6 +81,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)\$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -91,9 +93,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <TreatWarningAsError>true</TreatWarningAsError>
+      <TreatWarningAsError>false</TreatWarningAsError>
       <AdditionalOptions>/wd4100 %(AdditionalOptions)</AdditionalOptions>
       <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
@@ -125,10 +127,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <TreatWarningAsError>false</TreatWarningAsError>
       <AdditionalOptions>/wd4100 %(AdditionalOptions)</AdditionalOptions>
       <ExceptionHandling>Async</ExceptionHandling>
+      <OmitFramePointers>false</OmitFramePointers>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -182,6 +186,7 @@
     <ClCompile Include="ListBox.cpp" />
     <ClCompile Include="ListControl.cpp" />
     <ClCompile Include="ListItem.cpp" />
+    <ClCompile Include="MDIClient.cpp" />
     <ClCompile Include="MenuStrip.cpp" />
     <ClCompile Include="Message.cpp" />
     <ClCompile Include="MessageDecoder.cpp" />
@@ -243,12 +248,16 @@
     <ClInclude Include="Bitmap.h" />
     <ClInclude Include="CancelEventArgs.h" />
     <ClInclude Include="CancelEventHandler.h" />
+    <ClInclude Include="ChartDashStyle.h" />
     <ClInclude Include="ComboBox.h" />
     <ClInclude Include="Appheaders.h" />
     <ClInclude Include="ArithmeticException.h" />
+    <ClInclude Include="ComboBoxStyle.h" />
+    <ClInclude Include="ControlStyles.h" />
     <ClInclude Include="CreateParams.h" />
     <ClInclude Include="Direct2D.h" />
     <ClInclude Include="DivideByZeroException.h" />
+    <ClInclude Include="DrawMode.h" />
     <ClInclude Include="Encoder.h" />
     <ClInclude Include="EncoderParameter.h" />
     <ClInclude Include="Exceptions.h" />
@@ -263,8 +272,16 @@
     <ClInclude Include="FlatButtonAppearance.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="ArgumentException.h" />
+    <ClInclude Include="FontStyle.h" />
+    <ClInclude Include="FormBorderStyle.h" />
+    <ClInclude Include="FormStartPosition.h" />
+    <ClInclude Include="FormWindowState.h" />
     <ClInclude Include="GDI.h" />
+    <ClInclude Include="GenericFontFamilies.h" />
     <ClInclude Include="Graphics.h" />
+    <ClInclude Include="GraphicsType.h" />
+    <ClInclude Include="GraphicsUnit.h" />
+    <ClInclude Include="HorizontalAlignment.h" />
     <ClInclude Include="HorizontalScrollBar.h" />
     <ClInclude Include="IComparable.h" />
     <ClInclude Include="IComponent.h" />
@@ -277,6 +294,7 @@
     <ClInclude Include="InvalidOperationException.h" />
     <ClInclude Include="IOException.h" />
     <ClInclude Include="ISite.h" />
+    <ClInclude Include="IWindowTarget.h" />
     <ClInclude Include="Keys.h" />
     <ClInclude Include="Label.h" />
     <ClInclude Include="ListBox.h" />
@@ -285,6 +303,8 @@
     <ClInclude Include="ListControlConvertEventHandler.h" />
     <ClInclude Include="ListItem.h" />
     <ClInclude Include="Map.h" />
+    <ClInclude Include="MDIClient.h" />
+    <ClInclude Include="MDILayout.h" />
     <ClInclude Include="MenuStrip.h" />
     <ClInclude Include="Message.h" />
     <ClInclude Include="NotImplementedException.h" />
@@ -324,7 +344,7 @@
     <ClInclude Include="Graphics3d.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="IEquatable.h" />
-    <ClInclude Include="IHandle.h" />
+    <ClInclude Include="IWin32Window.h" />
     <ClInclude Include="IntPtr.h" />
     <ClInclude Include="TestUserApplication.h" />
     <ClInclude Include="Utilities.h" />

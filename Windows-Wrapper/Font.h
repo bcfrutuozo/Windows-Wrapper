@@ -1,35 +1,10 @@
 #pragma once
 
 #include "Object.h"
+#include "FontStyle.h"
+#include "GraphicsUnit.h"
 
 #include <string>
-
-enum class GenericFontFamilies
-{
-	Serif = 0,
-	SansSerif = 1,
-	Monospace = 2
-};
-
-enum class FontStyle
-{
-	Regular = 0,
-	Bold = 1,
-	Italic = 2,
-	Underline = 4,
-	Strikeout = 8
-};
-
-enum class GraphicsUnit
-{
-	World = 0,
-	Display = 1,
-	Pixel = 2,
-	Point = 3,
-	Inch = 4,
-	Document = 5,
-	Millimeter = 6
-};
 
 class Font final: public Object
 {

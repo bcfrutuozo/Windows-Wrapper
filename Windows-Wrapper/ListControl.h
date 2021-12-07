@@ -44,7 +44,7 @@ public:
 	void OnSelectedValueChangedSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept;
 	void OnValueMemberChangedSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept;
 
-	void Initialize() override;
+	//void Initialize() override;
 	bool IsSelectionAllowed();
 	void EnableSelection() noexcept;
 	void DisableSelection() noexcept;

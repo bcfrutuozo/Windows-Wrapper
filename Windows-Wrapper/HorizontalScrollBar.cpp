@@ -4,7 +4,7 @@
 
 void HorizontalScrollBar::OnHorizontalScrolling_Impl(HWND hwnd, HWND hwndCtl, unsigned int code, int pos)
 {
-	if (GetFocus() != static_cast<HWND>(Parent->Handle.ToPointer())) SetFocus(static_cast<HWND>(Parent->Handle.ToPointer()));
+	if (GetFocus() != static_cast<HWND>(Parent->GetHandle().ToPointer())) SetFocus(static_cast<HWND>(Parent->GetHandle().ToPointer()));
 
 	int nPos;
 	int nOldPos;
@@ -46,8 +46,8 @@ void HorizontalScrollBar::OnHorizontalScrolling_Impl(HWND hwnd, HWND hwndCtl, un
 	RECT rc;
 	GetClientRect(hwnd, &rc);
 
-	InvalidateRect(static_cast<HWND>(Owner->Handle.ToPointer()), &rc, false);
-	NativeWindow::OnHorizontalScrolling_Impl(hwnd, hwndCtl, code, pos);
+	InvalidateRect(static_cast<HWND>(Owner->GetHandle().ToPointer()), &rc, false);
+	Control::OnHorizontalScrolling_Impl(hwnd, hwndCtl, code, pos);
 }
 
 void HorizontalScrollBar::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy)
@@ -68,7 +68,7 @@ void HorizontalScrollBar::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int
 		SetScrollInfo(hwnd, SB_HORZ, &si, true);
 	}
 
-	NativeWindow::OnSize_Impl(hwnd, state, cx, cy);
+	Control::OnSize_Impl(hwnd, state, cx, cy);
 }
 
 HorizontalScrollBar::HorizontalScrollBar(ScrollableControl* parent, int width, int height, int x, int y)

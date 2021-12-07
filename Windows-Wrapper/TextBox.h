@@ -54,7 +54,7 @@ private:
 	void OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus) noexcept override;
 	void OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus) noexcept override;
 
-	void CopyToClipboard() const noexcept;
+	void CopyToClipboard() noexcept;
 	void PasteFromClipboard() noexcept;
 	void EnableCaret() noexcept;
 	void DisableCaret() noexcept;
@@ -72,7 +72,7 @@ public:
 
 	size_t GetSelectionLenght() const noexcept;
 	std::string GetSelectedText() const noexcept;
-	void Initialize() override;
+	//void Initialize() override;
 
 	HorizontalAlignment GetTextAlign() const noexcept;
 	void SetTextAlign(HorizontalAlignment alignment) noexcept;

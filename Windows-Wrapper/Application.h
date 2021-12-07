@@ -2,6 +2,7 @@
 
 #include "Object.h"
 #include "Appheaders.h"
+#include "GraphicsType.h"
 
 #include <list>
 
@@ -9,6 +10,7 @@ class Application : public Object
 {
 	friend class Window;
 	friend class NativeWindow;
+	friend class Control;
 
 private:
 
