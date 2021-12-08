@@ -1,56 +1,56 @@
-#pragma once
-
-#include "ListControl.h"
-#include "ComboBoxStyle.h"
-#include "DrawMode.h"
-#include "VerticalScrollBar.h"
-
-class ComboBox : public ListControl
-{
-	friend class Control;
-
-private:
-
-	class ComboBoxChildNativeWindow : public ScrollableControl
-	{
-	public:
-
-		ComboBox* m_ComboBox;
-		std::vector<Drawing::Rectangle> m_RowPosition;
-		size_t m_TotalItemsInDrawableArea;
-		size_t m_RowNumber;
-		size_t m_MouseOverIndex;
-
-		void PreDraw(Graphics* const graphics) override;
-		void Draw(Graphics* const graphics, Drawing::Rectangle rectangle) override;
-		void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) override;
-		void OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) override;
-		void OnMouseLeftUp_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) override;
-		void OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) override;
-
-		ComboBoxChildNativeWindow(Control* parent, ComboBox* comboBox, int width, int height, int x, int y);
-		virtual ~ComboBoxChildNativeWindow();
-
-		//void Initialize() override;
-		size_t GetMouseOverIndex() const noexcept;
-	};
-
-	bool m_IntegralHeight;
-	ComboBoxStyle m_DropDownStyle;
-	DrawMode m_DrawMode;
-	ComboBoxChildNativeWindow* m_ChildWindow;
-	FlatStyle m_FlatStyle;
-
-	void Draw(Graphics* const graphics, Drawing::Rectangle rectangle) override;
-	void OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) override;
-	CreateParams* CreateParameters() override;
-
-	ComboBox(Control* parent, const std::string& name, int width, int x, int y);
-
-public:
-
-	virtual ~ComboBox();
-
-	void SetSelectedIndex(int index, bool value) override;
-	void SetSelectedValue(const ListItem& item) override;
-};
+//#pragma once
+//
+//#include "ListControl.h"
+//#include "ComboBoxStyle.h"
+//#include "DrawMode.h"
+//#include "VerticalScrollBar.h"
+//
+//class ComboBox : public ListControl
+//{
+//	friend class Control;
+//
+//private:
+//
+//	class ComboBoxChildNativeWindow : public ScrollableControl
+//	{
+//	public:
+//
+//		ComboBox* m_ComboBox;
+//		std::vector<Drawing::Rectangle> m_RowPosition;
+//		size_t m_TotalItemsInDrawableArea;
+//		size_t m_RowNumber;
+//		size_t m_MouseOverIndex;
+//
+//		void PreDraw(Graphics* const graphics) override;
+//		void Draw(Graphics* const graphics, Drawing::Rectangle rectangle) override;
+//		void OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned int flags) override;
+//		void OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) override;
+//		void OnMouseLeftUp_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) override;
+//		void OnMouseMove_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) override;
+//
+//		ComboBoxChildNativeWindow(Control* parent, ComboBox* comboBox, int width, int height, int x, int y);
+//		virtual ~ComboBoxChildNativeWindow();
+//
+//		//void Initialize() override;
+//		size_t GetMouseOverIndex() const noexcept;
+//	};
+//
+//	bool m_IntegralHeight;
+//	ComboBoxStyle m_DropDownStyle;
+//	DrawMode m_DrawMode;
+//	ComboBoxChildNativeWindow* m_ChildWindow;
+//	FlatStyle m_FlatStyle;
+//
+//	void Draw(Graphics* const graphics, Drawing::Rectangle rectangle) override;
+//	void OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlags) override;
+//	CreateParams* CreateParameters() override;
+//
+//	ComboBox(Control* parent, const std::string& name, int width, int x, int y);
+//
+//public:
+//
+//	virtual ~ComboBox();
+//
+//	void SetSelectedIndex(int index, bool value) override;
+//	void SetSelectedValue(const ListItem& item) override;
+//};

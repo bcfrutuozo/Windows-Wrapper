@@ -8,6 +8,7 @@
 #include "Window.h"
 #include "IntPtr.h"
 #include "Application.h"
+#include "Type.h"
 
 // Linker for ::_TrackMouseEvent function (NativeWindow.cpp usage)
 #pragma comment(lib, "comctl32.lib")

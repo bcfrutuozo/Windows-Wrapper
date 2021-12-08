@@ -2,6 +2,7 @@
 
 #include "NativeWindow.h"
 #include "Application.h"
+#include "Type.h"
 
 #include <sstream>
 

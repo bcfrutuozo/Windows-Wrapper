@@ -239,6 +239,15 @@
     <ClCompile Include="MDIClient.cpp">
       <Filter>Controls\Base</Filter>
     </ClCompile>
+    <ClCompile Include="ScrollProperties.cpp">
+      <Filter>Controls\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="HScrollProperties.cpp">
+      <Filter>Controls\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="VScrollProperties.cpp">
+      <Filter>Controls\Base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dxerr.h" />
@@ -646,6 +655,15 @@
     </ClInclude>
     <ClInclude Include="ControlStyles.h">
       <Filter>Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="ScrollProperties.h">
+      <Filter>Controls\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="HScrollProperties.h">
+      <Filter>Controls\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="VScrollProperties.h">
+      <Filter>Controls\Base</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

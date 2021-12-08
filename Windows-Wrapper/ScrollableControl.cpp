@@ -2,21 +2,22 @@
 #include "ScrollBar.h"
 #include "Exceptions.h"
 
-void ScrollableControl::SetMinimumItemWidth(const int& weight) noexcept
+void ScrollableControl::UpdateFullDrag()
 {
-	m_MinimumItemWidth = weight;
+	SetScrollState(ScrollStateFullDrag, SystemParametersInfo(SPI_GETDRAGFULLWINDOWS, 0, nullptr, 0));
 }
 
 ScrollableControl::ScrollableControl(Control* parent, const std::string& name, int width, int height, int x, int y)
 	:
 	Control(parent, name, width, height, x, y),
-	HorizontalScrollBar(this, GetSize().Width - m_Margin.Left - m_Margin.Right, GetSystemMetrics(SM_CYHSCROLL) + 1, m_Margin.Left, GetSize().Height - (GetSystemMetrics(SM_CYHSCROLL) + 1) - m_Margin.Bottom),
-	VerticalScrollBar(this, GetSystemMetrics(SM_CXVSCROLL), GetSize().Height - m_Margin.Top - m_Margin.Bottom, GetSize().Width - GetSystemMetrics(SM_CXVSCROLL) - m_Margin.Right, m_Margin.Top),
-	m_ItemWidth(0),
-	m_ItemHeight(0),
-	m_IsHorizontalScrollEnabled(false),
-	m_IsVerticalScrollEnabled(false),
-	m_MinimumItemWidth(0)
+	m_UserAutoScrollMinSize(Size::Empty()),
+	m_DisplayRectangle(Drawing::Rectangle::Empty()),
+	m_ScrollMargin(Size::Empty()),
+	m_RequestedScrollMargin(Size::Empty()),
+	m_ScrollPosition(Point::Empty()),
+	HorizontalScroll(this),
+	VerticalScroll(this),
+	m_ScrollState(0)
 {
 
 }
@@ -26,79 +27,62 @@ ScrollableControl::~ScrollableControl()
 
 }
 
-bool ScrollableControl::IsHorizontalScrollEnabled() const noexcept
+Drawing::Rectangle ScrollableControl::GetDisplayRectangle()
 {
-	return HorizontalScrollBar.IsShown();
-}
-
-void ScrollableControl::EnableHorizontalScroll() noexcept
-{
-	if (!IsHorizontalScrollEnabled())
+	auto rect = GetClientRectangle();
+	if(!m_DisplayRectangle.IsEmpty())
 	{
-		HorizontalScrollBar.Show();
+		rect.Left = m_DisplayRectangle.Left;
+		rect.Top = m_DisplayRectangle.Top;
+
+		if(GetHScroll()) rect.Right = m_DisplayRectangle.Right;
+		if(GetVScroll()) rect.Bottom = m_DisplayRectangle.Bottom;
 	}
+	//rect.Deflate()
+
+	return rect;
 }
 
-void ScrollableControl::DisableHorizontalScroll() noexcept
+bool ScrollableControl::GetScrollState(int bit) const noexcept
 {
-	if (IsHorizontalScrollEnabled())
-	{
-		HorizontalScrollBar.Hide();
-	}
+	return (bit & m_ScrollState) == bit;
 }
 
-bool ScrollableControl::IsVerticalScrollEnabled() const noexcept
+void ScrollableControl::SetScrollState(int bit, bool value)
 {
-	return VerticalScrollBar.IsShown();
+	if(value) m_ScrollState |= bit;
+	else m_ScrollState &= (~bit);
 }
 
-void ScrollableControl::EnableVerticalScroll() noexcept
+bool ScrollableControl::GetHScroll() const noexcept
 {
-	if (!VerticalScrollBar.IsShown())
-	{
-		VerticalScrollBar.Show();
-	}
+	return GetScrollState(ScrollStateHScrollVisible);
 }
 
-void ScrollableControl::DisableVerticalScroll() noexcept
+void ScrollableControl::SetHScroll(bool value)
 {
-	if (VerticalScrollBar.IsShown())
-	{
-		VerticalScrollBar.Hide();
-	}
+	SetScrollState(ScrollStateHScrollVisible, value);
 }
 
-int ScrollableControl::GetItemWidth() const noexcept
+bool ScrollableControl::GetVScroll() const noexcept
 {
-	return m_ItemWidth;
+	return GetScrollState(ScrollStateVScrollVisible);
 }
 
-void ScrollableControl::SetItemWidth(int width)
+void ScrollableControl::SetVScroll(bool value)
 {
-	if (width < m_MinimumItemWidth)
-	{
-		throw ArgumentException("Desired width for each column is smaller than a single character.");
-	}
-
-	m_ItemWidth = width;
+	SetScrollState(ScrollStateVScrollVisible, value);
 }
 
-int ScrollableControl::GetItemHeight() const noexcept
+bool ScrollableControl::HasAutoScroll()
 {
-	return m_ItemHeight;
+	return GetScrollState(ScrollStateAutoScrolling);
 }
 
-void ScrollableControl::SetItemHeight(int height) noexcept
+void ScrollableControl::SetAutoScroll(bool value)
 {
-	m_ItemHeight = height;
+	if(value) UpdateFullDrag();
+
+	SetScrollState(ScrollStateAutoScrolling, true);
 }
 
-int ScrollableControl::GetHorizontalPage() const noexcept
-{
-	return GetSize().Width / GetItemWidth();
-}
-
-int ScrollableControl::GetVerticalPage() const noexcept
-{
-	return GetSize().Height / GetItemHeight();
-}

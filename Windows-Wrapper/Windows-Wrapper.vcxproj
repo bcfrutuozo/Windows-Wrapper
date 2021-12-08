@@ -178,6 +178,7 @@
     <ClCompile Include="GDI.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="HorizontalScrollBar.cpp" />
+    <ClCompile Include="HScrollProperties.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="InvalidCastException.cpp" />
     <ClCompile Include="InvalidOperationException.cpp" />
@@ -199,6 +200,7 @@
     <ClCompile Include="RectangleF.cpp" />
     <ClCompile Include="ScrollableControl.cpp" />
     <ClCompile Include="ScrollBar.cpp" />
+    <ClCompile Include="ScrollProperties.cpp" />
     <ClCompile Include="SHA1.cpp" />
     <ClCompile Include="Site.cpp" />
     <ClCompile Include="SizeF.cpp" />
@@ -237,6 +239,7 @@
     <ClCompile Include="Type.cpp" />
     <ClCompile Include="Utilities.cpp" />
     <ClCompile Include="VerticalScrollBar.cpp" />
+    <ClCompile Include="VScrollProperties.cpp" />
     <ClCompile Include="Win32Exception.cpp" />
     <ClCompile Include="NativeWindow.cpp" />
     <ClCompile Include="Window.cpp" />
@@ -283,6 +286,7 @@
     <ClInclude Include="GraphicsUnit.h" />
     <ClInclude Include="HorizontalAlignment.h" />
     <ClInclude Include="HorizontalScrollBar.h" />
+    <ClInclude Include="HScrollProperties.h" />
     <ClInclude Include="IComparable.h" />
     <ClInclude Include="IComponent.h" />
     <ClInclude Include="IContainer.h" />
@@ -318,6 +322,7 @@
     <ClInclude Include="RectangleF.h" />
     <ClInclude Include="ScrollableControl.h" />
     <ClInclude Include="ScrollBar.h" />
+    <ClInclude Include="ScrollProperties.h" />
     <ClInclude Include="SHA1.h" />
     <ClInclude Include="Site.h" />
     <ClInclude Include="SizeF.h" />
@@ -349,6 +354,7 @@
     <ClInclude Include="TestUserApplication.h" />
     <ClInclude Include="Utilities.h" />
     <ClInclude Include="VerticalScrollBar.h" />
+    <ClInclude Include="VScrollProperties.h" />
     <ClInclude Include="Win32Exception.h" />
     <ClInclude Include="NativeWindow.h" />
     <ClInclude Include="Keyboard.h" />
