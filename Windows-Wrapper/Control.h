@@ -19,7 +19,9 @@
 #include "ControlException.h"
 #include "Rectangle.h"
 #include "IWindowTarget.h"
+#include "LayoutEventArgs.h"
 #include "ControlStyles.h"
+#include "RightToLeft.h"
 
 #include <list>
 #include <memory>
@@ -29,6 +31,7 @@ class Window;
 
 class Control : public Component
 {
+	friend class ScrollableControl;
 	friend class Window;
 	friend class Button;
 	friend class ToolStrip;
@@ -64,8 +67,15 @@ private:
 		constexpr void SetWindowTarget(IWindowTarget* const value) noexcept { m_Target = value; }
 	};
 
+	int m_X;
+	int m_Y;
+	int m_Width;
+	int m_Height;
+	int m_ClientWidth;
+	int m_ClientHeight;
 	ControlNativeWindow* m_Window;
 	CreateParams* m_CreateParams;
+	RightToLeft m_RightToLeft;
 
 	int m_State;
 	static constexpr int STATE_CREATED = 0x00000001;
@@ -102,7 +112,10 @@ private:
 
 	ControlStyles m_ControlStyle;
 
+	bool GetAnyDisposingInHierarchy() const noexcept;
 	void SetHandle(IntPtr value);
+	void PerformLayout(LayoutEventArgs args);
+	RightToLeft GetDefaultRightToLeft() const noexcept;
 
 protected:
 
@@ -240,9 +253,13 @@ protected:
 	virtual void OnShowWindow_Impl(HWND hwnd, bool fShow, unsigned int status);
 	virtual void OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, UINT code, int pos);
 
+	bool GetTopLevel() const noexcept;
 	unsigned int GetId() const noexcept;
 	void SetMouseOverState(bool state) noexcept;
 	void SetClickingState(bool state) noexcept;
+	void UpdateBounds();
+	void UpdateBounds(int x, int y, int width, int height);
+	void UpdateBounds(int x, int y, int width, int height, int clientWidth, int clientHeight);
 
 	IntPtr SendControlMessage(int msg, int wparam, int lparam);
 	IntPtr SendControlMessage(int msg, int& wparam, int& lparam);
@@ -340,6 +357,10 @@ public:
 	void SetBackgroundColor(const Color& color) noexcept;
 	Color GetForeColor() const noexcept;
 	void SetForeColor(const Color& color) noexcept;
+	void PerformLayout();
+	void PerformLayout(Control* const affectedControl, const std::string& affectedProperty);
+	bool IsMirrored();
+	virtual RightToLeft IsRightToLeft();
 
 	// MOUSEENTER Event Handling
 	void ResetMouseEventArgs();

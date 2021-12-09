@@ -665,6 +665,21 @@
     <ClInclude Include="VScrollProperties.h">
       <Filter>Controls\Base</Filter>
     </ClInclude>
+    <ClInclude Include="LayoutEventArgs.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="ScrollOrientation.h">
+      <Filter>Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="ScrollEventType.h">
+      <Filter>Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="ScrollEventArgs.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="RightToLeft.h">
+      <Filter>Enums</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interfaces">

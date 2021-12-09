@@ -6,6 +6,8 @@ class ScrollableControl;
 
 class ScrollProperties : public Object
 {
+	friend class ScrollableControl;
+
 private:
 
 	int m_Minimum;
@@ -16,7 +18,6 @@ private:
 	bool m_MaximumSetExternally;
 	bool m_SmallChangeSetExternally;
 	bool m_LargeChangeSetExternally;
-
 
 	ScrollableControl* m_ParentControl;
 	bool m_IsVisible;

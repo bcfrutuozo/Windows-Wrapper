@@ -23,7 +23,7 @@ Control::ControlNativeWindow::ControlNativeWindow(Control* control)
 	m_Control(control),
 	m_Target(this)
 {
-	
+
 }
 
 void Control::OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus)
@@ -183,12 +183,43 @@ void Control::Dispose()
 	if(m_Graphics != nullptr) m_Graphics->Dispose();
 }
 
+bool Control::GetAnyDisposingInHierarchy() const noexcept
+{
+	const Control* up = this;
+	bool isDisposing = false;
+
+	while(up != nullptr)
+	{
+		if(up->Disposing)
+		{
+			isDisposing = true;
+			break;
+		}
+
+		up = up->Parent;
+	}
+
+	return isDisposing;
+}
+
 void Control::SetHandle(IntPtr value)
 {
 	if(value == IntPtr::Zero())
 	{
 		SetState(STATE_CREATED, false);
 	}
+}
+
+void Control::PerformLayout(LayoutEventArgs args)
+{
+	if(GetAnyDisposingInHierarchy()) return;
+
+
+}
+
+RightToLeft Control::GetDefaultRightToLeft() const noexcept
+{
+	return RightToLeft::No;
 }
 
 Control::Control() noexcept
@@ -1050,6 +1081,37 @@ void Control::SetForeColor(const Color& color) noexcept
 	Update();
 }
 
+void Control::PerformLayout()
+{
+	PerformLayout(nullptr, "");
+}
+
+void Control::PerformLayout(Control* const affectedControl, const std::string& affectedProperty)
+{
+	PerformLayout(LayoutEventArgs(affectedControl, affectedProperty));
+}
+
+bool Control::IsMirrored()
+{
+	if(!IsHandleCreated())
+	{
+		CreateParams* cp = CreateParameters();
+		SetState(STATE_MIRRORED, (cp->ExStyle & WS_EX_LAYOUTRTL) != 0);
+	}
+
+	return GetState(STATE_MIRRORED);
+}
+
+RightToLeft Control::IsRightToLeft()
+{
+	if(m_RightToLeft == RightToLeft::Inherit)
+	{
+		Control* parent = Parent;
+		if(parent != nullptr) return parent->IsRightToLeft();
+		else return GetDefaultRightToLeft();
+	}
+}
+
 void Control::ResetMouseEventArgs()
 {
 	if(GetState(STATE_TRACKINGMOUSEEVENT))
@@ -1057,6 +1119,11 @@ void Control::ResetMouseEventArgs()
 		UnhookMouseEvent();
 		HookMouseEvent();
 	}
+}
+
+bool Control::GetTopLevel() const noexcept
+{
+	return (m_State & STATE_TOPLEVEL) != 0;
 }
 
 unsigned int Control::GetId() const noexcept
@@ -1072,6 +1139,53 @@ void Control::SetMouseOverState(bool state) noexcept
 void Control::SetClickingState(bool state) noexcept
 {
 	m_IsClicking = state;
+}
+
+void Control::UpdateBounds()
+{
+	RECT rect;
+	GetClientRect(GetHandle(), &rect);
+	int clientWidth = rect.right;
+	int clientHeight = rect.bottom;
+
+	GetWindowRect(GetHandle(), &rect);
+
+	if(!GetTopLevel()) MapWindowPoints(nullptr, GetParent(GetHandle()), (LPPOINT)(&rect), 2);
+
+	UpdateBounds(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, clientWidth, clientHeight);
+}
+
+void Control::UpdateBounds(int x, int y, int width, int height)
+{
+	assert(!IsHandleCreated(), "Don't call this function when handle is created!");
+
+	RECT rect = { 0 };
+	CreateParams* cp = CreateParameters();
+
+	AdjustWindowRectEx(&rect, cp->Style, false, cp->ExStyle);
+	int clientWidth = width - (rect.right - rect.left);
+	int clientHeight = height - (rect.bottom - rect.top);
+	UpdateBounds(x, y, width, height, clientWidth, clientHeight);
+}
+
+void Control::UpdateBounds(int x, int y, int width, int height, int clientWidth, int clientHeight)
+{
+	bool newLocation = m_X != x || m_Y != y;
+	bool newSize = m_Width != width || m_Height != height || m_ClientWidth != clientWidth || m_ClientHeight != clientHeight;
+
+	m_X = x;
+	m_Y = y;
+	m_Width = width;
+	m_Height = height;
+	m_ClientWidth = clientWidth;
+	m_ClientHeight = clientHeight;
+
+	if(newLocation) Dispatch("OnLocationChanged", &ArgsDefault);
+	if(newSize)
+	{
+		Dispatch("OnSizeChanged", &ArgsDefault);
+		Dispatch("OnClientSizeChanged", &ArgsDefault);
+	}
 }
 
 // Default PreDraw function which is used to recalculate elements according to DataSource, number of elements, etc...

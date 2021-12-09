@@ -5,11 +5,13 @@
 #include "VScrollProperties.h"
 #include "Point.h"
 #include "Size.h"
+#include "ScrollOrientation.h"
 
 class ScrollableControl : public Control
 {
 	friend class HScrollProperties;
 	friend class VScrollProperties;
+
 private:
 
 	Size m_UserAutoScrollMinSize;
@@ -18,11 +20,22 @@ private:
 	Size m_RequestedScrollMargin;
 	Point m_ScrollPosition;
 	int m_ScrollState;
+	bool m_ResetRTLHScrollValue;
 
 	HScrollProperties HorizontalScroll;
 	VScrollProperties VerticalScroll;
 
+	int ScrollThumbPosition(int fnBar);
 	void UpdateFullDrag();
+	void SyncScrollbars(bool hasAutoScroll);
+	void ResetScrollProperties(ScrollProperties* const scrollProperties);
+
+	void WmVScroll(Message& m);
+	void WmHScroll(Message& m);
+	void WmOnScroll(Message& m, int oldValue, int value, ScrollOrientation scrollOrientation);
+	void WmSettingChange(Message& m);
+
+	void OnSetScrollPosition(Object* const sender, EventArgs* const e);
 
 protected:
 
@@ -45,8 +58,13 @@ protected:
 	bool GetVScroll() const noexcept;
 	void SetVScroll(bool value);
 
+	void SetDisplayRectLocation(int x, int y);
+
+	void WndProc(Message& m) override;
+
 public:
 
 	virtual bool HasAutoScroll();
 	virtual void SetAutoScroll(bool value);
+	void SetAutoScrollMargin(int x, int y);
 };

@@ -301,6 +301,7 @@
     <ClInclude Include="IWindowTarget.h" />
     <ClInclude Include="Keys.h" />
     <ClInclude Include="Label.h" />
+    <ClInclude Include="LayoutEventArgs.h" />
     <ClInclude Include="ListBox.h" />
     <ClInclude Include="ListControl.h" />
     <ClInclude Include="ListControlConvertEventArgs.h" />
@@ -320,8 +321,12 @@
     <ClInclude Include="PointF.h" />
     <ClInclude Include="Rectangle.h" />
     <ClInclude Include="RectangleF.h" />
+    <ClInclude Include="RightToLeft.h" />
     <ClInclude Include="ScrollableControl.h" />
     <ClInclude Include="ScrollBar.h" />
+    <ClInclude Include="ScrollEventArgs.h" />
+    <ClInclude Include="ScrollEventType.h" />
+    <ClInclude Include="ScrollOrientation.h" />
     <ClInclude Include="ScrollProperties.h" />
     <ClInclude Include="SHA1.h" />
     <ClInclude Include="Site.h" />
