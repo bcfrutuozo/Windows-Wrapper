@@ -248,6 +248,33 @@
     <ClCompile Include="VScrollProperties.cpp">
       <Filter>Controls\Base</Filter>
     </ClCompile>
+    <ClCompile Include="DockPaddingEdges.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
+    <ClCompile Include="PowerStatus.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemInformation.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
+    <ClCompile Include="FormatException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="Version.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
+    <ClCompile Include="OperatingSystem.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
+    <ClCompile Include="Environment.cpp">
+      <Filter>Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="ContainerControl.cpp">
+      <Filter>Controls\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="CommonProperties.cpp">
+      <Filter>Helpers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dxerr.h" />
@@ -679,6 +706,72 @@
     </ClInclude>
     <ClInclude Include="RightToLeft.h">
       <Filter>Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="DockPaddingEdges.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="LayoutUtils.h">
+      <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="PowerStatus.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemInformation.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="UserPreferenceCategory.h">
+      <Filter>Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="UserPreferenceChangedEventArgs.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Environment.h">
+      <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="PlatformID.h">
+      <Filter>Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="FormatException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Version.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="OperatingSystem.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="ContainerControl.h">
+      <Filter>Controls\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="IContainerControl.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="AutoValidate.h">
+      <Filter>Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="AutoScaleMode.h">
+      <Filter>Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonProperties.h">
+      <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="ContentAlignment.h">
+      <Filter>Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="AnchorStyles.h">
+      <Filter>Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="DockStyle.h">
+      <Filter>Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="BoundsSpecified.h">
+      <Filter>Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="IArrangedElement.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="InvalidateEventArgs.h">
+      <Filter>Events</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -182,8 +182,8 @@ void Window::FillInCreateParamsStartPosition(CreateParams* cp)
 				//if, we're maximized, then don't set the x & y coordinates (they're @ (0,0) )
 				if(m_FormWindowState != FormWindowState::Maximized)
 				{
-					cp->X = (std::max)(screenRect.Left, screenRect.Left + (screenRect.Right - cp->Width) / 2);
-					cp->Y = (std::max)(screenRect.Top, screenRect.Top + (screenRect.Bottom - cp->Height) / 2);
+					cp->X = (std::max)(screenRect.X, screenRect.X + (screenRect.Width - cp->Width) / 2);
+					cp->Y = (std::max)(screenRect.Y, screenRect.Y + (screenRect.Height - cp->Height) / 2);
 				}
 			}
 			break;

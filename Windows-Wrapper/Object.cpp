@@ -9,7 +9,7 @@
 bool Object::Equals(const Object* const b) const
 {
 	if (b == nullptr) return false;
-	return ReferenceEquals(*b);
+	return ReferenceEquals(this, b);
 }
 
 int Object::GetHashCode() const

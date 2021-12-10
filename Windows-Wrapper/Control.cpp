@@ -9,6 +9,10 @@
 #include "IntPtr.h"
 #include "Application.h"
 #include "Type.h"
+#include "LayoutUtils.h"
+#include "BoundsSpecified.h"
+#include "IContainerControl.h"
+#include "InvalidateEventArgs.h"
 
 // Linker for ::_TrackMouseEvent function (NativeWindow.cpp usage)
 #pragma comment(lib, "comctl32.lib")
@@ -183,14 +187,14 @@ void Control::Dispose()
 	if(m_Graphics != nullptr) m_Graphics->Dispose();
 }
 
-bool Control::GetAnyDisposingInHierarchy() const noexcept
+bool Control::GetAnyDisposingInHierarchy() noexcept
 {
-	const Control* up = this;
+	Control* up = this;
 	bool isDisposing = false;
 
 	while(up != nullptr)
 	{
-		if(up->Disposing)
+		if(up->IsDisposing())
 		{
 			isDisposing = true;
 			break;
@@ -217,21 +221,134 @@ void Control::PerformLayout(LayoutEventArgs args)
 
 }
 
-RightToLeft Control::GetDefaultRightToLeft() const noexcept
+void Control::InitScaling(BoundsSpecified specified)
 {
-	return RightToLeft::No;
+	m_RequiredScaling != (unsigned char)((int)specified & RequiredScalingMask);
+}
+
+bool Control::IsFocusManagingContainerControl(Control* const ctl)
+{
+	return ((ctl->m_ControlStyle & ControlStyles::ContainerControl) == ControlStyles::ContainerControl && (IContainerControl*)ctl);
+}
+
+void Control::OnParentInvalidated(InvalidateEventArgs* const e)
+{
+	if(!RenderTransparent()) return;
+
+	if(IsHandleCreated())
+	{
+		Drawing::Rectangle clipRect = e->InvalidRect;
+		Point offs = GetLocation();
+		clipRect.Offset(-offs.X, -offs.Y);
+		clipRect = Drawing::Rectangle::Intersect(GetClientRectangle(), clipRect);
+
+		if(clipRect.IsEmpty()) return;
+
+		Invalidate(clipRect);
+	}
 }
 
 Control::Control() noexcept
 	:
-	Control(nullptr, "")
+	m_Padding(0),
+	m_TabIndex(m_IncrementalTabIndex++),
+	m_IsTabSelected(false),
+	m_IsTabStop(true),
+	m_MinSize(0u),
+	OnActivate(nullptr),
+	OnClick(nullptr),
+	OnDeactivate(nullptr),
+	OnGotFocus(nullptr),
+	OnLostFocus(nullptr),
+	OnKeyDown(nullptr),
+	OnKeyPress(nullptr),
+	OnKeyUp(nullptr),
+	OnMouseClick(nullptr),
+	OnMouseDown(nullptr),
+	OnMouseEnter(nullptr),
+	OnMouseHover(nullptr),
+	OnMouseLeave(nullptr),
+	OnMouseLeftDoubleClick(nullptr),
+	OnMouseMove(nullptr),
+	OnMouseRightDoubleClick(nullptr),
+	OnMouseUp(nullptr),
+	OnMouseWheel(nullptr),
+	OnVisibleChanged(nullptr),
+	OnPaint(nullptr),
+	m_Margin(3, 3, 3, 3),
+	m_Font("Segoe UI", 9, false, false, false, false, GraphicsUnit::Point),
+	ArgsOnClosing(CloseReason::None, false),
+	ArgsOnClosed(CloseReason::None),
+	ArgsOnKeyDown(Keys::None),
+	ArgsOnKeyPressed('0'),
+	ArgsOnKeyUp(Keys::None),
+	ArgsOnMouseMove(MouseButtons::None, 0, 0, 0, 0),
+	ArgsOnMouseDown(MouseButtons::None, 0, 0, 0, 0),
+	ArgsOnMouseClick(MouseButtons::None, 0, 0, 0, 0),
+	ArgsOnMouseUp(MouseButtons::None, 0, 0, 0, 0),
+	ArgsOnMouseDoubleClick(MouseButtons::None, 0, 0, 0, 0),
+	ArgsOnMouseWheel(MouseButtons::None, 0, 0, 0, 0),
+	m_State(0),
+	m_CreateParams(nullptr),
+	m_MinimumSize(0, 0),
+	m_MaximumSize(0, 0),
+	m_Location(0, 0),
+	Parent(nullptr)
 {
+	m_Window = new ControlNativeWindow(this);
+	m_State = STATE_VISIBLE | STATE_ENABLED | STATE_TABSTOP | STATE_CAUSESVALIDATION;
+	SetStyle(ControlStyles::AllPaintingInWmPaint |
+			 ControlStyles::UserPaint |
+			 ControlStyles::StandardClick |
+			 ControlStyles::StandardDoubleClick |
+			 ControlStyles::UseTextForAccessibility |
+			 ControlStyles::Selectable, true);
 
+	if(DefaultMargin() != CommonProperties::DefaultMargin) SetMargin(DefaultMargin());
+	if(DefaultMinimumSize() != CommonProperties::DefaultMinimumSize) SetMinimumSize(DefaultMinimumSize());
+	if(DefaultMaximumSize() != CommonProperties::DefaultMaximumSize) SetMaximumSize(DefaultMaximumSize());
+
+	Size defaultsSize = DefaultSize();
+	m_Width = defaultsSize.Width;
+	m_Height = defaultsSize.Height;
+
+	if(m_Width != 0 && m_Height != 0)
+	{
+		RECT rect = { 0 };
+
+		CreateParams* cp = CreateParameters();
+		AdjustWindowRectEx(&rect, cp->Style, false, cp->ExStyle);
+		m_ClientWidth = m_Width - (rect.right - rect.left);
+		m_ClientHeight = m_Height - (rect.bottom - rect.top);
+	}
 }
 
 Control::Control(Control* parent, const std::string& text) noexcept
 	:
-	Control(parent, text, 0, 0, 0, 0)
+	Control()
+{
+	Parent = parent;
+}
+
+Control::Control(Control* parent, const std::string& text, int width, int height, int x, int y) noexcept
+	:
+	Control()
+{
+	Parent = parent;
+	SetLocation(x, y);
+	SetSize(Size(width, height));
+}
+
+Control::Control(const std::string& text) noexcept
+	:
+	Control(nullptr, text)
+{
+
+}
+
+Control::Control(const std::string& text, int width, int height, int x, int y) noexcept
+	:
+	Control(nullptr, text, width, height, x, y)
 {
 
 }
@@ -274,79 +391,6 @@ void Control::SetText(const std::string& text) noexcept
 	Text = text;
 }
 
-Control::Control(Control* parent, const std::string& text, int width, int height, int x, int y) noexcept
-	:
-	Parent(parent),
-	Text(text),
-	m_Padding(0),
-	m_TabIndex(m_IncrementalTabIndex++),
-	m_IsTabSelected(false),
-	m_IsTabStop(true),
-	m_MinSize(0u),
-	OnActivate(nullptr),
-	OnClick(nullptr),
-	OnDeactivate(nullptr),
-	OnGotFocus(nullptr),
-	OnLostFocus(nullptr),
-	OnKeyDown(nullptr),
-	OnKeyPress(nullptr),
-	OnKeyUp(nullptr),
-	OnMouseClick(nullptr),
-	OnMouseDown(nullptr),
-	OnMouseEnter(nullptr),
-	OnMouseHover(nullptr),
-	OnMouseLeave(nullptr),
-	OnMouseLeftDoubleClick(nullptr),
-	OnMouseMove(nullptr),
-	OnMouseRightDoubleClick(nullptr),
-	OnMouseUp(nullptr),
-	OnMouseWheel(nullptr),
-	OnVisibleChanged(nullptr),
-	OnPaint(nullptr),
-	m_Margin(3, 3, 3, 3),
-	m_DrawableArea(3, 3, width - 3, height - 3),
-	m_Size(width, height),
-	m_Location(x, y),
-	m_Font("Segoe UI", 9, false, false, false, false, GraphicsUnit::Point),
-	ArgsOnClosing(CloseReason::None, false),
-	ArgsOnClosed(CloseReason::None),
-	ArgsOnKeyDown(Keys::None),
-	ArgsOnKeyPressed('0'),
-	ArgsOnKeyUp(Keys::None),
-	ArgsOnMouseMove(MouseButtons::None, 0, 0, 0, 0),
-	ArgsOnMouseDown(MouseButtons::None, 0, 0, 0, 0),
-	ArgsOnMouseClick(MouseButtons::None, 0, 0, 0, 0),
-	ArgsOnMouseUp(MouseButtons::None, 0, 0, 0, 0),
-	ArgsOnMouseDoubleClick(MouseButtons::None, 0, 0, 0, 0),
-	ArgsOnMouseWheel(MouseButtons::None, 0, 0, 0, 0),
-	m_State(0)
-{
-	m_Window = new ControlNativeWindow(this);
-
-	if(width != 0 && height != 0)
-	{
-		RECT rect = { 0 };
-
-		CreateParams* cp = CreateParameters();
-		AdjustWindowRectEx(&rect, cp->Style, false, cp->ExStyle);
-		CreateHandle();
-	}
-}
-
-Control::Control(const std::string& text) noexcept
-	:
-	Control(nullptr, text, 0, 0, 0, 0)
-{
-
-}
-
-Control::Control(const std::string& text, int width, int height, int x, int y) noexcept
-	:
-	Control(nullptr, text, width, height, x, y)
-{
-
-}
-
 void Control::CreateHandle()
 {
 	Drawing::Rectangle originalBounds;
@@ -361,11 +405,11 @@ void Control::CreateHandle()
 		{
 			if(cp->X != CW_USEDEFAULT)
 			{
-				cp->X -= parentClient.Left;
+				cp->X -= parentClient.X;
 			}
 			if(cp->Y != CW_USEDEFAULT)
 			{
-				cp->Y -= parentClient.Left;
+				cp->Y -= parentClient.X;
 			}
 		}
 	}
@@ -391,13 +435,11 @@ CreateParams* Control::CreateParameters()
 
 	cp->X = m_Location.X;
 	cp->Y = m_Location.Y;
-	cp->Width = m_Size.Width;
-	cp->Height = m_Size.Height;
+	cp->Width = m_Width;
+	cp->Height = m_Height;
 
 	cp->Style = WS_CLIPCHILDREN;
-	//if (GetStyle(ControlStyles.ContainerControl)) {
-	//	cp.ExStyle |= NativeMethods.WS_EX_CONTROLPARENT;
-	//}
+	if(GetStyle(ControlStyles::ContainerControl)) cp->ExStyle |= WS_EX_CONTROLPARENT;
 	cp->ClassStyle = CS_DBLCLKS;
 
 	if(Parent != nullptr)
@@ -417,6 +459,123 @@ CreateParams* Control::CreateParameters()
 	cp->Param = dynamic_cast<NativeWindow*>(m_Window);
 
 	return cp;
+}
+
+void Control::OnBoundsUpdate(int x, int y, int width, int height)
+{
+
+}
+
+Drawing::Rectangle Control::ApplyBoundsConstraints(int suggestedX, int suggestedY, int proposedWidth, int proposedHeight)
+{
+	if(GetMaximumSize() != Size::Empty() || GetMinimumSize() != Size::Empty())
+	{
+		Size maximumSize = LayoutUtils::ConvertZeroToUnbounded(GetMaximumSize());
+		Drawing::Rectangle newBounds = Drawing::Rectangle(suggestedX, suggestedY, 0, 0);
+
+		// Clip the size to maximum and inflate it to minimum as necessary.
+		newBounds.SetSize(LayoutUtils::IntersectSizes(Size(proposedWidth, proposedHeight), maximumSize));
+		newBounds.SetSize(LayoutUtils::UnionSizes(newBounds.GetSize(), GetMinimumSize()));
+
+		return newBounds;
+	}
+
+	return Drawing::Rectangle(suggestedX, suggestedY, proposedWidth, proposedHeight);
+}
+
+void Control::SetBoundsCore(int x, int y, int width, int height, BoundsSpecified specified)
+{
+	if(Parent != nullptr)
+	{
+		// Suspend Layout
+	}
+
+	if(m_X != x || m_Y != y || m_Width != width || m_Height != height)
+	{
+		CommonProperties::UpdateSpecifiedBounds(this, x, y, width, height, specified);
+
+		// Provide control with an opportunity to apply self imposed constraints on its size.
+		Drawing::Rectangle adjustedBounds = ApplyBoundsConstraints(x, y, width, height);
+		width = adjustedBounds.Width;
+		height = adjustedBounds.Height;
+		x = adjustedBounds.X;
+		y = adjustedBounds.Y;
+
+		if(!IsHandleCreated())
+		{
+			// Handle is not created, just record our new position and we're done.
+			UpdateBounds(x, y, width, height);
+		}
+		else
+		{
+			if(!GetState(STATE_SIZELOCKEDBYOS))
+			{
+				int flags = SWP_NOZORDER | SWP_NOACTIVATE;
+
+				if(m_X == x && m_Y == y)
+				{
+					flags |= SWP_NOMOVE;
+				}
+				if(m_Width == width && m_Height == height)
+				{
+					flags |= SWP_NOSIZE;
+				}
+
+				//
+				// Give a chance for derived controls to do what they want, just before we resize.
+				OnBoundsUpdate(x, y, width, height);
+
+				SetWindowPos(GetHandle(), nullptr, x, y, width, height, flags);
+			}
+		}
+	}
+
+	//finally
+	//{
+
+	//	// Initialize the scaling engine.
+	//	InitScaling(specified);
+
+	//	if(ParentInternal != null)
+	//	{
+	//		// Some layout engines (DefaultLayout) base their PreferredSize on
+	//		// the bounds of their children.  If we change change the child bounds, we
+	//		// need to clear their PreferredSize cache.  The semantics of SetBoundsCore
+	//		// is that it does not cause a layout, so we just clear.
+	//		CommonProperties.xClearPreferredSizeCache(ParentInternal);
+
+	//		// Cause the current control to initialize its layout (e.g., Anchored controls
+	//		// memorize their distance from their parent's edges).  It is your parent's
+	//		// LayoutEngine which manages your layout, so we call into the parent's
+	//		// LayoutEngine.
+	//		ParentInternal.LayoutEngine.InitLayout(this, specified);
+	//		ParentInternal.ResumeLayout( /* performLayout = */ true);
+	//	#if DEBUG
+	//		Debug.Assert(ParentInternal.LayoutSuspendCount == suspendCount, "Suspend/Resume layout mismatch!");
+	//	#endif
+	//	}
+	//}
+}
+
+bool Control::IsContainerControl()
+{
+	return false;
+}
+
+IContainerControl* Control::GetContainerControl()
+{
+	Control* c = this;
+
+	if(c != nullptr && IsContainerControl()) c = c->Parent;
+
+	while(c != nullptr && !IsFocusManagingContainerControl(c)) c = c->Parent;
+
+	return (IContainerControl*)c;
+}
+
+bool Control::RenderTransparent()
+{
+	return GetStyle(ControlStyles::SupportsTransparentBackColor) && GetBackgroundColor().GetA() < 255;
 }
 
 void Control::HookMouseEvent()
@@ -592,6 +751,57 @@ void Control::OnVisibleChangedSet(const std::function<void(Object*, EventArgs*)>
 {
 	OnVisibleChanged = new EventHandler("OnVisibleChanged", callback);
 	Events.Register(OnVisibleChanged);
+}
+
+void Control::OnClientSizeChanged(EventArgs* const e)
+{
+	Dispatch("OnClientSizeChanged", e);
+}
+
+void Control::OnMove(EventArgs* const e)
+{
+	Dispatch("OnMove", e);
+	if(RenderTransparent()) Invalidate();
+}
+
+void Control::OnLocationChanged(EventArgs* const e)
+{
+	OnMove(e);
+	Dispatch("OnLocationChanged", e);
+}
+
+void Control::OnInvalidated(InvalidateEventArgs* const e)
+{
+	for(const auto& c : Controls)
+	{
+		c->OnParentInvalidated(e);
+	}
+
+	Dispatch("OnInvalidated", e);
+}
+
+void Control::OnResize(EventArgs* const e)
+{
+	if((m_ControlStyle & ControlStyles::ResizeRedraw) == ControlStyles::ResizeRedraw
+	   || GetState(STATE_EXCEPTIONWHILEPAINTING))
+	{
+		Invalidate();
+	}
+
+	Dispatch("OnResize", e);
+}
+
+void Control::OnSizeChanged(EventArgs* const e)
+{
+	OnResize(e);
+	Dispatch("OnSizeChanged", e);
+}
+
+void Control::NotifyInvalidate(Drawing::Rectangle invalidatedArea)
+{
+	auto event = new InvalidateEventArgs(invalidatedArea);
+	OnInvalidated(event);
+	delete event;
 }
 
 void Control::DefWndProc(Message& m)
@@ -783,9 +993,12 @@ Padding Control::GetMargin() const noexcept
 
 void Control::SetMargin(Padding margin) noexcept
 {
-	auto size = GetSize();
-	m_DrawableArea = Drawing::Rectangle(margin.Left, margin.Top, size.Width - margin.Right, size.Height - margin.Bottom);
-	m_Margin = margin;
+	margin = LayoutUtils::ClampNegativePaddingToZero(margin);
+	if(margin != m_Margin)
+	{
+		m_Margin = margin;
+		Dispatch("OnMarginChanged", &ArgsDefault);
+	}
 }
 
 void Control::SetMargin(int left, int top, int right, int bottom) noexcept
@@ -928,19 +1141,19 @@ void Control::SetTabIndex(const int& index) noexcept
 
 Window* Control::GetWindow() noexcept
 {
-	if(GetType() == typeid(Window))
-		return dynamic_cast<Window*>(this);
-
-	if(Parent != nullptr)
-	{
-		if(Parent->GetType() == typeid(Window))
-		{
-			return dynamic_cast<Window*>(Parent);
-		}
-
-		return Parent->GetWindow();
-	}
-
+	//if(GetType() == typeid(Window))
+	//	return dynamic_cast<Window*>(this);
+	//
+	//if(Parent != nullptr)
+	//{
+	//	if(Parent->GetType() == typeid(Window))
+	//	{
+	//		return dynamic_cast<Window*>(Parent);
+	//	}
+	//
+	//	return Parent->GetWindow();
+	//}
+	//
 	return nullptr;
 }
 
@@ -952,32 +1165,37 @@ Point Control::GetLocation() const noexcept
 void Control::SetLocation(Point p) noexcept
 {
 	m_Location = p;
-	SetWindowPos(static_cast<HWND>(GetHandle().ToPointer()), nullptr, m_Location.X, m_Location.Y, m_Size.Width, m_Size.Height, SWP_NOZORDER);
+	//SetWindowPos(static_cast<HWND>(GetHandle().ToPointer()), nullptr, m_Location.X, m_Location.Y, GetSize().Width, GetSize().Height, SWP_NOZORDER);
 }
 
 void Control::SetLocation(int x, int y) noexcept
 {
 	m_Location = Point(x, y);
-	SetWindowPos(static_cast<HWND>(GetHandle().ToPointer()), nullptr, m_Location.X, m_Location.Y, m_Size.Width, m_Size.Height, SWP_NOZORDER);
+	m_X = x;
+	m_Y = y;
+	//SetWindowPos(static_cast<HWND>(GetHandle().ToPointer()), nullptr, m_Location.X, m_Location.Y, GetSize().Width, GetSize().Height, SWP_NOZORDER);
 }
 
 Size Control::GetSize() const noexcept
 {
-	return m_Size;
+	return Size(m_Width, m_Height);
+}
+
+void Control::SetSize(Size value)
+{
+	SetBounds(m_X, m_Y, value.Width, value.Height, BoundsSpecified::None);
 }
 
 void Control::Resize(Size s)
 {
-	m_Size = s;
 	m_DrawableArea = Drawing::Rectangle(m_Margin.Left, m_Margin.Top, s.Width - m_Margin.Right, s.Height - m_Margin.Bottom);
-	SetWindowPos(static_cast<HWND>(GetHandle().ToPointer()), nullptr, m_Location.X, m_Location.Y, m_Size.Width, m_Size.Height, SWP_NOZORDER);
+	SetWindowPos(static_cast<HWND>(GetHandle().ToPointer()), nullptr, m_Location.X, m_Location.Y, GetSize().Width, GetSize().Height, SWP_NOZORDER);
 }
 
 void Control::Resize(int width, int height)
 {
-	m_Size = Size(width, height);
 	m_DrawableArea = Drawing::Rectangle(m_Margin.Left, m_Margin.Top, width - m_Margin.Right, height - m_Margin.Bottom);
-	SetWindowPos(static_cast<HWND>(GetHandle().ToPointer()), nullptr, m_Location.X, m_Location.Y, m_Size.Width, m_Size.Height, SWP_NOZORDER);
+	SetWindowPos(static_cast<HWND>(GetHandle().ToPointer()), nullptr, m_Location.X, m_Location.Y, GetSize().Width, GetSize().Height, SWP_NOZORDER);
 }
 
 bool Control::IsMouseOver() const noexcept
@@ -1086,11 +1304,6 @@ void Control::PerformLayout()
 	PerformLayout(nullptr, "");
 }
 
-void Control::PerformLayout(Control* const affectedControl, const std::string& affectedProperty)
-{
-	PerformLayout(LayoutEventArgs(affectedControl, affectedProperty));
-}
-
 bool Control::IsMirrored()
 {
 	if(!IsHandleCreated())
@@ -1108,8 +1321,246 @@ RightToLeft Control::IsRightToLeft()
 	{
 		Control* parent = Parent;
 		if(parent != nullptr) return parent->IsRightToLeft();
-		else return GetDefaultRightToLeft();
+		else return DefaultRightToLeft();
 	}
+}
+
+Padding Control::GetPadding() const noexcept
+{
+	return m_Padding;
+}
+
+void Control::SetPadding(Padding value)
+{
+	if(value != m_Padding)
+	{
+
+	}
+}
+
+Size Control::GetMaximumSize() const noexcept
+{
+	return m_MaximumSize;
+}
+
+Size Control::GetMinimumSize() const noexcept
+{
+	return m_MinimumSize;
+}
+
+void Control::SetMaximumSize(Size value)
+{
+	m_MaximumSize = value;
+}
+
+void Control::SetMinimumSize(Size value)
+{
+	m_MinimumSize = value;
+}
+
+Drawing::Rectangle Control::GetRectangle() const noexcept
+{
+	return Drawing::Rectangle(m_X, m_Y, m_Width, m_Height);
+}
+
+void Control::SetRectangle(Drawing::Rectangle rectangle)
+{
+	SetBounds(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height, BoundsSpecified::All);
+}
+
+void Control::SetBounds(int x, int y, int width, int height, BoundsSpecified specified)
+{
+	if((specified & BoundsSpecified::X) == BoundsSpecified::None) x = m_X;
+	if((specified & BoundsSpecified::Y) == BoundsSpecified::None) y = m_Y;
+	if((specified & BoundsSpecified::Width) == BoundsSpecified::None) width = m_Width;
+	if((specified & BoundsSpecified::Height) == BoundsSpecified::None) height = m_Height;
+	if(m_X != x || m_Y != y || m_Width != width || m_Height != height)
+	{
+		SetBoundsCore(x, y, width, height, specified);
+
+		// WM_WINDOWPOSCHANGED will trickle down to an OnResize() which will
+		// have refreshed the interior layout or the resized control.  We only need to layout
+		// the parent.  This happens after InitLayout has been invoked.
+		//LayoutTransaction.DoLayout(ParentInternal, this, PropertyNames.Bounds);
+	}
+	else
+	{
+		// Still need to init scaling.
+		InitScaling(specified);
+	}
+}
+
+void Control::SetBounds(Drawing::Rectangle bounds, BoundsSpecified specified)
+{
+	ISite* site = GetSite();
+	//IComponentChangeService ccs = null;
+	//PropertyDescriptor sizeProperty = null;
+	//PropertyDescriptor locationProperty = null;
+	bool sizeChanged = false;
+	bool locationChanged = false;
+
+	//if(site != nullptr && site->IsDesignMode())
+	//{
+	//	//ccs = (IComponentChangeService)site.GetService(typeof(IComponentChangeService));
+	//	if(ccs != null)
+	//	{
+	//		sizeProperty = TypeDescriptor.GetProperties(this)[PropertyNames.Size];
+	//		locationProperty = TypeDescriptor.GetProperties(this)[PropertyNames.Location];
+	//		Debug.Assert(sizeProperty != null && locationProperty != null, "Error retrieving Size/Location properties on Control.");
+	//
+	//		try
+	//		{
+	//			if(sizeProperty != null && !sizeProperty.IsReadOnly && (bounds.Width != this.Width || bounds.Height != this.Height))
+	//			{
+	//				if(!(site is INestedSite))
+	//				{
+	//					ccs.OnComponentChanging(this, sizeProperty);
+	//				}
+	//				sizeChanged = true;
+	//			}
+	//			if(locationProperty != null && !locationProperty.IsReadOnly && (bounds.X != this.x || bounds.Y != this.y))
+	//			{
+	//				if(!(site is INestedSite))
+	//				{
+	//					ccs.OnComponentChanging(this, locationProperty);
+	//				}
+	//				locationChanged = true;
+	//			}
+	//		}
+	//		catch(InvalidOperationException)
+	//		{
+	//			// The component change events can throw InvalidOperationException if a change is
+	//			// currently not allowed (typically because the doc data in VS is locked). 
+	//			// When this happens, we just eat the exception and proceed with the change.
+	//		}
+	//	}
+	//}
+
+	SetBoundsCore(bounds.X, bounds.Y, bounds.Width, bounds.Height, specified);
+
+	//if(site != nullptr && ccs != null)
+	//{
+	//	try
+	//	{
+	//		if(sizeChanged)  ccs.OnComponentChanged(this, sizeProperty, null, null);
+	//		if(locationChanged) ccs.OnComponentChanged(this, locationProperty, null, null);
+	//	}
+	//	catch(InvalidOperationException)
+	//	{
+	//		// The component change events can throw InvalidOperationException if a change is
+	//		// currently not allowed (typically because the doc data in VS is locked). 
+	//		// When this happens, we just eat the exception and proceed with the change.
+	//	}
+	//}
+}
+
+Size Control::GetPreferredSize(Size proposedSize) noexcept
+{
+	if(GetState(STATE_DISPOSING | STATE_DISPOSED)) return Size(0, 0);
+	else return LayoutUtils::ConvertZeroToUnbounded(proposedSize);
+
+}
+
+Drawing::Rectangle Control::GetDisplayRectangle() const noexcept
+{
+	return Drawing::Rectangle(0, 0, m_ClientWidth, m_ClientHeight);
+}
+
+bool Control::GetParticipatesInLayout() noexcept
+{
+	return GetState(STATE_VISIBLE);
+}
+
+void Control::PerformLayout(IArrangedElement* affectedElement, const std::string& property)
+{
+	PerformLayout(LayoutEventArgs(affectedElement, property));
+}
+
+IArrangedElement* Control::GetContainer() const noexcept
+{
+	return Parent;
+}
+
+std::vector<IArrangedElement*> Control::GetChildren() const noexcept
+{
+	return std::vector<IArrangedElement*>();
+}
+
+bool Control::IsDisposing() noexcept
+{
+	return GetState(STATE_DISPOSING);
+}
+
+bool Control::Contains(Control* control)
+{
+	while(control != nullptr)
+	{
+		control = control->Parent;
+		if(control == nullptr) return false;
+		if(control == this) return true;
+	}
+
+	return false;
+}
+
+bool Control::IsFocused() noexcept
+{
+	return IsHandleCreated() && GetFocus() == GetHandle().ToPointer();
+}
+
+Control* Control::GetParent() const noexcept
+{
+	return Parent;
+}
+
+void Control::Invalidate()
+{
+	Invalidate(false);
+}
+
+void Control::Invalidate(bool invalidateChildren)
+{
+	if(IsHandleCreated())
+	{
+		if(invalidateChildren)
+		{
+			RedrawWindow(GetHandle(), nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN);
+		}
+		else
+		{
+			InvalidateRect(GetHandle(), nullptr, (m_ControlStyle & ControlStyles::Opaque) != ControlStyles::Opaque);
+		}
+
+		NotifyInvalidate(GetClientRectangle());
+	}
+}
+
+void Control::Invalidate(Drawing::Rectangle rc)
+{
+	Invalidate(rc, false);
+}
+
+void Control::Invalidate(Drawing::Rectangle rc, bool invalidateChildren)
+{
+	if(rc.IsEmpty())
+	{
+		Invalidate(invalidateChildren);
+	}
+	else if(IsHandleCreated())
+	{
+		RECT rcArea = { rc.X, rc.Y, rc.Width, rc.Height };
+
+		if(invalidateChildren)
+		{	
+			RedrawWindow(GetHandle(), &rcArea, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN);
+		}
+		else
+		{
+			InvalidateRect(GetHandle(), &rcArea, (m_ControlStyle & ControlStyles::Opaque) != ControlStyles::Opaque);
+		}
+	}
+
+	NotifyInvalidate(rc);
 }
 
 void Control::ResetMouseEventArgs()
@@ -1150,7 +1601,7 @@ void Control::UpdateBounds()
 
 	GetWindowRect(GetHandle(), &rect);
 
-	if(!GetTopLevel()) MapWindowPoints(nullptr, GetParent(GetHandle()), (LPPOINT)(&rect), 2);
+	if(!GetTopLevel()) MapWindowPoints(nullptr, GetParent()->GetHandle(), (LPPOINT)(&rect), 2);
 
 	UpdateBounds(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, clientWidth, clientHeight);
 }
@@ -1180,11 +1631,11 @@ void Control::UpdateBounds(int x, int y, int width, int height, int clientWidth,
 	m_ClientWidth = clientWidth;
 	m_ClientHeight = clientHeight;
 
-	if(newLocation) Dispatch("OnLocationChanged", &ArgsDefault);
+	if(newLocation) OnLocationChanged(&ArgsDefault);
 	if(newSize)
 	{
-		Dispatch("OnSizeChanged", &ArgsDefault);
-		Dispatch("OnClientSizeChanged", &ArgsDefault);
+		OnSizeChanged(&ArgsDefault);
+		OnClientSizeChanged(&ArgsDefault);
 	}
 }
 
@@ -1261,11 +1712,11 @@ int Control::OnClosing_Impl(HWND hwnd)
 	// and application must post quit
 	if(!ArgsOnClosing.Cancel)
 	{
-		if(GetType() == typeid(Window))
-		{
-			Dispose();
-			Application::RemoveWindow(dynamic_cast<Window*>(this));
-		}
+		//if(GetType() == typeid(Window))
+		//{
+		//	Dispose();
+		//	Application::RemoveWindow(dynamic_cast<Window*>(this));
+		//}
 
 		if(Application::CanCloseApplication())
 		{
@@ -1287,7 +1738,7 @@ void Control::OnCreate_Impl(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
 {
 	if(!IsHandleCreated()) CreateHandle();
 
-	m_Graphics = Graphics::Create(hwnd, m_Size);
+	m_Graphics = Graphics::Create(hwnd, GetSize());
 	m_Graphics->CreateSolidBrush(m_BackgroundColor);
 	m_Graphics->CreateSolidBrush(m_ForeColor);
 	m_Graphics->CreateFontObject(m_Font);
@@ -1442,11 +1893,11 @@ void Control::OnPaint_Impl(HWND hwnd)
 {
 	if(IsShown())
 	{
-		Drawing::Rectangle rect = Drawing::Rectangle(0, 0, m_Size.Width, m_Size.Height);
+		Drawing::Rectangle rect = Drawing::Rectangle(0, 0, GetSize().Width, GetSize().Height);
 
 		if(m_Graphics == nullptr)
 		{
-			m_Graphics = Graphics::Create(GetHandle(), m_Size);
+			m_Graphics = Graphics::Create(GetHandle(), GetSize());
 		}
 
 		PaintEventArgs pArgs = PaintEventArgs(m_Graphics, rect);
@@ -1494,10 +1945,7 @@ int Control::OnSetCursor_Impl(HWND hwnd, HWND hwndCursor, unsigned int codeHitTe
 
 void Control::OnSize_Impl(HWND hwnd, unsigned int state, int cx, int cy)
 {
-	m_Size.Width = cx;
-	m_Size.Height = cy;
 
-	if(m_Graphics) m_Graphics->UpdateSize(m_Size);
 
 	Dispatch("OnResize", &ArgsDefault);
 }

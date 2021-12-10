@@ -15,7 +15,7 @@ public:
 	constexpr Object() 
 	{ }
 
-	constexpr bool ReferenceEquals(const Object& b) const noexcept { return std::addressof(*this) == std::addressof(b); }
+	constexpr static bool ReferenceEquals(const Object* a, const Object* b) noexcept { return std::addressof(*a) == std::addressof(*b); }
 
 	constexpr static bool Equals(const Object* const lhs, const Object* const rhs)
 	{

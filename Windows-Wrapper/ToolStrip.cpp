@@ -4,7 +4,7 @@
 void ToolStrip::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 {
 	auto hdc = static_cast<HDC>(graphics->GetHDC().ToPointer());
-	RECT rc = { rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom};
+	RECT rc = { rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height};
 
 	HBRUSH bgColor = CreateSolidBrush(RGB(m_BackgroundColor.GetR(), m_BackgroundColor.GetG(), m_BackgroundColor.GetB()));
 	FillRect(hdc, &rc, bgColor);

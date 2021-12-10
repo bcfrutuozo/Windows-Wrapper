@@ -7,10 +7,10 @@ namespace Drawing
 {
 	int RectangleF::GetHashCode() const
 	{
-		return ((int)((uint32_t)Left ^
-			(((uint32_t)Top << 13) | ((uint32_t)Top >> 19)) ^
-			(((uint32_t)Right << 26) | ((uint32_t)Right >> 6)) ^
-			(((uint32_t)Bottom << 7) | ((uint32_t)Bottom >> 25))));
+		return ((int)((uint32_t)X ^
+			(((uint32_t)Y << 13) | ((uint32_t)Y >> 19)) ^
+			(((uint32_t)Width << 26) | ((uint32_t)Width >> 6)) ^
+			(((uint32_t)Height << 7) | ((uint32_t)Height >> 25))));
 	}
 
 	bool RectangleF::Equals(const Object* const obj) const
@@ -19,7 +19,7 @@ namespace Drawing
 
 		if (const auto r = dynamic_cast<const RectangleF*>(obj))
 		{
-			return (r->Left == Left) && (r->Top == Top) && (r->Right == Right) && (r->Bottom == Bottom);
+			return (r->X == X) && (r->Y == Y) && (r->Width == Width) && (r->Height == Height);
 		}
 
 		throw ArgumentException("Arg_MustBeRectangle");
@@ -28,13 +28,13 @@ namespace Drawing
 	bool RectangleF::Equals(const RectangleF* const b) const
 	{
 		if (b == nullptr) return false;
-		return (b->Left == Left) && (b->Top == Top) && (b->Right == Right) && (b->Bottom == Bottom);
+		return (b->X == X) && (b->Y == Y) && (b->Width == Width) && (b->Height == Height);
 	}
 
 	std::string RectangleF::ToString() const noexcept
 	{
 		std::ostringstream oss;
-		oss << "{X=" << Left << ",Y=" << Top << ",Width=" << Right << ",Height=" << Bottom << "}";
+		oss << "{X=" << X << ",Y=" << Y << ",Width=" << Width << ",Height=" << Height << "}";
 		return oss.str();
 	}
 }

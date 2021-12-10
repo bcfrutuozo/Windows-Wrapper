@@ -4,6 +4,16 @@
 #include "ScrollEventType.h"
 #include "ScrollEventArgs.h"
 
+Drawing::Rectangle ScrollableControl::GetDisplayRectInternal() noexcept
+{
+	if(m_DisplayRectangle.IsEmpty()) m_DisplayRectangle = GetClientRectangle();
+
+	if(!HasAutoScroll() && HorizontalScroll.IsVisible()) m_DisplayRectangle = Drawing::Rectangle(m_DisplayRectangle.X, m_DisplayRectangle.Y, HorizontalScroll.GetMaximum(), m_DisplayRectangle.Height);
+	if(!HasAutoScroll() && VerticalScroll.IsVisible()) m_DisplayRectangle = Drawing::Rectangle(m_DisplayRectangle.X, m_DisplayRectangle.Y, m_DisplayRectangle.Width, VerticalScroll.GetMaximum());
+
+	return m_DisplayRectangle;
+}
+
 int ScrollableControl::ScrollThumbPosition(int fnBar)
 {
 	SCROLLINFO si;
@@ -29,11 +39,11 @@ void ScrollableControl::SyncScrollbars(bool hasAutoScroll)
 		{
 			if(!HorizontalScroll.m_MaximumSetExternally)
 			{
-				HorizontalScroll.SetMaximum(m_DisplayRectangle.GetWidth() - 1);
+				HorizontalScroll.SetMaximum(m_DisplayRectangle.Width - 1);
 			}
 			if(!HorizontalScroll.m_LargeChangeSetExternally)
 			{
-				HorizontalScroll.SetLargeChange(GetClientRectangle().GetWidth());
+				HorizontalScroll.SetLargeChange(GetClientRectangle().Width);
 			}
 			if(!HorizontalScroll.m_SmallChangeSetExternally)
 			{
@@ -44,9 +54,9 @@ void ScrollableControl::SyncScrollbars(bool hasAutoScroll)
 				m_ResetRTLHScrollValue = false;
 				OnSetScrollPosition(this, new EventArgs());
 			}
-			else if(-m_DisplayRectangle.Left >= HorizontalScroll.GetMinimum() && -m_DisplayRectangle.Left < HorizontalScroll.GetMaximum())
+			else if(-m_DisplayRectangle.X >= HorizontalScroll.GetMinimum() && -m_DisplayRectangle.X < HorizontalScroll.GetMaximum())
 			{
-				HorizontalScroll.SetValue(-m_DisplayRectangle.Left);
+				HorizontalScroll.SetValue(-m_DisplayRectangle.X);
 			}
 
 			HorizontalScroll.UpdateScrollInfo();
@@ -55,19 +65,19 @@ void ScrollableControl::SyncScrollbars(bool hasAutoScroll)
 		{
 			if(!VerticalScroll.m_MaximumSetExternally)
 			{
-				VerticalScroll.SetMaximum(m_DisplayRectangle.GetHeight() - 1);
+				VerticalScroll.SetMaximum(m_DisplayRectangle.Height - 1);
 			}
 			if(!VerticalScroll.m_LargeChangeSetExternally)
 			{
-				VerticalScroll.SetLargeChange(GetClientRectangle().GetHeight());
+				VerticalScroll.SetLargeChange(GetClientRectangle().Height);
 			}
 			if(!VerticalScroll.m_SmallChangeSetExternally)
 			{
 				VerticalScroll.SetSmallChange(5);
 			}
-			if(-m_DisplayRectangle.Top >= VerticalScroll.GetMinimum() && -m_DisplayRectangle.Top < VerticalScroll.GetMaximum())
+			if(-m_DisplayRectangle.Y >= VerticalScroll.GetMinimum() && -m_DisplayRectangle.Y < VerticalScroll.GetMaximum())
 			{
-				VerticalScroll.SetValue(-m_DisplayRectangle.Top);
+				VerticalScroll.SetValue(-m_DisplayRectangle.Y);
 			}
 
 			VerticalScroll.UpdateScrollInfo();
@@ -77,7 +87,7 @@ void ScrollableControl::SyncScrollbars(bool hasAutoScroll)
 	{
 		if(HorizontalScroll.IsVisible())
 		{
-			HorizontalScroll.SetValue(-m_DisplayRectangle.Left);
+			HorizontalScroll.SetValue(-m_DisplayRectangle.X);
 		}
 		else
 		{
@@ -85,7 +95,7 @@ void ScrollableControl::SyncScrollbars(bool hasAutoScroll)
 		}
 		if(VerticalScroll.IsVisible())
 		{
-			VerticalScroll.SetValue(-m_DisplayRectangle.Top);
+			VerticalScroll.SetValue(-m_DisplayRectangle.Y);
 		}
 		else
 		{
@@ -113,10 +123,10 @@ void ScrollableControl::WmVScroll(Message& m)
 
 	Drawing::Rectangle client = GetClientRectangle();
 	bool thumbTrack = LOWORD(m.wParam) != SB_THUMBTRACK;
-	int pos = m_DisplayRectangle.Top;
+	int pos = m_DisplayRectangle.Y;
 	int oldValue = pos;
 
-	int maxPos = -(client.GetHeight() - m_DisplayRectangle.GetHeight());
+	int maxPos = -(client.Height - m_DisplayRectangle.Height);
 	if(!HasAutoScroll()) maxPos = VerticalScroll.GetMaximum();
 	
 	switch(LOWORD(m.wParam))
@@ -166,7 +176,7 @@ void ScrollableControl::WmVScroll(Message& m)
 	if(GetScrollState(ScrollStateFullDrag) || thumbTrack)
 	{
 		SetScrollState(ScrollStateUserHasScrolled, true);
-		SetDisplayRectLocation(m_DisplayRectangle.Left, -pos);
+		SetDisplayRectLocation(m_DisplayRectangle.X, -pos);
 		SyncScrollbars(HasAutoScroll());
 	}
 
@@ -185,9 +195,9 @@ void ScrollableControl::WmHScroll(Message& m)
 
 	Drawing::Rectangle client = GetClientRectangle();
 
-	int pos = -m_DisplayRectangle.Left;
+	int pos = -m_DisplayRectangle.X;
 	int oldValue = pos;
-	int maxPos = -(client.GetWidth() - m_DisplayRectangle.GetWidth());
+	int maxPos = -(client.Width - m_DisplayRectangle.Width);
 	if(!HasAutoScroll()) maxPos = HorizontalScroll.GetMaximum();
 	
 	switch(LOWORD(m.wParam))
@@ -235,7 +245,7 @@ void ScrollableControl::WmHScroll(Message& m)
 	if(GetScrollState(ScrollStateFullDrag) || LOWORD(m.wParam) != SB_THUMBTRACK)
 	{
 		SetScrollState(ScrollStateUserHasScrolled, true);
-		SetDisplayRectLocation(-pos, m_DisplayRectangle.Top);
+		SetDisplayRectLocation(-pos, m_DisplayRectangle.Y);
 		SyncScrollbars(HasAutoScroll());
 	}
 
@@ -265,9 +275,9 @@ void ScrollableControl::OnSetScrollPosition(Object* const sender, EventArgs* con
 	}
 }
 
-ScrollableControl::ScrollableControl(Control* parent, const std::string& name, int width, int height, int x, int y)
+ScrollableControl::ScrollableControl()
 	:
-	Control(parent, name, width, height, x, y),
+	Control(),
 	m_UserAutoScrollMinSize(Size::Empty()),
 	m_DisplayRectangle(Drawing::Rectangle::Empty()),
 	m_ScrollMargin(Size::Empty()),
@@ -276,7 +286,8 @@ ScrollableControl::ScrollableControl(Control* parent, const std::string& name, i
 	HorizontalScroll(this),
 	VerticalScroll(this),
 	m_ScrollState(0),
-	m_ResetRTLHScrollValue(false)
+	m_ResetRTLHScrollValue(false),
+	m_DockPadding(this)
 {
 	SetStyle(ControlStyles::ContainerControl, true);
 	SetStyle(ControlStyles::AllPaintingInWmPaint, false);
@@ -293,11 +304,11 @@ Drawing::Rectangle ScrollableControl::GetDisplayRectangle()
 	auto rect = GetClientRectangle();
 	if(!m_DisplayRectangle.IsEmpty())
 	{
-		rect.Left = m_DisplayRectangle.Left;
-		rect.Top = m_DisplayRectangle.Top;
+		rect.X = m_DisplayRectangle.X;
+		rect.Y = m_DisplayRectangle.Y;
 
-		if(GetHScroll()) rect.Right = m_DisplayRectangle.Right;
-		if(GetVScroll()) rect.Bottom = m_DisplayRectangle.Bottom;
+		if(GetHScroll()) rect.Width = m_DisplayRectangle.Width;
+		if(GetVScroll()) rect.Height = m_DisplayRectangle.Height;
 	}
 	//rect.Deflate()
 
@@ -346,25 +357,25 @@ void ScrollableControl::SetDisplayRectLocation(int x, int y)
 	// include this padding in our adjustment of the DisplayRect
 	// because it interferes with the scrolling.
 	Drawing::Rectangle displayRectangle = m_DisplayRectangle;
-	int minX = (std::min)(client.GetWidth() - displayRectangle.GetWidth(), 0);
-	int minY = (std::min)(client.GetHeight() - displayRectangle.GetHeight(), 0);
+	int minX = (std::min)(client.Width - displayRectangle.Width, 0);
+	int minY = (std::min)(client.Height - displayRectangle.Height, 0);
 
 	if(x > 0) x = 0;
 	if(y > 0) y = 0;
 	if(x < minX) x = minX;
 	if(y < minY) y = minY;
 	
-	if(displayRectangle.Left != x) xDelta = x - displayRectangle.Left;
-	if(displayRectangle.Top != y) yDelta = y - displayRectangle.Top;
+	if(displayRectangle.X != x) xDelta = x - displayRectangle.X;
+	if(displayRectangle.Y != y) yDelta = y - displayRectangle.Y;
 	
-	m_DisplayRectangle.Left = x;
-	m_DisplayRectangle.Top = y;
+	m_DisplayRectangle.X = x;
+	m_DisplayRectangle.Y = y;
 
 	if(xDelta != 0 || yDelta != 0 && IsHandleCreated())
 	{
 		Drawing::Rectangle cr = GetClientRectangle();
-		RECT rcClip = RECT(cr.Left, cr.Top, cr.GetWidth(), cr.GetHeight());
-		RECT rcUpdate = RECT(cr.Left, cr.Top, cr.GetWidth(), cr.GetHeight());
+		RECT rcClip = RECT(cr.X, cr.Y, cr.Width, cr.Height);
+		RECT rcUpdate = RECT(cr.X, cr.Y, cr.Width, cr.Height);
 		ScrollWindowEx(GetHandle(), xDelta, yDelta,
 										 nullptr,
 										 &rcClip,
@@ -381,6 +392,19 @@ void ScrollableControl::SetDisplayRectLocation(int x, int y)
 			c->UpdateBounds();
 		}
 	}
+}
+
+CreateParams* ScrollableControl::CreateParameters()
+{
+	CreateParams* cp = Control::CreateParameters();
+
+	if(GetHScroll() || HorizontalScroll.IsVisible()) cp->Style |= WS_HSCROLL;
+	else cp->Style &= WS_HSCROLL;
+
+	if(GetVScroll() || VerticalScroll.IsVisible()) cp->Style |= WS_VSCROLL;
+	else cp->Style &= WS_VSCROLL;
+
+	return cp;
 }
 
 void ScrollableControl::WndProc(Message& m)
@@ -422,6 +446,11 @@ void ScrollableControl::SetAutoScroll(bool value)
 	SetScrollState(ScrollStateAutoScrolling, true);
 }
 
+Size ScrollableControl::GetAutoScrollMargin() const noexcept
+{
+	return m_RequestedScrollMargin;
+}
+
 void ScrollableControl::SetAutoScrollMargin(int x, int y)
 {
 	if(x < 0) x = 0;
@@ -434,5 +463,12 @@ void ScrollableControl::SetAutoScrollMargin(int x, int y)
 		
 		if(HasAutoScroll())	PerformLayout();
 	}
+}
+
+void ScrollableControl::SetAutoScrollMargin(Size s)
+{
+	if(s.Width < 0 || s.Height < 0) throw ArgumentOutOfRangeException("AutoScrollMargin", "InvalidArgument");
+
+	SetAutoScrollMargin(s.Width, s.Height);
 }
 

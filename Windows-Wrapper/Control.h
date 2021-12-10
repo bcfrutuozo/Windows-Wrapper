@@ -22,15 +22,19 @@
 #include "LayoutEventArgs.h"
 #include "ControlStyles.h"
 #include "RightToLeft.h"
+#include "CommonProperties.h"
 
 #include <list>
 #include <memory>
 #include <functional>
 
 class Window;
+class IContainerControl;
+class InvalidateEventArgs;
 
-class Control : public Component
+class Control : public Component, public IArrangedElement
 {
+	friend class ContainerControl;
 	friend class ScrollableControl;
 	friend class Window;
 	friend class Button;
@@ -73,6 +77,7 @@ private:
 	int m_Height;
 	int m_ClientWidth;
 	int m_ClientHeight;
+	unsigned char m_RequiredScaling;
 	ControlNativeWindow* m_Window;
 	CreateParams* m_CreateParams;
 	RightToLeft m_RightToLeft;
@@ -110,12 +115,17 @@ private:
 	static constexpr int STATE_PARENTRECREATING = 0x20000000;
 	static constexpr int STATE_MIRRORED = 0x40000000;
 
+	static constexpr unsigned char RequiredScalingMask = 0x0F;
+
 	ControlStyles m_ControlStyle;
 
-	bool GetAnyDisposingInHierarchy() const noexcept;
+	bool GetAnyDisposingInHierarchy() noexcept;
 	void SetHandle(IntPtr value);
 	void PerformLayout(LayoutEventArgs args);
-	RightToLeft GetDefaultRightToLeft() const noexcept;
+	void InitScaling(BoundsSpecified specified);
+	static bool IsFocusManagingContainerControl(Control* const ctl);
+	void OnParentInvalidated(InvalidateEventArgs* const e);
+	constexpr RightToLeft DefaultRightToLeft() noexcept { return RightToLeft::No; };
 
 protected:
 
@@ -140,7 +150,8 @@ protected:
 	Padding m_Padding;
 	unsigned int m_MinSize;
 
-	Size m_Size;
+	Size m_MinimumSize;
+	Size m_MaximumSize;
 	Point m_Location;
 	Graphics* m_Graphics;
 	Font m_Font;
@@ -278,11 +289,30 @@ protected:
 	constexpr bool GetStyle(ControlStyles flag) { return (m_ControlStyle & flag) == 0; }
 	constexpr void SetStyle(ControlStyles flag, bool value) { m_ControlStyle = value ? m_ControlStyle | flag : m_ControlStyle & ~flag; }
 
+	virtual constexpr Padding DefaultMargin() { return CommonProperties::DefaultMargin; }
+	virtual constexpr Size DefaultMaximumSize() { return CommonProperties::DefaultMaximumSize; }
+	virtual constexpr Size DefaultMinimumSize() { return CommonProperties::DefaultMinimumSize; }
+	virtual constexpr Padding DefaultPadding() { return Padding::Empty(); }
+	virtual constexpr Size DefaultSize() { return Size::Empty(); }
+	virtual void OnBoundsUpdate(int x, int y, int width, int height);
+	virtual Drawing::Rectangle ApplyBoundsConstraints(int suggestedX, int suggestedY, int proposedWidth, int proposedHeight);
+	virtual void SetBoundsCore(int x, int y, int width, int height, BoundsSpecified specified);
+	virtual bool IsContainerControl();
+	IContainerControl* GetContainerControl();
+	bool RenderTransparent();
+
 	// MOUSEENTER Event handling
 	LPTRACKMOUSEEVENT m_TrackMouseEvent;
 	void HookMouseEvent();
 	void UnhookMouseEvent();
 	
+	virtual void OnClientSizeChanged(EventArgs* const e);
+	virtual void OnMove(EventArgs* const e);
+	virtual void OnLocationChanged(EventArgs* const e);
+	virtual void OnInvalidated(InvalidateEventArgs* const e);
+	virtual void OnResize(EventArgs* const e);
+	virtual void OnSizeChanged(EventArgs* const e);
+	virtual void NotifyInvalidate(Drawing::Rectangle invalidatedArea);
 	virtual void DefWndProc(Message& m);
 	virtual void WndProc(Message& m);
 
@@ -343,6 +373,7 @@ public:
 	void SetLocation(Point p) noexcept;
 	void SetLocation(int x, int y) noexcept;
 	Size GetSize() const noexcept;
+	void SetSize(Size value);
 	bool IsMouseOver() const noexcept;
 	bool IsClicking() const noexcept;
 	void Enable();
@@ -358,13 +389,36 @@ public:
 	Color GetForeColor() const noexcept;
 	void SetForeColor(const Color& color) noexcept;
 	void PerformLayout();
-	void PerformLayout(Control* const affectedControl, const std::string& affectedProperty);
 	bool IsMirrored();
 	virtual RightToLeft IsRightToLeft();
+	Padding GetPadding() const noexcept;
+	void SetPadding(Padding value);
+	Size GetMaximumSize() const noexcept;
+	Size GetMinimumSize() const noexcept;
+	void SetMaximumSize(Size value);
+	void SetMinimumSize(Size value);
+	Drawing::Rectangle GetRectangle() const noexcept override;
+	void SetRectangle(Drawing::Rectangle rectangle) override;
+	void SetBounds(int x, int y, int width, int height, BoundsSpecified specified);
+	void SetBounds(Drawing::Rectangle bounds, BoundsSpecified specified) override;
+	virtual Size GetPreferredSize(Size proposedSize) noexcept override;
+	virtual Drawing::Rectangle GetDisplayRectangle() const noexcept override;
+	virtual bool GetParticipatesInLayout() noexcept override;
+	virtual void PerformLayout(IArrangedElement* affectedElement, const std::string& property) override;
+	virtual IArrangedElement* GetContainer() const noexcept override;
+	virtual std::vector<IArrangedElement*> GetChildren() const noexcept override;
+	bool IsDisposing() noexcept;
+	bool Contains(Control* control);
+	virtual bool IsFocused() noexcept;
+	Control* GetParent() const noexcept;
+	void Invalidate();
+	void Invalidate(bool invalidateChildren);
+	void Invalidate(Drawing::Rectangle rc);
+	void Invalidate(Drawing::Rectangle rc, bool invalidateChildren);
 
 	// MOUSEENTER Event Handling
 	void ResetMouseEventArgs();
 
 	constexpr bool IsTopLevel() const noexcept { return Parent == nullptr; }
-	constexpr Drawing::Rectangle GetClientRectangle() { return Drawing::Rectangle(0, 0, m_Size.Width, m_Size.Height); }
+	constexpr Drawing::Rectangle GetClientRectangle() { return Drawing::Rectangle(0, 0, m_Width, m_Height); }
 };

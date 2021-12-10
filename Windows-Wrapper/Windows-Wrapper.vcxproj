@@ -90,7 +90,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
@@ -124,7 +124,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
@@ -163,18 +163,23 @@
     <ClCompile Include="ArithmeticException.cpp" />
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="ComboBox.cpp" />
+    <ClCompile Include="CommonProperties.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="Container.cpp" />
+    <ClCompile Include="ContainerControl.cpp" />
     <ClCompile Include="ControlException.cpp" />
     <ClCompile Include="CreateParams.cpp" />
     <ClCompile Include="Direct2D.cpp" />
     <ClCompile Include="DivideByZeroException.cpp" />
+    <ClCompile Include="DockPaddingEdges.cpp" />
     <ClCompile Include="EncoderParameter.cpp" />
+    <ClCompile Include="Environment.cpp" />
     <ClCompile Include="EventDispatcher.cpp" />
     <ClCompile Include="ExternalException.cpp" />
     <ClCompile Include="File.cpp" />
     <ClCompile Include="FileNotFoundException.cpp" />
     <ClCompile Include="Font.cpp" />
+    <ClCompile Include="FormatException.cpp" />
     <ClCompile Include="GDI.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="HorizontalScrollBar.cpp" />
@@ -193,9 +198,11 @@
     <ClCompile Include="MessageDecoder.cpp" />
     <ClCompile Include="NotImplementedException.cpp" />
     <ClCompile Include="NotSupportedException.cpp" />
+    <ClCompile Include="OperatingSystem.cpp" />
     <ClCompile Include="OutOfMemoryException.cpp" />
     <ClCompile Include="OverflowException.cpp" />
     <ClCompile Include="PointF.cpp" />
+    <ClCompile Include="PowerStatus.cpp" />
     <ClCompile Include="Rectangle.cpp" />
     <ClCompile Include="RectangleF.cpp" />
     <ClCompile Include="ScrollableControl.cpp" />
@@ -205,6 +212,7 @@
     <ClCompile Include="Site.cpp" />
     <ClCompile Include="SizeF.cpp" />
     <ClCompile Include="SystemException.cpp" />
+    <ClCompile Include="SystemInformation.cpp" />
     <ClCompile Include="TestRealTimeApplication.cpp" />
     <ClCompile Include="ToolStrip.cpp" />
     <ClCompile Include="Padding.cpp" />
@@ -238,6 +246,7 @@
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Type.cpp" />
     <ClCompile Include="Utilities.cpp" />
+    <ClCompile Include="Version.cpp" />
     <ClCompile Include="VerticalScrollBar.cpp" />
     <ClCompile Include="VScrollProperties.cpp" />
     <ClCompile Include="Win32Exception.cpp" />
@@ -246,9 +255,13 @@
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AnchorStyles.h" />
     <ClInclude Include="ArgumentNullException.h" />
     <ClInclude Include="ArgumentOutOfRangeException.h" />
+    <ClInclude Include="AutoScaleMode.h" />
+    <ClInclude Include="AutoValidate.h" />
     <ClInclude Include="Bitmap.h" />
+    <ClInclude Include="BoundsSpecified.h" />
     <ClInclude Include="CancelEventArgs.h" />
     <ClInclude Include="CancelEventHandler.h" />
     <ClInclude Include="ChartDashStyle.h" />
@@ -256,13 +269,19 @@
     <ClInclude Include="Appheaders.h" />
     <ClInclude Include="ArithmeticException.h" />
     <ClInclude Include="ComboBoxStyle.h" />
+    <ClInclude Include="CommonProperties.h" />
+    <ClInclude Include="ContainerControl.h" />
+    <ClInclude Include="ContentAlignment.h" />
     <ClInclude Include="ControlStyles.h" />
     <ClInclude Include="CreateParams.h" />
     <ClInclude Include="Direct2D.h" />
     <ClInclude Include="DivideByZeroException.h" />
+    <ClInclude Include="DockPaddingEdges.h" />
+    <ClInclude Include="DockStyle.h" />
     <ClInclude Include="DrawMode.h" />
     <ClInclude Include="Encoder.h" />
     <ClInclude Include="EncoderParameter.h" />
+    <ClInclude Include="Environment.h" />
     <ClInclude Include="Exceptions.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Container.h" />
@@ -276,6 +295,7 @@
     <ClInclude Include="Font.h" />
     <ClInclude Include="ArgumentException.h" />
     <ClInclude Include="FontStyle.h" />
+    <ClInclude Include="FormatException.h" />
     <ClInclude Include="FormBorderStyle.h" />
     <ClInclude Include="FormStartPosition.h" />
     <ClInclude Include="FormWindowState.h" />
@@ -287,13 +307,16 @@
     <ClInclude Include="HorizontalAlignment.h" />
     <ClInclude Include="HorizontalScrollBar.h" />
     <ClInclude Include="HScrollProperties.h" />
+    <ClInclude Include="IArrangedElement.h" />
     <ClInclude Include="IComparable.h" />
     <ClInclude Include="IComponent.h" />
     <ClInclude Include="IContainer.h" />
+    <ClInclude Include="IContainerControl.h" />
     <ClInclude Include="IDeviceContext.h" />
     <ClInclude Include="IDisposable.h" />
     <ClInclude Include="IEvent.h" />
     <ClInclude Include="Image.h" />
+    <ClInclude Include="InvalidateEventArgs.h" />
     <ClInclude Include="InvalidCastException.h" />
     <ClInclude Include="InvalidOperationException.h" />
     <ClInclude Include="IOException.h" />
@@ -302,6 +325,7 @@
     <ClInclude Include="Keys.h" />
     <ClInclude Include="Label.h" />
     <ClInclude Include="LayoutEventArgs.h" />
+    <ClInclude Include="LayoutUtils.h" />
     <ClInclude Include="ListBox.h" />
     <ClInclude Include="ListControl.h" />
     <ClInclude Include="ListControlConvertEventArgs.h" />
@@ -314,11 +338,14 @@
     <ClInclude Include="Message.h" />
     <ClInclude Include="NotImplementedException.h" />
     <ClInclude Include="NotSupportedException.h" />
+    <ClInclude Include="OperatingSystem.h" />
     <ClInclude Include="OutOfMemoryException.h" />
     <ClInclude Include="OverflowException.h" />
     <ClInclude Include="PaintEventArgs.h" />
     <ClInclude Include="PaintEventHandler.h" />
+    <ClInclude Include="PlatformID.h" />
     <ClInclude Include="PointF.h" />
+    <ClInclude Include="PowerStatus.h" />
     <ClInclude Include="Rectangle.h" />
     <ClInclude Include="RectangleF.h" />
     <ClInclude Include="RightToLeft.h" />
@@ -332,6 +359,7 @@
     <ClInclude Include="Site.h" />
     <ClInclude Include="SizeF.h" />
     <ClInclude Include="SystemException.h" />
+    <ClInclude Include="SystemInformation.h" />
     <ClInclude Include="TestRealTimeApplication.h" />
     <ClInclude Include="ToolStrip.h" />
     <ClInclude Include="MessageDecoder.h" />
@@ -357,7 +385,10 @@
     <ClInclude Include="IWin32Window.h" />
     <ClInclude Include="IntPtr.h" />
     <ClInclude Include="TestUserApplication.h" />
+    <ClInclude Include="UserPreferenceCategory.h" />
+    <ClInclude Include="UserPreferenceChangedEventArgs.h" />
     <ClInclude Include="Utilities.h" />
+    <ClInclude Include="Version.h" />
     <ClInclude Include="VerticalScrollBar.h" />
     <ClInclude Include="VScrollProperties.h" />
     <ClInclude Include="Win32Exception.h" />

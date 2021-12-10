@@ -5,6 +5,18 @@
 
 struct Padding : public IEquatable<Padding>
 {
+	friend class DockPaddingEdges;
+
+private:
+
+	constexpr void Scale(float dx, float dy)
+	{
+		Top = (int)((float)Top * dy);
+		Left = (int)((float)Left * dx);
+		Right = (int)((float)Right * dx);
+		Bottom = (int)((float)Bottom * dy);
+	}
+
 public:
 
 	int Left;
@@ -34,10 +46,11 @@ public:
 
 	constexpr Padding Add(Padding& p1, Padding& p2) { return p1 + p2; }
 	constexpr Padding Subtract(Padding& p1, Padding& p2) { return p1 - p2; }
-	constexpr void SetAll(int padding) { Left = Top = Right = Bottom = padding; }
 	constexpr int GetHorizontal() const { return Left + Right; }
 	constexpr int GetVertical() const { return Top + Bottom; }
 	constexpr Size GetSize() const { return Size(GetHorizontal(), GetVertical()); }
+	constexpr int GetAll() const { return Left == Top && Left == Right && Left == Bottom ? Left : -1; }
+	constexpr void SetAll(int value) noexcept { Left = Top = Right = Bottom = value; }
 
 	bool Equals(const Object* const p) const override;
 	bool Equals(const Padding* const p) const override;

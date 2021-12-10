@@ -2,7 +2,7 @@
 
 #include "Object.h"
 
-class IDisposable : public Object
+class IDisposable : public virtual Object
 {
 protected:
 

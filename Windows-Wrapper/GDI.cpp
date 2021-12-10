@@ -109,7 +109,7 @@ Drawing::Rectangle GDI::DrawRectangle(Color c, Drawing::Rectangle rect, int bord
 
 	if (!brush) throw InvalidCastException("Cannot convert the following item to brush type!");
 
-	RECT rc = { rect.Left, rect.Top, rect.Right, rect.Bottom };
+	RECT rc = { rect.X, rect.Y, rect.Width, rect.Height };
 
 	int bordergdi = -1;
 
@@ -159,7 +159,7 @@ Drawing::Rectangle GDI::DrawRoundedRectangle(Color c, Drawing::Rectangle rect, i
 
 	if (!brush) throw InvalidCastException("Cannot convert the following item to brush type!");
 
-	RECT rc = { rect.Left, rect.Top, rect.Right, rect.Bottom };
+	RECT rc = { rect.X, rect.Y, rect.Width, rect.Height };
 
 	int bordergdi = -1;
 
@@ -209,7 +209,7 @@ void GDI::FillRectangle(Color c, Drawing::Rectangle rect)
 
 	if (!brush) throw InvalidCastException("Cannot convert the following item to brush type!");
 
-	RECT rc = { rect.Left, rect.Top, rect.Right, rect.Bottom };
+	RECT rc = { rect.X, rect.Y, rect.Width, rect.Height };
 
 	FillRect(m_MemoryDC, &rc, brush);
 }
@@ -218,11 +218,11 @@ void GDI::FillRoundedRectangle(Color c, Drawing::Rectangle rect, int radius)
 {
 	auto brush = Elements.contains(c.ToString()) ? (HBRUSH)Elements.at(c.ToString()) : (HBRUSH)CreateSolidBrush(c).ToPointer();
 
-	RECT rcLeftToRight = { rect.Left, rect.Top + radius, rect.Right, rect.Bottom - radius };
+	RECT rcLeftToRight = { rect.X, rect.Y + radius, rect.Width, rect.Height - radius };
 
 	FillRect(m_MemoryDC, &rcLeftToRight, brush);
 
-	RECT rcTopToBottom{ rect.Left + radius, rect.Top, rect.Right - radius, rect.Bottom };
+	RECT rcTopToBottom{ rect.X + radius, rect.Y, rect.Width - radius, rect.Height };
 
 	FillRect(m_MemoryDC, &rcTopToBottom, brush);
 }
@@ -252,7 +252,7 @@ Drawing::Rectangle GDI::DrawTransparentText(const std::string& text, HorizontalA
 
 	SetTextColor(m_MemoryDC, foreColor.ToRGB());
 
-	RECT rc = { rect.Left, rect.Top, rect.Right, rect.Bottom };
+	RECT rc = { rect.X, rect.Y, rect.Width, rect.Height };
 
 	unsigned int align = 0;
 
@@ -283,7 +283,7 @@ Drawing::Rectangle GDI::DrawOpaqueText(const std::string& text, HorizontalAlignm
 	SetTextColor(m_MemoryDC, foreColor.ToRGB());
 	SetBkColor(m_MemoryDC, backColor.ToRGB());
 
-	RECT rc = { rect.Left, rect.Top, rect.Right, rect.Bottom };
+	RECT rc = { rect.X, rect.Y, rect.Width, rect.Height };
 
 	unsigned int align = 0;
 

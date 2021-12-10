@@ -6,7 +6,7 @@ void TestClick(Object* sender, EventArgs* e)
 	ossin << sender->ToString() << std::endl << e->ToString() << std::endl << "Clicked!" << std::endl << std::endl;
 	printf_s(ossin.str().c_str());
 
-    Button* b = (Button*)sender;
+    Button* b = dynamic_cast<Button*>(sender);
     auto f = b->GetFont();
     f.SetSize(24);
     b->SetFont(f);

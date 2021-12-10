@@ -15,50 +15,59 @@ namespace Drawing
 	{
 	public:
 
-		float Left;
-		float Top;
-		float Right;
-		float Bottom;
+		float X;
+		float Y;
+		float Width;
+		float Height;
 
-		constexpr RectangleF() noexcept : Left(0.0f), Top(0.0f), Right(0.0f), Bottom(0.0f) {}
-		constexpr RectangleF(float x, float y, float width, float height) noexcept : Left(x), Top(y), Right(width), Bottom(height) {}
-		constexpr RectangleF(PointF p, SizeF s) noexcept : Left(p.X), Top(p.Y), Right(s.Width), Bottom(s.Height) {}
+		constexpr RectangleF() noexcept : X(0.0f), Y(0.0f), Width(0.0f), Height(0.0f) {}
+		constexpr RectangleF(float x, float y, float width, float height) noexcept : X(x), Y(y), Width(width), Height(height) {}
+		constexpr RectangleF(PointF p, SizeF s) noexcept : X(p.X), Y(p.Y), Width(s.Width), Height(s.Height) {}
 
-		constexpr bool operator==(RectangleF r) const noexcept { return (Left == r.Left && Top == r.Top && Right == r.Right && Bottom == r.Bottom); }
+		constexpr bool operator==(RectangleF r) const noexcept { return (X == r.X && Y == r.Y && Width == r.Width && Height == r.Height); }
 		constexpr bool operator!=(RectangleF r) const noexcept { return !(*this == r); }
 
-		constexpr bool Contains(float x, float y) const noexcept { return (Left <= x && x < (Left + Right) && Top <= y && y < (Top + Bottom)); }
+		constexpr bool Contains(float x, float y) const noexcept { return (X <= x && x < (X + Width) && Y <= y && y < (Y + Height)); }
 		constexpr bool Contains(PointF p) const noexcept { return Contains(p.X, p.Y); }
-		constexpr bool Contains(RectangleF r) const noexcept { return (Left <= r.Left) && ((r.Left + r.Right) <= (Left + Right)) && (Top <= r.Top) && ((r.Top + r.Bottom) <= (Top + Bottom)); }
-		constexpr bool IsEmpty() const noexcept { return (Left == 0.0f && Top == 0.0f && Right == 0.0f && Bottom == 0.0f); }
-		constexpr float GetWidth() const noexcept { return Right - Left; }
-		constexpr float GetHeight() const noexcept { return Bottom - Top; }
-		constexpr SizeF GetSize() const noexcept { return SizeF(Right - Left, Bottom - Top); }
-		constexpr void Offset(float x, float y) noexcept { Left += x; Top += y; }
+		constexpr bool Contains(RectangleF r) const noexcept { return (X <= r.X) && ((r.X + r.Width) <= (X + Width)) && (Y <= r.Y) && ((r.Y + r.Height) <= (Y + Height)); }
+		constexpr bool IsEmpty() const noexcept { return (X == 0.0f && Y == 0.0f && Width == 0.0f && Height == 0.0f); }
+		constexpr float GetLeft() const noexcept { return X; }
+		constexpr float GetTop() const noexcept { return Y; }
+		constexpr float GetRight() const noexcept { return X + Width; }
+		constexpr float GetBottom() const noexcept { return Y + Height; }
+		constexpr SizeF GetSize() const noexcept { return SizeF(Width - X, Height - Y); }
+		
+		constexpr void SetSize(SizeF value) noexcept
+		{
+			Width = value.Width;
+			Height = value.Height;
+		}
+
+		constexpr void Offset(float x, float y) noexcept { X += x; Y += y; }
 		constexpr void Offset(PointF p) noexcept { return Offset(p.X, p.Y); }
 
 		constexpr void Inflate(float width, float height) noexcept
 		{
-			Left -= width;
-			Top -= height;
-			Right += width;
-			Bottom += height;
+			X -= width;
+			Y -= height;
+			Width += 2.0f * width;
+			Height += 2.0f * height;
 		}
 
 		constexpr void Deflate(float width, float height) noexcept
 		{
-			Left += width;
-			Top += height;
-			Right -= width;
-			Bottom -= height;
+			X += width;
+			Y += height;
+			Width -= width;
+			Height -= height;
 		}
 
 		constexpr void AddMargin(Padding m) noexcept
 		{
-			Left += static_cast<float>(m.Left);
-			Top += static_cast<float>(m.Top);
-			Right -= static_cast<float>(m.Right);
-			Bottom -= static_cast<float>(m.Bottom);
+			X += static_cast<float>(m.Left);
+			Y += static_cast<float>(m.Top);
+			Width -= static_cast<float>(m.Right);
+			Height -= static_cast<float>(m.Bottom);
 		}
 
 		constexpr void Inflate(SizeF s) noexcept { Inflate(s.Width, s.Height); }
@@ -69,13 +78,13 @@ namespace Drawing
 		{
 			RectangleF result = RectangleF::Intersect(rect, *this);
 
-			Left = result.Left;
-			Top = result.Top;
-			Right = result.Right;
-			Bottom = result.Bottom;
+			X = result.X;
+			Y = result.Y;
+			Width = result.Width;
+			Height = result.Height;
 		}
 
-		constexpr bool IntersectsWith(RectangleF r) noexcept { return (r.Left < Left + Right) && (Left < (r.Left + r.Right)) && (r.Top < Top + Bottom) && (Top < r.Top + r.Bottom); }
+		constexpr bool IntersectsWith(RectangleF r) noexcept { return (r.X < X + Width) && (X < (r.X + r.Width)) && (r.Y < Y + Height) && (Y < r.Y + r.Height); }
 
 		static constexpr RectangleF FromLTRB(float left, float top, float right, float bottom) noexcept { return RectangleF(left, top, right - left, bottom - top); }
 
@@ -102,10 +111,10 @@ namespace Drawing
 
 		static constexpr RectangleF Intersect(RectangleF lhs, RectangleF rhs) noexcept
 		{
-			float x1 = (std::max)(lhs.Left, rhs.Left);
-			float x2 = (std::min)(lhs.Left + lhs.Right, rhs.Left + rhs.Right);
-			float y1 = (std::max)(lhs.Top, rhs.Top);
-			float y2 = (std::min)(lhs.Top + lhs.Bottom, rhs.Top + rhs.Bottom);
+			float x1 = (std::max)(lhs.X, rhs.X);
+			float x2 = (std::min)(lhs.X + lhs.Width, rhs.X + rhs.Width);
+			float y1 = (std::max)(lhs.Y, rhs.Y);
+			float y2 = (std::min)(lhs.Y + lhs.Height, rhs.Y + rhs.Height);
 
 			if (x2 >= x1 && y2 >= y1)  return RectangleF(x1, y1, x2 - x1, y2 - y1);
 
@@ -115,10 +124,10 @@ namespace Drawing
 
 		static constexpr RectangleF Union(RectangleF lhs, RectangleF rhs) noexcept
 		{
-			float x1 = (std::min)(lhs.Left, rhs.Left);
-			float x2 = (std::max)(lhs.Left + lhs.Right, rhs.Left + rhs.Right);
-			float y1 = (std::min)(lhs.Top, rhs.Top);
-			float y2 = (std::max)(lhs.Top + lhs.Bottom, rhs.Top + rhs.Bottom);
+			float x1 = (std::min)(lhs.X, rhs.X);
+			float x2 = (std::max)(lhs.X + lhs.Width, rhs.X + rhs.Width);
+			float y1 = (std::min)(lhs.Y, rhs.Y);
+			float y2 = (std::max)(lhs.Y + lhs.Height, rhs.Y + rhs.Height);
 
 			return RectangleF(x1, y1, x2 - x1, y2 - y1);
 		}

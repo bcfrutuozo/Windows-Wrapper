@@ -93,35 +93,6 @@ enum class ProgressBarAnimation
 	Marquee = 1,
 };
 
-enum class DockStyle
-{
-	//
-	// Summary:
-	//     The control is not docked.
-	None,
-	//
-	// Summary:
-	//     The control's top edge is docked to the top of its containing control.
-	Top,
-	//
-	// Summary:
-	//     The control's bottom edge is docked to the bottom of its containing control.
-	Bottom,
-	//
-	// Summary:
-	//     The control's left edge is docked to the left edge of its containing control.
-	Left,
-	//
-	// Summary:
-	//     The control's right edge is docked to the right edge of its containing control.
-	Right,
-	//
-	// Summary:
-	//     All the control's edges are docked to the all edges of its containing control
-	//     and sized appropriately.
-	Fill
-};
-
 enum class ToolStripGripStyle
 {
 	//

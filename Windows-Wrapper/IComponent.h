@@ -8,7 +8,7 @@ class IComponent : public IDisposable
 {
 protected:
 
-	constexpr IComponent()
+	IComponent()
 		:
 		m_Site(nullptr)
 	{	};

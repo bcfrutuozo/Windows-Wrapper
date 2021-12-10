@@ -10,7 +10,7 @@ VScrollProperties::VScrollProperties(ScrollableControl* container)
 
 int VScrollProperties::GetPageSize() const noexcept
 {
-	return GetParentControl()->GetClientRectangle().GetHeight();
+	return GetParentControl()->GetClientRectangle().Height;
 }
 
 int VScrollProperties::GetOrientation() const noexcept
@@ -20,7 +20,7 @@ int VScrollProperties::GetOrientation() const noexcept
 
 int VScrollProperties::GetHorizontalDisplayPosition() const noexcept
 {
-	return GetParentControl()->GetDisplayRectangle().Left;
+	return GetParentControl()->GetDisplayRectangle().X;
 }
 
 int VScrollProperties::GetVerticalDisplayPosition() const noexcept

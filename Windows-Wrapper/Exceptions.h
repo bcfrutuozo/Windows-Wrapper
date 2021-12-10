@@ -9,6 +9,7 @@
 #include "Exception.h"
 #include "ExternalException.h"
 #include "FileNotFoundException.h"
+#include "FormatException.h"
 #include "InvalidCastException.h"
 #include "InvalidOperationException.h"
 #include "IOException.h"
@@ -107,6 +108,15 @@ FileNotFoundException(const std::string& message, const std::string& filename)
 FileNotFoundException(const std::string& message, const std::string& filename, Exception* const innerException)
 **************************************************************************************************************************************/
 #define FileNotFoundException(...) FileNotFoundException(__LINE__, __FILE__, ##__VA_ARGS__)
+
+/**************************************************************************************************************************************
+FormatException macro translations:
+
+FormatException()
+FormatException(const std::string& message)
+FormatException(const std::string& message, Exception* const innerException)
+**************************************************************************************************************************************/
+#define FormatException(...) FormatException(__LINE__, __FILE__, ##__VA_ARGS__)
 
 /**************************************************************************************************************************************
 InvalidCastException macro translations:

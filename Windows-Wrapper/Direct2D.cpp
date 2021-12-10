@@ -134,8 +134,8 @@ Drawing::Rectangle Direct2D::DrawRectangle(Color c, Drawing::Rectangle rect, int
 	D2D1_RECT_F a;
 	a.left = 0.0f;
 	a.top = 0.0f;
-	a.right = (float)rect.Right;
-	a.bottom = (float)rect.Bottom;
+	a.right = (float)rect.Width;
+	a.bottom = (float)rect.Height;
 
 	m_pRenderTarget->DrawRectangle(a, brush);
 
@@ -156,8 +156,8 @@ void Direct2D::FillRectangle(Color c, Drawing::Rectangle rect)
 	D2D1_RECT_F a;
 	a.left = 0.0f;
 	a.top = 0.0f;
-	a.right = (float)rect.Right;
-	a.bottom = (float)rect.Bottom;
+	a.right = (float)rect.Width;
+	a.bottom = (float)rect.Height;
 
 	m_pRenderTarget->FillRectangle(a, brush);
 }
@@ -171,8 +171,8 @@ void Direct2D::FillRoundedRectangle(Color c, Drawing::Rectangle rect, int radius
 	D2D1_RECT_F a;
 	a.left = 0.0f;
 	a.top = 0.0f;
-	a.right = (float)rect.Right;
-	a.bottom = (float)rect.Bottom;
+	a.right = (float)rect.Width;
+	a.bottom = (float)rect.Height;
 
 	D2D1_ROUNDED_RECT rr;
 	rr.radiusX = (float)radius;

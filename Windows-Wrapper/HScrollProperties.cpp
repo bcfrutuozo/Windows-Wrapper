@@ -10,7 +10,7 @@ HScrollProperties::HScrollProperties(ScrollableControl* container)
 
 int HScrollProperties::GetPageSize() const noexcept
 {
-	return GetParentControl()->GetClientRectangle().GetWidth();
+	return GetParentControl()->GetClientRectangle().Width;
 }
 
 int HScrollProperties::GetOrientation() const noexcept
@@ -25,5 +25,5 @@ int HScrollProperties::GetHorizontalDisplayPosition() const noexcept
 
 int HScrollProperties::GetVerticalDisplayPosition() const noexcept
 {
-	return GetParentControl()->GetDisplayRectangle().Top;
+	return GetParentControl()->GetDisplayRectangle().Y;
 }

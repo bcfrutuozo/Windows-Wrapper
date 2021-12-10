@@ -15,7 +15,7 @@ void ProgressBar::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 	RECT rt;
 	GetClientRect(hwnd, &rt);
 	HDC hdcMem = CreateCompatibleDC(hdc);
-	HBITMAP hbmMem = CreateCompatibleBitmap(hdc, m_Size.Width, m_Size.Height);
+	HBITMAP hbmMem = CreateCompatibleBitmap(hdc, GetSize().Width, GetSize().Height);
 	HBITMAP hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
 
 	switch (m_Animation)
@@ -92,7 +92,7 @@ void ProgressBar::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 
 	// Perform the bit-block transfer between the memory Device Context which has the next bitmap
 	// with the current image to avoid flickering
-	BitBlt(hdc, 0, 0, m_Size.Width, m_Size.Height, hdcMem, 0, 0, SRCCOPY);
+	BitBlt(hdc, 0, 0, GetSize().Width, GetSize().Height, hdcMem, 0, 0, SRCCOPY);
 
 	SelectObject(hdcMem, hbmOld);
 	DeleteObject(hbmOld);
@@ -114,7 +114,7 @@ void ProgressBar::OnPaintMarquee_Thread(HWND hwnd) noexcept
 
 	while (m_IsRunning)
 	{
-		HBITMAP hbmMem = CreateCompatibleBitmap(hdc, m_Size.Width, m_Size.Height);
+		HBITMAP hbmMem = CreateCompatibleBitmap(hdc, GetSize().Width, GetSize().Height);
 		HBITMAP hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
 
 		int64_t time = static_cast<int64_t>((static_cast<float>(m_Speed) * 2.0f) * static_cast<float>(m_Speed));
@@ -137,7 +137,7 @@ void ProgressBar::OnPaintMarquee_Thread(HWND hwnd) noexcept
 		rt.bottom -= 1;
 
 		// Reset Marquee effect when inner bar leaves the main bar window
-		if (Minimum >= m_Size.Width)
+		if (Minimum >= GetSize().Width)
 		{
 			Minimum = -125;
 			Maximum = 0;
@@ -164,9 +164,9 @@ void ProgressBar::OnPaintMarquee_Thread(HWND hwnd) noexcept
 					rt.left = Minimum - 1;
 				}
 
-				if (Maximum > m_Size.Width - 1)
+				if (Maximum > GetSize().Width - 1)
 				{
-					rt.right = m_Size.Width - 1;
+					rt.right = GetSize().Width - 1;
 				}
 				else
 				{
@@ -177,10 +177,10 @@ void ProgressBar::OnPaintMarquee_Thread(HWND hwnd) noexcept
 			}
 
 			// Draw the end of the bar if Marquee effect is in middle
-			if (Maximum < m_Size.Width - 1)
+			if (Maximum < GetSize().Width - 1)
 			{
 				rt.left = Maximum + 1;
-				rt.right = m_Size.Width - 1;
+				rt.right = GetSize().Width - 1;
 
 				FillRect(hdcMem, &rt, defaultControlColor);
 			}
@@ -200,7 +200,7 @@ void ProgressBar::OnPaintMarquee_Thread(HWND hwnd) noexcept
 
 		// Perform the bit-block transfer between the memory Device Context which has the next bitmap
 		// with the current image to avoid flickering
-		BitBlt(hdc, 0, 0, m_Size.Width, m_Size.Height, hdcMem, 0, 0, SRCCOPY);
+		BitBlt(hdc, 0, 0, GetSize().Width, GetSize().Height, hdcMem, 0, 0, SRCCOPY);
 
 		SelectObject(hdc, hbmMem);
 		DeleteObject(hbmMem);

@@ -7,7 +7,7 @@ void TextBox::PreDraw(Graphics* const graphics)
 {
 	if (m_HasFontChanged)
 	{
-		Resize(m_Size.Width, CalculateHeightForSingleLine());
+		Resize(GetSize().Width, CalculateHeightForSingleLine());
 	}
 
 	if (m_HasTextChanged)
@@ -128,7 +128,7 @@ void TextBox::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 
 		if (m_CursorIndex == 0)
 		{
-			r.Right = insider.Left;
+			r.Width = insider.X;
 		}
 	}
 	else
@@ -147,14 +147,14 @@ void TextBox::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 			temp = Text.substr(0, start);
 			tempSize = graphics->GetTextSize(temp, GetFont());
 			graphics->DrawTransparentText(temp, m_TextAlign, GetFont(), GetForeColor(), rc);
-			rc.Left += tempSize.Width;
+			rc.X += tempSize.Width;
 		}
 
 		temp = Text.substr(start, end - start);
 		tempSize = graphics->GetTextSize(temp, GetFont());
 		r = graphics->DrawOpaqueText(temp, m_TextAlign, GetFont(), Color(255, 255, 255), rc, Color(0, 120, 215));
-		rc.Left += tempSize.Width;
-		r.Right = rc.Left;
+		rc.X += tempSize.Width;
+		r.Width = rc.X;
 
 		if (end != Text.length())
 		{
@@ -173,15 +173,15 @@ void TextBox::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
 		{
 			EnableCaret();
 
-			if (r.Right > insider.Right)
+			if (r.Width > insider.Width)
 			{
-				oss << "Caret X: " << insider.Right << " | " << "Caret Y: " << insider.Top << std::endl;
-				SetCaretPos(insider.Right, insider.Top + 2);
+				oss << "Caret X: " << insider.Width << " | " << "Caret Y: " << insider.Y << std::endl;
+				SetCaretPos(insider.Width, insider.Y + 2);
 			}
 			else
 			{
-				oss << "Caret X: " << r.Right << " | " << "Caret Y: " << insider.Top << std::endl;
-				SetCaretPos(r.Right, insider.Top + 2);
+				oss << "Caret X: " << r.Width << " | " << "Caret Y: " << insider.Y << std::endl;
+				SetCaretPos(r.Width, insider.Y + 2);
 			}
 		}
 		else
@@ -197,7 +197,7 @@ void TextBox::OnCreate_Impl(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
 {
 	// Call base function to create Graphics handle
 	Control::OnCreate_Impl(hwnd, lpCreateStruct);
-	Resize(m_Size.Width, CalculateHeightForSingleLine());
+	Resize(GetSize().Width, CalculateHeightForSingleLine());
 }
 
 int TextBox::OnEraseBackground_Impl(HWND hwnd, HDC hdc) noexcept
@@ -774,7 +774,7 @@ void TextBox::InputRedraw() noexcept
 
 int TextBox::CalculateHeightForSingleLine() noexcept
 {
-	Size r(m_Size);
+	Size r(GetSize());
 
 	auto size = m_Graphics->GetTextSize(Text, GetFont()).Height;
 	
@@ -917,7 +917,7 @@ void TextBox::EnableMultiline() noexcept
 void TextBox::DisableMultiline() noexcept
 {
 	m_IsMultiline = false;
-	Resize(m_Size.Width, CalculateHeightForSingleLine());
+	Resize(GetSize().Width, CalculateHeightForSingleLine());
 }
 
 bool TextBox::IsWordWrapped() const noexcept

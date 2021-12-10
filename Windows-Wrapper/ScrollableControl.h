@@ -6,6 +6,7 @@
 #include "Point.h"
 #include "Size.h"
 #include "ScrollOrientation.h"
+#include "DockPaddingEdges.h"
 
 class ScrollableControl : public Control
 {
@@ -21,10 +22,12 @@ private:
 	Point m_ScrollPosition;
 	int m_ScrollState;
 	bool m_ResetRTLHScrollValue;
+	DockPaddingEdges m_DockPadding;
 
 	HScrollProperties HorizontalScroll;
 	VScrollProperties VerticalScroll;
 
+	Drawing::Rectangle GetDisplayRectInternal() noexcept;
 	int ScrollThumbPosition(int fnBar);
 	void UpdateFullDrag();
 	void SyncScrollbars(bool hasAutoScroll);
@@ -45,26 +48,27 @@ protected:
 	static constexpr int ScrollStateUserHasScrolled = 0x0008;
 	static constexpr int ScrollStateFullDrag = 0x0010;
 
-	ScrollableControl(Control* parent, const std::string& name, int width, int height, int x, int y);
+	ScrollableControl();
 	virtual ~ScrollableControl();
 	
 	Drawing::Rectangle GetDisplayRectangle();
-
 	bool GetScrollState(int bit) const noexcept;
 	void SetScrollState(int bit, bool value);
-
 	bool GetHScroll() const noexcept;
 	void SetHScroll(bool value);
 	bool GetVScroll() const noexcept;
 	void SetVScroll(bool value);
 
 	void SetDisplayRectLocation(int x, int y);
-
+	virtual CreateParams* CreateParameters() override;
 	void WndProc(Message& m) override;
 
 public:
 
 	virtual bool HasAutoScroll();
 	virtual void SetAutoScroll(bool value);
+
+	Size GetAutoScrollMargin() const noexcept;
 	void SetAutoScrollMargin(int x, int y);
+	void SetAutoScrollMargin(Size s);
 };
