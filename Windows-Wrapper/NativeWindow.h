@@ -70,6 +70,7 @@ private:
 
 	static bool m_AnyHandleCreated;
 	static bool m_AnyHandleCreatedInApp;
+	static int m_HandleCount;
 	static int m_GlobalID;
 	static std::map<void*, NativeWindow*> m_WindowMap;
 	static std::map<short, void*> m_HashForIdHandle;
@@ -90,6 +91,7 @@ private:
 	static void RemoveWindowFromTable(IntPtr handle, NativeWindow* window);
 	static void AddWindowToIDTable(IntPtr handle);
 	static void RemoveWindowFromIDTable(IntPtr handle);
+	static NativeWindow* GetWindowFromTable(IntPtr handle);
 
 protected:
 
@@ -110,4 +112,6 @@ public:
 	virtual void CreateHandle(CreateParams* cp);
 	void DefWndProc(Message& m);
 	void AssignHandle(IntPtr handle);
+	NativeWindow* GetPreviousWindow();
+	static NativeWindow* FromHandle(IntPtr handle);
 };

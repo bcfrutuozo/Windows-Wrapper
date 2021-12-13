@@ -6,18 +6,25 @@ void TestClick(Object* sender, EventArgs* e)
 	ossin << sender->ToString() << std::endl << e->ToString() << std::endl << "Clicked!" << std::endl << std::endl;
 	printf_s(ossin.str().c_str());
 
-    Button* b = dynamic_cast<Button*>(sender);
-    auto f = b->GetFont();
-    f.SetSize(24);
-    b->SetFont(f);
+    //Button* b = dynamic_cast<Button*>(sender);
+    //auto f = b->GetFont();
+    //f.SetSize(24);
+    //b->SetFont(f);
 }
 
 void TestUserApplication::Initialize()
-{   
-	Window* window = new Window("Teste", 1000, 1000);
-	window->GetMouse().EnableRaw();
-	window->GetKeyboard().DisableAutorepeat();
+{
+    Window* window = new Window();
+    window->SetSize(Size(00, 200));
+    window->SetText("Abcdef");
+    window->SetLocation(0, 0);
     window->Show();
+    RECT rc = { 0 };
+    GetWindowRect(window->GetHandle(), &rc);
+    printf_s(("X: " + std::to_string(rc.left) + " | Y: " + std::to_string(rc.top) + " | Width: " + std::to_string(rc.right - rc.left) + " | Height: " + std::to_string(rc.bottom - rc.top)).c_str());
+	//window->GetMouse().EnableRaw();
+	//window->GetKeyboard().DisableAutorepeat();
+    //window->Show();
 	
 	//auto lb = window->AddListBox(260, 240, 450, 50);
     //lb->SetSelectionMode(SelectionMode::Single);

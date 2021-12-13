@@ -21,8 +21,9 @@ CreateParams* MDIClient::CreateParameters()
 
 MDIClient::MDIClient()
 {
+    SetStyle(ControlStyles::Selectable, false);
     m_BackgroundColor = Color::Black();
-    //m_Dock = DockStyle::Fill;
+    //m_DockStyle = DockStyle::Fill;
 }
 
 const std::vector<Window*>& MDIClient::GetMDIChildren() const noexcept

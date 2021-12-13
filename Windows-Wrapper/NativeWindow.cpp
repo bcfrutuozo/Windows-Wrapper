@@ -30,6 +30,7 @@ int NativeWindow::GetWM_UIUNSUBCLASS() noexcept
 	return m_WMUNSUBCLASS;
 }
 
+int NativeWindow::m_HandleCount = 0;
 int NativeWindow::m_GlobalID = 1;
 std::map<int, std::string_view> NativeWindow::CustomMessages = std::map<int, std::string_view>();
 std::map<void*, NativeWindow*> NativeWindow::m_WindowMap = std::map<void*, NativeWindow*>();
@@ -553,6 +554,7 @@ void NativeWindow::AddWindowToTable(IntPtr handle, NativeWindow* window)
 	m_AnyHandleCreatedInApp = true;
 
 	m_WindowMap[handle.ToPointer()] = window;
+	++m_HandleCount;
 }
 
 void NativeWindow::RemoveWindowFromTable(IntPtr handle, NativeWindow* window)
@@ -574,6 +576,7 @@ void NativeWindow::RemoveWindowFromTable(IntPtr handle, NativeWindow* window)
 
 	m_WindowMap.erase(handle.ToPointer());
 	SafeDelete(window);
+	--m_HandleCount;
 }
 
 void NativeWindow::AddWindowToIDTable(IntPtr handle)
@@ -591,7 +594,33 @@ void NativeWindow::RemoveWindowFromIDTable(IntPtr handle)
 	m_HashForIdHandle.erase(id);
 }
 
+NativeWindow* NativeWindow::GetWindowFromTable(IntPtr handle)
+{
+	auto it = m_WindowMap.find(handle.ToPointer());
+	if(it != m_WindowMap.end())
+	{
+		return it->second;
+	}
+
+	return nullptr;
+}
+
 void NativeWindow::AssignHandle(IntPtr handle)
 {
 	AssignHandle(handle, true);
+}
+
+NativeWindow* NativeWindow::GetPreviousWindow()
+{
+	return m_PreviousWindow;
+}
+
+NativeWindow* NativeWindow::FromHandle(IntPtr handle)
+{
+	if(handle != IntPtr::Zero() && m_HandleCount > 0)
+	{
+		return GetWindowFromTable(handle);
+	}
+
+	return nullptr;
 }

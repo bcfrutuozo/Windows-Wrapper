@@ -17,3 +17,17 @@ struct Map
 		else return "";		// Always return empty string for unknown messages (Messages created at runtime starts with C0)
 	}
 };
+
+template<typename Key, typename Value, std::size_t Size>
+struct InvertedMap
+{
+	std::array<std::pair<Key, Value>, Size> data;
+	constexpr Value at(const Key& key) const
+	{
+		const auto it = std::find_if(begin(data), end(data),
+									 [&key](const auto& v) { return v.first == key; });
+
+		if(it != end(data)) return it->second;
+		else return 0;		// Always return 0 value for unknown values
+	}
+};

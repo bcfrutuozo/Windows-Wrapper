@@ -36,6 +36,10 @@ namespace Drawing
 		constexpr int GetRight() const noexcept { return X + Width; }
 		constexpr int GetBottom() const noexcept { return Y + Height; }
 		constexpr Size GetSize() const noexcept { return Size(Width - X, Height - Y); }
+		constexpr Point GetLocation() const noexcept { return Point(X, Y); }
+		constexpr void SetLocation(Point value) noexcept { X = value.X; Y = value.Y; }
+
+		static constexpr Rectangle FromLTRB(int left, int top, int right, int bottom) { return Rectangle(left, top, right - left, bottom - top); }
 		
 		constexpr void SetSize(Size value) noexcept
 		{

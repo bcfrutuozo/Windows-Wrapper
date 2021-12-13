@@ -15,15 +15,15 @@ void Application::AddWindow(Window* window)
 
 bool Application::RemoveWindow(Window* window)
 {
-	if (std::contains(*Windows, window) && window->IsDisposed())
-	{
-		if (Windows->remove(window))
-		{
-			delete window;
-			window = nullptr;
-			return true;
-		}
-	}
+	//if (std::contains(*Windows, window) && window->IsDisposed())
+	//{
+	//	if (Windows->remove(window))
+	//	{
+	//		delete window;
+	//		window = nullptr;
+	//		return true;
+	//	}
+	//}
 
 	return false;
 }
@@ -38,7 +38,7 @@ void Application::Start() noexcept
 	m_IsRunning = true;
 	m_HasGraphicsChanged = false;
 
-	if (m_SetGraphicsType == GraphicsType::D2D) Direct2D::CreateDeviceIndependentResources();
+	//if (m_SetGraphicsType == GraphicsType::D2D) Direct2D::CreateDeviceIndependentResources();
 }
 
 void Application::SetGraphicsType(GraphicsType graphicsType) noexcept
@@ -65,7 +65,7 @@ void Application::Exit() noexcept
 
 	SafeDelete(Windows);
 
-	if (m_SetGraphicsType == GraphicsType::D2D) Direct2D::DiscardDeviceResources();
+	//if (m_SetGraphicsType == GraphicsType::D2D) Direct2D::DiscardDeviceResources();
 
 	PostQuitMessage(0);
 }

@@ -2,11 +2,11 @@
 #include "ScrollableControl.h"
 #include "Exceptions.h"
 
-void ScrollBar::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
-{
-	
-}
-
+//void ScrollBar::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
+//{
+//	
+//}
+//
 ScrollBar::ScrollBar(ScrollableControl* parent, int width, int height, int x, int y)
 	:
 	Control(parent, "", width, height, x, y),

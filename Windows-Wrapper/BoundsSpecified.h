@@ -21,3 +21,23 @@ constexpr inline BoundsSpecified operator|(BoundsSpecified a, BoundsSpecified b)
 {
     return static_cast<BoundsSpecified>(static_cast<int>(a) | static_cast<int>(b));
 }
+
+constexpr inline BoundsSpecified operator&=(BoundsSpecified a, BoundsSpecified b)
+{
+    return a = a & b;
+}
+
+constexpr inline BoundsSpecified operator|=(BoundsSpecified a, BoundsSpecified b)
+{
+    return a = a | b;
+}
+
+constexpr inline bool operator==(BoundsSpecified a, int b)
+{
+    return static_cast<int>(a) == b;
+}
+
+constexpr inline bool operator!=(BoundsSpecified a, int b)
+{
+    return !(static_cast<int>(a) == b);
+}

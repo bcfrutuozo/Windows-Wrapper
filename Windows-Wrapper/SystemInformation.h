@@ -4,6 +4,7 @@
 #include "IntPtr.h"
 #include "PowerStatus.h"
 #include "UserPreferenceChangedEventArgs.h"
+#include "Size.h"
 
 #include <string>
 
@@ -36,5 +37,7 @@ public:
     static bool IsHighContrastEnabled() noexcept;
     static bool IsUserInteractiveModeEnabled() noexcept;
     static bool IsFlatMenuEnabled() noexcept;
+    static Size MinWindowTrackSize();
+    static Size MaxWindowTrackSize();
 };
 

@@ -346,6 +346,55 @@ void ScrollableControl::SetVScroll(bool value)
 	SetScrollState(ScrollStateVScrollVisible, value);
 }
 
+Point ScrollableControl::ScrollToControl(Control* activeControl)
+{
+	Drawing::Rectangle client = GetClientRectangle();
+	int xCalc = m_DisplayRectangle.X;
+	int yCalc = m_DisplayRectangle.Y;
+	int xMargin = m_ScrollMargin.Width;
+	int yMargin = m_ScrollMargin.Height;
+
+	Drawing::Rectangle bounds = activeControl->GetRectangle();
+	if(activeControl->Parent != this)
+	{
+		bounds = RectangleToClient(activeControl->Parent->RectangleToScreen(bounds));
+	}
+
+	if(bounds.X < xMargin)
+	{
+		xCalc = m_DisplayRectangle.X + xMargin - bounds.X;
+	}
+	else if(bounds.X + bounds.Width + xMargin > client.Width)
+	{
+		xCalc = client.Width - (bounds.X + bounds.Width + xMargin - m_DisplayRectangle.X);
+
+		if(bounds.X + xCalc - m_DisplayRectangle.X < xMargin)
+		{
+			xCalc = m_DisplayRectangle.X + xMargin - bounds.X;
+		}
+	}
+
+	if(bounds.Y < yMargin)
+	{
+		yCalc = m_DisplayRectangle.Y + yMargin - bounds.Y;
+	}
+	else if(bounds.Y + bounds.Height + yMargin > client.Height)
+	{
+
+		yCalc = client.Height - (bounds.Y + bounds.Height + yMargin - m_DisplayRectangle.Y);
+
+		if(bounds.Y + yCalc - m_DisplayRectangle.Y < yMargin)
+		{
+			yCalc = m_DisplayRectangle.Y + yMargin - bounds.Y;
+		}
+	}
+
+	xCalc += activeControl->GetAutoScrollOffset().X;
+	yCalc += activeControl->GetAutoScrollOffset().Y;
+
+	return Point(xCalc, yCalc);
+}
+
 void ScrollableControl::SetDisplayRectLocation(int x, int y)
 {
 	int xDelta = 0;
@@ -470,5 +519,22 @@ void ScrollableControl::SetAutoScrollMargin(Size s)
 	if(s.Width < 0 || s.Height < 0) throw ArgumentOutOfRangeException("AutoScrollMargin", "InvalidArgument");
 
 	SetAutoScrollMargin(s.Width, s.Height);
+}
+
+void ScrollableControl::ScrollControlIntoView(Control* activeControl)
+{
+	Drawing::Rectangle client = GetClientRectangle();
+
+	if(IsDescendant(activeControl)
+	   && HasAutoScroll()
+	   && (GetHScroll() || GetVScroll())
+	   && activeControl != nullptr
+	   && (client.Width > 0 && client.Height > 0))
+	{
+		Point scrollLocation = ScrollToControl(activeControl);
+		SetScrollState(ScrollStateUserHasScrolled, false);
+		SetDisplayRectLocation(scrollLocation.X, scrollLocation.Y);
+		SyncScrollbars(true);
+	}
 }
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Control.h"
+#include "ContainerControl.h"
 #include "ListBox.h"
 #include "ComboBox.h"
 #include "MenuBar.h"
@@ -17,7 +17,7 @@
 #include "FormStartPosition.h"
 #include "MDIClient.h"
 
-class Window final : public Control
+class Window final : public ContainerControl
 {
 	friend class Menu;
 	friend class NativeWindow;
@@ -37,14 +37,20 @@ private:
 	bool m_IsMenuStripEnabled;
 	bool m_IsIconShown;
 	bool m_IsMDI;
+	bool m_UseMDIChildProc;
+	Drawing::Rectangle m_RestoreBounds;
 	std::unique_ptr<Keyboard> m_Keyboard;
 	std::unique_ptr<Mouse> m_Mouse;
 	std::vector<BYTE> m_RawBuffer;
 	FormBorderStyle m_FormBorderStyle;
 	FormWindowState m_FormWindowState;
 	FormStartPosition m_FormStartPosition;
+	Window* m_ActiveMDIChild;
 	MDIClient* m_CtlClient;
 	Window* m_MDIParent;
+	NativeWindow* m_OwnerWindow;
+	Drawing::Rectangle m_RestoredWindowBounds;
+	BoundsSpecified m_RestoredWindowBoundsSpecified;
 
 	void FillInCreateParamsBorderStyles(CreateParams* cp);
 	void FillInCreateParamsWindowState(CreateParams* cp);
@@ -58,16 +64,26 @@ private:
 	static void HideCursor() noexcept;
 	static void ShowCursor() noexcept;
 	bool HasMenu() noexcept;
+	void UpdateWindowState();
 
-	void Draw(Graphics* const graphics, Drawing::Rectangle rectangle) override;
+	//void Draw(Graphics* const graphics, Drawing::Rectangle rectangle) override;
+
+	void WmCreate(Message& m);
+	void WmEraseBackground(Message& m);
+	void WmNcButtonDown(Message& m);
+	void WmWinPosChanged(Message& m);
 
 protected:
 
+	void DefWndProc(Message& m) override;
+	void WndProc(Message& m) override;
+	
+	void SetBoundsCore(int x, int y, int width, int height, BoundsSpecified specified) override;
 	//void Initialize() override;
 
 public:
 
-	Window(const std::string& name, int width, int height);
+	Window();
 	Window(const Window&) = default;
 	Window& operator=(const Window&) = default;
 	virtual ~Window() noexcept(false) = default;
@@ -97,6 +113,10 @@ public:
 	bool IsCursorEnabled() const noexcept;
 	Keyboard& GetKeyboard() const;
 	Mouse& GetMouse() const;
+	FormWindowState WindowState();
+	void WindowState(FormWindowState value);
+	FormBorderStyle GetFormBorderStyle();
+	void SetFormBorderStyle(FormBorderStyle value);
 
 	constexpr bool HasControlBox() const noexcept { return m_HasControlBox; }
 	constexpr void EnableControlBox() noexcept { m_HasControlBox = 1; }
@@ -106,7 +126,8 @@ public:
 	constexpr void EnableIcon() noexcept { m_IsIconShown = 1; }
 	constexpr void DisableIcon() noexcept { m_IsIconShown = 0; }
 
-	constexpr bool IsMDIChild() const noexcept { return m_CtlClient != nullptr; }
+	constexpr bool IsMDIChild() const noexcept { return m_MDIParent != nullptr; }
+	constexpr Window* GetActiveMDIChild() const noexcept { return m_ActiveMDIChild; }
 	constexpr MDIClient* GetMDIClient() const noexcept { return m_CtlClient; }
 	constexpr Window* GetMDIParent() const noexcept { return m_MDIParent; }
 };

@@ -3,6 +3,7 @@
 #include "Control.h"
 #include "CreateParams.h"
 #include "MDILayout.h"
+#include "DockStyle.h"
 
 #include <vector>
 

@@ -75,7 +75,7 @@ void TestRealTimeApplication::Process(float dt)
 
 void TestRealTimeApplication::Initialize()
 {
-	MainWindow = new Window("Teste", 1920, 1080);
+	MainWindow = new Window();
 
 
 	//ToolStrip& p = window->AddToolStrip();

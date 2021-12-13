@@ -1,56 +1,62 @@
 #include "Color.h"
-#include "Exceptions.h"
+#include "Type.h"
 
 #include <sstream>
 
-void Color::SetR(uint8_t value) noexcept
+Color Color::FromName(const std::string& name)
 {
-	*this = Color(value, GetG(), GetB(), GetA());
+	auto color = LookupNamedColor(name);
+	if(color == KnownColor::Unknown) color = LookupSystemColor(name);
+
+	if(color != KnownColor::Unknown) return color;
+
+	return Color(NotDefinedValue, StateNameValid, name, KnownColor::Unknown);
 }
 
-void Color::SetG(uint8_t value) noexcept
+bool Color::Equals(const Object* const obj) const
 {
-	*this = Color(GetR(), value, GetB(), GetA());
-}
-
-void Color::SetB(uint8_t value) noexcept
-{
-	*this = Color(GetR(), GetG(), value, GetA());
-}
-
-void Color::SetA(uint8_t value) noexcept
-{
-	*this = Color(GetR(), GetG(), GetB(), value);
-}
-
-int Color::GetHashCode() const
-{
-	int tmp;
-	std::memcpy(&tmp, &rgba, sizeof(tmp));
-	return tmp;
-}
-
-inline bool Color::Equals(const Object* const c) const
-{
-	if (c == nullptr) return c;
-
-	if (const auto clr = dynamic_cast<const Color*>(c))
+	if(obj != nullptr)
 	{
-		return rgba == clr->rgba;
+		if(const auto right = dynamic_cast<const Color*>(obj))
+		{
+			if(m_Value == right->m_Value
+			   && m_State == right->m_State
+			   && m_KnownColor == right->m_KnownColor)
+			{
+				if(m_Name.compare(right->m_Name)) return true;
+			}
+		}
 	}
 
-	throw ArgumentException("Arg_MustBeColor");
+	return false;
 }
 
-inline bool Color::Equals(const Color* const c) const
+int Color::GetHashCode() const noexcept
 {
-	if (c == nullptr) return c;
-	return rgba == c->rgba;
+	return ((int)((long)m_Value)) ^ (int)(m_Value >> 32)						// m_Value (int GetHashCode())
+		^ ((int)((unsigned short)m_State) | (((int)m_State) << 16))				// m_State (short GetHashCode())
+		^ ((int)((unsigned short)m_KnownColor) | (((int)m_KnownColor) << 16));	// m_KnownColor (short GetHashCode())
 }
 
 std::string Color::ToString() const noexcept
 {
 	std::ostringstream oss;
-	oss << "{{ARGB=(" << ((rgba >> 24) & 0xFF) << ", " << ((rgba >> 0) & 0xFF) << ", " << ((rgba >> 8) & 0xFF) << ", " << ((rgba >> 16) & 0xFF) << ")}}";
+
+	oss << GetType().ToString();
+	oss << "[";
+
+	if(m_State & StateNameValid != 0) oss << m_Name;
+	else if(m_State & StateKnownColorValid != 0) oss << m_Name;
+	else if(m_State & StateValueMask != 0)
+	{
+		oss << "A=" << GetA() << ", R=" << GetR() << ", G=" << GetG() << ", B=" << GetB();
+	}
+	else
+	{
+		oss << "Empty";
+	}
+
+	oss << "]";
+
 	return oss.str();
 }

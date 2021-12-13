@@ -72,3 +72,13 @@ bool SystemInformation::IsFlatMenuEnabled() noexcept
 {
 	return false;
 }
+
+Size SystemInformation::MinWindowTrackSize()
+{
+	return Size(GetSystemMetrics(SM_CXMINTRACK), GetSystemMetrics(SM_CYMINTRACK));
+}
+
+Size SystemInformation::MaxWindowTrackSize()
+{
+	return Size(GetSystemMetrics(SM_CXMAXTRACK), GetSystemMetrics(SM_CYMAXTRACK));
+}

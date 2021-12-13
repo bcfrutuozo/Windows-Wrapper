@@ -59,6 +59,7 @@ protected:
 	bool GetVScroll() const noexcept;
 	void SetVScroll(bool value);
 
+	virtual Point ScrollToControl(Control* activeControl);
 	void SetDisplayRectLocation(int x, int y);
 	virtual CreateParams* CreateParameters() override;
 	void WndProc(Message& m) override;
@@ -71,4 +72,5 @@ public:
 	Size GetAutoScrollMargin() const noexcept;
 	void SetAutoScrollMargin(int x, int y);
 	void SetAutoScrollMargin(Size s);
+	void ScrollControlIntoView(Control* activeControl);
 };

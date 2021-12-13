@@ -12,12 +12,14 @@
 #include "LayoutUtils.h"
 #include "BoundsSpecified.h"
 #include "IContainerControl.h"
+#include "ContainerControl.h"
 #include "InvalidateEventArgs.h"
 
 // Linker for ::_TrackMouseEvent function (NativeWindow.cpp usage)
 #pragma comment(lib, "comctl32.lib")
 #include <Commctrl.h>
 
+bool Control::m_NeedToLoadCOMCtl = true;
 int Control::m_IncrementalTabIndex = 0;
 unsigned int Control::m_CurrentIndex = 1;
 IntPtr Control::m_OpenedControl = nullptr;
@@ -85,7 +87,7 @@ void Control::OnKeyDown_Impl(HWND hwnd, unsigned int vk, int cRepeat, unsigned i
 			}
 			else // Next control
 			{
-				newCtl = GetNextControl();
+				//newCtl = GetNextControl();
 
 			}
 
@@ -117,7 +119,7 @@ void Control::OnMouseLeftDown_Impl(HWND hwnd, int x, int y, unsigned int keyFlag
 	{
 		const auto& newCtl = GetByHandle(hwnd);
 
-		if(newCtl->IsEnabled() && newCtl->IsTabStop())
+		if(newCtl->IsEnabled() && newCtl->TabStop())
 		{
 			SetFocus(static_cast<HWND>(newCtl->GetHandle().ToPointer()));
 		}
@@ -184,7 +186,39 @@ void Control::Dispose()
 	}
 
 	Controls.clear();
-	if(m_Graphics != nullptr) m_Graphics->Dispose();
+	//if(m_Graphics != nullptr) m_Graphics->Dispose();
+}
+
+ContainerControl* Control::GetParentContainerControl()
+{
+	Control* c = Parent;
+	while(Parent != nullptr)
+	{
+		if(const auto cc = (ContainerControl*)Parent)
+		{
+			return cc;
+		}
+
+		c = c->Parent;
+	}
+
+	return nullptr;
+}
+
+AutoValidate Control::GetAutoValidateForControl(Control* control)
+{
+	ContainerControl* parent = control->GetParentContainerControl();
+	return (parent != nullptr) ? parent->GetAutoValidate() : AutoValidate::EnablePreventFocusChange;
+}
+
+bool Control::CacheTextInternal()
+{
+	return false;
+}
+
+void Control::ChildGotFocus(Control* const child)
+{
+	if(Parent != nullptr) Parent->ChildGotFocus(child);
 }
 
 bool Control::GetAnyDisposingInHierarchy() noexcept
@@ -248,17 +282,43 @@ void Control::OnParentInvalidated(InvalidateEventArgs* const e)
 	}
 }
 
+bool Control::ShouldAutoValidate()
+{
+	return GetAutoValidateForControl(this) != AutoValidate::Disable;
+}
+
+void Control::NotifyValidated()
+{
+	OnValidated(&ArgsDefault);
+}
+
+bool Control::NotifyValidating()
+{
+	CancelEventArgs* ev = new CancelEventArgs();
+	OnValidating(ev);
+	bool ret = ev->Cancel;
+	delete ev;
+	return ret;
+}
+
+void Control::PaintWithoutErrorHandling(PaintEventArgs* const e, short layer)
+{
+	//try
+	//{
+	//
+	//}
+}
+
 Control::Control() noexcept
 	:
 	m_Padding(0),
-	m_TabIndex(m_IncrementalTabIndex++),
+	m_TabIndex(-1),
 	m_IsTabSelected(false),
 	m_IsTabStop(true),
 	m_MinSize(0u),
 	OnActivate(nullptr),
 	OnClick(nullptr),
 	OnDeactivate(nullptr),
-	OnGotFocus(nullptr),
 	OnLostFocus(nullptr),
 	OnKeyDown(nullptr),
 	OnKeyPress(nullptr),
@@ -293,7 +353,11 @@ Control::Control() noexcept
 	m_MinimumSize(0, 0),
 	m_MaximumSize(0, 0),
 	m_Location(0, 0),
-	Parent(nullptr)
+	m_AutoScroll(0, 0),
+	Parent(nullptr),
+	m_IsVisible(false),
+	m_BackgroundColor(Color::FromKnownColor(KnownColor::ActiveBorder)),
+	m_ForeColor(Color::FromName("SlateBlue"))
 {
 	m_Window = new ControlNativeWindow(this);
 	m_State = STATE_VISIBLE | STATE_ENABLED | STATE_TABSTOP | STATE_CAUSESVALIDATION;
@@ -309,8 +373,8 @@ Control::Control() noexcept
 	if(DefaultMaximumSize() != CommonProperties::DefaultMaximumSize) SetMaximumSize(DefaultMaximumSize());
 
 	Size defaultsSize = DefaultSize();
-	m_Width = defaultsSize.Width;
-	m_Height = defaultsSize.Height;
+	m_Width = DefaultSize().Width;
+	m_Height = DefaultSize().Height;
 
 	if(m_Width != 0 && m_Height != 0)
 	{
@@ -352,28 +416,6 @@ Control::Control(const std::string& text, int width, int height, int x, int y) n
 {
 
 }
-
-void Control::EnableTabStop() noexcept
-{
-	if(!IsTabStop())
-	{
-		m_IsTabStop = true;
-	}
-}
-
-void Control::DisableTabStop() noexcept
-{
-	if(IsTabStop())
-	{
-		m_IsTabStop = false;
-	}
-}
-
-bool Control::IsTabStop() const noexcept
-{
-	return m_IsTabStop;
-}
-
 void Control::SetFont(Font font) noexcept
 {
 	for(const auto& c : Controls)
@@ -384,6 +426,21 @@ void Control::SetFont(Font font) noexcept
 	m_Font = font;
 	m_HasFontChanged = true;
 	Update();
+}
+
+bool Control::TabStop() const noexcept
+{
+	return TabStopInternal();
+}
+
+void Control::TabStop(bool value)
+{
+	if(TabStop() != value)
+	{
+		TabStopInternal(value);
+		if(IsHandleCreated()) SetWindowStyle(WS_TABSTOP, value);
+		OnTabStopChanged(&ArgsDefault);
+	}
 }
 
 void Control::SetText(const std::string& text) noexcept
@@ -425,6 +482,12 @@ void Control::CreateHandle()
 
 CreateParams* Control::CreateParameters()
 {
+	if(m_NeedToLoadCOMCtl)
+	{
+		const char* COMctlPath = "C:\\Windows\\System32\\ComCtl32.dll";
+		if(GetModuleHandle(COMctlPath) != 0 || LoadLibrary(COMctlPath) != 0) m_NeedToLoadCOMCtl = false;
+	}
+
 	if(m_CreateParams == nullptr) m_CreateParams = new CreateParams();
 
 	CreateParams* cp = m_CreateParams;
@@ -452,7 +515,7 @@ CreateParams* Control::CreateParameters()
 		cp->Parent = IntPtr::Zero();
 	}
 
-	if(IsTabStop()) cp->Style |= WS_TABSTOP;
+	if(TabStop()) cp->Style |= WS_TABSTOP;
 	if(IsShown()) cp->Style |= WS_VISIBLE;
 	if(IsEnabled()) cp->Style |= WS_DISABLED;
 
@@ -521,7 +584,6 @@ void Control::SetBoundsCore(int x, int y, int width, int height, BoundsSpecified
 					flags |= SWP_NOSIZE;
 				}
 
-				//
 				// Give a chance for derived controls to do what they want, just before we resize.
 				OnBoundsUpdate(x, y, width, height);
 
@@ -578,6 +640,179 @@ bool Control::RenderTransparent()
 	return GetStyle(ControlStyles::SupportsTransparentBackColor) && GetBackgroundColor().GetA() < 255;
 }
 
+const Control* const Control::FromHandleInternal(IntPtr handle)
+{
+	NativeWindow* w = NativeWindow::FromHandle(handle);
+	while(w != nullptr && !(ControlNativeWindow*)w)
+	{
+		w = w->GetPreviousWindow();
+	}
+
+	if(!(ControlNativeWindow*)w)
+	{
+		return ((ControlNativeWindow*)w)->GetControl();
+	}
+
+	return nullptr;
+}
+
+Control* Control::FromChildHandleInternal(IntPtr handle)
+{
+	while(handle != IntPtr::Zero())
+	{
+		Control* ctl = const_cast<Control*>(FromHandleInternal(handle));
+		if(ctl != nullptr) return ctl;
+
+		handle = GetAncestor(handle, GA_PARENT);
+	}
+
+	return nullptr;
+}
+
+bool Control::IsHostedInWin32DialogManager()
+{
+	if(!GetState(STATE_CHECKEDHOST))
+	{
+		Control* topMost = GetTopMostParent();
+		if(this != topMost)
+		{
+			SetState(STATE_HOSTEDINDIALOG, topMost->IsHostedInWin32DialogManager());
+		}
+		else
+		{
+			IntPtr parentHandle = ::GetParent(GetHandle());
+			IntPtr lastParentHandle = parentHandle;
+
+			std::ostringstream oss;
+
+			SetState(STATE_HOSTEDINDIALOG, false);
+
+			while(parentHandle != IntPtr::Zero())
+			{
+				int len = GetClassName(lastParentHandle, nullptr, 0);
+				len += 5;
+				char buffer[256];
+				GetClassName(lastParentHandle, buffer, len);
+				oss << std::string(buffer);
+
+				if(oss.str() == "#32770")
+				{
+					SetState(STATE_HOSTEDINDIALOG, true);
+					break;
+				}
+
+				lastParentHandle = parentHandle;
+				parentHandle = ::GetParent(parentHandle);
+			}
+		}
+
+		SetState(STATE_CHECKEDHOST, true);
+	}
+
+	return GetState(STATE_HOSTEDINDIALOG);
+}
+
+Control* Control::GetTopMostParent()
+{
+	Control* control = this;
+
+	while(control->Parent != nullptr)
+	{
+		control = control->Parent;
+	}
+
+	return control;
+}
+
+Window* Control::FindWindowInternal()
+{
+	Control* cur = this;
+	while(cur != nullptr && !(Window*)cur)
+	{
+		cur = cur->Parent;
+	}
+
+	return (Window*)cur;
+}
+
+bool Control::IsDescendant(Control* descendant)
+{
+	Control* control = descendant;
+	while(control != nullptr)
+	{
+		if(control == this) return true;
+		control = control->Parent;
+	}
+	return false;
+}
+
+void Control::NotifyEnter()
+{
+	OnEnter(&ArgsDefault);
+}
+
+void Control::NotifyLeave()
+{
+	OnLeave(&ArgsDefault);
+}
+
+bool Control::GetValidationCancelled()
+{
+	if(GetState(STATE_VALIDATIONCANCELLED)) return true;
+	else
+	{
+		Control* parent = Parent;
+		if(parent != nullptr) return parent->GetValidationCancelled();
+		return false;
+	}
+}
+
+void Control::SetValidationCancelled(bool value)
+{
+	SetState(STATE_VALIDATIONCANCELLED, value);
+}
+
+bool Control::CanSelectCore()
+{
+	if((m_ControlStyle & ControlStyles::Selectable) != ControlStyles::Selectable)
+	{
+		return false;
+	}
+
+	for(auto ctl = this; ctl != nullptr; ctl = ctl->Parent)
+	{
+		if(!ctl->IsEnabled() || !ctl->IsShown()) return false;
+	}
+
+	return true;
+}
+
+bool Control::TabStopInternal() const noexcept
+{
+	return (m_State & STATE_TABSTOP) != 0;
+}
+
+void Control::TabStopInternal(bool value)
+{
+	if(TabStopInternal() != value) SetState(STATE_TABSTOP, value);
+}
+
+Size Control::SizeFromClientSize(int width, int height)
+{
+	RECT rect = { 0, 0, width, height };
+	CreateParams* cp = CreateParameters();
+	AdjustWindowRectEx(&rect, cp->Style, HasMenu(), cp->ExStyle);
+	return Size(rect.right - rect.left, rect.bottom - rect.top);
+}
+
+void Control::SetClientSizeCore(int x, int y)
+{
+	SetSize(SizeFromClientSize(x, y));
+	m_ClientWidth = x;
+	m_ClientHeight = y;
+	OnClientSizeChanged(&ArgsDefault);
+}
+
 void Control::HookMouseEvent()
 {
 	if(!GetState(STATE_TRACKINGMOUSEEVENT))
@@ -605,7 +840,6 @@ Control::~Control() noexcept(false)
 	if(OnActivate != nullptr) { delete OnActivate; OnActivate = nullptr; }
 	if(OnClick != nullptr) { delete OnClick; OnClick = nullptr; }
 	if(OnDeactivate != nullptr) { delete OnDeactivate; OnDeactivate = nullptr; }
-	if(OnGotFocus != nullptr) { delete OnGotFocus; OnGotFocus = nullptr; }
 	if(OnLostFocus != nullptr) { delete OnLostFocus; OnLostFocus = nullptr; }
 	if(OnKeyDown != nullptr) { delete OnKeyDown; OnKeyDown = nullptr; }
 	if(OnKeyPress != nullptr) { delete OnKeyPress; OnKeyPress = nullptr; }
@@ -623,7 +857,7 @@ Control::~Control() noexcept(false)
 	if(OnPaint != nullptr) { delete OnPaint; OnPaint = nullptr; }
 	if(OnVisibleChanged != nullptr) { delete OnVisibleChanged; OnVisibleChanged = nullptr; }
 
-	SafeDelete(m_Graphics);
+	//SafeDelete(m_Graphics);
 	if(DestroyWindow(static_cast<HWND>(GetHandle().ToPointer())) == 0)
 	{
 		throw CTL_LAST_EXCEPT();
@@ -649,12 +883,6 @@ void Control::OnDeactivateSet(const std::function<void(Object*, EventArgs*)>& ca
 {
 	OnDeactivate = new EventHandler("OnDeactivate", callback);
 	Events.Register(OnDeactivate);
-}
-
-void Control::OnGotFocusSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept
-{
-	OnGotFocus = new EventHandler("OnGotFocus", callback);
-	Events.Register(OnGotFocus);
 }
 
 void Control::OnLostFocusSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept
@@ -753,15 +981,36 @@ void Control::OnVisibleChangedSet(const std::function<void(Object*, EventArgs*)>
 	Events.Register(OnVisibleChanged);
 }
 
+void Control::OnCausesValidationChanged(EventArgs* const e)
+{
+	Dispatch("OnCausesValidationChanged", e);
+}
+
 void Control::OnClientSizeChanged(EventArgs* const e)
 {
 	Dispatch("OnClientSizeChanged", e);
+}
+
+void Control::OnEnter(EventArgs* const e)
+{
+	Dispatch("OnEnter", e);
+}
+
+void Control::OnGotFocus(EventArgs* const e)
+{
+	if(Parent != nullptr) Parent->ChildGotFocus(this);
+	Dispatch("OnGotFocus", e);
 }
 
 void Control::OnMove(EventArgs* const e)
 {
 	Dispatch("OnMove", e);
 	if(RenderTransparent()) Invalidate();
+}
+
+void Control::OnLeave(EventArgs* const e)
+{
+	Dispatch("OnLeave", e);
 }
 
 void Control::OnLocationChanged(EventArgs* const e)
@@ -780,6 +1029,12 @@ void Control::OnInvalidated(InvalidateEventArgs* const e)
 	Dispatch("OnInvalidated", e);
 }
 
+void Control::OnPaddingChanged(EventArgs* const e)
+{
+	if(GetStyle(ControlStyles::ResizeRedraw)) Invalidate();
+	Dispatch("OnPaddingChanged", e);
+}
+
 void Control::OnResize(EventArgs* const e)
 {
 	if((m_ControlStyle & ControlStyles::ResizeRedraw) == ControlStyles::ResizeRedraw
@@ -795,6 +1050,21 @@ void Control::OnSizeChanged(EventArgs* const e)
 {
 	OnResize(e);
 	Dispatch("OnSizeChanged", e);
+}
+
+void Control::OnTabStopChanged(EventArgs* const e)
+{
+	Dispatch("OnTabStopChanged", e);
+}
+
+void Control::OnValidated(EventArgs* const e)
+{
+	Dispatch("OnValidated", e);
+}
+
+void Control::OnValidating(CancelEventArgs* const e)
+{
+	Dispatch("OnValidating", e);
 }
 
 void Control::NotifyInvalidate(Drawing::Rectangle invalidatedArea)
@@ -831,12 +1101,12 @@ void Control::WndProc(Message& m)
 		}
 		case WM_CREATE:
 		{
-			OnCreate_Impl(hWnd, (LPCREATESTRUCT)lParam.ToPointer());
+			WmCreate(m);
 			break;
 		}
 		case WM_ERASEBKGND:
 		{
-			OnEraseBackground_Impl(hWnd, (HDC)wParam);
+			WmEraseBackground(m);
 			break;
 		}
 		case WM_COMMAND:
@@ -1045,7 +1315,7 @@ Control* Control::GetPreviousControl() noexcept
 		for(auto i = searchIndex; i >= 0; --i)
 		{
 			const auto& ret = root->GetByTabIndex(i);
-			if(ret != nullptr && ret->IsEnabled() && ret->IsTabStop())
+			if(ret != nullptr && ret->IsEnabled() && ret->TabStop())
 			{
 				return ret;
 			}
@@ -1061,24 +1331,198 @@ bool Control::HasChildren() const noexcept
 	return Controls.size() > 0;
 }
 
-Control* Control::GetNextControl() noexcept
+Control* Control::GetNextControl(Control* ctl, bool forward) noexcept
 {
-	if(const auto& root = dynamic_cast<Control*>(GetWindow()))
+	if(!Contains(ctl))
 	{
-		auto searchIndex = m_TabIndex >= m_IncrementalTabIndex - 1 ? 0 : m_TabIndex + 1;
+		ctl = this;
+	}
 
-		for(auto i = searchIndex; i < m_IncrementalTabIndex; ++i)
+	if(forward)
+	{
+		if(Controls.size() > 0 && (ctl == this || !IsFocusManagingContainerControl(ctl)))
 		{
-			const auto& ret = root->GetByTabIndex(i);
-			if(ret != nullptr && ret->IsEnabled() && ret->IsTabStop())
+			Control* found = ctl->GetFirstChildControlInTabOrder(/*forward=*/true);
+			if(found != nullptr)
 			{
-				return ret;
+				return found;
+			}
+		}
+
+		while(ctl != this)
+		{
+			int targetIndex = ctl->m_TabIndex;
+			bool hitCtl = false;
+			Control* found = nullptr;
+			Control* p = ctl->Parent;
+
+			// Cycle through the controls in z-order looking for the one with the next highest
+			// tab index.  Because there can be dups, we have to start with the existing tab index and
+			// remember to exclude the current control.
+			//
+			int parentControlCount = 0;
+
+			std::vector<Control*> parentControls = std::vector<Control*>(p->Controls.size());
+
+			for(const auto c : p->Controls)
+				parentControls.push_back(c);
+
+			parentControlCount = parentControls.size();
+
+			for(int c = 0; c < parentControlCount; c++)
+			{
+
+				// The logic for this is a bit lengthy, so I have broken it into separate
+				// caluses:
+
+				// We are not interested in ourself.
+				//
+				if(parentControls[c] != ctl)
+				{
+
+					// We are interested in controls with >= tab indexes to ctl.  We must include those
+					// controls with equal indexes to account for duplicate indexes.
+					//
+					if(parentControls[c]->m_TabIndex >= targetIndex)
+					{
+
+						// Check to see if this control replaces the "best match" we've already
+						// found.
+						//
+						if(found == nullptr || found->m_TabIndex > parentControls[c]->m_TabIndex)
+						{
+
+							// Finally, check to make sure that if this tab index is the same as ctl,
+							// that we've already encountered ctl in the z-order.  If it isn't the same,
+							// than we're more than happy with it.
+							//
+							if(parentControls[c]->m_TabIndex != targetIndex || hitCtl)
+							{
+								found = parentControls[c];
+							}
+						}
+					}
+				}
+				else
+				{
+					// We track when we have encountered "ctl".  We never want to select ctl again, but
+					// we want to know when we've seen it in case we find another control with the same tab index.
+					//
+					hitCtl = true;
+				}
+			}
+
+			if(found != nullptr)
+			{
+				return found;
+			}
+
+			ctl = ctl->Parent;
+		}
+	}
+	else
+	{
+		if(ctl != this)
+		{
+
+			int targetIndex = ctl->m_TabIndex;
+			bool hitCtl = false;
+			Control* found = nullptr;
+			Control* p = ctl->Parent;
+				   
+			// Cycle through the controls in reverse z-order looking for the next lowest tab index.  We must
+			// start with the same tab index as ctl, because there can be dups.
+			//
+			int parentControlCount = 0;
+
+			std::vector<Control*> parentControls = std::vector<Control*>(p->Controls.size());
+
+			for(const auto c : p->Controls)
+				parentControls.push_back(c);
+
+			parentControlCount = parentControls.size();
+
+			for(int c = parentControlCount - 1; c >= 0; c--)
+			{
+
+				// The logic for this is a bit lengthy, so I have broken it into separate
+				// caluses:
+
+				// We are not interested in ourself.
+				//
+				if(parentControls[c] != ctl)
+				{
+
+					// We are interested in controls with <= tab indexes to ctl.  We must include those
+					// controls with equal indexes to account for duplicate indexes.
+					//
+					if(parentControls[c]->m_TabIndex <= targetIndex)
+					{
+
+						// Check to see if this control replaces the "best match" we've already
+						// found.
+						//
+						if(found == nullptr || found->m_TabIndex < parentControls[c]->m_TabIndex)
+						{
+
+							// Finally, check to make sure that if this tab index is the same as ctl,
+							// that we've already encountered ctl in the z-order.  If it isn't the same,
+							// than we're more than happy with it.
+							//
+							if(parentControls[c]->m_TabIndex != targetIndex || hitCtl)
+							{
+								found = parentControls[c];
+							}
+						}
+					}
+				}
+				else
+				{
+					// We track when we have encountered "ctl".  We never want to select ctl again, but
+					// we want to know when we've seen it in case we find another control with the same tab index.
+					//
+					hitCtl = true;
+				}
+			}
+
+			// If we were unable to find a control we should return the control's parent.  However, if that parent is us, return
+			// NULL.
+			//
+			if(found != nullptr)
+			{
+				ctl = found;
+			}
+			else
+			{
+				if(p == this)
+				{
+					return nullptr;
+				}
+				else
+				{
+					return p;
+				}
+			}
+		}
+
+		auto ctlControls = ctl->Controls;
+
+		while(ctlControls.size() > 0 && (ctl == this || !IsFocusManagingContainerControl(ctl)))
+		{
+			Control* found = ctl->GetFirstChildControlInTabOrder(/*forward=*/false);
+			if(found != nullptr)
+			{
+				ctl = found;
+				ctlControls = ctl->Controls;
+			}
+			else
+			{
+				break;
 			}
 		}
 	}
 
-	// Returning nullptr is extremely important, otherwise it will be a trash pointer and will launch an exception trying to process it
-	return nullptr;
+	return ctl == this ? nullptr : ctl;
 }
 
 Control* Control::GetByHandle(const IntPtr p) noexcept
@@ -1238,10 +1682,10 @@ void Control::Update()
 	InvalidateRect(static_cast<HWND>(GetHandle().ToPointer()), nullptr, true);
 }
 
-const Graphics* Control::CreateGraphics() const noexcept
-{
-	return m_Graphics;
-}
+//const Graphics* Control::CreateGraphics() const noexcept
+//{
+//	return m_Graphics;
+//}
 
 bool Control::IsShown() const noexcept
 {
@@ -1271,31 +1715,44 @@ Font Control::GetFont() const noexcept
 	return m_Font;
 }
 
+bool Control::ContainsFocus()
+{
+	if(!IsHandleCreated()) return false;
+
+	IntPtr focusHwnd = GetFocus();
+
+	if(focusHwnd == IntPtr::Zero()) return false;
+	if(focusHwnd == GetHandle()) return true;
+	if(IsChild(GetHandle(), focusHwnd)) return true;
+
+	return false;
+}
+
 Color Control::GetBackgroundColor() const noexcept
 {
-	if((m_BackgroundColor == Color::ControlBackground_Win11() || m_BackgroundColor == Color::ControlBackground_Win10()) && !IsEnabled())
-	{
-		return Color::DisabledControlBackground();
-	}
+	//if((m_BackgroundColor == Color::ControlBackground_Win11() || m_BackgroundColor == Color::ControlBackground_Win10()) && !IsEnabled())
+	//{
+	//	return Color::DisabledControlBackground();
+	//}
 
 	return m_BackgroundColor;
 }
 
 void Control::SetBackgroundColor(const Color& color) noexcept
 {
-	m_BackgroundColor = color;
+	//m_BackgroundColor = color;
 	Update();
 }
 
 Color Control::GetForeColor() const noexcept
 {
-	if(!IsEnabled()) return Color::DisabledForeground();
+	//if(!IsEnabled()) return Color::DisabledForeground();
 	return m_ForeColor;
 }
 
 void Control::SetForeColor(const Color& color) noexcept
 {
-	m_ForeColor = color;
+	//m_ForeColor = color;
 	Update();
 }
 
@@ -1551,7 +2008,7 @@ void Control::Invalidate(Drawing::Rectangle rc, bool invalidateChildren)
 		RECT rcArea = { rc.X, rc.Y, rc.Width, rc.Height };
 
 		if(invalidateChildren)
-		{	
+		{
 			RedrawWindow(GetHandle(), &rcArea, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN);
 		}
 		else
@@ -1563,6 +2020,64 @@ void Control::Invalidate(Drawing::Rectangle rc, bool invalidateChildren)
 	NotifyInvalidate(rc);
 }
 
+Drawing::Rectangle Control::RectangleToClient(Drawing::Rectangle r)
+{
+	RECT rect = { r.X, r.Y, r.X + r.Width, r.Y + r.Height };
+	MapWindowPoints(nullptr, GetHandle(), (LPPOINT)(&rect), 2);
+	return Drawing::Rectangle::FromLTRB(rect.left, rect.top, rect.right, rect.bottom);
+}
+
+Drawing::Rectangle Control::RectangleToScreen(Drawing::Rectangle r)
+{
+	RECT rect = { r.X, r.Y, r.X + r.Width, r.Y + r.Height };
+	MapWindowPoints(GetHandle(), nullptr, (LPPOINT)(&rect), 2);
+	return Drawing::Rectangle::FromLTRB(rect.left, rect.top, rect.right, rect.bottom);
+}
+
+Point Control::GetAutoScrollOffset() const noexcept
+{
+	return m_AutoScroll;
+}
+
+void Control::SetAutoScrollOffse(Point p)
+{
+	m_AutoScroll = p;
+}
+
+void Control::SetAutoScrollOffse(int x, int y)
+{
+	m_AutoScroll = Point(x, y);
+}
+
+bool Control::CausesValidation()
+{
+	return GetState(STATE_CAUSESVALIDATION);
+}
+
+void Control::CausesValidation(bool value)
+{
+	if(value != CausesValidation())
+	{
+		SetState(STATE_CAUSESVALIDATION, value);
+		OnCausesValidationChanged(&ArgsDefault);
+	}
+}
+
+bool Control::CanSelect()
+{
+	return CanSelectCore();
+}
+
+Size Control::GetClientSize()
+{
+	return Size(m_ClientWidth, m_ClientHeight);
+}
+
+void Control::SetClientSize(Size value)
+{
+	SetClientSizeCore(value.Width, value.Height);
+}
+
 void Control::ResetMouseEventArgs()
 {
 	if(GetState(STATE_TRACKINGMOUSEEVENT))
@@ -1570,6 +2085,11 @@ void Control::ResetMouseEventArgs()
 		UnhookMouseEvent();
 		HookMouseEvent();
 	}
+}
+
+bool Control::HasMenu()
+{
+	return false;
 }
 
 bool Control::GetTopLevel() const noexcept
@@ -1639,32 +2159,96 @@ void Control::UpdateBounds(int x, int y, int width, int height, int clientWidth,
 	}
 }
 
-// Default PreDraw function which is used to recalculate elements according to DataSource, number of elements, etc...
-void Control::PreDraw(Graphics* const graphics)
+void Control::InvokeGotFocus(Control* const toInvoke, EventArgs* const e)
 {
-	auto hwnd = static_cast<HWND>(GetHandle().ToPointer());
-
-	if(m_HasFontChanged)
+	if(toInvoke != nullptr)
 	{
-		graphics->CreateFontObject(m_Font);
-		auto hFont = graphics->GetElement(std::string(m_Font.ToString()));
-		SendMessage(hwnd, WM_SETFONT, (WPARAM)hFont, true);
-		m_HasFontChanged = false;
+		toInvoke->OnGotFocus(e);
+	}
+}
+
+bool Control::PerformControlValidation(bool bulkValidation)
+{
+	if(!CausesValidation()) return false;
+
+	if(NotifyValidating()) return true;
+
+	if(bulkValidation)
+	{
+		NotifyValidated();
+	}
+	else
+	{
+		try
+		{
+			NotifyValidated();
+		}
+		catch(const Exception& e)
+		{
+
+		}
+	}
+}
+
+Control* Control::GetFirstChildControlInTabOrder(bool forward)
+{
+	Control* found = nullptr;
+
+	if(forward)
+	{
+		for(auto it = Controls.begin(); it != Controls.end(); ++it)
+		{
+			if(found == nullptr || found->m_TabIndex > (*it)->m_TabIndex)
+			{
+				found = *it;
+			}
+		}
+	}
+	else
+	{
+		for(auto it = Controls.rbegin(); it != Controls.rend(); ++it)
+		{
+			if(found == nullptr || found->m_TabIndex < (*it)->m_TabIndex)
+			{
+				found = *it;
+			}
+		}
 	}
 
-	graphics->CreateSolidBrush(GetBackgroundColor());
-	graphics->CreateSolidBrush(GetForeColor());
+	return found;
 }
 
-void Control::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
+void Control::NotifyValidationResult(Object* const sender, CancelEventArgs* const e)
 {
-
+	SetValidationCancelled(e->Cancel);
 }
 
-void Control::PostDraw(Graphics* const graphics)
-{
+// Default PreDraw function which is used to recalculate elements according to DataSource, number of elements, etc...
+//void Control::PreDraw(Graphics* const graphics)
+//{
+//	auto hwnd = static_cast<HWND>(GetHandle().ToPointer());
+//
+//	if(m_HasFontChanged)
+//	{
+//		graphics->CreateFontObject(m_Font);
+//		auto hFont = graphics->GetElement(std::string(m_Font.ToString()));
+//		SendMessage(hwnd, WM_SETFONT, (WPARAM)hFont, true);
+//		m_HasFontChanged = false;
+//	}
+//
+//	graphics->CreateSolidBrush(GetBackgroundColor());
+//	graphics->CreateSolidBrush(GetForeColor());
+//}
 
-}
+//void Control::Draw(Graphics* const graphics, Drawing::Rectangle rectangle)
+//{
+//
+//}
+
+//void Control::PostDraw(Graphics* const graphics)
+//{
+//
+//}
 
 void Control::OnActivate_Impl(HWND hwnd, unsigned int state, HWND hwndActDeact, bool minimized)
 {
@@ -1734,14 +2318,17 @@ void Control::OnClosed_Impl(HWND hwnd)
 	Dispatch("OnClosed", &ArgsOnClosed);
 }
 
-void Control::OnCreate_Impl(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
+void Control::WmCreate(Message& m)
 {
-	if(!IsHandleCreated()) CreateHandle();
+	DefWndProc(m);
 
-	m_Graphics = Graphics::Create(hwnd, GetSize());
-	m_Graphics->CreateSolidBrush(m_BackgroundColor);
-	m_Graphics->CreateSolidBrush(m_ForeColor);
-	m_Graphics->CreateFontObject(m_Font);
+	//if(Parent != nullptr) Parent->UpdateChildZOrder(this);
+
+	UpdateBounds();
+	//OnHandleCreated(&ArgsDefault);
+
+	if(!GetStyle(ControlStyles::CacheText)) Text = "";
+
 	Dispatch("OnCreate", &ArgsDefault);
 }
 
@@ -1750,12 +2337,31 @@ void Control::OnEnable_Impl(HWND hwnd, bool fEnable)
 
 }
 
-int Control::OnEraseBackground_Impl(HWND hwnd, HDC hdc)
+void Control::WmEraseBackground(Message& m)
 {
-	// 0 always redraw
-	// Some controls like have 1 to avoid flickering on input
+	if(GetStyle(ControlStyles::UserPaint))
+	{
+		if(!GetStyle(ControlStyles::AllPaintingInWmPaint))
+		{
+			IntPtr dc = m.wParam;
+			if(dc == IntPtr::Zero())
+			{
+				m.Result = (void*)0;
+				return;
+			}
 
-	return 0;
+			RECT rc = { 0 };
+			GetClientRect(GetHandle(), &rc);
+			//PaintEventArgs* pevent = new PaintEventArgs(dc, Drawing::Rectangle::FromLTRB(rc.left, rc.top, rc.right, rc.bottom));
+			//PaintWithoutErrorHandling(pevent, PaintLayerBackground);
+		}
+
+		m.Result = (void*)1;
+	}
+	else
+	{
+		DefWndProc(m);
+	}
 }
 
 
@@ -1895,19 +2501,19 @@ void Control::OnPaint_Impl(HWND hwnd)
 	{
 		Drawing::Rectangle rect = Drawing::Rectangle(0, 0, GetSize().Width, GetSize().Height);
 
-		if(m_Graphics == nullptr)
-		{
-			m_Graphics = Graphics::Create(GetHandle(), GetSize());
-		}
+		//if(m_Graphics == nullptr)
+		//{
+		//	m_Graphics = Graphics::Create(GetHandle(), GetSize());
+		//}
 
-		PaintEventArgs pArgs = PaintEventArgs(m_Graphics, rect);
-
-		m_Graphics->BeginDraw();
-		PreDraw(m_Graphics);
-		Draw(m_Graphics, rect);
-		Dispatch("OnPaint", &pArgs);
-		m_Graphics->EndDraw();
-		PostDraw(m_Graphics);
+		//PaintEventArgs pArgs = PaintEventArgs(m_Graphics, rect);
+		//
+		//m_Graphics->BeginDraw();
+		//PreDraw(m_Graphics);
+		//Draw(m_Graphics, rect);
+		//Dispatch("OnPaint", &pArgs);
+		//m_Graphics->EndDraw();
+		//PostDraw(m_Graphics);
 
 		//PAINTSTRUCT ps = { 0 };
 		//BeginPaint(hwnd, &ps);
@@ -2075,4 +2681,10 @@ int Control::GetWindowStyle()
 void Control::SetWindowStyle(IntPtr value)
 {
 	SetWindowLong(static_cast<HWND>(GetHandle().ToPointer()), GWL_STYLE, value.ToInt64());
+}
+
+void Control::SetWindowStyle(int flag, bool value)
+{
+	int styleFlags = ((int)((long)GetWindowLong(GetHandle(), GWL_STYLE)));
+	SetWindowLong(GetHandle(), GWL_STYLE, (long)(value ? styleFlags | flag : styleFlags & ~flag));
 }

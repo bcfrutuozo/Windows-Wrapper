@@ -186,6 +186,7 @@
     <ClCompile Include="HScrollProperties.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="InvalidCastException.cpp" />
+    <ClCompile Include="InvalidEnumArgumentException.cpp" />
     <ClCompile Include="InvalidOperationException.cpp" />
     <ClCompile Include="IOException.cpp" />
     <ClCompile Include="Label.cpp" />
@@ -245,6 +246,7 @@
     <ClCompile Include="TextBox.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Type.cpp" />
+    <ClCompile Include="UserControl.cpp" />
     <ClCompile Include="Utilities.cpp" />
     <ClCompile Include="Version.cpp" />
     <ClCompile Include="VerticalScrollBar.cpp" />
@@ -261,6 +263,7 @@
     <ClInclude Include="AutoScaleMode.h" />
     <ClInclude Include="AutoValidate.h" />
     <ClInclude Include="Bitmap.h" />
+    <ClInclude Include="BorderStyle.h" />
     <ClInclude Include="BoundsSpecified.h" />
     <ClInclude Include="CancelEventArgs.h" />
     <ClInclude Include="CancelEventHandler.h" />
@@ -318,11 +321,13 @@
     <ClInclude Include="Image.h" />
     <ClInclude Include="InvalidateEventArgs.h" />
     <ClInclude Include="InvalidCastException.h" />
+    <ClInclude Include="InvalidEnumArgumentException.h" />
     <ClInclude Include="InvalidOperationException.h" />
     <ClInclude Include="IOException.h" />
     <ClInclude Include="ISite.h" />
     <ClInclude Include="IWindowTarget.h" />
     <ClInclude Include="Keys.h" />
+    <ClInclude Include="KnownColor.h" />
     <ClInclude Include="Label.h" />
     <ClInclude Include="LayoutEventArgs.h" />
     <ClInclude Include="LayoutUtils.h" />
@@ -385,6 +390,7 @@
     <ClInclude Include="IWin32Window.h" />
     <ClInclude Include="IntPtr.h" />
     <ClInclude Include="TestUserApplication.h" />
+    <ClInclude Include="UserControl.h" />
     <ClInclude Include="UserPreferenceCategory.h" />
     <ClInclude Include="UserPreferenceChangedEventArgs.h" />
     <ClInclude Include="Utilities.h" />

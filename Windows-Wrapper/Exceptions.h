@@ -11,6 +11,7 @@
 #include "FileNotFoundException.h"
 #include "FormatException.h"
 #include "InvalidCastException.h"
+#include "InvalidEnumArgumentException.h"
 #include "InvalidOperationException.h"
 #include "IOException.h"
 #include "NotImplementedException.h"
@@ -127,6 +128,16 @@ InvalidCastException(const std::string& message, Exception* const innerException
 InvalidCastException(const std::string& message, HRESULT hr)
 **************************************************************************************************************************************/
 #define InvalidCastException(...) InvalidCastException(__LINE__, __FILE__, ##__VA_ARGS__)
+
+/**************************************************************************************************************************************
+InvalidEnumException macro translations:
+
+InvalidEnumException()
+InvalidEnumException(const std::string& message)
+InvalidEnumException(const std::string& message, Exception* const innerException)
+InvalidEnumException(const std::string& argumentName, int invalidValue, const std::string& enumTypeClassName)
+**************************************************************************************************************************************/
+#define InvalidEnumArgumentException(...) InvalidEnumArgumentException(__LINE__, __FILE__, ##__VA_ARGS__)
 
 /**************************************************************************************************************************************
 InvalidOperationException macro translations:

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Color.h"
 #include "Component.h"
 #include "NativeWindow.h"
 #include "Utilities.h"
@@ -23,6 +24,8 @@
 #include "ControlStyles.h"
 #include "RightToLeft.h"
 #include "CommonProperties.h"
+#include "AutoValidate.h"
+#include "Font.h"
 
 #include <list>
 #include <memory>
@@ -30,10 +33,12 @@
 
 class Window;
 class IContainerControl;
+class ContainerControl;
 class InvalidateEventArgs;
 
 class Control : public Component, public IArrangedElement
 {
+	friend class UserControl;
 	friend class ContainerControl;
 	friend class ScrollableControl;
 	friend class Window;
@@ -41,6 +46,7 @@ class Control : public Component, public IArrangedElement
 	friend class ToolStrip;
 	friend class TextBox;
 	friend class ListBox;
+	friend class Window;
 
 private:
 
@@ -81,6 +87,11 @@ private:
 	ControlNativeWindow* m_Window;
 	CreateParams* m_CreateParams;
 	RightToLeft m_RightToLeft;
+	Point m_AutoScroll;
+	static bool m_NeedToLoadCOMCtl;
+
+	static constexpr int PaintLayerBackground = 1;
+	static constexpr int PaintLayerForeground = 2;
 
 	int m_State;
 	static constexpr int STATE_CREATED = 0x00000001;
@@ -115,16 +126,31 @@ private:
 	static constexpr int STATE_PARENTRECREATING = 0x20000000;
 	static constexpr int STATE_MIRRORED = 0x40000000;
 
+	static constexpr unsigned char RequiredScalingEnabledMask = 0x10;
 	static constexpr unsigned char RequiredScalingMask = 0x0F;
+	static constexpr unsigned char HighOrderBitMask = 0x80;
 
 	ControlStyles m_ControlStyle;
 
+	ContainerControl* GetParentContainerControl();
+
+	static AutoValidate GetAutoValidateForControl(Control* control);
+
+	bool CacheTextInternal();
+	void CacheTextInternal(bool value);
+
+	void ChildGotFocus(Control* const child);
 	bool GetAnyDisposingInHierarchy() noexcept;
 	void SetHandle(IntPtr value);
 	void PerformLayout(LayoutEventArgs args);
 	void InitScaling(BoundsSpecified specified);
 	static bool IsFocusManagingContainerControl(Control* const ctl);
 	void OnParentInvalidated(InvalidateEventArgs* const e);
+	bool ShouldAutoValidate();
+	void NotifyValidated();
+	bool NotifyValidating();
+
+	void PaintWithoutErrorHandling(PaintEventArgs* const e, short layer);
 	constexpr RightToLeft DefaultRightToLeft() noexcept { return RightToLeft::No; };
 
 protected:
@@ -153,7 +179,7 @@ protected:
 	Size m_MinimumSize;
 	Size m_MaximumSize;
 	Point m_Location;
-	Graphics* m_Graphics;
+	//Graphics* m_Graphics;
 	Font m_Font;
 	Color m_ForeColor;
 	Color m_BackgroundColor;
@@ -186,7 +212,6 @@ protected:
 	EventHandler* OnActivate;
 	EventHandler* OnClick;
 	EventHandler* OnDeactivate;
-	EventHandler* OnGotFocus;
 	EventHandler* OnLostFocus;
 	KeyEventHandler* OnKeyDown;
 	KeyPressEventHandler* OnKeyPress;
@@ -209,23 +234,23 @@ protected:
 	Control(Control* parent, const std::string& text, int width, int height, int x, int y) noexcept;
 	Control(const std::string& text) noexcept;
 	Control(const std::string& text, int width, int height, int x, int y) noexcept;
-	Control(const Control&) = default;														
-	Control(Control&&) = default;															
-	Control& operator=(const Control&) = default;											
-	Control& operator=(Control&&) = default;	
+	Control(const Control&) = default;
+	Control(Control&&) = default;
+	Control& operator=(const Control&) = default;
+	Control& operator=(Control&&) = default;
 
 	virtual void CreateHandle();
 	virtual CreateParams* CreateParameters();
 
 	// Default PreDraw function which is used to recalculate elements according to DataSource, number of elements, etc...
-	virtual void PreDraw(Graphics* const graphics);
+	//virtual void PreDraw(Graphics* const graphics);
 
 	// Private Draw function called to base draw the control
 	// Rectangle is not passed as reference because it will be modified to draw elements while the user must receive the original one
-	virtual void Draw(Graphics* const graphics, Drawing::Rectangle rectangle) = 0;
+	//virtual void Draw(Graphics* const graphics, Drawing::Rectangle rectangle) = 0;
 
 	// Perform the PostDraw to clear drawing objects
-	virtual void PostDraw(Graphics* const graphics);
+	//virtual void PostDraw(Graphics* const graphics);
 
 	/***** Global events declaration *****/
 	/* All are virtual to be overritten on the derived classes. Not all should be, but events like OnPaint(), OnMouseOver(),
@@ -235,9 +260,9 @@ protected:
 	virtual void OnCommand_Impl(HWND hwnd, int id, HWND hwndCtl, unsigned int codeNotify);
 	virtual int OnClosing_Impl(HWND hwnd);
 	virtual void OnClosed_Impl(HWND hwnd);
-	virtual void OnCreate_Impl(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
+	virtual void WmCreate(Message& m);
 	virtual void OnEnable_Impl(HWND hwnd, bool fEnable);
-	virtual int OnEraseBackground_Impl(HWND hwnd, HDC hdc);
+	virtual void WmEraseBackground(Message& m);
 	virtual void OnFocusEnter_Impl(HWND hwnd, HWND hwndOldFocus);
 	virtual void OnFocusLeave_Impl(HWND hwnd, HWND hwndNewFocus);
 	virtual int OnGetDLGCode_Impl(HWND hwnd, LPMSG msg);
@@ -264,6 +289,7 @@ protected:
 	virtual void OnShowWindow_Impl(HWND hwnd, bool fShow, unsigned int status);
 	virtual void OnVerticalScrolling_Impl(HWND hwnd, HWND hwndCtl, UINT code, int pos);
 
+	virtual bool HasMenu();
 	bool GetTopLevel() const noexcept;
 	unsigned int GetId() const noexcept;
 	void SetMouseOverState(bool state) noexcept;
@@ -271,6 +297,10 @@ protected:
 	void UpdateBounds();
 	void UpdateBounds(int x, int y, int width, int height);
 	void UpdateBounds(int x, int y, int width, int height, int clientWidth, int clientHeight);
+	void InvokeGotFocus(Control* const toInvoke, EventArgs* const e);
+	bool PerformControlValidation(bool bulkValidation);
+	virtual Control* GetFirstChildControlInTabOrder(bool forward);
+	virtual void NotifyValidationResult(Object* const sender, CancelEventArgs* const e);
 
 	IntPtr SendControlMessage(int msg, int wparam, int lparam);
 	IntPtr SendControlMessage(int msg, int& wparam, int& lparam);
@@ -283,11 +313,14 @@ protected:
 
 	int GetWindowStyle();
 	void SetWindowStyle(IntPtr value);
+	void SetWindowStyle(int flag, bool value);
 
 	constexpr bool GetState(int flag) { return (m_State & flag) != 0; }
 	constexpr void SetState(int flag, bool value) { m_State = value ? m_State | flag : m_State & ~flag; }
 	constexpr bool GetStyle(ControlStyles flag) { return (m_ControlStyle & flag) == 0; }
 	constexpr void SetStyle(ControlStyles flag, bool value) { m_ControlStyle = value ? m_ControlStyle | flag : m_ControlStyle & ~flag; }
+	constexpr bool GetResizeRedraw() { return GetStyle(ControlStyles::ResizeRedraw); }
+	constexpr void SetResizeRedraw(bool value) { SetStyle(ControlStyles::ResizeRedraw, value); }
 
 	virtual constexpr Padding DefaultMargin() { return CommonProperties::DefaultMargin; }
 	virtual constexpr Size DefaultMaximumSize() { return CommonProperties::DefaultMaximumSize; }
@@ -300,18 +333,41 @@ protected:
 	virtual bool IsContainerControl();
 	IContainerControl* GetContainerControl();
 	bool RenderTransparent();
+	static const Control* const FromHandleInternal(IntPtr handle);
+	static Control* FromChildHandleInternal(IntPtr handle);
+	bool IsHostedInWin32DialogManager();
+	Control* GetTopMostParent();
+	Window* FindWindowInternal();
+	bool IsDescendant(Control* descendant);
+	void NotifyEnter();
+	void NotifyLeave();
+	bool GetValidationCancelled();
+	void SetValidationCancelled(bool value);
+	virtual bool CanSelectCore();
+	bool TabStopInternal() const noexcept;
+	void TabStopInternal(bool value);
+	Size SizeFromClientSize(int width, int height);
+	virtual void SetClientSizeCore(int x, int y);
 
 	// MOUSEENTER Event handling
 	LPTRACKMOUSEEVENT m_TrackMouseEvent;
 	void HookMouseEvent();
 	void UnhookMouseEvent();
-	
+
+	virtual void OnCausesValidationChanged(EventArgs* const e);
 	virtual void OnClientSizeChanged(EventArgs* const e);
+	virtual void OnEnter(EventArgs* const e);
+	virtual void OnGotFocus(EventArgs* const e);
 	virtual void OnMove(EventArgs* const e);
+	virtual void OnLeave(EventArgs* const e);
 	virtual void OnLocationChanged(EventArgs* const e);
 	virtual void OnInvalidated(InvalidateEventArgs* const e);
+	virtual void OnPaddingChanged(EventArgs* const e);
 	virtual void OnResize(EventArgs* const e);
 	virtual void OnSizeChanged(EventArgs* const e);
+	virtual void OnTabStopChanged(EventArgs* const e);
+	virtual void OnValidated(EventArgs* const e);
+	virtual void OnValidating(CancelEventArgs* const e);
 	virtual void NotifyInvalidate(Drawing::Rectangle invalidatedArea);
 	virtual void DefWndProc(Message& m);
 	virtual void WndProc(Message& m);
@@ -320,7 +376,7 @@ public:
 
 	std::list<Control*> Controls;
 
-	virtual ~Control() noexcept(false);																		
+	virtual ~Control() noexcept(false);
 	void Dispose() override;
 
 	void OnActivateSet(const std::function<void(Object*, EventArgs*)>& callback) noexcept;
@@ -355,15 +411,14 @@ public:
 	const std::string& GetText() const noexcept;
 	void SetText(const std::string& text) noexcept;
 	Control* GetPreviousControl() noexcept;
-	Control* GetNextControl() noexcept;
+	Control* GetNextControl(Control* ctl, bool forward) noexcept;
 	Control* GetById(unsigned int id) noexcept;
 	Control* GetByHandle(const IntPtr p) noexcept;
 	int GetTabIndex() const noexcept;
 	void SetTabIndex(const int& index) noexcept;
 	void SetFont(Font font) noexcept;
-	void EnableTabStop() noexcept;
-	void DisableTabStop() noexcept;
-	bool IsTabStop() const noexcept;
+	bool TabStop() const noexcept;
+	void TabStop(bool value);
 	Drawing::Rectangle const GetDrawableArea() noexcept;
 	void Resize(Size size);
 	void Resize(int width, int height);
@@ -379,11 +434,12 @@ public:
 	void Enable();
 	void Disable();
 	virtual void Update();
-	const Graphics* CreateGraphics() const noexcept;
+	//const Graphics* CreateGraphics() const noexcept;
 	bool IsShown() const noexcept;
 	virtual void Hide();
 	virtual void Show();
 	Font GetFont() const noexcept;
+	bool ContainsFocus();
 	Color GetBackgroundColor() const noexcept;
 	void SetBackgroundColor(const Color& color) noexcept;
 	Color GetForeColor() const noexcept;
@@ -415,6 +471,17 @@ public:
 	void Invalidate(bool invalidateChildren);
 	void Invalidate(Drawing::Rectangle rc);
 	void Invalidate(Drawing::Rectangle rc, bool invalidateChildren);
+	Drawing::Rectangle RectangleToClient(Drawing::Rectangle r);
+	Drawing::Rectangle RectangleToScreen(Drawing::Rectangle r);
+	constexpr bool IsCreated() { return (m_State & STATE_CREATED) != 0; }
+	Point GetAutoScrollOffset() const noexcept;
+	void SetAutoScrollOffse(Point p);
+	void SetAutoScrollOffse(int x, int y);
+	bool CausesValidation();
+	void CausesValidation(bool value);
+	bool CanSelect();
+	Size GetClientSize();
+	void SetClientSize(Size value);
 
 	// MOUSEENTER Event Handling
 	void ResetMouseEventArgs();

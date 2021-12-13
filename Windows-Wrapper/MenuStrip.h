@@ -1,8 +1,8 @@
-#pragma once
-
-#include "ToolStrip.h"
-
-class MenuStrip : public ToolStrip
-{
-};
-
+//#pragma once
+//
+//#include "ToolStrip.h"
+//
+//class MenuStrip : public ToolStrip
+//{
+//};
+//

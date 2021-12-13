@@ -275,6 +275,12 @@
     <ClCompile Include="CommonProperties.cpp">
       <Filter>Helpers</Filter>
     </ClCompile>
+    <ClCompile Include="InvalidEnumArgumentException.cpp">
+      <Filter>Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="UserControl.cpp">
+      <Filter>Controls\Base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dxerr.h" />
@@ -772,6 +778,15 @@
     </ClInclude>
     <ClInclude Include="InvalidateEventArgs.h">
       <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="InvalidEnumArgumentException.h">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="UserControl.h">
+      <Filter>Controls\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="BorderStyle.h">
+      <Filter>Enums</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

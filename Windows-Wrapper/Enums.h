@@ -59,16 +59,6 @@ enum class CloseReason
 	ApplicationExitCall = 6
 };
 
-
-/* Specifies the border style for a control.
-Documentation: https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.borderstyle?view=net-5.0*/
-enum class BorderStyle
-{
-	None = 0,
-	FixedSingle = 1,
-	Fixed3D = 2
-};
-
 enum class FlatStyle
 {
 	//The control appears flat.
