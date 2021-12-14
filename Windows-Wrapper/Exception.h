@@ -6,7 +6,6 @@
 #include <exception>
 #include <string_view>
 #include <string>
-#include <Windows.h>
 
 class Exception : public Object, public std::exception
 {

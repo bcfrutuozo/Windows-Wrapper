@@ -36,7 +36,7 @@ private:
 
 protected:
 
-	void FocusActivateControlInternal();
+	void FocusActiveControlInternal();
 	bool HasFocusableChild();
 	void SetActiveControlInternal(Control* value);
 	virtual void OnAutoValidateChanged(EventArgs* e);

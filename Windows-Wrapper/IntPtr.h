@@ -3,32 +3,32 @@
 #include "IEquatable.h"
 #include "IComparable.h"
 
-#include <Windows.h>
-
+/*
+* Wrapper class for uintptr_t (void*) which provides additional functionalities to handle pointers.
+* This class should be used to work along with a teoritically SafeHandle class for handles (HWND).
+* 
+* However, due to the C++ language, NO GC (GARBAGE COLLECTOR) WILL BE IMPLEMENTED.
+* All memory must be managed by the user while using this library! Otherwise he/she MUST use C#
+* instead of this wrapper.
+* 
+* With that in mind, EVERY use of the SafeHandle class in the ReferenceSource API IS TRANSLATED
+* AS INTPTR IN THIS PROJECT.
+*/
 class IntPtr : public IComparable<IntPtr>, public IEquatable<IntPtr>
 {
 private:
 
-#if _WIN64
-	uint64_t m_Ptr;
-#else
-	uint32_t m_Ptr;
-#endif
+	uintptr_t m_Ptr;
 
 public:
 
-#ifdef _WIN64
 	constexpr IntPtr() : m_Ptr(0L) { }
-	constexpr IntPtr(const uint64_t ptr) : m_Ptr(ptr) {}
-	constexpr IntPtr(void* ptr) : m_Ptr(ptr == nullptr ? 0 : (uint64_t)ptr) {}
+	constexpr IntPtr(const uintptr_t ptr) : m_Ptr(ptr) {}
+	constexpr IntPtr(void* ptr) : m_Ptr(ptr == nullptr ? 0 : (uintptr_t)ptr) {}
 
-	constexpr operator HWND() { return static_cast<HWND>((void*)m_Ptr); }
-	constexpr operator HDC() { return static_cast<HDC>((void*)m_Ptr); }
-	constexpr operator HBRUSH() { return static_cast<HBRUSH>((void*)m_Ptr); }
-	constexpr operator HFONT() { return static_cast<HFONT>((void*)m_Ptr); }
-	constexpr operator HINSTANCE() { return static_cast<HINSTANCE>((void*)m_Ptr); }
-	constexpr operator WPARAM() { return (WPARAM)((void*)m_Ptr); }
-	constexpr operator LPARAM() { return (LPARAM)((void*)ToInt64()); }
+	constexpr operator int() { return (int)m_Ptr; }
+	constexpr operator void*() { return (void*)m_Ptr; }
+	constexpr operator long() { return (long)m_Ptr; }
 
 	constexpr bool operator==(uint64_t p) const noexcept { return m_Ptr == p; }
 
@@ -37,41 +37,24 @@ public:
 		m_Ptr = p;
 		return *this;
 	}
-#else
-	constexpr IntPtr() : m_Ptr(0) { }
-	constexpr IntPtr(const uint32_t ptr) : m_Ptr(ptr) {}
-	constexpr IntPtr(void* ptr) : m_Ptr(ptr == nullptr ? 0 : (uint32_t)ptr) {}
-#endif
 
 	constexpr bool operator==(const IntPtr& p) const { return m_Ptr == p.m_Ptr; }
 
 	constexpr uint32_t ToInt32() const noexcept
 	{
-#if _WIN64
-		return static_cast<uint32_t>(m_Ptr);
-#else
-		return m_Ptr;
-#endif
+		return static_cast<int>(m_Ptr);
 	}
 
 	constexpr uint64_t ToInt64() const noexcept
 	{
-#if _WIN64
-		return m_Ptr;
-#else
-		return static_cast<uint64_t>(m_Ptr);
-#endif
+		return static_cast<long>(m_Ptr);
 	}
 
 	constexpr void* ToPointer() const noexcept { return (void*)m_Ptr; }
 
 	constexpr int Size() const noexcept
 	{
-#if _WIN64
-		return 8;
-#else
-		return 4;
-#endif
+		return sizeof(uintptr_t);
 	}
 
 	constexpr bool IsNull() const noexcept { return m_Ptr == 0; }
@@ -79,51 +62,31 @@ public:
 
 	static constexpr IntPtr Add(IntPtr p, uint32_t offset) noexcept { return IntPtr(p.m_Ptr + offset); }
 
-	constexpr IntPtr& operator=(uint32_t p) noexcept
+	constexpr IntPtr& operator=(int p) noexcept
 	{
-#if _WIN64
-		m_Ptr = static_cast<uint64_t>(p);
-#else
-		m_Ptr = p;
-#endif
+		m_Ptr = static_cast<uintptr_t>(p);
 		return *this;
 	}
 
 	constexpr IntPtr& operator=(void* p) noexcept
 	{
-#if _WIN64
-		m_Ptr = p == nullptr ? 0 : (uint64_t)(p);
-#else
-		m_Ptr = p == nullptr ? 0 : (uint32_t)p;
-#endif
+		m_Ptr = p == nullptr ? 0 : (uintptr_t)(p);
 		return *this;
 	}
 
-	constexpr bool operator==(uint32_t p) const noexcept
+	constexpr bool operator==(int p) const noexcept
 	{
-#if _WIN64
-		return m_Ptr == static_cast<uint64_t>(p);
-#else
 		return m_Ptr == p;
-#endif
 	}
 
 	constexpr bool operator==(void* p) const noexcept
 	{
-#if _WIN64
-		return m_Ptr == (p == nullptr ? 0 : (uint64_t)p);
-#else
-		return m_Ptr == (p == nullptr ? 0 : (uint32_t)p);
-#endif
+		return m_Ptr == (p == nullptr ? 0 : (uintptr_t)p);
 	}
 
 	constexpr bool operator!=(void* p) const noexcept
 	{
-#if _WIN64
-		return m_Ptr != (p != nullptr ? 0 : (uint64_t)p);
-#else
-		return m_Ptr != (p != nullptr ? 0 : (uint32_t)p);
-#endif
+		return !(*this == p);
 	}
 
 	int GetHashCode() const override;
@@ -133,9 +96,5 @@ public:
 	bool Equals(const IntPtr* const p) const override;
 	std::string ToString() const noexcept override;
 
-#if _WIN64
-	static constexpr IntPtr Zero() { return IntPtr(static_cast<uint64_t>(0UL)); }
-#else
-	static constexpr IntPtr Zero() { return IntPtr(static_cast<uint32_t>(0U)); }
-#endif
+	static constexpr IntPtr Zero() { return IntPtr(static_cast<uintptr_t>(0UL)); }
 };

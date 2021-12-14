@@ -238,7 +238,7 @@ CreateParams* Window::CreateParameters()
 
 	if(IsMDIChild())
 	{
-		if(IsShown() && (m_FormWindowState == FormWindowState::Maximized || m_FormWindowState == FormWindowState::Normal))
+		if(IsVisible() && (m_FormWindowState == FormWindowState::Maximized || m_FormWindowState == FormWindowState::Normal))
 		{
 			Window* formMdiParent = m_MDIParent;
 			//Form form = formMdiParent.ActiveMdiChildInternal;
@@ -396,7 +396,7 @@ void Window::UpdateMenuStrip() noexcept
 
 void Window::SetText(const std::string& title)
 {
-	if(IsShown())
+	if(IsVisible())
 	{
 		if(SetWindowText(static_cast<HWND>(GetHandle().ToPointer()), title.c_str()) == 0)
 		{
@@ -594,7 +594,7 @@ void Window::WmNcButtonDown(Message& m)
 		{
 			if(GetActiveControl() != nullptr && !GetActiveControl()->ContainsFocus())
 			{
-				GetInnerMostActiveControl()->FocusActivateControlInternal();
+				GetInnerMostActiveControl()->FocusActiveControlInternal();
 			}
 		}
 	}
@@ -896,7 +896,7 @@ void Window::WindowState(FormWindowState value)
 		}
 	}
 
-	if(IsHandleCreated() && IsShown())
+	if(IsHandleCreated() && IsVisible())
 	{
 		IntPtr hWnd = GetHandle();
 		switch(value)

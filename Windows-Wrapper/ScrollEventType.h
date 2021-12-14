@@ -1,16 +1,14 @@
 #pragma once
 
-#include <Windows.h>
-
 enum class ScrollEventType
 {
-	SmallDecrement = SB_LINELEFT,
-	SmallIncrement = SB_LINERIGHT,
-	LargeDecrement = SB_PAGELEFT,
-	LargeIncrement = SB_PAGERIGHT,
-	ThumbPosition = SB_THUMBPOSITION,
-	ThumbTrack = SB_THUMBTRACK,
-	First = SB_LEFT,
-	Last = SB_RIGHT,
-	EndScroll = SB_ENDSCROLL
+	SmallDecrement = NativeMethods::SB_LINELEFT,
+	SmallIncrement = NativeMethods::SB_LINERIGHT,
+	LargeDecrement = NativeMethods::SB_PAGELEFT,
+	LargeIncrement = NativeMethods::SB_PAGERIGHT,
+	ThumbPosition = NativeMethods::SB_THUMBPOSITION,
+	ThumbTrack = NativeMethods::SB_THUMBTRACK,
+	First = NativeMethods::SB_LEFT,
+	Last = NativeMethods::SB_RIGHT,
+	EndScroll = NativeMethods::SB_ENDSCROLL
 };

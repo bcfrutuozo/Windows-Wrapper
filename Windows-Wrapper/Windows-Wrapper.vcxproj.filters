@@ -281,6 +281,9 @@
     <ClCompile Include="UserControl.cpp">
       <Filter>Controls\Base</Filter>
     </ClCompile>
+    <ClCompile Include="UnsafeNativeMethods.cpp" />
+    <ClCompile Include="NativeMethods.cpp" />
+    <ClCompile Include="SafeNativeMethods.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dxerr.h" />
@@ -788,6 +791,10 @@
     <ClInclude Include="BorderStyle.h">
       <Filter>Enums</Filter>
     </ClInclude>
+    <ClInclude Include="KnownColor.h" />
+    <ClInclude Include="UnsafeNativeMethods.h" />
+    <ClInclude Include="NativeMethods.h" />
+    <ClInclude Include="SafeNativeMethods.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interfaces">

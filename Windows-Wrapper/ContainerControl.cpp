@@ -2,6 +2,10 @@
 #include "Window.h"
 #include "Exceptions.h"
 #include "UserControl.h"
+#include "UnsafeNativeMethods.h"
+
+using namespace Microsoft::Win32;
+
 
 bool ContainerControl::ActivateControlInternal(Control* control)
 {
@@ -128,20 +132,20 @@ ContainerControl* ContainerControl::GetInnerMostFocusedControl()
 	return ret;
 }
 
-void ContainerControl::FocusActivateControlInternal()
+void ContainerControl::FocusActiveControlInternal()
 {
-	if(m_ActiveControl != nullptr && m_ActiveControl->IsShown())
+	if(m_ActiveControl != nullptr && m_ActiveControl->IsVisible())
 	{
 		IntPtr focusHandle = GetFocus();
 		if(focusHandle == IntPtr::Zero() || Control::FromChildHandleInternal(focusHandle) != m_ActiveControl)
 		{
-			SetFocus(m_ActiveControl->GetHandle());
+			UnsafeNativeMethods::SetFocus(m_ActiveControl->GetHandle());
 		}
 	}
 	else
 	{
 		ContainerControl* cc = this;
-		while(cc != nullptr && !cc->IsShown())
+		while(cc != nullptr && !cc->IsVisible())
 		{
 			Control* parent = cc->Parent;
 			if(parent != nullptr)
@@ -154,9 +158,9 @@ void ContainerControl::FocusActivateControlInternal()
 			}
 		}
 
-		if(cc != nullptr && cc->IsShown())
+		if(cc != nullptr && cc->IsVisible())
 		{
-			SetFocus(cc->GetHandle());
+			UnsafeNativeMethods::SetFocus(cc->GetHandle());
 		}
 	}
 }
@@ -411,7 +415,7 @@ void ContainerControl::SetActiveControlInternal(Control* value)
 				!(UserControl*)value ||
 				((UserControl*)value && !((UserControl*)value)->HasFocusableChild())))\
 			{
-				cc->FocusActivateControlInternal();
+				cc->FocusActiveControlInternal();
 			}
 		}
 	}
@@ -434,8 +438,8 @@ void ContainerControl::WmSetFocus(Message& m)
 		if(GetActiveControl() != nullptr)
 		{
 			//WmImeSetFocus();
-			if(!GetActiveControl()->IsShown()) InvokeGotFocus(this, &ArgsDefault);
-			FocusActivateControlInternal();
+			if(!GetActiveControl()->IsVisible()) InvokeGotFocus(this, &ArgsDefault);
+			FocusActiveControlInternal();
 		}
 		else
 		{

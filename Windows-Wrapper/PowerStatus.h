@@ -2,8 +2,6 @@
 
 #include "Object.h"
 
-#include <Windows.h>
-
 enum class PowerLineStatus
 {
 	Offline = 0,

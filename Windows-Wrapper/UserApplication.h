@@ -2,7 +2,6 @@
 
 #include "Application.h"
 
-#include <Windows.h>
 
 template<typename T>
 class UserApplication : public Application

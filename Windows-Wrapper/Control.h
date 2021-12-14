@@ -435,7 +435,7 @@ public:
 	void Disable();
 	virtual void Update();
 	//const Graphics* CreateGraphics() const noexcept;
-	bool IsShown() const noexcept;
+	bool IsVisible() const noexcept;
 	virtual void Hide();
 	virtual void Show();
 	Font GetFont() const noexcept;

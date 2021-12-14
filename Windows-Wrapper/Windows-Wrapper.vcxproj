@@ -197,6 +197,7 @@
     <ClCompile Include="MenuStrip.cpp" />
     <ClCompile Include="Message.cpp" />
     <ClCompile Include="MessageDecoder.cpp" />
+    <ClCompile Include="NativeMethods.cpp" />
     <ClCompile Include="NotImplementedException.cpp" />
     <ClCompile Include="NotSupportedException.cpp" />
     <ClCompile Include="OperatingSystem.cpp" />
@@ -206,6 +207,7 @@
     <ClCompile Include="PowerStatus.cpp" />
     <ClCompile Include="Rectangle.cpp" />
     <ClCompile Include="RectangleF.cpp" />
+    <ClCompile Include="SafeNativeMethods.cpp" />
     <ClCompile Include="ScrollableControl.cpp" />
     <ClCompile Include="ScrollBar.cpp" />
     <ClCompile Include="ScrollProperties.cpp" />
@@ -246,6 +248,7 @@
     <ClCompile Include="TextBox.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Type.cpp" />
+    <ClCompile Include="UnsafeNativeMethods.cpp" />
     <ClCompile Include="UserControl.cpp" />
     <ClCompile Include="Utilities.cpp" />
     <ClCompile Include="Version.cpp" />
@@ -341,6 +344,9 @@
     <ClInclude Include="MDILayout.h" />
     <ClInclude Include="MenuStrip.h" />
     <ClInclude Include="Message.h" />
+    <ClInclude Include="NativeMethods.h" />
+    <ClInclude Include="SafeNativeMethods.h" />
+    <ClInclude Include="UnsafeNativeMethods.h" />
     <ClInclude Include="NotImplementedException.h" />
     <ClInclude Include="NotSupportedException.h" />
     <ClInclude Include="OperatingSystem.h" />

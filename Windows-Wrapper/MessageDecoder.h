@@ -6,7 +6,6 @@
 
 #include <string>
 #include <array>
-#include <Windows.h>
 #include <Richedit.h>
 
 struct Message;

@@ -516,7 +516,7 @@ CreateParams* Control::CreateParameters()
 	}
 
 	if(TabStop()) cp->Style |= WS_TABSTOP;
-	if(IsShown()) cp->Style |= WS_VISIBLE;
+	if(IsVisible()) cp->Style |= WS_VISIBLE;
 	if(IsEnabled()) cp->Style |= WS_DISABLED;
 
 	cp->Param = dynamic_cast<NativeWindow*>(m_Window);
@@ -781,7 +781,7 @@ bool Control::CanSelectCore()
 
 	for(auto ctl = this; ctl != nullptr; ctl = ctl->Parent)
 	{
-		if(!ctl->IsEnabled() || !ctl->IsShown()) return false;
+		if(!ctl->IsEnabled() || !ctl->IsVisible()) return false;
 	}
 
 	return true;
@@ -1687,14 +1687,14 @@ void Control::Update()
 //	return m_Graphics;
 //}
 
-bool Control::IsShown() const noexcept
+bool Control::IsVisible() const noexcept
 {
 	return m_IsVisible;
 }
 
 void Control::Hide()
 {
-	if(IsShown())
+	if(IsVisible())
 	{
 		m_IsVisible = false;
 		ShowWindow(static_cast<HWND>(GetHandle().ToPointer()), SW_HIDE);
@@ -1703,7 +1703,7 @@ void Control::Hide()
 
 void Control::Show()
 {
-	if(!IsShown())
+	if(!IsVisible())
 	{
 		m_IsVisible = true;
 		ShowWindow(static_cast<HWND>(GetHandle().ToPointer()), SW_SHOWDEFAULT);
@@ -2497,7 +2497,7 @@ void Control::OnNotifyMessage(Message& m)
 
 void Control::OnPaint_Impl(HWND hwnd)
 {
-	if(IsShown())
+	if(IsVisible())
 	{
 		Drawing::Rectangle rect = Drawing::Rectangle(0, 0, GetSize().Width, GetSize().Height);
 

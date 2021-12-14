@@ -8,7 +8,6 @@
 
 #include <map>
 #include <string>
-#include <Windows.h>
 
 #define WM_MOUSEENTER NativeWindow::GetWM_MOUSEENTER()
 #define WM_UIUNSUBCLASS NativeWindow::GetWM_UIUNSUBCLASS()
